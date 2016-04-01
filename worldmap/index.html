@@ -1,0 +1,808 @@
+<!DOCTYPE HTML>
+<!--
+  Copyright 2015 IBM Corp.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+<head>
+    <title>Node-RED map all the things</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet",type="text/css" href="css/map.css"/>
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.css"/>
+    <link rel="stylesheet",type="text/css" href="leaflet/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.vector-markers.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.Default.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.draw.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.measurecontrol.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
+    <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/>
+
+    <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
+    <script type="text/javascript" src="leaflet/leaflet.js"></script>
+    <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.markercluster.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.active-layers.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.select-layers.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.draw.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.measurecontrol.js"></script>
+    <script type="text/javascript" src="leaflet/easy-button.js"></script>
+    <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet-heat.js"></script>
+    <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
+    <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
+    <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
+    <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script>
+</head>
+
+<body onunload="socket.disconnect;">
+<div id="topbar">
+    <a href="http://nodered.org"><img src="images/node-red.png" width="72px" height="28px" style="padding-top:4px; margin:4px; vertical-align: middle;"/></a>
+    <span style="display:inline-block; padding-top:6px; vertical-align:middle;"><font size="+2"><b> Node-RED</b> map all the things</font></span>
+</div>
+<div id="results">
+    <span id="searchRes"></span>
+    <span onclick='toggleMenu()'><i class="fa fa-bars fa-2x fa-inverse"></i></span>
+</div>
+<div id="menu"><table>
+    <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
+    <tr><td><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
+    <tr><td><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
+    <tr><td><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
+    <tr><td><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
+    <tr><td><span id="showHelp"><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
+</table></div>
+<div id="map"></div>
+<div id="foot">&nbsp;&copy; IBM 2015</div>
+<!-- <div id="heat"><button type="button" onclick="clearHeat();">Clear Heatmap</button></div> -->
+
+<dialog id="helpWindow">
+    <h3>Node-RED - Map all the things</h3>
+    <p><i class="fa fa-search fa-lg fa-fw"></i> Search - You may enter a name or partial name of an object to search for.<br/>
+    The map will then jump to centre on each of the results.</p>
+    <p><i class="fa fa-spinner fa-lg fa-fw"></i> Max Age - You can set the time after which points
+    that haven't been updated get removed.</p>
+    <p><i class="fa fa-arrows fa-lg fa-fw"></i> Auto Pan - When selected, the map will
+    automatically move to centre on each data point as they arrive.</p>
+    <p><i class="fa fa-lock fa-lg fa-fw"></i> Lock Map - When selected will save the
+    currently displayed area and basemap.<br/>
+    Reloading the map in the current browser will return to the same view.<br/>
+    This can be used to set your initial start position.<br/>
+    While active it also restricts the "auto pan" to within that area.</p>
+    <p><i class="fa fa-globe fa-lg fa-fw"></i> Heatmap all layers - When selected
+    all layers whether hidden or not will contribute to the heatmap.<br/>
+    The default is that only visible layers add to the heatmap.</p>
+    <button id="exitHelp">Close</button>
+</dialog>
+
+<script language="javascript" type="text/javascript">
+
+var startpos = [51.03, -1.379];
+var startzoom = 10;
+
+var map;
+var markers = {};
+var polygons = {};
+var layers = {};
+var overlays = {};
+var basemaps = {};
+var marks = [];
+var marksIndex = 0;
+var popid = "";
+var menuOpen = false;
+var maxage = 600;
+baselayername = "OSM grey";
+var ws;
+var wsUri;
+var loc = window.location;
+
+window.onbeforeunload = function(e) {
+    return 'Reloading will delete all the local markers, including drawing on the "drawing" layer';
+};
+
+if (window.self !== window.top) { console.log("In an Iframe"); }
+else { console.log("NOT in an Iframe"); }
+
+if (loc.host.indexOf("bluemix") !== -1) {
+    wsUri = "ws://" + loc.host +"/ws/worldmap";
+}
+else {
+    if (loc.protocol === "https:") { wsUri = "wss:"; }
+    else { wsUri = "ws:"; }
+    wsUri += "//" + loc.host + loc.pathname.replace("worldmap/","ws/worldmap");
+    //wsUri = "ws://"+window.location.hostname+":1880/red/ws/map";
+}
+//console.log(wsUri);
+var ibmfoot = "&nbsp;&copy; IBM 2015"
+
+var isChrome = !!window.chrome;
+if (!isChrome) { document.getElementById("showHelp").innerHTML=""; }
+
+function start(wsUri) {  // Create the websocket
+    ws = new WebSocket(wsUri);
+
+    ws.onopen = function(evt) {
+        console.log("CONNECTED");
+        document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+        //ws.send("Open for mapping");
+    };
+
+    ws.onclose = function(evt) {
+        console.log("DISCONNECTED");
+        document.getElementById("foot").innerHTML = "<font color='#944'>"+ibmfoot+"</font>";
+        setTimeout(function(){ start(wsUri) }, 3000); // try to reconnect every 3 secs... bit fast ?
+    }
+
+    // This expects a websocket message with data as a stringified object containing at least name, lat and lon
+    ws.onmessage = function (evt) {
+        //console.log("MESSAGE",evt);
+        var data;
+        try {
+            data = JSON.parse(evt.data); // expects a stringified object
+        } catch (e) {
+            console.log("BAD PARSE",evt.data);
+            return;
+        }
+        if (data.command) { doCommand(data.command); delete data.command; }
+        if (data.hasOwnProperty("name") && data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { setMarker(data); }
+        else { console.log("SKIP",data); }
+    }
+
+    ws.onerror = function(evt) {
+        console.log("ERROR",evt);
+        document.getElementById("foot").innerHTML = "<font color='#f00'>"+ibmfoot+"</font>";
+    }
+}
+start(wsUri);
+
+if ( window.localStorage.hasOwnProperty("lastpos") ) {
+    var sp = JSON.parse(localStorage.getItem("lastpos"));
+    startpos = [ sp.lat, sp.lng ];
+}
+if ( window.localStorage.hasOwnProperty("lastzoom") ) {
+    startzoom = JSON.parse(localStorage.getItem("lastzoom"));
+}
+// Create the Initial Map object.
+map = new L.map('map').setView(startpos, startzoom);
+
+// Add the locate my position button
+L.easyButton( 'fa-crosshairs fa-lg', function() {
+    map.locate({setView: true, maxZoom: 15});
+}, "Locate me").addTo(map);
+
+L.Control.measureControl().addTo(map);
+
+// Create the clear heatmap button
+var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
+    console.log("reset heatmap");
+    heat.setLatLngs([]);
+}, "Clears the current heatmap", "bottomright");
+
+var dialog = document.getElementById('helpWindow');
+document.getElementById('showHelp').onclick = function() {
+    dialog.show();
+};
+document.getElementById('exitHelp').onclick = function() {
+    dialog.close();
+};
+
+var panit = false;
+function doPanit() {
+    panit = !panit;
+    console.log("Panit set :",panit);
+}
+
+var heatAll = false;
+function doHeatAll() {
+    heatAll = !heatAll;
+    console.log("Heatall set :",heatAll);
+}
+
+var lockit = false;
+var mb = new L.LatLngBounds([[-120,-360],[120,360]]);
+function doLock() {
+    if (lockit) {
+        lockit = false;
+        mb = new L.LatLngBounds([[-120,-360],[120,360]]);
+    }
+    else {
+        lockit = true;
+        mb = map.getBounds();
+        window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
+        window.localStorage.setItem("lastzoom", map.getZoom());
+        window.localStorage.setItem("lastlayer", baselayername);
+        console.log("Saved :",JSON.stringify(map.getCenter()),map.getZoom(),baselayername);
+    }
+    map.setMaxBounds(mb);
+    console.log("Map bounds lock :",lockit);
+}
+
+// Remove old markers
+function doTidyUp() {
+    var d = parseInt(Date.now()/1000);
+    for (var m in markers) {
+        if (typeof markers[m].ts != "undefined") {
+            //console.log(m,markers[m].ts,markers[m]);
+            if (((Number(markers[m].ts) + Number(maxage)) < d) && (markers[m].lay !== "drawing")) {
+            //if ((Number(markers[m].ts) + Number(maxage)) < d) {
+                //console.log("STALE :",m);
+                layers[markers[m].lay].removeLayer(markers[m]);
+                if (typeof polygons[m] != "undefined") {
+                    layers[markers[m].lay].removeLayer(polygons[m]);
+                    delete polygons[m];
+                }
+                delete markers[m];
+            }
+        }
+    }
+}
+
+// move the daylight / nighttime boundary (if enabled)
+function moveTerminator() { // if terminator line plotted move it every minute
+    if (layers["_daynight"].getLayers().length > 0) {
+        layers["_daynight"].clearLayers();
+        layers["_daynight"].addLayer(L.terminator());
+    }
+}
+setInterval( function() {moveTerminator()}, 60000 );
+
+// Call tidyup every {maxage} seconds
+var stale = null;
+function setMaxAge() {
+    maxage = document.getElementById('maxage').value;
+    if (stale) { clearInterval(stale); }
+    if (maxage > 0) { stale = setInterval( function() {doTidyUp()}, (maxage*1000) ); }
+    //console.log("Stale time set :",maxage+"s");
+}
+setMaxAge();
+
+// Search for markers with names of ....
+function doSearch() {
+    var value = document.getElementById('search').value;
+    console.log("Search for :",value);
+    marks = [];
+    marksIndex = 0;
+    for (var key in markers) {
+        if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+            marks.push(markers[key]);
+        }
+    }
+    moveToMarks();
+    if (lockit) {
+        document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results within bounds.</font>";
+    } else {
+        document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results.</font>";
+    }
+}
+
+// Jump to a markers position - centralise it on map
+function moveToMarks() {
+    if (marks.length > marksIndex) {
+        var m = marks[marksIndex];
+        map.setView(m.getLatLng(), map.getZoom());
+        m.openPopup();
+        marksIndex++;
+        setTimeout(moveToMarks, 2000);
+    }
+}
+
+function toggleMenu() {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+        document.getElementById("menu").style.display = 'block';
+    } else {
+        document.getElementById("menu").style.display = 'none';
+    }
+}
+document.getElementById("menu").style.display = 'none';
+
+//function clearHeat() {
+    //console.log("reset heatmap");
+    //heat.setLatLngs([]);
+//}
+//document.getElementById("heat").style.display = 'none';
+
+var popped = false;
+var popmark = null;
+map.on('popupopen', function(e) {
+    popped = true;
+    popmark = e.popup._source;
+    popid = e.popup.dname;
+});
+
+map.on('popupclose', function(e) {
+    popped = false;
+});
+
+map.on('overlayadd', function(e) {
+    if (e.name == "satellite") {
+        overlays["satellite"].bringToBack();
+    }
+    if (e.name == "heatmap") { // show heatmap button when it's layer is added.
+        //document.getElementById("heat").style.display = 'block';
+        clrHeat.addTo(map);
+    }
+    if (e.name == "day/night") {
+        //console.log("add daynight");
+        layers["_daynight"].addLayer(L.terminator());
+    }
+    if (e.name == "drawing") {
+        map.addControl(drawControl);
+        overlays["drawing"].bringToBack();
+    }
+    //else { console.log("layer add :",e.name); }
+    ws.send(e.name+":add");
+});
+
+map.on('overlayremove', function(e) {
+    if (e.name == "heatmap") { // hide heatmap button when it's layer is removed.
+        //document.getElementById("heat").style.display = 'none';
+        clrHeat.removeFrom(map);
+    }
+    if (e.name == "day/night") {
+        //console.log("del daynight");
+        layers["_daynight"].clearLayers();
+    }
+    if (e.name == "drawing") {
+        map.removeControl(drawControl);
+    }
+    //else console.log("layer del :",e.name);
+    ws.send(e.name+":del");
+});
+
+map.on('baselayerchange', function(e) {
+    //console.log("base layer now :",e.name);
+    baselayername = e.name;
+    ws.send(e.name+":chg");
+});
+
+map.on('zoomend', function() {
+    setTimeout( function() {
+        //console.log("ZOOM=",map.getZoom());
+        for (var key in markers) {
+            if (polygons[key]) {
+                var vis = layers[markers[key].lay].getVisibleParent(markers[key]);
+                if ((vis) && (vis.hasOwnProperty("lay"))) {
+                    polygons[key].setStyle({opacity:1});
+                }
+                else {
+                    polygons[key].setStyle({opacity:0});
+                }
+                polygons[key].redraw();
+            }
+        }
+    },750);
+});
+
+//map.on('contextmenu', function(e) {
+//    ws.send("click:"+e.latlng.lat.toFixed(5)+","+e.latlng.lng.toFixed(5));
+//});
+
+var rightmenuMap = L.popup().setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer)'/>");
+
+var rclk;
+var addThing = function() {
+    var thing = document.getElementById('rinput').value;
+    console.log(thing);
+    ws.send("add:point,"+rclk.lat.toFixed(5)+","+rclk.lng.toFixed(5)+","+thing);
+    map.closePopup();
+    var bits = thing.split(",");
+    var lay = (bits[2] || "drawing").trim();
+    var icon = (bits[1] || "circle").trim();
+    var d = {name:bits[0].trim(),layer:lay,icon:icon,lat:rclk.lat,lon:rclk.lng};
+    setMarker(d);
+    map.addLayer(layers[lay]);
+}
+
+// allow double right click to zoom out
+// single right click opens a message window that send to the websocket.
+var rclicked = false;
+var rtout = null;
+map.on('contextmenu', function(e) {
+    if (rclicked) {
+        rclicked = false;
+        clearTimeout(rtout);
+        map.zoomOut();
+    }
+    else {
+        rclicked = true;
+        rtout = setTimeout( function() {
+            rclicked = false;
+            rclk = e.latlng;
+            rightmenuMap.setLatLng(e.latlng);
+            map.openPopup(rightmenuMap);
+            setTimeout( function() {
+                document.getElementById('rinput').focus();
+            }, 200);
+        }, 300);
+    }
+});
+
+function onLocationFound(e) {
+    //var radius = e.accuracy / 2;
+    //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+    //L.circle(e.latlng, radius).addTo(map);
+}
+function onLocationError(e) { console.log(e.message); }
+map.on('locationfound', onLocationFound);
+map.on('locationerror', onLocationError);
+
+// Add all the base layer maps
+
+// Use this for OSM online maps
+var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+//var osmUrl='http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+var osmAttrib='Map data © OpenStreetMap contributors';
+var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution: osmAttrib});
+basemaps["OSM grey"] = osmg;
+var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib});
+basemaps["OSM"] = osm;
+
+// Extra Leaflet map layers from http://leaflet-extras.github.io/leaflet-providers/preview/
+var Esri_WorldStreetMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+});
+basemaps["Esri"] = Esri_WorldStreetMap;
+
+var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+basemaps["Esri Satelite"] = Esri_WorldImagery;
+
+var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
+    maxZoom: 15
+});
+basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
+
+var Esri_OceanBasemap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+    maxZoom: 15
+});
+basemaps["Esri Ocean"] = Esri_OceanBasemap;
+
+var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
+
+var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+    type: 'map',
+    ext: 'jpg',
+    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: '1234'
+});
+basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
+
+var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+    maxZoom: 16
+});
+basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
+
+var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+    bounds: [[49.6, -12], [61.7, 3]],
+    minZoom: 1,
+    maxZoom: 18,
+    subdomains: '0123'
+});
+basemaps["UK OS Opendata"] = NLS_OS_opendata;
+
+//var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
+    //attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+    //bounds: [[49.6, -12], [61.7, 3]],
+    //minZoom: 1,
+    //maxZoom: 18,
+    //subdomains: '0123'
+//});
+//basemaps["UK OS 1900"] = NLS_OS_1900;
+
+var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+});
+//basemaps["CartoDB Light"] = CartoPos;
+
+// Nice watercolour based maps by Stamen Design
+var watermap = new L.StamenTileLayer('watercolor');
+basemaps["Watercolor"] = watermap;
+var usterrainmap = new L.StamenTileLayer('terrain');
+basemaps["US terrain"] = usterrainmap;
+
+// Now add the overlays
+
+// Add the day/night overlay
+layers["_daynight"] = new L.LayerGroup();
+overlays["day/night"] = layers["_daynight"];
+
+// Add the heatmap layer
+var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
+layers["heat"] = new L.LayerGroup().addLayer(heat);
+overlays["heatmap"] = layers["heat"];
+
+// Add the drawing layer for fun...
+layers["drawing"] = new L.FeatureGroup();
+overlays["drawing"] = layers["drawing"];
+var drawControl = new L.Control.Draw({
+    draw: {
+        polyline: { shapeOptions: { clickable:false } },
+        marker: false,
+        circle: false,
+        //circle: { shapeOptions: { clickable:false } },
+        rectangle: { shapeOptions: { clickable:true } },
+        polygon: { shapeOptions: { clickable:true } },
+    },
+    edit: {
+        featureGroup: layers["drawing"],
+        remove: true,
+        edit: false
+    }
+});
+map.on('draw:created', function (e) {
+    var type = e.layerType;
+    var layer = e.layer;
+    //console.log(type, layer._latlngs);
+    //console.log(JSON.stringify(layer.toGeoJSON()));
+    ws.send("add:"+type+","+layer._latlngs);
+    layers["drawing"].addLayer(layer);
+
+});
+
+// Add the roads overlay
+overlays["roads"] = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+    type: 'hyb',
+    ext: 'png',
+    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: '1234',
+    opacity: 0.9
+});
+
+overlays["rain"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/rain/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+    opacity: 0.5
+});
+
+overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/pressure_cntr/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+    opacity: 0.5
+});
+
+overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
+
+// Add the shipping navigation markers
+var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
+});
+//overlays["ship nav"] = OpenSeaMap;
+
+if ( window.localStorage.hasOwnProperty("lastlayer") ) {
+    if ( basemaps[window.localStorage.getItem("lastlayer")] ) {
+        baselayername = window.localStorage.getItem("lastlayer");
+    }
+}
+basemaps[baselayername].addTo(map);
+
+// Add the layers control widget
+var layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+// Layer control based on select box rather than radio buttons.
+//var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
+
+// Delete a marker (and notify websocket)
+var delMarker = function(dname) {
+    //console.log("Deleting",dname);
+    if (typeof polygons[dname] != "undefined") {
+        layers[markers[dname].lay].removeLayer(polygons[dname]);
+        delete polygons[dname];
+    }
+    if (typeof markers[dname] != "undefined") {
+        var d = {name:dname,type:"DELETE",lat:markers[dname]._latlng.lat,lon:markers[dname]._latlng.lng};
+        ws.send("del:"+dname);
+        layers[markers[dname].lay].removeLayer(markers[dname]);
+        delete markers[dname];
+    }
+    map.closePopup();
+}
+
+// the MAIN add something to map function
+function setMarker(data) {
+    //console.log(typeof data, data);
+    var ll;
+    var stay = popped;
+
+    var lay = data.layer || "not known";
+    if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
+        //layers[lay] = new L.LayerGroup().addTo(map);
+        layers[lay] = new L.MarkerClusterGroup({maxClusterRadius:50, disableClusteringAtZoom:12}).addTo(map);
+        overlays[lay] = layers[lay];
+        layercontrol.addOverlay(layers[lay],lay);
+    }
+
+    if (typeof markers[data.name] != "undefined") { layers[lay].removeLayer(markers[data.name]); }
+    if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
+
+    if (data.deleted) { // remove markers we are told to
+        delMarker(data.name);
+    }
+    else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
+        var col = data.iconColor || "#910000";
+        var polygon = L.polygon(data.area, {stroke:true, weight:2, color:col, fillColor:col, fillOpacity:0.2, clickable:false});
+        polygons[data.name] = polygon;
+        layers[lay].addLayer(polygon);
+    }
+    else {
+        //console.log("handling",data.name);
+        if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
+        else { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
+
+        var words="<b>"+data.name+"</b><br/>";
+
+        // Create the icons... handle ship, earthquake as specials
+        var marker;
+        if (data.icon === "ship") {
+            marker = L.boatMarker(ll, {
+                title: data.name,
+                color: (data.iconColor || "blue")
+            });
+            marker.setHeading(data.bearing);
+            var q = 'http://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
+            words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
+        }
+        else if (data.icon === "plane") {
+            data.iconColor = data.iconColor || "black";
+            if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
+            var icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310" >';
+            icon += '<g><path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></g></svg>';
+            var svgplane = "data:image/svg+xml;base64," + btoa(icon);
+            var myMarker = L.divIcon({
+                className:"planeicon",
+                iconAnchor: [15, 15],
+                html:'<img src="'+svgplane+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
+            });
+            marker = L.marker(ll, {title: data.name, icon: myMarker});
+            var q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
+            words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
+        }
+        else if (data.icon === "friend") {
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name });
+        }
+        else if (data.icon === "hostile") {
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle h', iconSize: [16, 16] }), title: data.name });
+        }
+        else if (data.icon === "neutral") {
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle n', iconSize: [16, 16] }), title: data.name });
+        }
+        else if (data.icon === "unknown") {
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data.name });
+        }
+        else if (data.icon === "danger") {
+            console.log("danger will robinson");
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data.name });
+        }
+        else if (data.icon === "earthquake") {
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
+        }
+        else {
+            var myMarker = L.VectorMarkers.icon({
+                icon: data.icon || "circle",
+                markerColor: (data.iconColor || "#910000"),
+                prefix: 'fa',
+                iconColor: 'white'
+            });
+            marker = L.marker(ll, {title: data.name, icon: myMarker});
+        }
+
+        //var q = "/red/boatpic?name="+data.name;
+        //words += '<img width=240px height=180px alt="" src="'+q+'"><br/>';
+
+        // remove icon from list of properties, then add all others to popup
+        if (data.hasOwnProperty("icon")) { delete data.icon; }
+        if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
+        for (var i in data) {
+            if (i != "name") {
+                if (typeof data[i] === "object") {
+                    words += i +" : "+JSON.stringify(data[i])+"<br/>";
+                } else {
+                    words += i +" : "+data[i]+"<br/>";
+                }
+            }
+        }
+        if (data.hasOwnProperty("photourl")) {
+            words += "<img src=\"" + data.imageurl + "\" style=\"width: 100%; margin-top: 10px;\">";
+        }
+        marker.bindPopup(words);
+        marker._popup.dname = data.name;
+        marker.ts = parseInt(Date.now()/1000);  // save time we got this marker
+        marker.lay = lay;                       // and the layer it is on
+        var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");
+        marker.on('contextmenu', function(e) {
+            rightmenuMarker.setLatLng(e.latlng);
+            map.openPopup(rightmenuMarker);
+        });
+        if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(ll); }
+
+        markers[data.name] = marker;
+        layers[lay].addLayer(marker);
+
+        popped = stay;
+        if (popped) {
+            if (popid == data.name) { marker.openPopup(); }
+            else { popmark.openPopup(); }
+        }
+        if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
+        if (data.bearing != null) {  // if there is a heading
+            if (data.speed != null) { data.length = data.speed * 50; }  // and a speed
+            if (data.length != null) {
+                if (polygons[data.name] != null) { map.removeLayer(polygons[data.name]); }
+                var x = data.lon * 1; // X coordinate
+                var y = data.lat * 1; // Y coordinate
+                var ll = new L.LatLng(y,x);
+                var angle = data.bearing * 1;
+                var lengthAsDegrees = data.length / 110540; // metres in a degree..ish
+                var polygon = null;
+                if (data.accuracy != null) {
+                    data.accuracy = Number(data.accuracy);
+                    var y2 = y + Math.sin((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
+                    var x2 = x + Math.cos((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                    var ll2 = new L.LatLng(y2,x2);
+                    var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
+                    var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                    var ll3 = new L.LatLng(y3,x3);
+                    polygon = L.polygon([ ll, ll2, ll3 ], {weight:2, color:'#f30', fillOpacity:0.06, clickable:false});
+                } else {
+                    var y2 = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
+                    var x2 = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
+                    var ll2 = new L.LatLng(y2,x2);
+                    polygon = L.polygon([ ll, ll2 ], {weight:2, color:'#f30', clickable:false});
+                }
+                if (typeof layers[lay].getVisibleParent === 'function') {
+                    var vis = layers[lay].getVisibleParent(marker);
+                    if ((polygon !== null) && (vis !== null) && (!vis.hasOwnProperty("lay"))) {
+                        polygon.setStyle({opacity:0});
+                    }
+                    polygons[data.name] = polygon;
+                    layers[lay].addLayer(polygon);
+                }
+            }
+        }
+        if (panit) {
+            map.setView(ll,map.getZoom());
+        }
+    }
+}
+
+function doCommand(cmd) {
+    if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
+        basemaps[cmd.map.name] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
+    }
+    if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
+        basemaps[cmd.layer].addTo(map);
+    }
+    var clat = map.getCenter().lat;
+    var clon = map.getCenter().lng;
+    var czoom = map.getZoom();
+    if (cmd.hasOwnProperty("lat")) { clat = cmd.lat; }
+    if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
+    if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
+    map.setView([clat,clon],czoom);
+}
+</script>
+</body>
+</html>

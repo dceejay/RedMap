@@ -1,0 +1,159 @@
+body {
+    width:100%;
+    left:0px;
+    margin:0;
+    padding:0;
+    font:14px Verdana, Arial, sans-serif;
+}
+
+a {
+    color:#444;
+    text-decoration:none;
+}
+
+#topbar {
+    color:#999;
+    background-color:black;
+    position:fixed;
+    top:0px;
+    left:0px;
+    height:41px;
+    width:100%;"
+}
+
+#results {
+    position:fixed;
+    top:6px;
+    right:8px;
+    height:41px;
+}
+
+#map {
+    position:fixed;
+    top:41px;
+    bottom:0px;
+    min-width:100%;
+    display:block;
+}
+
+#foot {
+    position:absolute;
+    height:20px;
+    bottom:0;
+    width:100%;
+    z-index:10;
+}
+
+#heat {
+    position:absolute;
+    height:20px;
+    bottom:20px;
+    right:10px;
+    z-index:10;
+}
+
+#heat button {
+    padding:2px 10px;
+    border-radius:4px;
+    background-color:#fff;
+}
+
+#menu {
+    color:#fff;
+    background-color:#000;
+    position:fixed;
+    top:41px;
+    right:0px;
+    width:200px;
+    z-index:9999;
+}
+
+#menu td {
+    font-size:14px;
+    padding-top:2px;
+    padding-left:8px;
+}
+
+#menu input {
+    color:#fff;
+    background-color:#666;
+    text-align:right;
+    padding-right:4px;
+    border:2px solid #000;
+    line-height:20px;
+}
+
+#menu input[type=checkbox], input[type=radio] {
+    vertical-align:middle;
+    position:relative;
+    bottom:1px;
+}
+
+#rinput {
+    font-size:14px;
+    padding:4px;
+    height:20px;
+}
+
+.circle {
+    background-color:rgba(255,255,40,0.7);
+    border-color:darkgrey;
+    border-radius:4px;
+    border-style:solid;
+    border-width:2px;
+}
+
+.f {
+    background-color: rgba(30,120,255,0.6);
+    border-color: dodgerblue;
+}
+
+.h {
+    background-color: rgba(255,60,0,0.7);
+    border-color: red;
+    border-radius: 8px;
+}
+
+.n {
+    background-color: rgba(40,255,40,0.6);
+    border-color: green;
+}
+
+.p {
+    background-color: rgba(255,0,255,0.5);
+    border-color: yellow;
+    border-radius: 1px;
+}
+
+.e {
+    background-color: rgba(255,255,255,0);
+    border-color: black;
+    border-radius: 11px;
+}
+
+.up-triangle {
+   width:0 !important;
+   height:0 !important;
+   border-bottom:20px solid red;
+   border-left:10px solid transparent;
+   border-right:10px solid transparent;
+}
+
+.diamond {
+   width:80px !important;
+   height:80px !important;
+   background:purple;
+   margin:3px 0 0 30px !important;
+   /* Rotate */
+   -webkit-transform:rotate(-45deg) !important;
+   -moz-transform:rotate(-45deg);
+   -ms-transform:rotate(-45deg);
+   -o-transform:rotate(-45deg);
+   transform:rotate(-45deg);
+   /* Rotate Origin */
+   -webkit-transform-origin:0 100% !important;
+   -moz-transform-origin:0 100%;
+   -ms-transform-origin:0 100%;
+   -o-transform-origin:0 100%;
+   transform-origin:0 100%;
+}

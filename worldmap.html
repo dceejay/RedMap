@@ -1,0 +1,67 @@
+<!--
+  Copyright 2015 IBM Corp.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="worldmap">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="worldmap">
+    <p>Plots "things" on a web map. Needs an internet connection.</p>
+    <p>To use this node you must also create a <code>websocket out</code> node
+    configured to point at <b>{httpRoot}/ws/worldmap</b> .</p>
+    <p>The minimum <code>msg.payload</code> sent to the websocket must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
+    <pre>{name:"Joe", lat:51, lon:-1.05}</pre>
+    <p><code>name</code> must be a unique identifier.</p>
+    <p>Optional properties include</p>
+    <ul>
+        <li><code>layer</code> : specify a layer on the map to add marker to.</li>
+        <li><code>speed</code> : combined with bearing, draws a vector.</li>
+        <li><code>bearing</code> : combined with speed, draws a vector.</li>
+        <li><code>accuracy</code> : combined with bearing, draws a polygon of possible direction.</li>
+        <li><code>icon</code> : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name</li>
+        <li><code>iconColor</code> : standard CSS color name or #rrggbb hex value.</li>
+        <li><code>deleted</code> : set to <i>true</i> to remove the named marker. (default false)</li>
+    </ul>
+    <p>Any other sub-properties of <code>msg.payload</code> will be added to the icon popup text box as extra information.</p>
+    <p>Icons of type <i>plane</i> or <i>ship</i> will use built in SVG icons that align to the
+    <code>bearing</code> value.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:0,
+        icon: "white-globe.png",
+        align: "right",
+        label: function() {
+            return this.name||"world map";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        info: function() {
+            return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+'/worldmap).';
+        }
+    });
+</script>
