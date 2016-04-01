@@ -1,5 +1,5 @@
-node-red-node-web-worldmap
-==========================
+node-red-contrib-web-worldmap
+=============================
 
 A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
@@ -9,7 +9,7 @@ Install
 
 Run the following command in your Node-RED user directory - typically `~/.node-red`
 
-        npm install node-red-node-web-worldmap
+        npm install node-red-contrib-web-worldmap
 
 
 Usage
@@ -44,12 +44,12 @@ You may select any of the Font Awesome set of [icons](http://fortawesome.github.
 However there are several specials...
 
  - **plane** : a plane icon that aligns with the bearing of travel.
- - **ship** : a ship icon that aligns with the beearing of travel.
+ - **ship** : a ship icon that aligns with the bearing of travel.
  - **friend** : pseudo Nato style blue rectangle.
  - **hostile** : pseudo Nato style red circle.
  - **neutral** : pseudo Nato style green square.
- - **unknown** : psuedo Nato style yellow square.
- - **earthquake** : black circle - diametre proportional to magnitude.
+ - **unknown** : pseudo Nato style yellow square.
+ - **earthquake** : black circle - diameter proportional to magnitude.
 
 If the payload contains an **area** property - that is an array of co-ordinates, e.g.
 
