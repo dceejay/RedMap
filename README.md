@@ -4,16 +4,15 @@ node-red-contrib-web-worldmap
 A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
 
-Install
--------
+### Install
+
 
 Run the following command in your Node-RED user directory - typically `~/.node-red`
 
         npm install node-red-contrib-web-worldmap
 
 
-Usage
------
+### Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
 
@@ -26,7 +25,7 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g
 
         {name:"Joe", lat:51, lon:-1.05}
 
-*name* must be a unique identifier across the whole map.
+`name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the point.
 
 Optional properties include
 
@@ -34,11 +33,11 @@ Optional properties include
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
- - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name
+ - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
  - **iconColor** : Standard CSS color name or #rrggbb hex value.
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
 
-Any other msg.payload properties will be added to the icon popup text box.
+Any other `msg.payload` properties will be added to the icon popup text box.
 
 You may select any of the Font Awesome set of [icons](http://fortawesome.github.io/Font-Awesome/icons/).
 However there are several specials...
@@ -61,6 +60,23 @@ then rather than draw a point and icon it draws the polygon
  - **name** : is used as the id key - so can be redrawn/moved
  - **layer** : declares which layer you put it on.
 
+### Drawing
+
+A single right click will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
+
+Right-clicking on an icon will allow you to delete it.
+
+If you select the **drawing** layer you can also add polylines, polygons and rectangles.
+
+All these events generate messages that can be received by using a **websocket in** node set to the same endpoint. For example:
+
+    add:point,50.98523,-1.40625,joe,spot,test
+    del:joe
+    add:rectangle,LatLng(50.92944,-1.4502),
+        LatLng(50.99172,-1.4502),
+        LatLng(50.99172,-1.32729),
+        LatLng(50.92944, -1.32729)
+
 ### Control
 
 You can also control the map via the websocket, by sending in a msg.payload containing a **command** object.
@@ -78,7 +94,7 @@ Optional properties include
 
 #### For example
 
-To switch layer and move map
+To switch layer, move map and zoom
 
         msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
 
