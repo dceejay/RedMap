@@ -6,11 +6,9 @@ map web page for plotting "things" on.
 
 ### Install
 
-
 Run the following command in your Node-RED user directory - typically `~/.node-red`
 
         npm install node-red-contrib-web-worldmap
-
 
 ### Usage
 
@@ -106,7 +104,6 @@ To add a new layer
             url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
             opt:JSON.stringify('{ maxZoom: 19, attribution: "&copy; OpenStreetMap"}')
         };
-
 
 Demo Flow
 ---------

@@ -49,7 +49,7 @@
     <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script>
 </head>
 
-<body onunload="socket.disconnect;">
+<body onunload="ws.close;">
 <div id="topbar">
     <a href="http://nodered.org"><img src="images/node-red.png" width="72px" height="28px" style="padding-top:4px; margin:4px; vertical-align: middle;"/></a>
     <span style="display:inline-block; padding-top:6px; vertical-align:middle;"><font size="+2"><b> Node-RED</b> map all the things</font></span>
@@ -91,7 +91,7 @@
 
 <script language="javascript" type="text/javascript">
 
-var startpos = [51.03, -1.379];
+var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
 var startzoom = 10;
 
 var map;
@@ -104,14 +104,14 @@ var marks = [];
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
-var maxage = 600;
-baselayername = "OSM grey";
+var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
+var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ws;
 var wsUri;
 var loc = window.location;
 
 window.onbeforeunload = function(e) {
-    return 'Reloading will delete all the local markers, including drawing on the "drawing" layer';
+    return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
 };
 
 if (window.self !== window.top) { console.log("In an Iframe"); }
@@ -127,7 +127,7 @@ else {
     //wsUri = "ws://"+window.location.hostname+":1880/red/ws/map";
 }
 //console.log(wsUri);
-var ibmfoot = "&nbsp;&copy; IBM 2015"
+var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
 var isChrome = !!window.chrome;
 if (!isChrome) { document.getElementById("showHelp").innerHTML=""; }
@@ -143,7 +143,7 @@ function start(wsUri) {  // Create the websocket
 
     ws.onclose = function(evt) {
         console.log("DISCONNECTED");
-        document.getElementById("foot").innerHTML = "<font color='#944'>"+ibmfoot+"</font>";
+        document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
         setTimeout(function() { start(wsUri) }, 3000); // try to reconnect every 3 secs... bit fast ?
     }
 
@@ -251,7 +251,7 @@ function doTidyUp() {
     }
 }
 
-// move the daylight / nighttime boundary (if enabled)
+// move the daylight / nighttime boundary (if enabled) every minute
 function moveTerminator() { // if terminator line plotted move it every minute
     if (layers["_daynight"].getLayers().length > 0) {
         layers["_daynight"].clearLayers();
@@ -260,7 +260,7 @@ function moveTerminator() { // if terminator line plotted move it every minute
 }
 setInterval( function() {moveTerminator()}, 60000 );
 
-// Call tidyup every {maxage} seconds
+// Call tidyup every {maxage} seconds - default 10 mins
 var stale = null;
 function setMaxAge() {
     maxage = document.getElementById('maxage').value;
@@ -296,7 +296,7 @@ function moveToMarks() {
         map.setView(m.getLatLng(), map.getZoom());
         m.openPopup();
         marksIndex++;
-        setTimeout(moveToMarks, 2000);
+        setTimeout(moveToMarks, 2500);
     }
 }
 
@@ -521,6 +521,8 @@ var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{
 // Nice watercolour based maps by Stamen Design
 var watermap = new L.StamenTileLayer('watercolor');
 basemaps["Watercolor"] = watermap;
+
+// Terrain map of US only
 var usterrainmap = new L.StamenTileLayer('terrain');
 basemaps["US terrain"] = usterrainmap;
 
@@ -560,7 +562,6 @@ map.on('draw:created', function (e) {
     //console.log(JSON.stringify(layer.toGeoJSON()));
     ws.send("add:"+type+","+layer._latlngs);
     layers["drawing"].addLayer(layer);
-
 });
 
 // Add the roads overlay
@@ -587,9 +588,9 @@ overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/press
 overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
 
 // Add the shipping navigation markers
-var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
-});
+//var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+//    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
+//});
 //overlays["ship nav"] = OpenSeaMap;
 
 if ( window.localStorage.hasOwnProperty("lastlayer") ) {
@@ -622,7 +623,7 @@ var delMarker = function(dname) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-    //console.log(typeof data, data);
+    console.log(typeof data, data);
     var ll;
     var stay = popped;
 
@@ -645,6 +646,17 @@ function setMarker(data) {
         var polygon = L.polygon(data.area, {stroke:true, weight:2, color:col, fillColor:col, fillOpacity:0.2, clickable:false});
         polygons[data.name] = polygon;
         layers[lay].addLayer(polygon);
+    }
+    else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
+        var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, {color:(data.iconColor || "blue"), weight:2} );
+        ellipse.on('click', function(e) {
+            var popup = L.popup()
+                .setLatLng(new L.LatLng((data.lat*1), (data.lon*1)))
+                .setContent('<p><b>'+data.name+'</b><br/>lat : '+data.lat+'<br/>lon : '+data.lon+'</p>')
+                .openOn(map);
+        });
+        polygons[data.name] = ellipse;
+        layers[lay].addLayer(ellipse);
     }
     else {
         //console.log("handling",data.name);
@@ -690,8 +702,6 @@ function setMarker(data) {
                 html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
-            var q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
-            words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "friend") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name });
@@ -721,9 +731,6 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
         }
-
-        //var q = "/red/boatpic?name="+data.name;
-        //words += '<img width=240px height=180px alt="" src="'+q+'"><br/>';
 
         // remove icon from list of properties, then add all others to popup
         if (data.hasOwnProperty("icon")) { delete data.icon; }
