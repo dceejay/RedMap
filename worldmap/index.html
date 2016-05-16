@@ -47,6 +47,9 @@
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script>
+
+    <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
+    <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
 <body onunload="ws.close;">
@@ -64,7 +67,7 @@
     <tr><td><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
     <tr><td><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
     <tr><td><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
-    <tr><td><span id="showHelp"><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
+    <tr><td><span id="showHelp" onclick="dialog.showModal();"><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
 <div id="foot">&nbsp;&copy; IBM 2015</div>
@@ -130,7 +133,7 @@ else {
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
 var isChrome = !!window.chrome;
-if (!isChrome) { document.getElementById("showHelp").innerHTML=""; }
+//if (!isChrome) { document.getElementById("showHelp").innerHTML=""; }
 
 function start(wsUri) {  // Create the websocket
     ws = new WebSocket(wsUri);
@@ -192,7 +195,9 @@ var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
     heat.setLatLngs([]);
 }, "Clears the current heatmap", "bottomright");
 
-var dialog = document.getElementById('helpWindow');
+//var dialog = document.getElementById('helpWindow');
+var dialog = document.querySelector('dialog');
+dialogPolyfill.registerDialog(dialog);
 document.getElementById('showHelp').onclick = function() {
     dialog.show();
 };
