@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-  Copyright 2015 IBM Corp.
+  Copyright 2015, 2016 IBM Corp.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -63,11 +63,11 @@
 </div>
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
-    <tr><td><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
-    <tr><td><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
-    <tr><td><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
-    <tr><td><span id="showHelp" onclick="dialog.showModal();"><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
+    <tr><td style="cursor:pointer"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
+    <tr><td style="cursor:pointer"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
+    <tr><td style="cursor:pointer"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
+    <tr><td style="cursor:pointer"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
+    <tr><td style="cursor:pointer"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
 <div id="foot">&nbsp;&copy; IBM 2015</div>
@@ -77,7 +77,7 @@
     <h3>Node-RED - Map all the things</h3>
     <p><i class="fa fa-search fa-lg fa-fw"></i> Search - You may enter a name or partial name of an object to search for.<br/>
     The map will then jump to centre on each of the results.</p>
-    <p><i class="fa fa-spinner fa-lg fa-fw"></i> Max Age - You can set the time after which points
+    <p><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age - You can set the time after which points
     that haven't been updated get removed.</p>
     <p><i class="fa fa-arrows fa-lg fa-fw"></i> Auto Pan - When selected, the map will
     automatically move to centre on each data point as they arrive.</p>
@@ -131,9 +131,6 @@ else {
 }
 //console.log(wsUri);
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
-
-var isChrome = !!window.chrome;
-//if (!isChrome) { document.getElementById("showHelp").innerHTML=""; }
 
 function start(wsUri) {  // Create the websocket
     ws = new WebSocket(wsUri);
@@ -195,7 +192,7 @@ var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
     heat.setLatLngs([]);
 }, "Clears the current heatmap", "bottomright");
 
-//var dialog = document.getElementById('helpWindow');
+// Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
 dialogPolyfill.registerDialog(dialog);
 document.getElementById('showHelp').onclick = function() {
