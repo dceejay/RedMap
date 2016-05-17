@@ -64,6 +64,7 @@
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:pointer"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
+    <tr><td style="cursor:pointer"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' value="12" size="2" onchange='setCluster();'/></td></tr>
     <tr><td style="cursor:pointer"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
     <tr><td style="cursor:pointer"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
     <tr><td style="cursor:pointer"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
@@ -79,6 +80,7 @@
     The map will then jump to centre on each of the results.</p>
     <p><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age - You can set the time after which points
     that haven't been updated get removed.</p>
+    <p><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom - by default multiple objects will be clustered at zoom levels less than 12.</p>
     <p><i class="fa fa-arrows fa-lg fa-fw"></i> Auto Pan - When selected, the map will
     automatically move to centre on each data point as they arrive.</p>
     <p><i class="fa fa-lock fa-lg fa-fw"></i> Lock Map - When selected will save the
@@ -107,6 +109,7 @@ var marks = [];
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
+var clusterAt = 1;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ws;
@@ -271,6 +274,12 @@ function setMaxAge() {
     //console.log("Stale time set :",maxage+"s");
 }
 setMaxAge();
+
+function setCluster() {
+    clusterAt = document.getElementById('setclus').value;
+    console.log("clusterAt set :",clusterAt);
+}
+setCluster();
 
 // Search for markers with names of ....
 function doSearch() {
@@ -632,7 +641,7 @@ function setMarker(data) {
     var lay = data.layer || "not known";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         //layers[lay] = new L.LayerGroup().addTo(map);
-        layers[lay] = new L.MarkerClusterGroup({maxClusterRadius:50, disableClusteringAtZoom:12}).addTo(map);
+        layers[lay] = new L.MarkerClusterGroup({maxClusterRadius:50, disableClusteringAtZoom:clusterAt}).addTo(map);
         overlays[lay] = layers[lay];
         layercontrol.addOverlay(layers[lay],lay);
     }
