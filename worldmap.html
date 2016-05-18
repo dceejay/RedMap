@@ -1,5 +1,6 @@
+<!DOCTYPE html>
 <!--
-  Copyright 2015 IBM Corp.
+  Copyright 2015, 2016 IBM Corp.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,9 +24,7 @@
 
 <script type="text/x-red" data-help-name="worldmap">
     <p>Plots "things" on a web map. Needs an internet connection.</p>
-    <p>To use this node you must also create a <code>websocket out</code> node
-    configured to point at <b>{httpRoot}/ws/worldmap</b> .</p>
-    <p>The minimum <code>msg.payload</code> sent to the websocket must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
+    <p>The minimum <code>msg.payload</code> must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
     <pre>{name:"Joe", lat:51, lon:-1.05}</pre>
     <p><code>name</code> must be a unique identifier.</p>
     <p>Optional properties include</p>
@@ -50,10 +49,45 @@
         defaults: {
             name: {value:""}
         },
-        inputs:0,
+        inputs:1,
         outputs:0,
         icon: "white-globe.png",
         align: "right",
+        label: function() {
+            return this.name||"world map";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        info: function() {
+            return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+'/worldmap).';
+        }
+    });
+</script>
+
+
+<script type="text/x-red" data-template-name="worldmap in">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="worldmap in">
+    <p>Receives events from a worldmap web page.</p>
+    <p></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap in',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.png",
         label: function() {
             return this.name||"world map";
         },

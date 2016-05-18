@@ -31,6 +31,8 @@
     <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/>
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
+
+    <script type="text/javascript"  src="leaflet/socket.io-1.4.5.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
@@ -52,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.close;">
+<body onunload="ws.emit('end');">
 <div id="topbar">
     <a href="http://nodered.org"><img src="images/node-red.png" width="72px" height="28px" style="padding-top:4px; margin:4px; vertical-align: middle;"/></a>
     <span style="display:inline-block; padding-top:6px; vertical-align:middle;"><font size="+2"><b> Node-RED</b> map all the things</font></span>
@@ -71,7 +73,7 @@
     <tr><td style="cursor:pointer"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
-<div id="foot">&nbsp;&copy; IBM 2015</div>
+<div id="foot">&nbsp;&copy; IBM 2015,2016</div>
 <!-- <div id="heat"><button type="button" onclick="clearHeat();">Clear Heatmap</button></div> -->
 
 <dialog id="helpWindow">
@@ -123,54 +125,38 @@ window.onbeforeunload = function(e) {
 if (window.self !== window.top) { console.log("In an Iframe"); }
 else { console.log("NOT in an Iframe"); }
 
-if (loc.host.indexOf("bluemix") !== -1) {
-    wsUri = "ws://" + loc.host +"/ws/worldmap";
-}
-else {
-    if (loc.protocol === "https:") { wsUri = "wss:"; }
-    else { wsUri = "ws:"; }
-    wsUri += "//" + loc.host + loc.pathname.replace("worldmap/","ws/worldmap");
-    //wsUri = "ws://"+window.location.hostname+":1880/red/ws/map";
-}
-//console.log(wsUri);
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
-function start(wsUri) {  // Create the websocket
-    ws = new WebSocket(wsUri);
+function start() {  // Create the websocket
+    //ws = new WebSocket(wsUri);
+    ws = io();
 
-    ws.onopen = function(evt) {
+    //ws.onopen = function(evt) {
+    ws.on('connect', function() {
         console.log("CONNECTED");
         document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
-        //ws.send("Open for mapping");
-    };
+        ws.emit("worldmap",{action:"connected"});
+    });
 
-    ws.onclose = function(evt) {
+    //ws.onclose = function(evt) {
+    ws.on('close', function() {
         console.log("DISCONNECTED");
         document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
-        setTimeout(function() { start(wsUri) }, 3000); // try to reconnect every 3 secs... bit fast ?
-    }
+        setTimeout(function() { start() }, 3000); // try to reconnect every 3 secs... bit fast ?
+    });
 
-    // This expects a websocket message with data as a stringified object containing at least name, lat and lon
-    ws.onmessage = function (evt) {
-        //console.log("MESSAGE",evt);
-        var data;
-        try {
-            data = JSON.parse(evt.data); // expects a stringified object
-        } catch (e) {
-            console.log("BAD PARSE",evt.data);
-            return;
-        }
+    ws.on('worldmapdata', function(data) {
         if (data.command) { doCommand(data.command); delete data.command; }
         if (data.hasOwnProperty("name") && data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { setMarker(data); }
         else { console.log("SKIP",data); }
-    }
+    });
 
-    ws.onerror = function(evt) {
+    ws.on('error', function(evt) {
         console.log("ERROR",evt);
         document.getElementById("foot").innerHTML = "<font color='#f00'>"+ibmfoot+"</font>";
-    }
+    });
 }
-start(wsUri);
+start();
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
     var sp = JSON.parse(localStorage.getItem("lastpos"));
@@ -243,7 +229,7 @@ function doTidyUp() {
         if (typeof markers[m].ts != "undefined") {
             //console.log(m,markers[m].ts,markers[m]);
             if (((Number(markers[m].ts) + Number(maxage)) < d) && (markers[m].lay !== "drawing")) {
-            //if ((Number(markers[m].ts) + Number(maxage)) < d) {
+                //if ((Number(markers[m].ts) + Number(maxage)) < d) {
                 //console.log("STALE :",m);
                 layers[markers[m].lay].removeLayer(markers[m]);
                 if (typeof polygons[m] != "undefined") {
@@ -322,8 +308,8 @@ function toggleMenu() {
 document.getElementById("menu").style.display = 'none';
 
 //function clearHeat() {
-    //console.log("reset heatmap");
-    //heat.setLatLngs([]);
+//console.log("reset heatmap");
+//heat.setLatLngs([]);
 //}
 //document.getElementById("heat").style.display = 'none';
 
@@ -356,7 +342,7 @@ map.on('overlayadd', function(e) {
         overlays["drawing"].bringToBack();
     }
     //else { console.log("layer add :",e.name); }
-    ws.send(e.name+":add");
+    ws.emit("worldmap",{action:"addlayer", name:e.name});
 });
 
 map.on('overlayremove', function(e) {
@@ -372,13 +358,13 @@ map.on('overlayremove', function(e) {
         map.removeControl(drawControl);
     }
     //else console.log("layer del :",e.name);
-    ws.send(e.name+":del");
+    ws.emit("worldmap",{action:"delete", name:e.name});
 });
 
 map.on('baselayerchange', function(e) {
     //console.log("base layer now :",e.name);
     baselayername = e.name;
-    ws.send(e.name+":chg");
+    ws.emit("worldmap",{action:"modify", name:e.name});
 });
 
 map.on('zoomend', function() {
@@ -400,7 +386,7 @@ map.on('zoomend', function() {
 });
 
 //map.on('contextmenu', function(e) {
-//    ws.send("click:"+e.latlng.lat.toFixed(5)+","+e.latlng.lng.toFixed(5));
+//    ws.emit("worldmap",{action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)});
 //});
 
 var rightmenuMap = L.popup().setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer)'/>");
@@ -409,7 +395,7 @@ var rclk;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     console.log(thing);
-    ws.send("add:point,"+rclk.lat.toFixed(5)+","+rclk.lng.toFixed(5)+","+thing);
+    ws.emit("worldmap",{action:"point", lat:rclk.lat.toFixed(5), lon:rclk.lng.toFixed(5), point:thing});
     map.closePopup();
     var bits = thing.split(",");
     var lay = (bits[2] || "drawing").trim();
@@ -516,11 +502,11 @@ var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.p
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
 //var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
-    //attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
-    //bounds: [[49.6, -12], [61.7, 3]],
-    //minZoom: 1,
-    //maxZoom: 18,
-    //subdomains: '0123'
+//attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+//bounds: [[49.6, -12], [61.7, 3]],
+//minZoom: 1,
+//maxZoom: 18,
+//subdomains: '0123'
 //});
 //basemaps["UK OS 1900"] = NLS_OS_1900;
 
@@ -571,7 +557,7 @@ map.on('draw:created', function (e) {
     var layer = e.layer;
     //console.log(type, layer._latlngs);
     //console.log(JSON.stringify(layer.toGeoJSON()));
-    ws.send("add:"+type+","+layer._latlngs);
+    ws.emit("worldmap",{action:"draw",type:type, points:layer._latlngs});
     layers["drawing"].addLayer(layer);
 });
 
@@ -625,7 +611,7 @@ var delMarker = function(dname) {
     }
     if (typeof markers[dname] != "undefined") {
         var d = {name:dname,type:"DELETE",lat:markers[dname]._latlng.lat,lon:markers[dname]._latlng.lng};
-        ws.send("del:"+dname);
+        ws.emit("worldmap",{action:"delete", name:dname});
         layers[markers[dname].lay].removeLayer(markers[dname]);
         delete markers[dname];
     }
@@ -634,7 +620,7 @@ var delMarker = function(dname) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-    console.log(typeof data, data);
+    //console.log(typeof data, data);
     var ll;
     var stay = popped;
 
@@ -677,37 +663,38 @@ function setMarker(data) {
         var words="<b>"+data.name+"</b><br/>";
 
         // Create the icons... handle ship, earthquake as specials
-        var marker;
+        var marker, mymarker;
+        var icon, q;
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
                 color: (data.iconColor || "blue")
             });
             marker.setHeading(data.bearing);
-            var q = 'http://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
+            q = 'http://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "plane") {
             data.iconColor = data.iconColor || "black";
             if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
-            var icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310" >';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310" >';
             icon += '<g><path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></g></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
-            var myMarker = L.divIcon({
+            myMarker = L.divIcon({
                 className:"planeicon",
                 iconAnchor: [15, 15],
                 html:'<img src="'+svgplane+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
-            var q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
+            q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
-            var icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47.032 47.032">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47.032 47.032">';
             icon += '<g><path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336   h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></g></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
-            var myMarker = L.divIcon({
+            myMarker = L.divIcon({
                 className:"caricon",
                 iconAnchor: [15, 15],
                 html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
@@ -734,7 +721,7 @@ function setMarker(data) {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
         }
         else {
-            var myMarker = L.VectorMarkers.icon({
+            myMarker = L.VectorMarkers.icon({
                 icon: data.icon || "circle",
                 markerColor: (data.iconColor || "#910000"),
                 prefix: 'fa',

@@ -4,6 +4,12 @@ node-red-contrib-web-worldmap
 A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
 
+### Changes
+ - v1.0.0 - now uses socket.io to connect to backend - means this node now has an input connection
+ (like "proper" nodes should :-), and you no longer need a websocket node in parallel.
+ Obviously this is a breaking change hence the major version number bump. Also thus adds a `worldmap in`
+ node to handle events coming from the map interaction. (to be documented more fully but are fairly obvious).
+
 ### Install
 
 Run the following command in your Node-RED user directory - typically `~/.node-red`
@@ -13,11 +19,6 @@ Run the following command in your Node-RED user directory - typically `~/.node-r
 ### Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
-
-To use this node you must also place a **websocket out** node onto the workspace
-and set the endpoint to
-
-        {httpRoot}/ws/worldmap
 
 The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
 
