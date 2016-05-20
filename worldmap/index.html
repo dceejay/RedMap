@@ -138,11 +138,13 @@ function start() {  // Create the websocket
         ws.emit("worldmap",{action:"connected"});
     });
 
-    //ws.onclose = function(evt) {
-    ws.on('close', function() {
+    ws.on('disconnect', function() {
         console.log("DISCONNECTED");
         document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
-        setTimeout(function() { start() }, 3000); // try to reconnect every 3 secs... bit fast ?
+        socketConnectTimeInterval = setInterval(function () {
+            ws.socket.reconnect();
+            if (ws.socket.connected) { clearInterval(socketConnectTimeInterval); }
+        }, 3000);
     });
 
     ws.on('worldmapdata', function(data) {
@@ -159,11 +161,17 @@ function start() {  // Create the websocket
 start();
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
-    var sp = JSON.parse(localStorage.getItem("lastpos"));
+    var sp = JSON.parse(window.localStorage.getItem("lastpos"));
     startpos = [ sp.lat, sp.lng ];
 }
 if ( window.localStorage.hasOwnProperty("lastzoom") ) {
-    startzoom = JSON.parse(localStorage.getItem("lastzoom"));
+    startzoom = window.localStorage.getItem("lastzoom");
+}
+if ( window.localStorage.hasOwnProperty("clusterAt") ) {
+    clusterAt = window.localStorage.getItem("clusterAt");
+}
+if ( window.localStorage.hasOwnProperty("maxage") ) {
+    maxage = window.localStorage.getItem("maxage");
 }
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
@@ -216,6 +224,8 @@ function doLock() {
         window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
         window.localStorage.setItem("lastzoom", map.getZoom());
         window.localStorage.setItem("lastlayer", baselayername);
+        window.localStorage.setItem("clusterAt", clusterAt);
+        window.localStorage.setItem("maxage", maxage);
         console.log("Saved :",JSON.stringify(map.getCenter()),map.getZoom(),baselayername);
     }
     map.setMaxBounds(mb);
