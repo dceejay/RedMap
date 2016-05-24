@@ -114,9 +114,6 @@ var menuOpen = false;
 var clusterAt = 1;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var ws;
-var wsUri;
-var loc = window.location;
 
 window.onbeforeunload = function(e) {
     return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
@@ -127,38 +124,31 @@ else { console.log("NOT in an Iframe"); }
 
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
-function start() {  // Create the websocket
-    //ws = new WebSocket(wsUri);
-    ws = io();
+// Create the socket
+var ws = io();
 
-    //ws.onopen = function(evt) {
-    ws.on('connect', function() {
-        console.log("CONNECTED");
-        document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
-        ws.emit("worldmap",{action:"connected"});
-    });
+ws.on('connect', function() {
+    console.log("CONNECTED");
+    document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+    ws.emit("worldmap",{action:"connected"});
+});
 
-    ws.on('disconnect', function() {
-        console.log("DISCONNECTED");
-        document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
-        socketConnectTimeInterval = setInterval(function () {
-            ws.socket.reconnect();
-            if (ws.socket.connected) { clearInterval(socketConnectTimeInterval); }
-        }, 3000);
-    });
+ws.on('disconnect', function() {
+    console.log("DISCONNECTED");
+    document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+});
 
-    ws.on('worldmapdata', function(data) {
-        if (data.command) { doCommand(data.command); delete data.command; }
-        if (data.hasOwnProperty("name") && data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { setMarker(data); }
-        else { console.log("SKIP",data); }
-    });
+ws.on('error', function() {
+    console.log("ERROR");
+    document.getElementById("foot").innerHTML = "<font color='#C00'>"+ibmfoot+"</font>";
+});
 
-    ws.on('error', function(evt) {
-        console.log("ERROR",evt);
-        document.getElementById("foot").innerHTML = "<font color='#f00'>"+ibmfoot+"</font>";
-    });
-}
-start();
+ws.on('worldmapdata', function(data) {
+    if (data.command) { doCommand(data.command); delete data.command; }
+    if (data.hasOwnProperty("name") && data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { setMarker(data); }
+    else { console.log("SKIP",data); }
+});
+
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
     var sp = JSON.parse(window.localStorage.getItem("lastpos"));
