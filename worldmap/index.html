@@ -61,7 +61,7 @@
 </div>
 <div id="results">
     <span id="searchRes"></span>
-    <span onclick='toggleMenu()'><i class="fa fa-bars fa-2x fa-inverse"></i></span>
+    <span id="bars" onclick='toggleMenu()' onmouseover='toggleMenu()''><i class="fa fa-bars fa-2x fa-inverse"></i></span>
 </div>
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
@@ -115,13 +115,6 @@ var clusterAt = 1;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 
-window.onbeforeunload = function(e) {
-    return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
-};
-
-if (window.self !== window.top) { console.log("In an Iframe"); }
-else { console.log("NOT in an Iframe"); }
-
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
 // Create the socket
@@ -149,7 +142,6 @@ ws.on('worldmapdata', function(data) {
     else { console.log("SKIP",data); }
 });
 
-
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
     var sp = JSON.parse(window.localStorage.getItem("lastpos"));
     startpos = [ sp.lat, sp.lng ];
@@ -157,12 +149,15 @@ if ( window.localStorage.hasOwnProperty("lastpos") ) {
 if ( window.localStorage.hasOwnProperty("lastzoom") ) {
     startzoom = window.localStorage.getItem("lastzoom");
 }
-if ( window.localStorage.hasOwnProperty("clusterAt") ) {
-    clusterAt = window.localStorage.getItem("clusterAt");
+if ( window.localStorage.hasOwnProperty("clusterat") ) {
+    clusterAt = window.localStorage.getItem("clusterat");
+    document.getElementById("setclus").value = clusterAt;
 }
 if ( window.localStorage.hasOwnProperty("maxage") ) {
     maxage = window.localStorage.getItem("maxage");
+    document.getElementById("maxage").value = maxage;
 }
+
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
@@ -172,6 +167,27 @@ L.easyButton( 'fa-crosshairs fa-lg', function() {
 }, "Locate me").addTo(map);
 
 L.Control.measureControl().addTo(map);
+
+if (window.self !== window.top) {
+    console.log("In an Iframe");
+    (document.getElementById("topbar").style.display="none");
+    (document.getElementById("map").style.top="0px");
+    (document.getElementById("results").style.right="50px");
+    (document.getElementById("results").style.top="10px");
+    (document.getElementById("results").style.zIndex="1");
+    (document.getElementById("results").style.height="31px");
+    (document.getElementById("results").style.paddingTop="6px");
+    (document.getElementById("bars").style.display="none");
+    (document.getElementById("menu").style.right="8px");
+    (document.getElementById("menu").style.borderRadius="6px");
+    L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
+}
+else {
+    console.log("NOT in an Iframe");
+    window.onbeforeunload = function(e) {
+        return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
+    };
+}
 
 // Create the clear heatmap button
 var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
@@ -214,7 +230,7 @@ function doLock() {
         window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
         window.localStorage.setItem("lastzoom", map.getZoom());
         window.localStorage.setItem("lastlayer", baselayername);
-        window.localStorage.setItem("clusterAt", clusterAt);
+        window.localStorage.setItem("clusterat", clusterAt);
         window.localStorage.setItem("maxage", maxage);
         console.log("Saved :",JSON.stringify(map.getCenter()),map.getZoom(),baselayername);
     }
@@ -501,6 +517,15 @@ var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.p
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
+var NLS_OS_1919_1947 = L.tileLayer( 'http://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
+    attribution: 'Historical Maps Layer, 1919-1947 from the <a href="http://maps.nls.uk/projects/api/">NLS Maps API</a>',
+    bounds: [[49.6, -12], [61.7, 3]],
+    minZoom: 1,
+    maxZoom: 18,
+    subdomains: '0123'
+});
+basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
+
 //var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
 //attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
 //bounds: [[49.6, -12], [61.7, 3]],
@@ -515,13 +540,13 @@ var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{
 });
 //basemaps["CartoDB Light"] = CartoPos;
 
-// Nice watercolour based maps by Stamen Design
-var watermap = new L.StamenTileLayer('watercolor');
-basemaps["Watercolor"] = watermap;
-
 // Terrain map of US only
 var usterrainmap = new L.StamenTileLayer('terrain');
 basemaps["US terrain"] = usterrainmap;
+
+// Nice watercolour based maps by Stamen Design
+var watermap = new L.StamenTileLayer('watercolor');
+basemaps["Watercolor"] = watermap;
 
 // Now add the overlays
 

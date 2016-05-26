@@ -25,7 +25,7 @@ module.exports = function(RED) {
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
         io.on('connection', function(socket) {
-            node.log(socket.request.connection.remoteAddress);
+            //node.log(socket.request.connection.remoteAddress);
             node.status({fill:"green",shape:"dot",text:"connected"});
             node.on('input', function(msg) {
                 socket.emit("worldmapdata",msg.payload);
@@ -37,6 +37,7 @@ module.exports = function(RED) {
         node.on("close", function() {
             node.status({});
         });
+
     }
     RED.nodes.registerType("worldmap",WorldMap);
 

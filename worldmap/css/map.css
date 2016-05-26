@@ -23,6 +23,7 @@ a {
 
 #results {
     position:fixed;
+    background-color:black;
     top:6px;
     right:8px;
     height:41px;
@@ -78,7 +79,7 @@ a {
     color:#fff;
     background-color:#666;
     text-align:right;
-    padding-right:4px;
+    padding-right:7px;
     border:2px solid #000;
     line-height:20px;
 }
