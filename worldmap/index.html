@@ -28,6 +28,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.draw.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.measurecontrol.css">
     <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/>
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
@@ -42,6 +43,7 @@
     <script type="text/javascript" src="leaflet/leaflet.draw.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.measurecontrol.js"></script>
     <script type="text/javascript" src="leaflet/easy-button.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.fullscreen.min.js"></script>
     <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-heat.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
@@ -161,15 +163,9 @@ if ( window.localStorage.hasOwnProperty("maxage") ) {
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
-// Add the locate my position button
-L.easyButton( 'fa-crosshairs fa-lg', function() {
-    map.locate({setView: true, maxZoom: 15});
-}, "Locate me").addTo(map);
-
-L.Control.measureControl().addTo(map);
-
+// Move some bits around if in an iframe
 if (window.self !== window.top) {
-    console.log("In an Iframe");
+    console.log("In an iframe");
     (document.getElementById("topbar").style.display="none");
     (document.getElementById("map").style.top="0px");
     (document.getElementById("results").style.right="50px");
@@ -183,11 +179,27 @@ if (window.self !== window.top) {
     L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
 }
 else {
-    console.log("NOT in an Iframe");
+    console.log("NOT in an iframe")
     window.onbeforeunload = function(e) {
         return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
     };
 }
+
+// Add the fullscreen button
+L.control.fullscreen().addTo(map);
+
+// map.on('fullscreenchange', function () {
+//     if (map.isFullscreen()) { console.log('entered fullscreen') }
+//     else { console.log('exited fullscreen'); }
+// });
+
+// Add the locate my position button
+L.easyButton( 'fa-crosshairs fa-lg', function() {
+    map.locate({setView: true, maxZoom: 15});
+}, "Locate me").addTo(map);
+
+// Add the measure/ruler button
+L.Control.measureControl().addTo(map);
 
 // Create the clear heatmap button
 var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
