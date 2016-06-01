@@ -24,8 +24,7 @@ module.exports = function(RED) {
         var node = this;
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
-        io.on('connection', function(socket) {
-            //node.log(socket.request.connection.remoteAddress);
+        var callback = function(socket) {
             node.status({fill:"green",shape:"dot",text:"connected"});
             node.on('input', function(msg) {
                 socket.emit("worldmapdata",msg.payload);
@@ -33,18 +32,20 @@ module.exports = function(RED) {
             socket.on('disconnect', function() {
                 node.status({fill:"red",shape:"ring",text:"disconnected"});
             });
-        });
-        node.on("close", function() {
-            node.status({});
-        });
-
+            node.on("close", function() {
+                node.status({});
+                socket.disconnect();
+                io.sockets.removeListener('connection', callback);
+            });
+        }
+        io.on('connection', callback );
     }
     RED.nodes.registerType("worldmap",WorldMap);
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         var node = this;
-        io.on('connection', function(socket) {
+        var callback = function(socket) {
             node.status({fill:"green",shape:"dot",text:"connected"});
             socket.on('worldmap', function(data) {
                 node.send({payload:data, topic:"worldmap"});
@@ -53,10 +54,13 @@ module.exports = function(RED) {
                 node.status({fill:"red",shape:"ring",text:"disconnected"});
                 node.send({payload:{action:"disconnect"}, topic:"worldmap"});
             });
-        });
-        node.on("close", function() {
-            node.status({});
-        });
+            node.on("close", function() {
+                node.status({});
+                socket.disconnect();
+                io.sockets.removeListener('connection', callback);
+            });
+        }
+        io.on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
 }

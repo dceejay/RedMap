@@ -63,7 +63,7 @@
 </div>
 <div id="results">
     <span id="searchRes"></span>
-    <span id="bars" onclick='toggleMenu()' onmouseover='toggleMenu()''><i class="fa fa-bars fa-2x fa-inverse"></i></span>
+    <span id="bars" onclick='toggleMenu()' onmouseover='toggleMenu()'><i class="fa fa-bars fa-2x fa-inverse"></i></span>
 </div>
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
@@ -116,7 +116,6 @@ var menuOpen = false;
 var clusterAt = 1;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 
 // Create the socket
@@ -131,11 +130,13 @@ ws.on('connect', function() {
 ws.on('disconnect', function() {
     console.log("DISCONNECTED");
     document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+    setTimeout(function() { ws.connect(); }, 2500);
 });
 
 ws.on('error', function() {
     console.log("ERROR");
     document.getElementById("foot").innerHTML = "<font color='#C00'>"+ibmfoot+"</font>";
+    setTimeout(function() { ws.connect(); }, 2500);
 });
 
 ws.on('worldmapdata', function(data) {
@@ -165,7 +166,7 @@ map = new L.map('map').setView(startpos, startzoom);
 
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
-    console.log("In an iframe");
+    console.log("IN an iframe");
     (document.getElementById("topbar").style.display="none");
     (document.getElementById("map").style.top="0px");
     (document.getElementById("results").style.right="50px");
@@ -386,7 +387,7 @@ map.on('overlayremove', function(e) {
         map.removeControl(drawControl);
     }
     //else console.log("layer del :",e.name);
-    ws.emit("worldmap",{action:"delete", name:e.name});
+    ws.emit("worldmap",{action:"dellayer", name:e.name});
 });
 
 map.on('baselayerchange', function(e) {

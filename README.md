@@ -104,7 +104,7 @@ To add a new base layer
         msg.payload.command.map = {
             name:"OSMhot",
             url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-            opt:JSON.stringify('{ maxZoom: 19, attribution: "&copy; OpenStreetMap"}')
+            opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
         };
 
 Demo Flow
