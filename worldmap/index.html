@@ -43,7 +43,7 @@
     <script type="text/javascript" src="leaflet/leaflet.draw.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.measurecontrol.js"></script>
     <script type="text/javascript" src="leaflet/easy-button.js"></script>
-    <script type="text/javascript" src="leaflet/leaflet.fullscreen.min.js"></script>
+    <script type="text/javascript" src="leaflet/Leaflet.fullscreen.min.js"></script>
     <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-heat.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
@@ -392,7 +392,7 @@ map.on('overlayremove', function(e) {
 map.on('baselayerchange', function(e) {
     //console.log("base layer now :",e.name);
     baselayername = e.name;
-    ws.emit("worldmap",{action:"modify", name:e.name});
+    ws.emit("worldmap",{action:"layer", name:e.name});
 });
 
 map.on('zoomend', function() {
@@ -486,7 +486,7 @@ basemaps["Esri"] = Esri_WorldStreetMap;
 var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
-basemaps["Esri Satelite"] = Esri_WorldImagery;
+basemaps["Esri Satellite"] = Esri_WorldImagery;
 
 var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
@@ -844,12 +844,35 @@ function setMarker(data) {
 }
 
 function doCommand(cmd) {
+    var existsalready = false;
+    // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
+        console.log("New map:",cmd.map.name);
+        if (basemaps.hasOwnProperty(cmd.map.name)) { existsalready = true; }
         basemaps[cmd.map.name] = L.tileLayer(cmd.map.url, cmd.map.opt);
-        layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
+        if (!existsalready) {
+            layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
+        }
     }
+    // Add a new overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
+        console.log("New overlay:",cmd.map.overlay);
+        if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }
+        overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        overlays[cmd.map.overlay].addTo(map);
+    }
+    // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
-        basemaps[cmd.layer].addTo(map);
+        map.removeLayer(basemaps[baselayername]);
+        baselayername = cmd.layer;
+        basemaps[baselayername].addTo(map);
+    }
+    // Add an overlay
+    if (cmd.layer && overlays.hasOwnProperty(cmd.layer)) {
+        overlays[cmd.layer].addTo(map);
     }
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;

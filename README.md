@@ -72,12 +72,11 @@ If you select the **drawing** layer you can also add polylines, polygons and rec
 
 All these events generate messages that can be received by using a **worldmap in** node. For example:
 
-    add:point,50.98523,-1.40625,joe,spot,test
-    del:joe
-    add:rectangle,LatLng(50.92944,-1.4502),
-        LatLng(50.99172,-1.4502),
-        LatLng(50.99172,-1.32729),
-        LatLng(50.92944, -1.32729)
+    { "action": "connected" }
+    { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "joe,male,mylayer" }
+    { "action": "delete", "name": "joe" }
+    { "action": "layer", "name": "Esri Satellite" }
+    { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
 
 ### Control
 
@@ -90,7 +89,7 @@ Optional properties include
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **layer** - set map to specified layer name.
  - **map** - Object containing details of a new map layer:
-   - **name** - name of the map layer
+   - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
 
@@ -100,7 +99,7 @@ To switch layer, move map and zoom
 
         msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
 
-To add a new layer
+To add a new base layer
 
         msg.payload.command.map = {
             name:"OSMhot",
