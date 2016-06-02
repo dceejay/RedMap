@@ -25,19 +25,21 @@ module.exports = function(RED) {
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
         var callback = function(socket) {
-            node.status({fill:"green",shape:"dot",text:"connected"});
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(io.sockets.connected).length});
             node.on('input', function(msg) {
                 socket.emit("worldmapdata",msg.payload);
             });
             socket.on('disconnect', function() {
-                node.status({fill:"red",shape:"ring",text:"disconnected"});
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(io.sockets.connected).length});
             });
             node.on("close", function() {
-                node.status({});
                 socket.disconnect();
-                io.sockets.removeListener('connection', callback);
             });
         }
+        node.on("close", function() {
+            node.status({});
+            io.sockets.removeListener('connection', callback);
+        });
         io.on('connection', callback );
     }
     RED.nodes.registerType("worldmap",WorldMap);
@@ -46,20 +48,22 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         var node = this;
         var callback = function(socket) {
-            node.status({fill:"green",shape:"dot",text:"connected"});
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(io.sockets.connected).length});
             socket.on('worldmap', function(data) {
                 node.send({payload:data, topic:"worldmap"});
             });
             socket.on('disconnect', function() {
-                node.status({fill:"red",shape:"ring",text:"disconnected"});
-                node.send({payload:{action:"disconnect"}, topic:"worldmap"});
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(io.sockets.connected).length});
+                node.send({payload:{action:"disconnect", clients:Object.keys(io.sockets.connected).length}, topic:"worldmap"});
             });
             node.on("close", function() {
-                node.status({});
                 socket.disconnect();
-                io.sockets.removeListener('connection', callback);
             });
         }
+        node.on("close", function() {
+            node.status({});
+            io.sockets.removeListener('connection', callback);
+        });
         io.on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
