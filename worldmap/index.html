@@ -739,6 +739,23 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
         }
+        else if (data.icon === "locate") {
+            data.iconColor = data.iconColor || "cyan";
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
+            icon += '<polygon points="32 32 104 32 104 0 0 0 0 104 32 104" fill="'+data.iconColor+'"/>';
+            icon += '<polygon points="468 0 364 0 364 32 436 32 436 104 468 104" fill="'+data.iconColor+'"/>';
+            icon += '<polygon points="0 468 104 468 104 436 32 436 32 364 0 364" fill="'+data.iconColor+'"/>';
+            icon += '<polygon points="436 436 364 436 364 468 468 468 468 364 436 364" fill="'+data.iconColor+'"/>';
+            //icon += '<circle cx="234" cy="234" r="22" fill="'+data.iconColor+'"/>';
+            icon += '</svg>';
+            var svglocate = "data:image/svg+xml;base64," + btoa(icon);
+            myMarker = L.divIcon({
+                className:"locateicon",
+                iconAnchor: [16, 16],
+                html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
+        }
         else if (data.icon === "friend") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name });
         }
