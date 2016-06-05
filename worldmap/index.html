@@ -58,8 +58,8 @@
 
 <body onunload="ws.emit('end');">
 <div id="topbar">
-    <a href="http://nodered.org"><img src="images/node-red.png" width="72px" height="28px" style="padding-top:4px; margin:4px; vertical-align: middle;"/></a>
-    <span style="display:inline-block; padding-top:6px; vertical-align:middle;"><font size="+2"><b> Node-RED</b> map all the things</font></span>
+    <a href="http://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
+    <span class="topbar"> Node-RED - map all the things</span>
 </div>
 <div id="results">
     <span id="searchRes"></span>
@@ -67,12 +67,12 @@
 </div>
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
-    <tr><td style="cursor:pointer"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td style="cursor:pointer"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' value="12" size="2" onchange='setCluster();'/></td></tr>
-    <tr><td style="cursor:pointer"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
-    <tr><td style="cursor:pointer"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
-    <tr><td style="cursor:pointer"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
-    <tr><td style="cursor:pointer"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' value="12" size="2" onchange='setCluster();'/></td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
+    <tr><td style="cursor:default"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
 <div id="foot">&nbsp;&copy; IBM 2015,2016</div>
@@ -142,6 +142,7 @@ ws.on('error', function() {
 ws.on('worldmapdata', function(data) {
     if (data.command) { doCommand(data.command); delete data.command; }
     if (data.hasOwnProperty("name") && data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { setMarker(data); }
+    else if (data.hasOwnProperty("name") && (data.hasOwnProperty("area") || data.hasOwnProperty("line"))) { setMarker(data); }
     else { console.log("SKIP",data); }
 });
 
@@ -196,7 +197,7 @@ L.control.fullscreen().addTo(map);
 
 // Add the locate my position button
 L.easyButton( 'fa-crosshairs fa-lg', function() {
-    map.locate({setView: true, maxZoom: 15});
+    map.locate({setView:true, maxZoom:15});
 }, "Locate me").addTo(map);
 
 // Add the measure/ruler button
@@ -355,6 +356,9 @@ map.on('popupclose', function(e) {
 });
 
 map.on('overlayadd', function(e) {
+    if (typeof overlays[e.name].bringToFront === "function") {
+        overlays[e.name].bringToFront();
+    }
     if (e.name == "satellite") {
         overlays["satellite"].bringToBack();
     }
@@ -398,7 +402,7 @@ map.on('baselayerchange', function(e) {
 
 map.on('zoomend', function() {
     setTimeout( function() {
-        //console.log("ZOOM=",map.getZoom());
+        console.log("ZOOM :",map.getZoom());
         for (var key in markers) {
             if (polygons[key]) {
                 var vis = layers[markers[key].lay].getVisibleParent(markers[key]);
@@ -459,9 +463,9 @@ map.on('contextmenu', function(e) {
 });
 
 function onLocationFound(e) {
-    //var radius = e.accuracy / 2;
+    var radius = e.accuracy;
     //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-    //L.circle(e.latlng, radius).addTo(map);
+    L.circle(e.latlng, radius, {color:"cyan", weight:3, opacity:0.8, fill:false, clickable:false}).addTo(map);
 }
 function onLocationError(e) { console.log(e.message); }
 map.on('locationfound', onLocationFound);
@@ -473,9 +477,9 @@ map.on('locationerror', onLocationError);
 var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 //var osmUrl='http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
 var osmAttrib='Map data © OpenStreetMap contributors';
-var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution: osmAttrib});
+var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution:osmAttrib});
 basemaps["OSM grey"] = osmg;
-var osm = new L.TileLayer(osmUrl, {attribution: osmAttrib});
+var osm = new L.TileLayer(osmUrl, {attribution:osmAttrib});
 basemaps["OSM"] = osm;
 
 // Extra Leaflet map layers from http://leaflet-extras.github.io/leaflet-providers/preview/
@@ -491,18 +495,18 @@ basemaps["Esri Satellite"] = Esri_WorldImagery;
 
 var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
-    maxZoom: 15
+    maxNativeZoom: 13
 });
 basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-    maxZoom: 15
+    maxNativeZoom: 10
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
 var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
-    maxZoom: 20,
+    maxZoom: 18,
     attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 });
 basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
@@ -511,13 +515,14 @@ var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}
     type: 'map',
     ext: 'jpg',
     attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: '1234'
+    subdomains: '1234',
+    maxNativeZoom: 17
 });
 basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
 
 var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
-    maxZoom: 16
+    maxNativeZoom: 12
 });
 basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
 
@@ -525,7 +530,7 @@ var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.p
     attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
     bounds: [[49.6, -12], [61.7, 3]],
     minZoom: 1,
-    maxZoom: 18,
+    maxNativeZoom: 16,
     subdomains: '0123'
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
@@ -609,13 +614,13 @@ overlays["roads"] = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z
 });
 
 overlays["rain"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/rain/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    maxZoom: 18,
     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
     opacity: 0.5
 });
 
 overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/pressure_cntr/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    maxZoom: 18,
     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
     opacity: 0.5
 });
@@ -676,11 +681,17 @@ function setMarker(data) {
     if (data.deleted) { // remove markers we are told to
         delMarker(data.name);
     }
-    else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
+    else if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
         var col = data.iconColor || "#910000";
-        var polygon = L.polygon(data.area, {stroke:true, weight:2, color:col, fillColor:col, fillOpacity:0.2, clickable:false});
-        polygons[data.name] = polygon;
-        layers[lay].addLayer(polygon);
+        var polyln = L.polyline(data.line, {stroke:true, weight:3, color:col, opacity:0.8, clickable:false});
+        polygons[data.name] = polyln;
+        layers[lay].addLayer(polyln);
+    }
+    else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
+        var cola = data.iconColor || "#910000";
+        var polyarea = L.polygon(data.area, {stroke:true, weight:2, color:cola, fillColor:cola, fillOpacity:0.2, clickable:false});
+        polygons[data.name] = polyarea;
+        layers[lay].addLayer(polyarea);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, {color:(data.iconColor || "blue"), weight:2} );
@@ -798,7 +809,7 @@ function setMarker(data) {
             }
         }
         if (data.hasOwnProperty("photourl")) {
-            words += "<img src=\"" + data.imageurl + "\" style=\"width: 100%; margin-top: 10px;\">";
+            words += "<img src=\"" + data.imageurl + "\" style=\"width:100%; margin-top:10px;\">";
         }
         marker.bindPopup(words);
         marker._popup.dname = data.name;
@@ -826,7 +837,7 @@ function setMarker(data) {
                 if (polygons[data.name] != null) { map.removeLayer(polygons[data.name]); }
                 var x = data.lon * 1; // X coordinate
                 var y = data.lat * 1; // Y coordinate
-                var ll = new L.LatLng(y,x);
+                var ll1 = new L.LatLng(y,x);
                 var angle = data.bearing * 1;
                 var lengthAsDegrees = data.length / 110540; // metres in a degree..ish
                 var polygon = null;
@@ -838,12 +849,12 @@ function setMarker(data) {
                     var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
                     var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
                     var ll3 = new L.LatLng(y3,x3);
-                    polygon = L.polygon([ ll, ll2, ll3 ], {weight:2, color:'#f30', fillOpacity:0.06, clickable:false});
+                    polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:'#f30', fillOpacity:0.06, clickable:false});
                 } else {
-                    var y2 = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
-                    var x2 = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
-                    var ll2 = new L.LatLng(y2,x2);
-                    polygon = L.polygon([ ll, ll2 ], {weight:2, color:'#f30', clickable:false});
+                    var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
+                    var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
+                    var lla = new L.LatLng(ya,xa);
+                    polygon = L.polygon([ ll1, lla ], {weight:2, color:'#f30', clickable:false});
                 }
                 if (typeof layers[lay].getVisibleParent === 'function') {
                     var vis = layers[lay].getVisibleParent(marker);

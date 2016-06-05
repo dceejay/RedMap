@@ -35,12 +35,14 @@
         <li><code>accuracy</code> : combined with bearing, draws a polygon of possible direction.</li>
         <li><code>icon</code> : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name</li>
         <li><code>iconColor</code> : standard CSS color name or #rrggbb hex value.</li>
+        <li><code>photoUrl</code> : adds an image pointed at by the url to the popup box.</li>
         <li><code>deleted</code> : set to <i>true</i> to remove the named marker. (default false)</li>
     </ul>
     <p>Any other sub-properties of <code>msg.payload</code> will be added to the icon popup text box as extra information.</p>
     <p>Icons of type <i>plane</i>, <i>ship</i> or <i>car</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
-    <p>There are some <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">extra commands</a> to control the map.</p>
+    <p>There are some <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">extra commands</a>
+    for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and to <b>control</b> the map remotely.</p>
 </script>
 
 <script type="text/javascript">
@@ -76,7 +78,6 @@
 
 <script type="text/x-red" data-help-name="worldmap in">
     <p>Receives events from a worldmap web page.</p>
-    <p></p>
 </script>
 
 <script type="text/javascript">

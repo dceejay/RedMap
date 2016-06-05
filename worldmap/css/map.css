@@ -11,14 +11,26 @@ a {
     text-decoration:none;
 }
 
+.topbar {
+    font-size:16px;
+    vertical-align:middle;
+}
+
 #topbar {
-    color:#999;
+    color:#c7c7c7;
     background-color:black;
     position:fixed;
     top:0px;
     left:0px;
-    height:41px;
+    height:40px;
+    line-height:40px;
     width:100%;
+}
+
+#topbar img {
+    padding-left:12px;
+    padding-right:8px;
+    vertical-align: middle;
 }
 
 #results {
@@ -26,12 +38,12 @@ a {
     background-color:black;
     top:6px;
     right:8px;
-    height:41px;
+    height:40px;
 }
 
 #map {
     position:fixed;
-    top:41px;
+    top:40px;
     bottom:0px;
     min-width:100%;
     display:block;
@@ -63,7 +75,7 @@ a {
     color:#fff;
     background-color:#000;
     position:fixed;
-    top:41px;
+    top:40px;
     right:0px;
     width:200px;
     z-index:9999;

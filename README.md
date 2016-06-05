@@ -8,7 +8,7 @@ map web page for plotting "things" on.
  - v1.0.x - now uses socket.io to connect to backend - means this node now has an input connection
  (like "proper" nodes should :-), and you no longer need a websocket node in parallel.
  Obviously this is a breaking change hence the major version number bump. Also thus adds a `worldmap in`
- node to handle events coming from the map interaction. (to be documented more fully but are fairly obvious).
+ node to handle events coming from the map interaction.
 
 ### Install
 
@@ -34,6 +34,7 @@ Optional properties include
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
  - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
  - **iconColor** : Standard CSS color name or #rrggbb hex value.
+ - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
 
 Any other `msg.payload` properties will be added to the icon popup text box.
@@ -44,27 +45,29 @@ However there are several specials...
  - **plane** : a plane icon that aligns with the bearing of travel.
  - **ship** : a ship icon that aligns with the bearing of travel.
  - **car** : a car icon that aligns with the bearing of travel.
+ - **locate** : a 4 corner outline to locate a point without obscuring it.
  - **friend** : pseudo Nato style blue rectangle.
  - **hostile** : pseudo Nato style red circle.
  - **neutral** : pseudo Nato style green square.
  - **unknown** : pseudo Nato style yellow square.
  - **earthquake** : black circle - diameter proportional to magnitude.
 
-#### Areas
+#### Areas and Lines
 
 If the payload contains an **area** property - that is an array of co-ordinates, e.g.
 
     [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]
 
-then rather than draw a point and icon it draws the polygon
+then rather than draw a point and icon it draws the polygon. Likewise if it contains a
+**line** property it will draw the polyline.
 
- - **iconColor** : can set the colour of the polygon
- - **name** : is used as the id key - so can be redrawn/moved
- - **layer** : declares which layer you put it on.
+ - **iconColor** : can set the colour of the polygon or line.
+ - **name** : is used as the id key - so can be redrawn/moved.
+ - **layer** : declares which layer you put it on..
 
 ### Drawing
 
-A single right click will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
+A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
 
 Right-clicking on an icon will allow you to delete it.
 
