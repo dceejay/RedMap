@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<html>
+<html manifest="worldmap.appcache">
 <head>
     <title>Node-RED map all the things</title>
     <meta name="mobile-web-app-capable" content="yes">
@@ -809,7 +809,7 @@ function setMarker(data) {
             }
         }
         if (data.hasOwnProperty("photourl")) {
-            words += "<img src=\"" + data.imageurl + "\" style=\"width:100%; margin-top:10px;\">";
+            words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
         }
         marker.bindPopup(words);
         marker._popup.dname = data.name;
