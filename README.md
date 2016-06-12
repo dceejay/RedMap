@@ -5,6 +5,7 @@ A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
 
 ### Changes
+ - v1.0.12 - Added ability to set initial start position, zoom level and base map layer.
  - v1.0.x - now uses socket.io to connect to backend - means this node now has an input connection
  (like "proper" nodes should :-), and you no longer need a websocket node in parallel.
  Obviously this is a breaking change hence the major version number bump. Also thus adds a `worldmap in`

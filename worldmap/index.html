@@ -117,6 +117,7 @@ var clusterAt = 1;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
+var initialposition = false;
 
 // Create the socket
 var ws = io();
@@ -147,6 +148,7 @@ ws.on('worldmapdata', function(data) {
 });
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
+    initialposition = true;
     var sp = JSON.parse(window.localStorage.getItem("lastpos"));
     startpos = [ sp.lat, sp.lng ];
 }
@@ -873,6 +875,11 @@ function setMarker(data) {
 }
 
 function doCommand(cmd) {
+    //console.log("COMMAND",cmd);
+    // ignore server side initial command if client position already saved.
+    if (cmd.hasOwnProperty("init") && initialposition) {
+        return;
+    }
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {

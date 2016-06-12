@@ -16,10 +16,35 @@
 -->
 
 <script type="text/x-red" data-template-name="worldmap">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
+<div class="form-row">
+    <table border="0" width="96%">
+    <tr><td width="100px"><i class="fa fa-globe"></i> Start<td>Latitude</td><td>Longitude</td><td width="60px">Zoom</td></tr>
+    <tr><td>&nbsp;</td>
+    <td><input type="text" id="node-input-lat" style="width:90px;"></td>
+    <td><input type="text" id="node-input-lon" style="width:90px;"></td>
+    <td><input type="text" id="node-input-zoom" style="width:60px;" placeholder="1 - 18"></td>
+    </tr>
+    </table>
+</div>
+<div class="form-row">
+    <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
+    <select id="node-input-layer">
+        <option value="OSM grey">OpenStreetMap Greyscale</option>
+        <option value="OSM">OpenStreetMap</option>
+        <option value="Esri">ESRI Streetmap</option>
+        <option value="Esri Satellite">ESRI Satellite</option>
+        <option value="Esri Terrain">ESRI Terrain</option>
+        <option value="Esri Ocean">ESRI Ocean</option>
+        <option value="Mapsurfer">Mapsurfer</option>
+        <option value="MapQuest OSM">MapQuest OSM</option>
+        <option value="Nat Geo">National Geographic</option>
+        <option value="UK OS Opendata">UK OS Opendata</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+</div>
 </script>
 
 <script type="text/x-red" data-help-name="worldmap">
@@ -50,6 +75,10 @@
         category: 'location',
         color:"darksalmon",
         defaults: {
+            lat: {value:""},
+            lon: {value:""},
+            zoom: {value:""},
+            layer: {value:""},
             name: {value:""}
         },
         inputs:1,

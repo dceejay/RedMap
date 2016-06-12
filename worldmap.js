@@ -21,6 +21,10 @@ module.exports = function(RED) {
 
     var WorldMap = function(n) {
         RED.nodes.createNode(this,n);
+        this.lat = n.lat || "";
+        this.lon = n.lon || "";
+        this.zoom = n.zoom || "";
+        this.layer = n.layer || "";
         var node = this;
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
@@ -28,6 +32,16 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(io.sockets.connected).length});
             node.on('input', function(msg) {
                 socket.emit("worldmapdata",msg.payload);
+            });
+            socket.on('worldmap', function(data) {
+                if (data.action === "connected") {
+                    var c = {init:true};
+                    if (node.lat && node.lat.length > 0) { c.lat = node.lat; }
+                    if (node.lon && node.lon.length > 0) { c.lon = node.lon; }
+                    if (node.zoom && node.zoom.length > 0) { c.zoom = node.zoom; }
+                    if (node.layer && node.layer.length > 0) { c.layer = node.layer; }
+                    socket.emit("worldmapdata",{command:c});
+                }
             });
             socket.on('disconnect', function() {
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(io.sockets.connected).length});
