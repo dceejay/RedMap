@@ -25,6 +25,8 @@ module.exports = function(RED) {
         this.lon = n.lon || "";
         this.zoom = n.zoom || "";
         this.layer = n.layer || "";
+        this.cluster = n.cluster || "";
+        this.maxage = n.maxage || "";
         var node = this;
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
@@ -40,6 +42,8 @@ module.exports = function(RED) {
                     if (node.lon && node.lon.length > 0) { c.lon = node.lon; }
                     if (node.zoom && node.zoom.length > 0) { c.zoom = node.zoom; }
                     if (node.layer && node.layer.length > 0) { c.layer = node.layer; }
+                    if (node.cluster && node.cluster.length > 0) { c.cluster = node.cluster; }
+                    if (node.maxage && node.maxage.length > 0) { c.maxage = node.maxage; }
                     socket.emit("worldmapdata",{command:c});
                 }
             });
