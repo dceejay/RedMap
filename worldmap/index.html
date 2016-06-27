@@ -38,6 +38,7 @@
     <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.markercluster.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.markercluster.freezable-src.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.active-layers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.select-layers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.draw.js"></script>
@@ -113,7 +114,7 @@ var marks = [];
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
-var clusterAt = 1;
+var clusterAt = 12;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
@@ -154,10 +155,10 @@ if ( window.localStorage.hasOwnProperty("lastpos") ) {
 if ( window.localStorage.hasOwnProperty("lastzoom") ) {
     startzoom = window.localStorage.getItem("lastzoom");
 }
-if ( window.localStorage.hasOwnProperty("clusterat") ) {
-    clusterAt = window.localStorage.getItem("clusterat");
-    document.getElementById("setclus").value = clusterAt;
-}
+// if ( window.localStorage.hasOwnProperty("clusterat") ) {
+//     clusterAt = window.localStorage.getItem("clusterat");
+//     document.getElementById("setclus").value = clusterAt;
+// }
 if ( window.localStorage.hasOwnProperty("maxage") ) {
     maxage = window.localStorage.getItem("maxage");
     document.getElementById("maxage").value = maxage;
@@ -293,8 +294,9 @@ function setMaxAge() {
 setMaxAge();
 
 function setCluster() {
-    clusterAt = parseInt(document.getElementById('setclus').value);
-    console.log("clusterAt set :",clusterAt);
+    clusterAt = parseInt(document.getElementById('setclus').value) || 0;
+    console.log("clusterAt set:",clusterAt);
+    showMapCurrentZoom();
 }
 setCluster();
 
@@ -401,9 +403,19 @@ map.on('baselayerchange', function(e) {
     ws.emit("worldmap",{action:"layer", name:e.name});
 });
 
-map.on('zoomend', function() {
+function showMapCurrentZoom() {
+    console.log("ZOOM:",map.getZoom(),". CLUSTER:",clusterAt);
+    for (var l in layers) {
+        if (layers[l].hasOwnProperty("_zoom")) {
+            if (map.getZoom() >= clusterAt) {
+                layers[l].disableClustering();
+            }
+            else {
+                layers[l].enableClustering();
+            }
+        }
+    }
     setTimeout( function() {
-        console.log("ZOOM :",map.getZoom());
         for (var key in markers) {
             if (polygons[key]) {
                 var vis = layers[markers[key].lay].getVisibleParent(markers[key]);
@@ -417,6 +429,10 @@ map.on('zoomend', function() {
             }
         }
     },750);
+}
+
+map.on('zoomend', function() {
+    showMapCurrentZoom();
 });
 
 //map.on('contextmenu', function(e) {
@@ -680,7 +696,12 @@ function setMarker(data) {
     var lay = data.layer || "not known";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         //layers[lay] = new L.LayerGroup().addTo(map);
-        layers[lay] = new L.MarkerClusterGroup({maxClusterRadius:50, spiderfyDistanceMultiplier:1.8, disableClusteringAtZoom:clusterAt}).addTo(map);
+        layers[lay] = new L.MarkerClusterGroup({
+            maxClusterRadius:50,
+            spiderfyDistanceMultiplier:1.8,
+            disableClusteringAtZoom:clusterAt,
+            //zoomToBoundsOnClick:false
+        }).addTo(map);
         overlays[lay] = layers[lay];
         layercontrol.addOverlay(layers[lay],lay);
     }
@@ -926,8 +947,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
     if (cmd.hasOwnProperty("cluster")) {
-        document.getElementById("setclus").value = cmd.cluster;
-        setCluster();
+        clusterAt = cmd.cluster;
+        // document.getElementById("setclus").value = cmd.cluster;
+        // setCluster();
     }
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
