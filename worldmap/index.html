@@ -537,14 +537,14 @@ var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tile
 });
 basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
 
-var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
-    type: 'map',
-    ext: 'jpg',
-    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: '1234',
-    maxNativeZoom: 17
-});
-basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
+// var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+//     type: 'map',
+//     ext: 'jpg',
+//     attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+//     subdomains: '1234',
+//     maxNativeZoom: 17
+// });
+//basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
 
 var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
@@ -579,9 +579,9 @@ basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
 //});
 //basemaps["UK OS 1900"] = NLS_OS_1900;
 
-var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-});
+//var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+//    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+//});
 //basemaps["CartoDB Light"] = CartoPos;
 
 // Terrain map of US only
