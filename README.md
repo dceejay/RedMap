@@ -4,6 +4,8 @@ node-red-contrib-web-worldmap
 A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
 
+![Map Image](https://dceejay.github.io/pages/images/redmap.png)
+
 ### Changes
  - v1.0.12 - Added ability to set initial start position, zoom level and base map layer.
  - v1.0.x - now uses socket.io to connect to backend - means this node now has an input connection
