@@ -34,6 +34,7 @@ module.exports = function(RED) {
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
 
         var callback = function(client) {
+            client.setMaxListeners(0);
             node.status({fill:"green",shape:"dot",text:"connected "+socket.engine.clientsCount});
             function handler(msg) {
                 client.emit("worldmapdata",msg.payload);
@@ -74,6 +75,7 @@ module.exports = function(RED) {
         var node = this;
 
         var callback = function(client) {
+            client.setMaxListeners(0);
             node.status({fill:"green",shape:"dot",text:"connected "+socket.engine.clientsCount});
             client.on('worldmap', function(data) {
                 node.send({payload:data, topic:"worldmap"});
