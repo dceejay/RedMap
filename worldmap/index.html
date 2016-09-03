@@ -843,6 +843,9 @@ function setMarker(data) {
         if (data.hasOwnProperty("photourl")) {
             words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
         }
+        if (data.hasOwnProperty("photoUrl")) {
+            words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
+        }
         marker.bindPopup(words);
         marker._popup.dname = data.name;
         marker.ts = parseInt(Date.now()/1000);  // save time we got this marker

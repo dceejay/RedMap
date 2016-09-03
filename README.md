@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.18 - Correct .photourl property to match .photoUrl as per docs
  - v1.0.17 - Removed Mapquest maps. Bug fixes - reduced leakage of listeners being added.
  - v1.0.12 - Added ability to set initial start position, zoom level and base map layer.
  - v1.0.x - now uses socket.io to connect to backend - means this node now has an input connection
