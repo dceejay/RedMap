@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.19 - Add circle mode - specify name, lat, lon and radius.
  - v1.0.18 - Correct .photourl property to match .photoUrl as per docs
  - v1.0.17 - Removed Mapquest maps. Bug fixes - reduced leakage of listeners being added.
  - v1.0.12 - Added ability to set initial start position, zoom level and base map layer.
@@ -69,6 +70,13 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
  - **iconColor** : can set the colour of the polygon or line.
  - **name** : is used as the id key - so can be redrawn/moved.
  - **layer** : declares which layer you put it on..
+
+#### Circles
+
+If the payload contains a **radius** property, as well as name, lat and lon, then rather
+than draw a point it will draw a circle.
+
+As per Areas and Lines you may also specify *iconColor*, and *layer*.
 
 ### Drawing
 

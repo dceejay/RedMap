@@ -724,6 +724,14 @@ function setMarker(data) {
         polygons[data.name] = polyarea;
         layers[lay].addLayer(polyarea);
     }
+    else if (data.hasOwnProperty("radius")) {
+        if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
+            var colac = data.iconColor || "#910000";
+            var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
+            polygons[data.name] = polycirc;
+            layers[lay].addLayer(polycirc);
+        }
+    }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, {color:(data.iconColor || "blue"), weight:2} );
         ellipse.on('click', function(e) {
