@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: Sep 11th v1.0.18
+# date: Oct 18th v1.0.20
 
 CACHE:
 index.html
@@ -39,6 +39,7 @@ leaflet/leaflet.markercluster.freezable-src.js
 leaflet/leaflet.measurecontrol.css
 leaflet/leaflet.measurecontrol.js
 leaflet/leaflet.select-layers.min.js
+leaflet/OSMBuildings-Leaflet.js
 leaflet/socket.io-1.4.5.js
 leaflet/tile.stamen.js
 leaflet/images/layers-2x.png

@@ -6,7 +6,7 @@ map web page for plotting "things" on.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
-### Changes
+ - v1.0.20 - Add buildings overlay.
  - v1.0.19 - Add circle mode - specify name, lat, lon and radius.
  - v1.0.18 - Correct .photourl property to match .photoUrl as per docs
  - v1.0.17 - Removed Mapquest maps. Bug fixes - reduced leakage of listeners being added.

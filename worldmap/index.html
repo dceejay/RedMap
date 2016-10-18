@@ -52,6 +52,7 @@
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script>
+    <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
@@ -652,6 +653,9 @@ overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/press
 });
 
 overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
+
+overlays["buildings"] = new OSMBuildings(map).load();
+map.removeLayer(overlays["buildings"]);
 
 // Add the shipping navigation markers
 //var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
