@@ -728,14 +728,6 @@ function setMarker(data) {
         polygons[data.name] = polyarea;
         layers[lay].addLayer(polyarea);
     }
-    else if (data.hasOwnProperty("radius")) {
-        if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
-            var colac = data.iconColor || "#910000";
-            var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
-            polygons[data.name] = polycirc;
-            layers[lay].addLayer(polycirc);
-        }
-    }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, {color:(data.iconColor || "blue"), weight:2} );
         ellipse.on('click', function(e) {
@@ -748,6 +740,14 @@ function setMarker(data) {
         layers[lay].addLayer(ellipse);
     }
     else {
+        if (data.hasOwnProperty("radius")) {
+            if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
+                var colac = data.iconColor || "#910000";
+                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
+                polygons[data.name] = polycirc;
+                layers[lay].addLayer(polycirc);
+            }
+        }
         //console.log("handling",data.name);
         if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
         else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
@@ -837,40 +837,42 @@ function setMarker(data) {
                 prefix: 'fa',
                 iconColor: 'white'
             });
-            marker = L.marker(ll, {title: data.name, icon: myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
 
         // remove icon from list of properties, then add all others to popup
-        if (data.hasOwnProperty("icon")) { delete data.icon; }
-        if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
-        for (var i in data) {
-            if (i != "name") {
-                if (typeof data[i] === "object") {
-                    words += i +" : "+JSON.stringify(data[i])+"<br/>";
-                } else {
-                    words += i +" : "+data[i]+"<br/>";
+        if (data.hasOwnProperty("icon") || (!data.hasOwnProperty("radius"))) {
+            if (data.hasOwnProperty("icon")) { delete data.icon; }
+            if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
+            for (var i in data) {
+                if (i != "name") {
+                    if (typeof data[i] === "object") {
+                        words += i +" : "+JSON.stringify(data[i])+"<br/>";
+                    } else {
+                        words += i +" : "+data[i]+"<br/>";
+                    }
                 }
             }
-        }
-        if (data.hasOwnProperty("photourl")) {
-            words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
-        }
-        if (data.hasOwnProperty("photoUrl")) {
-            words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
-        }
-        marker.bindPopup(words);
-        marker._popup.dname = data.name;
-        marker.ts = parseInt(Date.now()/1000);  // save time we got this marker
-        marker.lay = lay;                       // and the layer it is on
-        var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");
-        marker.on('contextmenu', function(e) {
-            rightmenuMarker.setLatLng(e.latlng);
-            map.openPopup(rightmenuMarker);
-        });
-        if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(ll); }
+            if (data.hasOwnProperty("photourl")) {
+                words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
+            }
+            if (data.hasOwnProperty("photoUrl")) {
+                words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
+            }
+            marker.bindPopup(words);
+            marker._popup.dname = data.name;
+            marker.ts = parseInt(Date.now()/1000);  // save time we got this marker
+            marker.lay = lay;                       // and the layer it is on
+            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");
+            marker.on('contextmenu', function(e) {
+                rightmenuMarker.setLatLng(e.latlng);
+                map.openPopup(rightmenuMarker);
+            });
 
-        markers[data.name] = marker;
-        layers[lay].addLayer(marker);
+            if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(ll); }
+            markers[data.name] = marker;
+            layers[lay].addLayer(marker);
+        }
 
         popped = stay;
         if (popped) {

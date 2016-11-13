@@ -79,6 +79,7 @@
 </script>
 
 <script type="text/javascript">
+    RED.keyboard.add("*",/* w */ 87,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+document.location.host+RED.settings.httpNodeRoot+"/worldmap") });
     RED.nodes.registerType('worldmap',{
         category: 'location',
         color:"darksalmon",

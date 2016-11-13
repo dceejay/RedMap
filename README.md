@@ -6,6 +6,8 @@ map web page for plotting "things" on.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
+### Changes
+ - v1.0.21 - If you specify range and icon then you get a marker and a range circle, if you just specify range with no icon, you just get a circle, and vice versa.
  - v1.0.20 - Add buildings overlay.
  - v1.0.19 - Add circle mode - specify name, lat, lon and radius.
  - v1.0.18 - Correct .photourl property to match .photoUrl as per docs
