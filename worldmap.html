@@ -43,11 +43,22 @@
 </div>
 <div class="form-row">
     <label for="node-input-cluster"><i class="fa fa-gears"></i> Cluster at</label>
-    zoom levels less than <input type="text" id="node-input-cluster" placeholder="10 (0-19)" style="width:60px;">
+    zoom levels less than <input type="text" id="node-input-cluster" placeholder="10 (0-19)" style="width:70px;">
 </div>
 <div class="form-row">
-    <label for="node-input-maxage"><i class="fa fa-timer"></i> Max age</label>
-    Remove markers after <input type="text" id="node-input-maxage" style="width:60px;"> seconds
+    <label for="node-input-maxage"><i class="fa fa-clock-o"></i> Max age</label>
+    Remove markers after <input type="text" id="node-input-maxage" style="width:67px;"> seconds
+</div>
+<div class="form-row">
+    <label for="node-input-usermenu"><i class="fa fa-user"></i> User Menu</label>
+    <select id="node-input-usermenu" style="width:70px;">
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+    </select>
+    <i class="fa fa-arrows-alt" style="margin-left:50px"></i> Auto-pan <select id="node-input-panit" style="width:70px;">
+        <option value="false">False</option>
+        <option value="true">True</option>
+    </select>
 </div>
 <div class="form-row">
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
@@ -84,13 +95,15 @@
         category: 'location',
         color:"darksalmon",
         defaults: {
+            name: {value:""},
             lat: {value:""},
             lon: {value:""},
             zoom: {value:""},
             layer: {value:""},
             cluster: {value:""},
             maxage: {value:""},
-            name: {value:""}
+            usermenu: {value:"show"},
+            panit: {value:"false"}
         },
         inputs:1,
         outputs:0,

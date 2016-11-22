@@ -77,7 +77,7 @@
     <tr><td style="cursor:default"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
-<div id="foot">&nbsp;&copy; IBM 2015,2016</div>
+<div id="foot"></div>
 <!-- <div id="heat"><button type="button" onclick="clearHeat();">Clear Heatmap</button></div> -->
 
 <dialog id="helpWindow">
@@ -120,25 +120,33 @@ var maxage = 600;   // default max age of icons on map in seconds - cleared afte
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
 var initialposition = false;
+var inIframe = false;
+var showUserMenu = true;
 
 // Create the socket
 var ws = io();
 
 ws.on('connect', function() {
     console.log("CONNECTED");
-    document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+    if (!inIframe) {
+        document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+    }
     ws.emit("worldmap",{action:"connected"});
 });
 
 ws.on('disconnect', function() {
     console.log("DISCONNECTED");
-    document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+    if (!inIframe) {
+        document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+    }
     setTimeout(function() { ws.connect(); }, 2500);
 });
 
 ws.on('error', function() {
     console.log("ERROR");
-    document.getElementById("foot").innerHTML = "<font color='#C00'>"+ibmfoot+"</font>";
+    if (!inIframe) {
+        document.getElementById("foot").innerHTML = "<font color='#C00'>"+ibmfoot+"</font>";
+    }
     setTimeout(function() { ws.connect(); }, 2500);
 });
 
@@ -171,6 +179,7 @@ map = new L.map('map').setView(startpos, startzoom);
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
     console.log("IN an iframe");
+    inIframe = true;
     (document.getElementById("topbar").style.display="none");
     (document.getElementById("map").style.top="0px");
     (document.getElementById("results").style.right="50px");
@@ -181,36 +190,43 @@ if (window.self !== window.top) {
     (document.getElementById("bars").style.display="none");
     (document.getElementById("menu").style.right="8px");
     (document.getElementById("menu").style.borderRadius="6px");
-    L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
+    if (showUserMenu) {
+        var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
+    }
 }
 else {
     console.log("NOT in an iframe")
     window.onbeforeunload = function(e) {
         return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
     };
+    if (!showUserMenu) {
+        document.getElementById("bars").style.display="none";
+    }
 }
 
-// Add the fullscreen button
-L.control.fullscreen().addTo(map);
+if (!inIframe) {
+    // Add the fullscreen button
+    L.control.fullscreen().addTo(map);
 
-// map.on('fullscreenchange', function () {
-//     if (map.isFullscreen()) { console.log('entered fullscreen') }
-//     else { console.log('exited fullscreen'); }
-// });
+    // map.on('fullscreenchange', function () {
+    //     if (map.isFullscreen()) { console.log('entered fullscreen') }
+    //     else { console.log('exited fullscreen'); }
+    // });
 
-// Add the locate my position button
-L.easyButton( 'fa-crosshairs fa-lg', function() {
-    map.locate({setView:true, maxZoom:16});
-}, "Locate me").addTo(map);
+    // Add the locate my position button
+    L.easyButton( 'fa-crosshairs fa-lg', function() {
+        map.locate({setView:true, maxZoom:16});
+    }, "Locate me").addTo(map);
 
-// Add the measure/ruler button
-L.Control.measureControl().addTo(map);
+    // Add the measure/ruler button
+    L.Control.measureControl().addTo(map);
 
-// Create the clear heatmap button
-var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
-    console.log("reset heatmap");
-    heat.setLatLngs([]);
-}, "Clears the current heatmap", "bottomright");
+    // Create the clear heatmap button
+    var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
+        console.log("reset heatmap");
+        heat.setLatLngs([]);
+    }, "Clears the current heatmap", "bottomright");
+}
 
 // Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
@@ -511,30 +527,30 @@ basemaps["OSM"] = osm;
 
 // Extra Leaflet map layers from http://leaflet-extras.github.io/leaflet-providers/preview/
 var Esri_WorldStreetMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    attribution: 'Tiles &copy; Esri'
 });
 basemaps["Esri"] = Esri_WorldStreetMap;
 
 var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    attribution: 'Tiles &copy; Esri'
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
 var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri',
+    attribution: 'Tiles &copy; Esri',
     maxNativeZoom: 13
 });
 basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+    attribution: 'Tiles &copy; Esri',
     maxNativeZoom: 10
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
 var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
     maxZoom: 18,
-    attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 });
 basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
 
@@ -548,7 +564,7 @@ basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
 //basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
 
 var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+    attribution: 'Tiles &copy; Esri',
     maxNativeZoom: 12
 });
 basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
@@ -563,7 +579,7 @@ var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.p
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
 var NLS_OS_1919_1947 = L.tileLayer( 'http://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
-    attribution: 'Historical Maps Layer, 1919-1947 from the <a href="http://maps.nls.uk/projects/api/">NLS Maps API</a>',
+    attribution: 'Historical Maps Layer, from <a href="http://maps.nls.uk/projects/api/">NLS Maps</a>',
     bounds: [[49.6, -12], [61.7, 3]],
     minZoom: 1,
     maxZoom: 18,
@@ -635,7 +651,7 @@ map.on('draw:created', function (e) {
 overlays["roads"] = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
     type: 'hyb',
     ext: 'png',
-    attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution: '<a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     subdomains: '1234',
     opacity: 0.9
 });
@@ -671,7 +687,9 @@ if ( window.localStorage.hasOwnProperty("lastlayer") ) {
 basemaps[baselayername].addTo(map);
 
 // Add the layers control widget
-var layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+if (!inIframe) {
+    var layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+}
 // Layer control based on select box rather than radio buttons.
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
 
@@ -693,7 +711,7 @@ var delMarker = function(dname) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-    //console.log(typeof data, data);
+    console.log(typeof data, data);
     var ll;
     var stay = popped;
 
@@ -707,7 +725,9 @@ function setMarker(data) {
             //zoomToBoundsOnClick:false
         }).addTo(map);
         overlays[lay] = layers[lay];
-        layercontrol.addOverlay(layers[lay],lay);
+        if (!inIframe) {
+            layercontrol.addOverlay(layers[lay],lay);
+        }
     }
 
     if (typeof markers[data.name] != "undefined") { layers[lay].removeLayer(markers[data.name]); }
@@ -926,6 +946,20 @@ function doCommand(cmd) {
     // ignore server side initial command if client position already saved.
     if (cmd.hasOwnProperty("init") && initialposition) {
         return;
+    }
+    if (cmd.hasOwnProperty("panit")) {
+        if (cmd.panit === "true") { panit = true; }
+        else { panit = false; }
+    }
+    if (cmd.hasOwnProperty("showmenu")) {
+        if ((cmd.showmenu === "hide") && (showUserMenu === true)) {
+            showUserMenu = false;
+            map.removeControl(menuButton);
+        }
+        else if ((cmd.showmenu === "show") && (showUserMenu === false)) {
+            showUserMenu = true;
+            map.addControl(menuButton);
+        }
     }
     var existsalready = false;
     // Add a new base map layer

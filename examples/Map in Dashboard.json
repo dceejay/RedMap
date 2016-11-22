@@ -1,0 +1,158 @@
+[
+    {
+        "id": "104f9b89.5daf04",
+        "type": "worldmap",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSM",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "hide",
+        "panit": "true",
+        "x": 490,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "7892d55a.40864c",
+        "type": "inject",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 220,
+        "wires": [
+            [
+                "45dc04c5.811fcc"
+            ]
+        ]
+    },
+    {
+        "id": "45dc04c5.811fcc",
+        "type": "function",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "func": "// create random position\nvar lat = 51 + Math.random() * 0.2;\nvar lon = -1.45 + Math.random() * 0.2;\nmsg.payload={lat:lat, lon:lon, name:\"Mike\", icon:\"male\", url:\"<a href=\\\"/red/ui/#/0\\\">IBM link</a>\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 310,
+        "y": 280,
+        "wires": [
+            [
+                "104f9b89.5daf04"
+            ]
+        ]
+    },
+    {
+        "id": "39ae2a4d.5a6f06",
+        "type": "inject",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "topic": "",
+        "payload": "/red/worldmap",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 140,
+        "y": 340,
+        "wires": [
+            [
+                "a8660ccf.d7166"
+            ]
+        ]
+    },
+    {
+        "id": "be72c0ae.5925b",
+        "type": "ui_template",
+        "z": "5ab56e5e.449a5",
+        "group": "c60f4e05.ebb48",
+        "name": "",
+        "order": 0,
+        "width": "6",
+        "height": "6",
+        "format": "<div ng-bind-html=\"msg.payload | trusted\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 480,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a8660ccf.d7166",
+        "type": "template",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<iframe src={{{payload}}} height=300px ></iframe>",
+        "x": 310,
+        "y": 340,
+        "wires": [
+            [
+                "be72c0ae.5925b"
+            ]
+        ]
+    },
+    {
+        "id": "79411e5e.1af57",
+        "type": "ui_button",
+        "z": "5ab56e5e.449a5",
+        "name": "",
+        "group": "c60f4e05.ebb48",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Move Mike",
+        "color": "",
+        "icon": "fa-male",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "45dc04c5.811fcc"
+            ]
+        ]
+    },
+    {
+        "id": "235ad210.492b0e",
+        "type": "comment",
+        "z": "5ab56e5e.449a5",
+        "name": "How to embed Map in Dashboard",
+        "info": "This example shows how to embed the Worldmap \ninto a template node within the `node-red-dashboard`\n\nThe first flow creates a dashboard button that \ngenerates a randon position, with the required \nicon, and passes that to the worldmap. The\nmap is configured to automatically pan to the\nposition of any point that arrives.\n\nThe second flow initialise the dashboard template\nwith the initial map and sets it to a more square shape\nby adjusting the height.",
+        "x": 180,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "c60f4e05.ebb48",
+        "type": "ui_group",
+        "z": "5ab56e5e.449a5",
+        "name": "Default",
+        "tab": "6a3aec18.0bc474",
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "6a3aec18.0bc474",
+        "type": "ui_tab",
+        "z": "5ab56e5e.449a5",
+        "name": "Home",
+        "icon": "dashboard"
+    }
+]
