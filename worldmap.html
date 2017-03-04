@@ -117,6 +117,7 @@
         },
         info: function() {
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+'/worldmap).';
+            //return 'The map can be found <a href="'+RED.settings.httpNodeRoot.slice(0,-1)+'/worldmap" target="_blank">here</a>.';
         },
         oneditprepare: function() {
             $( "#node-input-zoom" ).spinner({min:0, max:18});

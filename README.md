@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.23 - Add msg.payload.command.heatmap to allow setting of heatmap config.
  - v1.0.22 - Add example how to embed into Node-RED-Dashboard template.
  - v1.0.21 - If you specify range and icon then you get a marker and a range circle, if you just specify range with no icon, you just get a circle, and vice versa.
  - v1.0.20 - Add buildings overlay.
@@ -23,7 +24,7 @@ map web page for plotting "things" on.
 
 Run the following command in your Node-RED user directory - typically `~/.node-red`
 
-        npm install node-red-contrib-web-worldmap
+        npm i --save node-red-contrib-web-worldmap
 
 ### Usage
 
@@ -111,6 +112,7 @@ Optional properties include
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
+ - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
 
 #### For example
 

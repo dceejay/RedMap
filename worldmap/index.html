@@ -619,6 +619,7 @@ overlays["day/night"] = layers["_daynight"];
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
 layers["heat"] = new L.LayerGroup().addLayer(heat);
 overlays["heatmap"] = layers["heat"];
+console.log("HEAT",heat);
 
 // Add the drawing layer for fun...
 layers["drawing"] = new L.FeatureGroup();
@@ -1005,6 +1006,10 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
+    }
+    if (cmd.hasOwnProperty("heatmap")) {
+        heat.setOptions(cmd.heatmap);
+        heat.redraw();
     }
     map.setView([clat,clon],czoom);
 }
