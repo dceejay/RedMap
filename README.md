@@ -46,6 +46,9 @@ Optional properties include
  - **iconColor** : Standard CSS color name or #rrggbb hex value.
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
+ - **addtoheatmap** : set to <i>false</i> to exlcude point from adding to heatmap layer. (default true)
+ - **int** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
+  
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 
