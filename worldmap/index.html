@@ -619,7 +619,6 @@ overlays["day/night"] = layers["_daynight"];
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
 layers["heat"] = new L.LayerGroup().addLayer(heat);
 overlays["heatmap"] = layers["heat"];
-console.log("HEAT",heat);
 
 // Add the drawing layer for fun...
 layers["drawing"] = new L.FeatureGroup();
@@ -872,6 +871,22 @@ function setMarker(data) {
         if (data.hasOwnProperty("icon") || (!data.hasOwnProperty("radius"))) {
             if (data.hasOwnProperty("icon")) { delete data.icon; }
             if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
+            if (data.hasOwnProperty("photourl")) {
+                words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
+                delete data.photourl;
+            }
+            if (data.hasOwnProperty("photoUrl")) {
+                words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
+                delete data.photoUrl;
+            }
+            if (data.hasOwnProperty("weblink")) {
+                if (typeof data.weblink === "string") {
+                    words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
+                } else {
+                    words += "<b><a href='"+ data.weblink.url + "' target='_new'>" + data.weblink.name + "</a></b><br/>";
+                }
+                delete data.weblink;
+            }
             for (var i in data) {
                 if (i != "name") {
                     if (typeof data[i] === "object") {
@@ -880,12 +895,6 @@ function setMarker(data) {
                         words += i +" : "+data[i]+"<br/>";
                     }
                 }
-            }
-            if (data.hasOwnProperty("photourl")) {
-                words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
-            }
-            if (data.hasOwnProperty("photoUrl")) {
-                words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
             }
             marker.bindPopup(words);
             marker._popup.dname = data.name;

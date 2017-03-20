@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.24 - Add `.weblink` property to allow links out to other information. Add more heatmap layer control
  - v1.0.23 - Add msg.payload.command.heatmap to allow setting of heatmap config.
  - v1.0.22 - Add example how to embed into Node-RED-Dashboard template.
  - v1.0.21 - If you specify range and icon then you get a marker and a range circle, if you just specify range with no icon, you just get a circle, and vice versa.
@@ -45,6 +46,7 @@ Optional properties include
  - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
  - **iconColor** : Standard CSS color name or #rrggbb hex value.
  - **photoUrl** : adds an image pointed at by the url to the popup box.
+ - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk"}`
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
  - **addtoheatmap** : set to <i>false</i> to exlcude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
