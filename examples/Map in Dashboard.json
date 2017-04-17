@@ -57,7 +57,7 @@
         "z": "5ab56e5e.449a5",
         "name": "",
         "topic": "",
-        "payload": "/red/worldmap",
+        "payload": "/worldmap",
         "payloadType": "str",
         "repeat": "",
         "crontab": "",
