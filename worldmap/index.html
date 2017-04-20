@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-  Copyright 2015, 2016 IBM Corp.
+  Copyright 2015, 2017 IBM Corp.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ var menuOpen = false;
 var clusterAt = 12;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var ibmfoot = "&nbsp;&copy; IBM 2015,2016"
+var ibmfoot = "&nbsp;&copy; IBM 2015,2017"
 var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
@@ -905,8 +905,8 @@ function setMarker(data) {
                 rightmenuMarker.setLatLng(e.latlng);
                 map.openPopup(rightmenuMarker);
             });
-            if ((data.addtoheatmap !== "false") || (!data.hasOwnProperty("addtoheatmap"))){ // Added to give ability to control if points from active layer contribute to heatmap
-  				if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }	
+            if ((data.addtoheatmap !== "false") || (!data.hasOwnProperty("addtoheatmap"))) { // Added to give ability to control if points from active layer contribute to heatmap
+                if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
             }
             markers[data.name] = marker;
             layers[lay].addLayer(marker);
@@ -982,9 +982,15 @@ function doCommand(cmd) {
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
-        console.log("New map:",cmd.map.name);
         if (basemaps.hasOwnProperty(cmd.map.name)) { existsalready = true; }
-        basemaps[cmd.map.name] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
+            console.log("New WMS:",cmd.map.name);
+            basemaps[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+        }
+        else {
+            console.log("New Map:",cmd.map.name);
+            basemaps[cmd.map.name] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        }
         if (!existsalready) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
@@ -993,7 +999,12 @@ function doCommand(cmd) {
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
         console.log("New overlay:",cmd.map.overlay);
         if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }
-        overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
+            overlays[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+        }
+        else {
+            overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
+        }
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }

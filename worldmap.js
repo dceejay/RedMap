@@ -34,6 +34,8 @@ module.exports = function(RED) {
         var node = this;
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
+        // add the cgi module for serving local maps....
+        RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
 
         var callback = function(client) {
             client.setMaxListeners(0);

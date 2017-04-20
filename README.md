@@ -7,7 +7,8 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
- - v1.0.24 - Add `.weblink` property to allow links out to other information. Add more heatmap layer control
+ - v1.0.26 - Add info on how to use with local WMS server
+ - v1.0.24 - Add `.weblink` property to allow links out to other information.
  - v1.0.23 - Add msg.payload.command.heatmap to allow setting of heatmap config.
  - v1.0.22 - Add example how to embed into Node-RED-Dashboard template.
  - v1.0.21 - If you specify range and icon then you get a marker and a range circle, if you just specify range with no icon, you just get a circle, and vice versa.
@@ -50,7 +51,7 @@ Optional properties include
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
  - **addtoheatmap** : set to <i>false</i> to exlcude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
-  
+
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 
@@ -132,6 +133,40 @@ To add a new base layer
             url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
             opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
         };
+
+
+### Using a local Map Server (WMS server)
+
+IMHO the easiest map server to make work is the <a href="http://www.mapserver.org/" target="_new">mapserver</a> package in Ubuntu / Debian. Usually you will start with
+
+    sudo apt-get install mapserver-bin cgi-mapserver gdal-bin
+
+Configuring that, setting up your tiles, and creating a .map file is way beyond the scope of this README so I will leave that as an exercise for the reader. Once set up you should have a cgi process you can run called `mapserv`, and a `.map` file that describes the layers available from the server.
+
+Create and edit these into a file called **mapserv**, located in this node's directory, typically
+`~/.node-red/node_modules/node-red-contrib-web-worldmap/mapserv`, for example:
+
+    #! /bin/sh
+    # set this to the path of your WMS map file (which in turn points to your tiles)
+    MS_MAPFILE=~/Data/maps/uk.map
+    export MS_MAPFILE
+    # and set this to the path of your cgi-mapserv executable
+    /usr/bin/mapserv
+
+You can then add a new WMS Base layer by injecting a message like
+
+    msg.payload.command.map = {
+        name: "Local WMS",
+        url: 'http://localhost:1880/cgi-bin/mapserv',   // we will serve the tiles from this node locally.
+        opt: {
+            layers: 'gb',                               // specifies a layer in your map file
+            format: 'image/png',
+            transparent: true,
+            attribution: "© Ordnance Survey, UK"
+        },
+        wms: true                                       // set to true for WMS type mapserver
+    }
+
 
 Demo Flow
 ---------

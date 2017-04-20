@@ -86,11 +86,21 @@
     <p>Icons of type <i>plane</i>, <i>ship</i> or <i>car</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
     <p>There are some <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">extra commands</a>
-    for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and to <b>control</b> the map remotely.</p>
+    for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and to <b>control</b> the map remotely, including how to
+    use a local map server.</p>
 </script>
 
 <script type="text/javascript">
-    RED.keyboard.add("*",/* w */ 87,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+document.location.host+RED.settings.httpNodeRoot+"/worldmap") });
+    var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
+    var re = new RegExp('\/{1,}','g');
+    lnk = lnk.replace(re,'/');
+    if (!RED.hasOwnProperty("actions")) {
+        RED.keyboard.add("*",/* m */ 77,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+lnk) });
+    }
+    else {
+        RED.keyboard.add("*","ctrl-shift-m","Show Map");
+        RED.actions.add("Show Map",function() { window.open(document.location.protocol+"//"+lnk) });
+    }
     RED.nodes.registerType('worldmap',{
         category: 'location',
         color:"darksalmon",
