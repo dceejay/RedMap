@@ -1,5 +1,5 @@
 /**
- * Copyright 2015, 2016 IBM Corp.
+ * Copyright 2015, 2017 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 
 module.exports = function(RED) {
     "use strict";
+    var path = require("path");
     var express = require("express");
     var io = require('socket.io');
     var socket;
 
     var WorldMap = function(n) {
         RED.nodes.createNode(this,n);
-        if (!socket) { socket = io.listen(RED.server); }
+        if (!socket) {
+            var fullPath = path.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
+            socket = io.listen(RED.server, {path:fullPath});
+        }
         this.lat = n.lat || "";
         this.lon = n.lon || "";
         this.zoom = n.zoom || "";
@@ -71,6 +75,7 @@ module.exports = function(RED) {
         socket.on('connection', callback);
     }
     RED.nodes.registerType("worldmap",WorldMap);
+
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);

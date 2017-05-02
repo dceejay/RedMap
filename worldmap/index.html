@@ -124,7 +124,7 @@ var inIframe = false;
 var showUserMenu = true;
 
 // Create the socket
-var ws = io();
+var ws = io({path:location.pathname + 'socket.io'});
 
 ws.on('connect', function() {
     console.log("CONNECTED");
@@ -771,9 +771,18 @@ function setMarker(data) {
         }
         //console.log("handling",data.name);
         if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
+        else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
+            data.lat = data.position.lat*1;
+            data.lon = data.position.lon*1;
+            data.alt = data.position.alt;
+            if (parseFloat(data.position.alt) == data.position.alt) { data.alt = data.position.alt + " m"; }
+            delete data.position;
+            ll = new L.LatLng((data.lat*1), (data.lon*1));
+        }
         else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
         else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude")) { ll = new L.LatLng((data.latitude*1), (data.longitude*1)); }
         else { console.log("No location:",data); return; }
+
         // Adding new L.LatLng object (lli) when optional intensity value is defined. Only for use in heatmap layer
         if (typeof data.coordinates == "object") { lli = new L.LatLng(data.coordinates[2],data.coordinates[1],data.coordinates[0]); }
         else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.lat*1), (data.lon*1), (data.intensity*1)); }
@@ -985,7 +994,12 @@ function doCommand(cmd) {
         if (basemaps.hasOwnProperty(cmd.map.name)) { existsalready = true; }
         if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
             console.log("New WMS:",cmd.map.name);
-            basemaps[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+            if (cmd.map.wms === "grey") {
+                basemaps[cmd.map.name] = L.tileLayer.graywms(cmd.map.url, cmd.map.opt);
+            }
+            else {
+                basemaps[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+            }
         }
         else {
             console.log("New Map:",cmd.map.name);
@@ -1000,7 +1014,12 @@ function doCommand(cmd) {
         console.log("New overlay:",cmd.map.overlay);
         if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }
         if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
-            overlays[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+            if (cmd.map.wms === "grey") {
+                overlays[cmd.map.name] = L.tileLayer.graywms(cmd.map.url, cmd.map.opt);
+            }
+            else {
+                overlays[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+            }
         }
         else {
             overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);

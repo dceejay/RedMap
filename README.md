@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.28 - Move websocket to specific path, and support satellite node
  - v1.0.26 - Add info on how to use with local WMS server
  - v1.0.24 - Add `.weblink` property to allow links out to other information.
  - v1.0.23 - Add msg.payload.command.heatmap to allow setting of heatmap config.
