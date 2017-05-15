@@ -24,7 +24,7 @@ module.exports = function(RED) {
     var WorldMap = function(n) {
         RED.nodes.createNode(this,n);
         if (!socket) {
-            var fullPath = path.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
             socket = io.listen(RED.server, {path:fullPath});
         }
         this.lat = n.lat || "";
@@ -104,4 +104,54 @@ module.exports = function(RED) {
         socket.on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
+
+    var satarray = {};
+    var WorldMapTracks = function(n) {
+        RED.nodes.createNode(this,n);
+        this.depth = Number(n.depth) || 20;
+        var node = this;
+
+        node.on("input", function(msg) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+                var newmsg = RED.util.cloneMessage(msg);
+                if (msg.payload.deleted) {
+                    delete satarray[msg.payload.name];
+                    newmsg.payload.name = msg.payload.name + "_";
+                    node.send(newmsg);  // send the track to be deleted
+                    return;
+                }
+                if (!satarray.hasOwnProperty(msg.payload.name)) {
+                    satarray[msg.payload.name] = [];
+                }
+                satarray[msg.payload.name].push(msg.payload);
+                if (satarray[msg.payload.name].length > node.depth) {
+                    satarray[msg.payload.name].shift();
+                }
+
+                var line = [];
+                for (var i=0; i<satarray[msg.payload.name].length; i++) {
+                    var m = satarray[msg.payload.name][i];
+                    if (m.hasOwnProperty("lat") && m.hasOwnProperty("lon")) {
+                        line.push( [m.lat*1, m.lon*1] );
+                        delete newmsg.payload.lat;
+                        delete newmsg.payload.lon;
+                    }
+                    if (m.hasOwnProperty("position") && m.position.hasOwnProperty("lat") && m.position.hasOwnProperty("lon")) {
+                        line.push( [m.position.lat*1, m.position.lon*1] );
+                        delete newmsg.payload.position;
+                    }
+                }
+                if (line.length > 1) { // only send track if two points or more
+                    newmsg.payload.line = line;
+                    newmsg.payload.name = msg.payload.name + "_";
+                    node.send(newmsg);  // send the track
+                }
+            }
+        });
+
+        node.on("close", function() {
+            satarray = {};
+        });
+    }
+    RED.nodes.registerType("worldmap-tracks",WorldMapTracks);
 }

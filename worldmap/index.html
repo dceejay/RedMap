@@ -223,7 +223,7 @@ if (!inIframe) {
 
     // Create the clear heatmap button
     var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
-        console.log("reset heatmap");
+        console.log("Reset heatmap");
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
@@ -284,6 +284,10 @@ function doTidyUp() {
                 if (typeof polygons[m] != "undefined") {
                     layers[markers[m].lay].removeLayer(polygons[m]);
                     delete polygons[m];
+                }
+                if (typeof polygons[m+"_"] != "undefined") {
+                    //layers[markers[m+"_"].lay].removeLayer(polygons[m+"_"]);
+                    delete polygons[m+"_"];
                 }
                 delete markers[m];
             }
@@ -821,7 +825,7 @@ function setMarker(data) {
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47.032 47.032">';
-            icon += '<g><path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336   h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></g></svg>';
+            icon += '<g><path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></g></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"caricon",
@@ -829,6 +833,23 @@ function setMarker(data) {
                 html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
+        }
+        else if (data.icon === "satellite") {
+            data.iconColor = data.iconColor || "black";
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
+            icon += '<polygon points="38.17 39.4 45.24 32.33 43.34 27.92 24.21 8.78 14.59 18.4 33.72 37.53" fill="'+data.iconColor+'"/>';
+            icon += '<path d="M69.22 44.57L54.38 29.73c-1.1-1.1-2.91-1.1-4.01 0L35.53 44.57c-1.1 1.1-1.1 2.91 0 4.01l14.84 14.84c1.1 1.1 2.91 1.1 4.01 0l14.84-14.84C70.32 47.47 70.32 45.67 69.22 44.57z" fill="'+data.iconColor+'"/>';
+            icon += '<polygon points="71.04 55.61 66.58 53.75 59.52 60.82 61.42 65.23 80.55 84.36 90.17 74.75" fill="'+data.iconColor+'"/>';
+            icon += '<path d="M28.08 55.26l-6.05 0.59C23.11 68.13 32.78 77.94 45 79.22l0.59-6.05C36.26 72.15 28.89 64.66 28.08 55.26z" fill="'+data.iconColor+'"/>';
+            icon += '<path d="M15.88 56.54L9.83 57.13c1.67 18.06 16.03 32.43 34.08 34.09l0.59-6.04C29.34 83.76 17.29 71.71 15.88 56.54z" fill="'+data.iconColor+'"/>';
+            icon += '</svg>';
+            var svglocate = "data:image/svg+xml;base64," + btoa(icon);
+            myMarker = L.divIcon({
+                className:"satelliteicon",
+                iconAnchor: [16, 16],
+                html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
         else if (data.icon === "locate") {
             data.iconColor = data.iconColor || "cyan";

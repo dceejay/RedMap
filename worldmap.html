@@ -169,3 +169,45 @@
         }
     });
 </script>
+
+
+<script type="text/x-red" data-template-name="worldmap-tracks">
+<div class="form-row">
+    <label for="node-input-depth"><i class="fa fa-map-marker"></i> Number of</label>
+    points in track <input type="text" id="node-input-depth" style="width:50%" placeholder="number - default 20">
+</div>
+<div class="form-row">
+    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="worldmap-tracks">
+    <p>Creates tracks lines based on a specified number of previous locations.</p>
+    <p>Holds all the points in memory, so if you have a lot of points held for a
+    large depth then memory usage may become excessive.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap-tracks',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            depth: {value:20},
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "white-globe.png",
+        paletteLabel: "tracks",
+        label: function() {
+            return this.name||"tracks";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        info: function() {
+            return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+'/worldmap).';
+        }
+    });
+</script>
