@@ -1042,6 +1042,11 @@ function doCommand(cmd) {
                 overlays[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
             }
         }
+        else if (cmd.map.hasOwnProperty("bounds")) {            //Image Overlay in the bounds specified (2D Array)
+            if (cmd.map.bounds.length === 2 && cmd.map.bounds[0].length === 2 && cmd.map.bounds[1].length === 2) {            
+                overlays[cmd.map.overlay] = new L.imageOverlay(cmd.map.url, L.latLngBounds(cmd.map.bounds));
+            }
+        }
         else {
             overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
         }
