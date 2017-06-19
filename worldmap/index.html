@@ -701,7 +701,8 @@ if (!inIframe) {
 var delMarker = function(dname) {
     //console.log("Deleting",dname);
     if (typeof polygons[dname] != "undefined") {
-        layers[markers[dname].lay].removeLayer(polygons[dname]);
+        layers[polygons[dname].lay].removeLayer(polygons[dname]);
+        ws.emit("worldmap",{action:"delete", name:dname});
         delete polygons[dname];
     }
     if (typeof markers[dname] != "undefined") {
@@ -745,12 +746,14 @@ function setMarker(data) {
         var col = data.iconColor || "#910000";
         var polyln = L.polyline(data.line, {stroke:true, weight:3, color:col, opacity:0.8, clickable:false});
         polygons[data.name] = polyln;
+        polygons[data.name].lay = lay;
         layers[lay].addLayer(polyln);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var cola = data.iconColor || "#910000";
         var polyarea = L.polygon(data.area, {stroke:true, weight:2, color:cola, fillColor:cola, fillOpacity:0.2, clickable:false});
         polygons[data.name] = polyarea;
+        polygons[data.name].lay = lay;
         layers[lay].addLayer(polyarea);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
@@ -762,6 +765,7 @@ function setMarker(data) {
                 .openOn(map);
         });
         polygons[data.name] = ellipse;
+        polygons[data.name].lay = lay;
         layers[lay].addLayer(ellipse);
     }
     else {
@@ -770,6 +774,7 @@ function setMarker(data) {
                 var colac = data.iconColor || "#910000";
                 var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
                 polygons[data.name] = polycirc;
+                polygons[data.name].lay = lay;
                 layers[lay].addLayer(polycirc);
             }
         }
@@ -979,6 +984,7 @@ function setMarker(data) {
                         polygon.setStyle({opacity:0});
                     }
                     polygons[data.name] = polygon;
+                    polygons[data.name].lay = lay;
                     layers[lay].addLayer(polygon);
                 }
             }
