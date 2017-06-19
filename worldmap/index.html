@@ -151,9 +151,19 @@ ws.on('error', function() {
 });
 
 ws.on('worldmapdata', function(data) {
-    if (data.command) { doCommand(data.command); delete data.command; }
-    if (data.hasOwnProperty("name")) { setMarker(data); }
-    else { console.log("SKIP",data); }
+    if (Array.isArray(data)) {
+        console.log("Data passed in is Array");
+        for (var prop in data) {
+            if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+            if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
+            else { console.log("SKIP",data[prop]); }
+        }
+    }
+    else {
+        if (data.command) { doCommand(data.command); delete data.command; }
+        if (data.hasOwnProperty("name")) { setMarker(data); }
+        else { console.log("SKIP",data); }
+    }
 });
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
