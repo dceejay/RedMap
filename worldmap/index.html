@@ -706,7 +706,6 @@ var delMarker = function(dname) {
         delete polygons[dname];
     }
     if (typeof markers[dname] != "undefined") {
-        var d = {name:dname,type:"DELETE",lat:markers[dname]._latlng.lat,lon:markers[dname]._latlng.lng};
         ws.emit("worldmap",{action:"delete", name:dname});
         layers[markers[dname].lay].removeLayer(markers[dname]);
         delete markers[dname];
