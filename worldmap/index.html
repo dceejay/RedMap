@@ -803,7 +803,7 @@ function setMarker(data) {
                 title: data.name,
                 color: (data.iconColor || "blue")
             });
-            marker.setHeading(data.bearing);
+            marker.setHeading(data.hdg||data.bearing);
             q = 'http://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
@@ -813,24 +813,26 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310" >';
             icon += '<g><path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></g></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
+            var dir = data.hdg || data.bearing;
             myMarker = L.divIcon({
                 className:"planeicon",
                 iconAnchor: [15, 15],
-                html:'<img src="'+svgplane+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
+                html:'<img src="'+svgplane+'" style="width:31px; height:30px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);" />',
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
-            q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
-            words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
+            //q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
+            //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47.032 47.032">';
             icon += '<g><path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></g></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
+            var dir = data.hdg || data.bearing;
             myMarker = L.divIcon({
                 className:"caricon",
                 iconAnchor: [15, 15],
-                html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+data.bearing+'deg); -moz-transform:rotate('+data.bearing+'deg);" />',
+                html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);" />',
             });
             marker = L.marker(ll, {title: data.name, icon: myMarker});
         }
@@ -918,7 +920,7 @@ function setMarker(data) {
                 delete data.weblink;
             }
             for (var i in data) {
-                if (i != "name") {
+                if ((i != "name") && (i != "length")) {
                     if (typeof data[i] === "object") {
                         words += i +" : "+JSON.stringify(data[i])+"<br/>";
                     } else {

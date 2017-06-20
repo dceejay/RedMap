@@ -105,6 +105,7 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
 
+
     var satarray = {};
     var WorldMapTracks = function(n) {
         RED.nodes.createNode(this,n);
@@ -127,7 +128,6 @@ module.exports = function(RED) {
                 if (satarray[msg.payload.name].length > node.depth) {
                     satarray[msg.payload.name].shift();
                 }
-
                 var line = [];
                 for (var i=0; i<satarray[msg.payload.name].length; i++) {
                     var m = satarray[msg.payload.name][i];
@@ -135,6 +135,11 @@ module.exports = function(RED) {
                         line.push( [m.lat*1, m.lon*1] );
                         delete newmsg.payload.lat;
                         delete newmsg.payload.lon;
+                    }
+                    if (m.hasOwnProperty("latitude") && m.hasOwnProperty("longitude")) {
+                        line.push( [m.latitude*1, m.longitude*1] );
+                        delete newmsg.payload.latitude;
+                        delete newmsg.payload.longitude;
                     }
                     if (m.hasOwnProperty("position") && m.position.hasOwnProperty("lat") && m.position.hasOwnProperty("lon")) {
                         line.push( [m.position.lat*1, m.position.lon*1] );
