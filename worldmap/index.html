@@ -778,8 +778,14 @@ function setMarker(data) {
         if (data.hasOwnProperty("radius")) {
             if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
                 var colac = data.iconColor || "#910000";
-                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
+                var strokeRad = (data.hasOwnProperty("stroke")) ? data.stroke : true;            //Stroke on Circles = Outline //Andreas more options
+                var weightRad = (data.hasOwnProperty("weight")) ? data.weight : 2;
+                var clickableRad = (data.hasOwnProperty("clickable")) ? data.clickable : false;
+                var fillRad = (data.hasOwnProperty("fillOpacity")) ? data.fillOpacity : 0.2;
+                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:strokeRad, weight:weightRad, color:colac, fillColor:colac, fillOpacity:fillRad, clickable:clickableRad});
+                if (clickableRad && data.name) polycirc.bindPopup(String(data.name)); // clickable Popup to Circle
                 polygons[data.name] = polycirc;
+                polygons[data.name].lay = lay;          //Added Layer String, similar to markers.lay
                 layers[lay].addLayer(polycirc);
             }
         }
