@@ -729,6 +729,15 @@ function setMarker(data) {
     var ll;
     var lli = null;
     var stay = popped;
+    var opt = {};
+    opt.color = data.color || "#910000";
+    opt.fillColor = data.fillColor || "#910000";
+    opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
+    opt.weight = data.weight || 2;
+    opt.opacity = data.opacity || 1;
+    opt.fillOpacity = data.fillOpacity || 0.2;
+    opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
+    opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
 
     var lay = data.layer || "not known";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
@@ -752,27 +761,35 @@ function setMarker(data) {
         delMarker(data.name);
     }
     else if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
-        var col = data.iconColor || "#910000";
-        var polyln = L.polyline(data.line, {stroke:true, weight:3, color:col, opacity:0.8, clickable:false});
+        delete opt.fill;
+        if (!data.hasOwnProperty("weight")) opt.weight = 3;     //Standard settings different for lines
+        if (!data.hasOwnProperty("opacity")) opt.opacity = 0.8; 
+        var polyln = L.polyline(data.line, opt);
+        if (opt.clickable) polyln.bindPopup(data.name);
         polygons[data.name] = polyln;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polyln);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
-        var cola = data.iconColor || "#910000";
-        var polyarea = L.polygon(data.area, {stroke:true, weight:2, color:cola, fillColor:cola, fillOpacity:0.2, clickable:false});
+        var polyarea = L.polygon(data.area, opt);
+        if (opt.clickable) polyarea.bindPopup(data.name);
         polygons[data.name] = polyarea;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polyarea);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
-        var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, {color:(data.iconColor || "blue"), weight:2} );
-        ellipse.on('click', function(e) {
-            var popup = L.popup()
-                .setLatLng(new L.LatLng((data.lat*1), (data.lon*1)))
-                .setContent('<p><b>'+data.name+'</b><br/>lat : '+data.lat+'<br/>lon : '+data.lon+'</p>')
-                .openOn(map);
-        });
+        if (!data.hasOwnProperty("iconColor")) opt.color = "blue";      //different standard Color Settings
+        if (!data.hasOwnProperty("fillColor")) opt.fillColor = "blue";
+        delete opt.clickable;
+        var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
+        if (data.clickable != false) {
+            ellipse.on('click', function(e) {
+                var popup = L.popup()
+                    .setLatLng(new L.LatLng((data.lat*1), (data.lon*1)))
+                    .setContent('<p><b>'+data.name+'</b><br/>lat : '+data.lat+'<br/>lon : '+data.lon+'</p>')
+                    .openOn(map);
+            });
+        }
         polygons[data.name] = ellipse;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(ellipse);
@@ -780,8 +797,8 @@ function setMarker(data) {
     else {
         if (data.hasOwnProperty("radius")) {
             if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
-                var colac = data.iconColor || "#910000";
-                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, {stroke:true, weight:2, color:colac, fillColor:colac, fillOpacity:0.2, clickable:false});
+                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
+                if (opt.clickable) polycirc.bindPopup(data.name);
                 polygons[data.name] = polycirc;
                 polygons[data.name].lay = lay;
                 layers[lay].addLayer(polycirc);
