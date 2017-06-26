@@ -152,7 +152,7 @@ ws.on('error', function() {
 
 ws.on('worldmapdata', function(data) {
     if (Array.isArray(data)) {
-        console.log("Data passed in is Array");
+        //console.log("ARRAY");
         for (var prop in data) {
             if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
             if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
@@ -762,24 +762,24 @@ function setMarker(data) {
     }
     else if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
         delete opt.fill;
-        if (!data.hasOwnProperty("weight")) opt.weight = 3;     //Standard settings different for lines
-        if (!data.hasOwnProperty("opacity")) opt.opacity = 0.8; 
+        if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
+        if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
-        if (opt.clickable) polyln.bindPopup(data.name);
+        if (opt.clickable) { polyln.bindPopup(data.name); }
         polygons[data.name] = polyln;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polyln);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea = L.polygon(data.area, opt);
-        if (opt.clickable) polyarea.bindPopup(data.name);
+        if (opt.clickable) { polyarea.bindPopup(data.name); }
         polygons[data.name] = polyarea;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polyarea);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
-        if (!data.hasOwnProperty("iconColor")) opt.color = "blue";      //different standard Color Settings
-        if (!data.hasOwnProperty("fillColor")) opt.fillColor = "blue";
+        if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings
+        if (!data.hasOwnProperty("fillColor")) { opt.fillColor = "blue"; }
         delete opt.clickable;
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
         if (data.clickable != false) {
@@ -798,7 +798,7 @@ function setMarker(data) {
         if (data.hasOwnProperty("radius")) {
             if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
                 var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
-                if (opt.clickable) polycirc.bindPopup(data.name);
+                if (opt.clickable) { polycirc.bindPopup(data.name); }
                 polygons[data.name] = polycirc;
                 polygons[data.name].lay = lay;
                 layers[lay].addLayer(polycirc);
@@ -826,7 +826,7 @@ function setMarker(data) {
 
         var words="<b>"+data.name+"</b><br/>";
 
-        // Create the icons... handle ship, earthquake as specials
+        // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, mymarker;
         var icon, q;
         if (data.icon === "ship") {
@@ -841,31 +841,57 @@ function setMarker(data) {
         else if (data.icon === "plane") {
             data.iconColor = data.iconColor || "black";
             if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
-            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310" >';
-            icon += '<g><path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></g></svg>';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
+            icon += '<path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
             var dir = data.hdg || data.bearing;
             myMarker = L.divIcon({
                 className:"planeicon",
-                iconAnchor: [15, 15],
-                html:'<img src="'+svgplane+'" style="width:31px; height:30px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);" />',
+                iconAnchor: [16, 16],
+                html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title: data.name, icon: myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
             //q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
             //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47.032 47.032">';
-            icon += '<g><path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></g></svg>';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47 47">';
+            icon += '<path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
             var dir = data.hdg || data.bearing;
             myMarker = L.divIcon({
                 className:"caricon",
-                iconAnchor: [15, 15],
-                html:'<img src="'+svgcar+'" style="width:31px; height:30px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);" />',
+                iconAnchor: [16, 16],
+                html:'<img src="'+svgcar+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title: data.name, icon: myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
+        }
+        else if (data.icon === "arrow") {
+            data.iconColor = data.iconColor || "black";
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 32 32">';
+            icon += '<path d="m16.2 0.6l-10.9 31 10.7-11.1 10.5 11.1 -10.3-31z" fill="'+data.iconColor+'"/></svg>';
+            var svgarrow = "data:image/svg+xml;base64," + btoa(icon);
+            var dir = data.hdg || data.bearing;
+            myMarker = L.divIcon({
+                className:"arrowicon",
+                iconAnchor: [16, 16],
+                html:"'<img src='"+svgarrow+"' style='width:32px; height:32px; -webkit-transform:translate(0px,-16px) rotate("+dir+"deg); -moz-transform:translate(0px,-16px) rotate("+dir+"deg);'/>",
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
+        }
+        else if (data.icon === "wind") {
+            data.iconColor = data.iconColor || "black";
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 32 32">';
+            icon += '<path d="M16.7 31.7l7-6.9c0.4-0.4 0.4-1 0-1.4 -0.4-0.4-1-0.4-1.4 0l-5.3 5.2V17.3l6.7-6.6c0.2-0.2 0.3-0.5 0.3-0.7v-9c0-0.9-1.1-1.3-1.7-0.7l-6.3 6.2L9.7 0.3C9.1-0.3 8 0.1 8 1.1v8.8c0 0.3 0.1 0.6 0.3 0.8l6.7 6.6v11.3l-5.3-5.2c-0.4-0.4-1-0.4-1.4 0 -0.4 0.4-0.4 1 0 1.4l7 6.9c0.2 0.2 0.5 0.3 0.7 0.3C16.2 32 16.5 31.9 16.7 31.7zM10 9.6V3.4l5 4.9v6.2L10 9.6zM17 8.3l5-4.9v6.2l-5 4.9V8.3z" fill="'+data.iconColor+'"/></svg>';
+            var svgwind = "data:image/svg+xml;base64," + btoa(icon);
+            var dir = data.hdg || data.bearing;
+            myMarker = L.divIcon({
+                className:"windicon",
+                iconAnchor: [16, 16],
+                html:'<img src="'+svgwind+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
         else if (data.icon === "satellite") {
             data.iconColor = data.iconColor || "black";
@@ -1077,7 +1103,7 @@ function doCommand(cmd) {
             }
         }
         else if (cmd.map.hasOwnProperty("bounds")) {            //Image Overlay in the bounds specified (2D Array)
-            if (cmd.map.bounds.length === 2 && cmd.map.bounds[0].length === 2 && cmd.map.bounds[1].length === 2) {            
+            if (cmd.map.bounds.length === 2 && cmd.map.bounds[0].length === 2 && cmd.map.bounds[1].length === 2) {
                 overlays[cmd.map.overlay] = new L.imageOverlay(cmd.map.url, L.latLngBounds(cmd.map.bounds));
             }
         }

@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.30 - Add ability to send an array of data points or commands. Add overlay map. Allow more drawing options for lines, areas, circles.
  - v1.0.29 - Add, tracks node, Fix websocket on Windows
  - v1.0.28 - Move websocket to specific path, and support satellite node
  - v1.0.26 - Add info on how to use with local WMS server
@@ -89,6 +90,18 @@ If the payload contains a **radius** property, as well as name, lat and lon, the
 than draw a point it will draw a circle.
 
 As per Areas and Lines you may also specify *iconColor*, and *layer*.
+
+#### Options
+
+Areas, Lines and Circles can also specify more optional properties:
+ - color
+ - fillColor
+ - stroke
+ - weight
+ - opacity
+ - fill
+ - fillOpacity
+ - clickable (if true sets the passed in name as Popup)
 
 ### Drawing
 
