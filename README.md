@@ -64,6 +64,8 @@ However there are several specials...
  - **plane** : a plane icon that aligns with the bearing of travel.
  - **ship** : a ship icon that aligns with the bearing of travel.
  - **car** : a car icon that aligns with the bearing of travel.
+ - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
+ - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
  - **friend** : pseudo Nato style blue rectangle.
  - **hostile** : pseudo Nato style red circle.
