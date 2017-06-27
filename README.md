@@ -87,9 +87,12 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 #### Circles
 
 If the payload contains a **radius** property, as well as name, lat and lon, then rather
-than draw a point it will draw a circle.
+than draw a point it will draw a circle. The *radius* property is specified in meters.
 
 As per Areas and Lines you may also specify *iconColor*, and *layer*.
+
+If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
+These are specified in the Latitude/Longitude format.
 
 #### Options
 
@@ -133,7 +136,7 @@ Optional properties include
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
-   - **wms** - if the data is provided by a Web Map Service
+   - **wms** - boolean, specifies if the data is provided by a Web Map Service
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lng Points)
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
 
@@ -142,6 +145,20 @@ Optional properties include
 To switch layer, move map and zoom
 
         msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
+
+To draw a heavily customized Circle on a layer
+
+        msg.payload.command =  {
+            name:"circle", 
+            lat:51.515, 
+            lon:-0.1235, 
+            radius:10, 
+            layer:"drawing", 
+            iconColor:'#464646', 
+            stroke:false, 
+            fillOpacity:0.8, 
+            clickable:true
+        };
 
 To add a new base layer
 
