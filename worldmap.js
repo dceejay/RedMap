@@ -71,7 +71,10 @@ module.exports = function(RED) {
                 client.disconnect(true);
             });
         }
-        node.on("close", function() { socket = null; });
+        node.on("close", function() {
+            socket.close();
+            socket = null;
+        });
         node.status({});
         socket.on('connection', callback);
     }
