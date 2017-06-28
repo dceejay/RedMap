@@ -854,6 +854,20 @@ function setMarker(data) {
             //q = 'http://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
             //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
+        else if (data.icon === "uav") {
+            data.iconColor = data.iconColor || "black";
+            if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">';
+            icon+= '<path d="M62 82h-8V64h36c0-5-4-9-9-9H54v-8c0-3 4-5 4-11.1 0-4.4-3.6-8-8-8-4.4 0-8 3.6-8 8 0 5.1 4 8.1 4 11.1V55h-27c-5 0-9 4-9 9h36v18H38c-2.4 0-5 2.3-5 5L50 92l17-5C67 84.3 64.4 82 62 82z" fill="'+data.iconColor+'"/></svg>';
+            var svguav = "data:image/svg+xml;base64," + btoa(icon);
+            var dir = data.hdg || data.bearing;
+            myMarker = L.divIcon({
+                className:"uavicon",
+                iconAnchor: [16, 16],
+                html:'<img src="'+svguav+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
+        }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47 47">';

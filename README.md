@@ -7,6 +7,10 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+- v1.0.32 - Add uav icon, update README
+- v1.0.31 - Add arrow and wind icons
+- v1.0.32 - Add uav icon
+- v1.0.31 - Add arrow and wind icons
  - v1.0.30 - Add ability to send an array of data points or commands. Add overlay map. Allow more drawing options for lines, areas, circles.
  - v1.0.29 - Add, tracks node, Fix websocket on Windows
  - v1.0.28 - Move websocket to specific path, and support satellite node
@@ -64,6 +68,7 @@ However there are several specials...
  - **plane** : a plane icon that aligns with the bearing of travel.
  - **ship** : a ship icon that aligns with the bearing of travel.
  - **car** : a car icon that aligns with the bearing of travel.
+ - **uav** : a small plane icon that aligns with the bearing of travel.
  - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
@@ -151,14 +156,14 @@ To switch layer, move map and zoom
 To draw a heavily customized Circle on a layer
 
         msg.payload.command =  {
-            name:"circle", 
-            lat:51.515, 
-            lon:-0.1235, 
-            radius:10, 
-            layer:"drawing", 
-            iconColor:'#464646', 
-            stroke:false, 
-            fillOpacity:0.8, 
+            name:"circle",
+            lat:51.515,
+            lon:-0.1235,
+            radius:10,
+            layer:"drawing",
+            iconColor:'#464646',
+            stroke:false,
+            fillOpacity:0.8,
             clickable:true
         };
 
@@ -171,7 +176,7 @@ To add a new base layer
         };
 
 To add an Image Overlay
-        var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]]; 
+        var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
         msg.payload.command.map = {
             overlay:"New York Historical",
             url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
