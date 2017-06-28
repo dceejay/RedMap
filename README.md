@@ -87,9 +87,12 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 #### Circles
 
 If the payload contains a **radius** property, as well as name, lat and lon, then rather
-than draw a point it will draw a circle.
+than draw a point it will draw a circle. The *radius* property is specified in meters.
 
 As per Areas and Lines you may also specify *iconColor*, and *layer*.
+
+If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
+These are specified in the Latitude/Longitude format.
 
 #### Options
 
@@ -128,11 +131,13 @@ Optional properties include
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
- - **layer** - set map to specified layer name.
+ - **layer** - set map to specified layer name (can be a base layer or an overlay layer).
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
+   - **wms** - boolean, specifies if the data is provided by a Web Map Service
+   - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lng Points)
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
 
 #### For example
@@ -141,12 +146,35 @@ To switch layer, move map and zoom
 
         msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
 
+To draw a heavily customized Circle on a layer
+
+        msg.payload.command =  {
+            name:"circle", 
+            lat:51.515, 
+            lon:-0.1235, 
+            radius:10, 
+            layer:"drawing", 
+            iconColor:'#464646', 
+            stroke:false, 
+            fillOpacity:0.8, 
+            clickable:true
+        };
+
 To add a new base layer
 
         msg.payload.command.map = {
             name:"OSMhot",
             url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
             opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
+        };
+
+To add an Image Overlay
+        var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]]; 
+        msg.payload.command.map = {
+            overlay:"New York Historical",
+            url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+            bounds: imageBounds,
+            opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
         };
 
 
