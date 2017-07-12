@@ -72,8 +72,8 @@ module.exports = function(RED) {
             });
         }
         node.on("close", function() {
-            socket.close();
-            socket = null;
+            // socket.close();
+            // socket = null;
         });
         node.status({});
         socket.on('connection', callback);
@@ -83,7 +83,10 @@ module.exports = function(RED) {
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
-        if (!socket) { socket = io.listen(RED.server); }
+        if (!socket) {
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
+            socket = io.listen(RED.server, {path:fullPath});
+        }
         var node = this;
 
         var callback = function(client) {

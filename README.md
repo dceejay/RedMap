@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+- v1.0.33 - Add fa-icon without marker
 - v1.0.32 - Add uav icon, update README
 - v1.0.31 - Add arrow and wind icons
 - v1.0.32 - Add uav icon
@@ -63,7 +64,9 @@ Optional properties include
 Any other `msg.payload` properties will be added to the icon popup text box.
 
 You may select any of the Font Awesome set of [icons](http://fortawesome.github.io/Font-Awesome/icons/).
-However there are several specials...
+If you use the name without the fa- prefix (eg male) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg fa-male) you will get the icon on it's own.
+
+There are also several special icons...
 
  - **plane** : a plane icon that aligns with the bearing of travel.
  - **ship** : a ship icon that aligns with the bearing of travel.
@@ -176,7 +179,9 @@ To add a new base layer
         };
 
 To add an Image Overlay
+
         var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
+        msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
         msg.payload.command.map = {
             overlay:"New York Historical",
             url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',

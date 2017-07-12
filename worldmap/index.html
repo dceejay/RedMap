@@ -829,6 +829,7 @@ function setMarker(data) {
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, mymarker;
         var icon, q;
+        //console.log("ICON",data.icon);
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
@@ -959,6 +960,15 @@ function setMarker(data) {
         }
         else if (data.icon === "earthquake") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
+        }
+        else if (data.icon.substr(0,3) === "fa-") {
+            var col = data.iconColor || "#910000";
+            myMarker = L.divIcon({
+                className: data.icon,
+                html: '<i class="fa fa-2x '+data.icon+'" style="color:'+col+'"></i>',
+                iconSize: [32, 32]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
         else {
             myMarker = L.VectorMarkers.icon({
