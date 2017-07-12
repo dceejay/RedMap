@@ -7,11 +7,9 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
-- v1.0.33 - Add fa-icon without marker
-- v1.0.32 - Add uav icon, update README
-- v1.0.31 - Add arrow and wind icons
-- v1.0.32 - Add uav icon
-- v1.0.31 - Add arrow and wind icons
+ - v1.0.33 - Add fa-icon without marker
+ - v1.0.32 - Add uav icon, update README
+ - v1.0.31 - Add arrow and wind icons
  - v1.0.30 - Add ability to send an array of data points or commands. Add overlay map. Allow more drawing options for lines, areas, circles.
  - v1.0.29 - Add, tracks node, Fix websocket on Windows
  - v1.0.28 - Move websocket to specific path, and support satellite node
