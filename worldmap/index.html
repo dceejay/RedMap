@@ -961,7 +961,7 @@ function setMarker(data) {
         else if (data.icon === "earthquake") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
         }
-        else if (data.icon.substr(0,3) === "fa-") {
+        else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
             myMarker = L.divIcon({
                 className: data.icon,

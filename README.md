@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.0.34 - Fix for icon not specified
  - v1.0.33 - Add fa-icon without marker
  - v1.0.32 - Add uav icon, update README
  - v1.0.31 - Add arrow and wind icons
