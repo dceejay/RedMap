@@ -964,9 +964,9 @@ function setMarker(data) {
         else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
             myMarker = L.divIcon({
-                className: data.icon,
-                html: '<i class="fa fa-2x '+data.icon+'" style="color:'+col+'"></i>',
-                iconSize: [32, 32]
+                className:"faicon",
+                html: '<center><i class="fa fa-fw fa-2x '+data.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [30, 30]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
