@@ -18,14 +18,15 @@ module.exports = function(RED) {
     "use strict";
     var path = require("path");
     var express = require("express");
-    var io = require('socket.io');
+    var sockjs = require('sockjs');
     var socket;
 
     var WorldMap = function(n) {
         RED.nodes.createNode(this,n);
         if (!socket) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
-            socket = io.listen(RED.server, {path:fullPath});
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
+            socket = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
+            socket.installHandlers(RED.server, {prefix:'/worldmap/socket'});
         }
         this.lat = n.lat || "";
         this.lon = n.lon || "";
@@ -36,20 +37,19 @@ module.exports = function(RED) {
         this.showmenu = n.usermenu || "show";
         this.panit = n.panit || "false";
         var node = this;
+        var clients = {};
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
         RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
         // add the cgi module for serving local maps....
         RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
 
         var callback = function(client) {
-            client.setMaxListeners(0);
-            node.status({fill:"green",shape:"dot",text:"connected "+socket.engine.clientsCount});
-            function handler(msg) {
-                client.emit("worldmapdata",msg.payload);
-            }
-            node.on('input', handler);
-            client.on('worldmap', function(data) {
-                if (data.action === "connected") {
+            //client.setMaxListeners(0);
+            clients[client.id] = client;
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
+            client.on('data', function(message) {
+                message = JSON.parse(message);
+                if (message.action === "connected") {
                     var c = {init:true};
                     if (node.lat && node.lat.length > 0) { c.lat = node.lat; }
                     if (node.lon && node.lon.length > 0) { c.lon = node.lon; }
@@ -59,23 +59,29 @@ module.exports = function(RED) {
                     if (node.maxage && node.maxage.length > 0) { c.maxage = node.maxage; }
                     c.showmenu = node.showmenu;
                     c.panit = node.panit;
-                    client.emit("worldmapdata",{command:c});
+                    client.write(JSON.stringify({command:c}));
                 }
             });
-            client.on('disconnect', function() {
-                node.removeListener("input", handler);
-                node.status({fill:"green",shape:"ring",text:"connected "+socket.engine.clientsCount});
-            });
-            node.on("close", function() {
-                node.status({});
-                client.disconnect(true);
+            client.on('close', function() {
+                delete clients[client.id];
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length});
             });
         }
-        node.on("close", function() {
-            // socket.close();
-            // socket = null;
+        node.on('input', function(msg) {
+            for (var c in clients) {
+                if (clients.hasOwnProperty(c)) {
+                    clients[c].write(JSON.stringify(msg.payload));
+                }
+            }
         });
-        node.status({});
+        node.on("close", function() {
+            for (var c in clients) {
+                if (clients.hasOwnProperty(c)) {
+                    clients[c].end();
+                }
+            }
+            node.status({});
+        });
         socket.on('connection', callback);
     }
     RED.nodes.registerType("worldmap",WorldMap);
@@ -84,60 +90,66 @@ module.exports = function(RED) {
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         if (!socket) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'socket.io');
-            socket = io.listen(RED.server, {path:fullPath});
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
+            socket = sockjs.createServer({sockjs_url:fullPath, prefix:'/worldmap/socket'});
+            socket.installHandlers(RED.server);
         }
         var node = this;
+        var clients = {};
 
         var callback = function(client) {
-            client.setMaxListeners(0);
-            node.status({fill:"green",shape:"dot",text:"connected "+socket.engine.clientsCount});
-            client.on('worldmap', function(data) {
-                node.send({payload:data, topic:"worldmap"});
+            //client.setMaxListeners(0);
+            clients[client.id] = client;
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
+            client.on('data', function(message) {
+                message = JSON.parse(message);
+                node.send({payload:message, topic:"worldmap"});
             });
-            client.on('disconnect', function() {
-                node.status({fill:"green",shape:"ring",text:"connected "+socket.engine.clientsCount});
-                node.send({payload:{action:"disconnect", clients:socket.engine.clientsCount}, topic:"worldmap"});
-            });
-            node.on("close", function() {
-                client.disconnect(true);
+            client.on('close', function() {
+                delete clients[client.id];
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length});
+                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:"worldmap"});
             });
         }
 
         node.on("close", function() {
+            for (var c in clients) {
+                if (clients.hasOwnProperty(c)) {
+                    clients[c].end();
+                }
+            }
             node.status({});
-            //socket.close();
         });
         socket.on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
 
 
-    var satarray = {};
     var WorldMapTracks = function(n) {
         RED.nodes.createNode(this,n);
         this.depth = Number(n.depth) || 20;
+        this.pointsarray = {};
         var node = this;
 
         node.on("input", function(msg) {
             if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
-                    delete satarray[msg.payload.name];
+                    delete node.pointsarray[msg.payload.name];
                     newmsg.payload.name = msg.payload.name + "_";
                     node.send(newmsg);  // send the track to be deleted
                     return;
                 }
-                if (!satarray.hasOwnProperty(msg.payload.name)) {
-                    satarray[msg.payload.name] = [];
+                if (!node.pointsarray.hasOwnProperty(msg.payload.name)) {
+                    node.pointsarray[msg.payload.name] = [];
                 }
-                satarray[msg.payload.name].push(msg.payload);
-                if (satarray[msg.payload.name].length > node.depth) {
-                    satarray[msg.payload.name].shift();
+                node.pointsarray[msg.payload.name].push(msg.payload);
+                if (node.pointsarray[msg.payload.name].length > node.depth) {
+                    node.pointsarray[msg.payload.name].shift();
                 }
                 var line = [];
-                for (var i=0; i<satarray[msg.payload.name].length; i++) {
-                    var m = satarray[msg.payload.name][i];
+                for (var i=0; i<node.pointsarray[msg.payload.name].length; i++) {
+                    var m = node.pointsarray[msg.payload.name][i];
                     if (m.hasOwnProperty("lat") && m.hasOwnProperty("lon")) {
                         line.push( [m.lat*1, m.lon*1] );
                         delete newmsg.payload.lat;
@@ -162,7 +174,7 @@ module.exports = function(RED) {
         });
 
         node.on("close", function() {
-            satarray = {};
+            node.pointsarray = {};
         });
     }
     RED.nodes.registerType("worldmap-tracks",WorldMapTracks);

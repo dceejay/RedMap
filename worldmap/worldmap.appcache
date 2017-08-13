@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: Aug 10th 2017 - v1.0.35
+# date: Aug 13th 2017 - v1.1.0
 
 CACHE:
 index.html
@@ -40,7 +40,7 @@ leaflet/leaflet.measurecontrol.css
 leaflet/leaflet.measurecontrol.js
 leaflet/leaflet.select-layers.min.js
 leaflet/OSMBuildings-Leaflet.js
-leaflet/socket.io-1.4.5.js
+leaflet/sockjs.min.js
 leaflet/tile.stamen.js
 leaflet/images/layers-2x.png
 leaflet/images/layers.png
