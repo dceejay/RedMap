@@ -33,7 +33,7 @@
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
-    <script type="text/javascript"  src="leaflet/socket.io-1.4.5.js"></script>
+    <script type="text/javascript" src="leaflet/sockjs.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
@@ -58,7 +58,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.emit('end');">
+<body onunload="ws.send(JSON.stringify({'action':'end'}));">
 <div id="topbar">
     <a href="http://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
@@ -122,49 +122,45 @@ var ibmfoot = "&nbsp;&copy; IBM 2015,2017"
 var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
+var ws;
 
 // Create the socket
-var ws = io({path:location.pathname + 'socket.io'});
-
-ws.on('connect', function() {
-    console.log("CONNECTED");
-    if (!inIframe) {
-        document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
-    }
-    ws.emit("worldmap",{action:"connected"});
-});
-
-ws.on('disconnect', function() {
-    console.log("DISCONNECTED");
-    if (!inIframe) {
-        document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
-    }
-    setTimeout(function() { ws.connect(); }, 2500);
-});
-
-ws.on('error', function() {
-    console.log("ERROR");
-    if (!inIframe) {
-        document.getElementById("foot").innerHTML = "<font color='#C00'>"+ibmfoot+"</font>";
-    }
-    setTimeout(function() { ws.connect(); }, 2500);
-});
-
-ws.on('worldmapdata', function(data) {
-    if (Array.isArray(data)) {
-        //console.log("ARRAY");
-        for (var prop in data) {
-            if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
-            if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
-            else { console.log("SKIP",data[prop]); }
+var connect = function() {
+    ws = new SockJS(location.pathname + 'socket');
+    ws.onopen = function() {
+        console.log("CONNECTED");
+        if (!inIframe) {
+            document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
         }
-    }
-    else {
-        if (data.command) { doCommand(data.command); delete data.command; }
-        if (data.hasOwnProperty("name")) { setMarker(data); }
-        else { console.log("SKIP",data); }
-    }
-});
+        ws.send(JSON.stringify({action:"connected"}));
+    };
+    ws.onclose = function() {
+        console.log("DISCONNECTED");
+        if (!inIframe) {
+            document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+        }
+        setTimeout(function() { connect(); }, 2500);
+    };
+    ws.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        //console.log("DATA",data);
+        if (Array.isArray(data)) {
+            //console.log("ARRAY");
+            for (var prop in data) {
+                if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+                if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
+                else { console.log("SKIP",data[prop]); }
+            }
+        }
+        else {
+            if (data.command) { doCommand(data.command); delete data.command; }
+            if (data.hasOwnProperty("name")) { setMarker(data); }
+            else { console.log("SKIP",data); }
+        }
+    };
+}
+console.log("CONNECT TO",location.pathname + 'socket');
+connect();
 
 if ( window.localStorage.hasOwnProperty("lastpos") ) {
     initialposition = true;
@@ -186,6 +182,8 @@ if ( window.localStorage.hasOwnProperty("maxage") ) {
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
+var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
+
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
     console.log("IN an iframe");
@@ -200,9 +198,7 @@ if (window.self !== window.top) {
     (document.getElementById("bars").style.display="none");
     (document.getElementById("menu").style.right="8px");
     (document.getElementById("menu").style.borderRadius="6px");
-    if (showUserMenu) {
-        var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
-    }
+    if (showUserMenu) { menuButton.addTo(map); }
 }
 else {
     console.log("NOT in an iframe")
@@ -296,7 +292,7 @@ function doTidyUp() {
                     delete polygons[m];
                 }
                 if (typeof polygons[m+"_"] != "undefined") {
-                    //layers[markers[m+"_"].lay].removeLayer(polygons[m+"_"]);
+                    layers[polygons[m+"_"].lay].removeLayer(polygons[m+"_"]);
                     delete polygons[m+"_"];
                 }
                 delete markers[m];
@@ -409,7 +405,7 @@ map.on('overlayadd', function(e) {
         overlays["drawing"].bringToBack();
     }
     //else { console.log("layer add :",e.name); }
-    ws.emit("worldmap",{action:"addlayer", name:e.name});
+    ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
 
 map.on('overlayremove', function(e) {
@@ -425,13 +421,13 @@ map.on('overlayremove', function(e) {
         map.removeControl(drawControl);
     }
     //else console.log("layer del :",e.name);
-    ws.emit("worldmap",{action:"dellayer", name:e.name});
+    ws.send(JSON.stringify({action:"dellayer", name:e.name}));
 });
 
 map.on('baselayerchange', function(e) {
     //console.log("base layer now :",e.name);
     baselayername = e.name;
-    ws.emit("worldmap",{action:"layer", name:e.name});
+    ws.send(JSON.stringify({action:"layer", name:e.name}));
 });
 
 function showMapCurrentZoom() {
@@ -467,7 +463,7 @@ map.on('zoomend', function() {
 });
 
 //map.on('contextmenu', function(e) {
-//    ws.emit("worldmap",{action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)});
+//    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 //});
 
 var rightmenuMap = L.popup().setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer)'/>");
@@ -476,7 +472,7 @@ var rclk;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     console.log(thing);
-    ws.emit("worldmap",{action:"point", lat:rclk.lat.toFixed(5), lon:rclk.lng.toFixed(5), point:thing});
+    ws.send(JSON.stringify({action:"point", lat:rclk.lat.toFixed(5), lon:rclk.lng.toFixed(5), point:thing}));
     map.closePopup();
     var bits = thing.split(",");
     var lay = (bits[2] || "drawing").trim();
@@ -521,7 +517,7 @@ function onLocationFound(e) {
         var lla = new L.LatLng(ya,xa);
         L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
     }
-    ws.emit("worldmap",{action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)});
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
 }
 function onLocationError(e) { console.log(e.message); }
 map.on('locationfound', onLocationFound);
@@ -657,32 +653,32 @@ map.on('draw:created', function (e) {
     var layer = e.layer;
     //console.log(type, layer._latlngs);
     //console.log(JSON.stringify(layer.toGeoJSON()));
-    ws.emit("worldmap",{action:"draw",type:type, points:layer._latlngs});
+    ws.send(JSON.stringify({action:"draw",type:type, points:layer._latlngs}));
     layers["drawing"].addLayer(layer);
 });
 
-// Add the roads overlay
-overlays["roads"] = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
-    type: 'hyb',
-    ext: 'png',
-    attribution: '<a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: '1234',
-    opacity: 0.9
-});
-
-overlays["rain"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/rain/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
-    opacity: 0.5
-});
-
-overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/pressure_cntr/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
-    opacity: 0.5
-});
-
-overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
+// // Add the roads overlay
+// overlays["roads"] = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+//     type: 'hyb',
+//     ext: 'png',
+//     attribution: '<a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+//     subdomains: '1234',
+//     opacity: 0.9
+// });
+//
+// overlays["rain"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/rain/{z}/{x}/{y}.png', {
+//     maxZoom: 18,
+//     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+//     opacity: 0.5
+// });
+//
+// overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/pressure_cntr/{z}/{x}/{y}.png', {
+//     maxZoom: 18,
+//     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+//     opacity: 0.5
+// });
+//
+// overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
 
 overlays["buildings"] = new OSMBuildings(map).load();
 map.removeLayer(overlays["buildings"]);
@@ -712,11 +708,11 @@ var delMarker = function(dname) {
     //console.log("Deleting",dname);
     if (typeof polygons[dname] != "undefined") {
         layers[polygons[dname].lay].removeLayer(polygons[dname]);
-        ws.emit("worldmap",{action:"delete", name:dname});
+        ws.send(JSON.stringify({action:"delete", name:dname}));
         delete polygons[dname];
     }
     if (typeof markers[dname] != "undefined") {
-        ws.emit("worldmap",{action:"delete", name:dname});
+        ws.send(JSON.stringify({action:"delete", name:dname}));
         layers[markers[dname].lay].removeLayer(markers[dname]);
         delete markers[dname];
     }
@@ -768,14 +764,14 @@ function setMarker(data) {
         if (opt.clickable) { polyln.bindPopup(data.name); }
         polygons[data.name] = polyln;
         polygons[data.name].lay = lay;
-        layers[lay].addLayer(polyln);
+        layers[lay].addLayer(polygons[data.name]);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea = L.polygon(data.area, opt);
         if (opt.clickable) { polyarea.bindPopup(data.name); }
         polygons[data.name] = polyarea;
         polygons[data.name].lay = lay;
-        layers[lay].addLayer(polyarea);
+        layers[lay].addLayer(polygons[data.name]);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings
@@ -964,9 +960,9 @@ function setMarker(data) {
         else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
             myMarker = L.divIcon({
-                className: data.icon,
-                html: '<i class="fa fa-2x '+data.icon+'" style="color:'+col+'"></i>',
-                iconSize: [32, 32]
+                className:"faicon",
+                html: '<center><i class="fa fa-fw fa-2x '+data.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [30, 30]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
@@ -1156,9 +1152,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
     if (cmd.hasOwnProperty("cluster")) {
-        clusterAt = cmd.cluster;
-        // document.getElementById("setclus").value = cmd.cluster;
-        // setCluster();
+        //clusterAt = cmd.cluster;
+        document.getElementById("setclus").value = cmd.cluster;
+        setCluster();
     }
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
