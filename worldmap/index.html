@@ -976,6 +976,10 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker});
         }
 
+        // var createLabelIcon = function(labelText) {
+        //     return L.marker(new L.LatLng(51.05, -1.35), {icon:L.divIcon({ html:labelText })});
+        // }
+
         // remove icon from list of properties, then add all others to popup
         if (data.hasOwnProperty("icon") || (!data.hasOwnProperty("radius"))) {
             if (data.hasOwnProperty("icon")) { delete data.icon; }

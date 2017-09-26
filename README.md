@@ -7,7 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
- - v1.1.3 - more typos
+ - v1.1.3 - more typos.
  - v1.1.1 - fix adding layer to embedded map in iframe
  - v1.1.0 - Move to sockjs (smaller than socket.io). Remove layers that are no longer served for free, Issue #24. Remove polygons as well as markers on timeout.
  - v1.0.35 - Try to better center fa-icon and remove black square (Windows) - Issue #25
