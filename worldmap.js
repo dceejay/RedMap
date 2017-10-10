@@ -36,6 +36,7 @@ module.exports = function(RED) {
         this.maxage = n.maxage || "";
         this.showmenu = n.usermenu || "show";
         this.panit = n.panit || "false";
+        this.layers = n.layers || "show";
         var node = this;
         var clients = {};
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
@@ -59,6 +60,7 @@ module.exports = function(RED) {
                     if (node.maxage && node.maxage.length > 0) { c.maxage = node.maxage; }
                     c.showmenu = node.showmenu;
                     c.panit = node.panit;
+                    c.showlayers = node.layers;
                     client.write(JSON.stringify({command:c}));
                 }
             });

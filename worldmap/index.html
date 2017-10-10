@@ -122,6 +122,8 @@ var ibmfoot = "&nbsp;&copy; IBM 2015,2017"
 var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
+var showLayerMenu = true;
+var layercontrol;
 var ws;
 
 // Create the socket
@@ -198,7 +200,6 @@ if (window.self !== window.top) {
     (document.getElementById("bars").style.display="none");
     (document.getElementById("menu").style.right="8px");
     (document.getElementById("menu").style.borderRadius="6px");
-    if (showUserMenu) { menuButton.addTo(map); }
 }
 else {
     console.log("NOT in an iframe")
@@ -233,6 +234,7 @@ if (!inIframe) {
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
+//else { if (showUserMenu) { menuButton.addTo(map); } }
 
 // Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
@@ -696,12 +698,13 @@ if ( window.localStorage.hasOwnProperty("lastlayer") ) {
 }
 basemaps[baselayername].addTo(map);
 
-// Add the layers control widget
-if (!inIframe) {
-    var layercontrol = L.control.layers(basemaps, overlays).addTo(map);
-}
 // Layer control based on select box rather than radio buttons.
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
+layercontrol = L.control.layers(basemaps, overlays);
+
+// Add the layers control widget
+if (!inIframe) { layercontrol.addTo(map); }
+else { showLayerMenu = false;}
 
 // Delete a marker (and notify websocket)
 var delMarker = function(dname) {
@@ -745,9 +748,9 @@ function setMarker(data) {
             //zoomToBoundsOnClick:false
         }).addTo(map);
         overlays[lay] = layers[lay];
-        if (!inIframe) {
+        //if (!inIframe) {
             layercontrol.addOverlay(layers[lay],lay);
-        }
+        //}
     }
 
     if (typeof markers[data.name] != "undefined") { layers[lay].removeLayer(markers[data.name]); }
@@ -1093,6 +1096,16 @@ function doCommand(cmd) {
             map.addControl(menuButton);
         }
     }
+    if (cmd.hasOwnProperty("showlayers")) {
+        if ((cmd.showlayers === "hide") && (showLayerMenu === true)) {
+            showLayerMenu = false;
+            layercontrol.removeFrom(map);
+        }
+        else if ((cmd.showlayers === "show") && (showLayerMenu === false)) {
+            showLayerMenu = true;
+            layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+        }
+    }
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
@@ -1110,7 +1123,8 @@ function doCommand(cmd) {
             console.log("New Map:",cmd.map.name);
             basemaps[cmd.map.name] = L.tileLayer(cmd.map.url, cmd.map.opt);
         }
-        if (!existsalready && !inIframe) {
+        //if (!existsalready && !inIframe) {
+        if (!existsalready) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
     }
@@ -1134,7 +1148,8 @@ function doCommand(cmd) {
         else {
             overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
         }
-        if (!existsalready && !inIframe) {
+        //if (!existsalready && !inIframe) {
+        if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         overlays[cmd.map.overlay].addTo(map);

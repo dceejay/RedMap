@@ -50,12 +50,20 @@
     Remove markers after <input type="text" id="node-input-maxage" style="width:67px;"> seconds
 </div>
 <div class="form-row">
-    <label for="node-input-usermenu"><i class="fa fa-user"></i> User Menu</label>
+    <label for="node-input-usermenu"><i class="fa fa-user"></i> User menu</label>
     <select id="node-input-usermenu" style="width:70px;">
         <option value="show">Show</option>
         <option value="hide">Hide</option>
     </select>
-    <i class="fa fa-arrows-alt" style="margin-left:50px"></i> Auto-pan <select id="node-input-panit" style="width:70px;">
+    &nbsp; <i class="fa fa-bars" style="margin-left:30px;"></i> Layer menu
+    <select id="node-input-layers" style="width:70px;">
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-panit"><i class="fa fa-arrows-alt"></i> Auto-pan</label>
+    <select id="node-input-panit" style="width:70px;">
         <option value="false">False</option>
         <option value="true">True</option>
     </select>
@@ -114,6 +122,7 @@
             cluster: {value:""},
             maxage: {value:""},
             usermenu: {value:"show"},
+            layers: {value:"show"},
             panit: {value:"false"}
         },
         inputs:1,
@@ -136,7 +145,6 @@
         }
     });
 </script>
-
 
 <script type="text/x-red" data-template-name="worldmap in">
     <div class="form-row">

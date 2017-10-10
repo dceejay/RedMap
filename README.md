@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.1.4 - Let layer control be visible or not
  - v1.1.3 - more typos.
  - v1.1.1 - fix adding layer to embedded map in iframe
  - v1.1.0 - Move to sockjs (smaller than socket.io). Remove layers that are no longer served for free, Issue #24. Remove polygons as well as markers on timeout.
