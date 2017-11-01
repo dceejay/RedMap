@@ -29,7 +29,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.measurecontrol.css">
     <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
-    <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/>
+    <!-- <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/> -->
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
@@ -51,7 +51,7 @@
     <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
-    <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script>
+    <!-- <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script> -->
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
@@ -280,13 +280,12 @@ function doLock() {
 }
 
 // Remove old markers
-function doTidyUp() {
+function doTidyUp(l) {
     var d = parseInt(Date.now()/1000);
     for (var m in markers) {
-        if (typeof markers[m].ts != "undefined") {
+        if ((l && (l == markers[m].lay)) || typeof markers[m].ts != "undefined") {
             //console.log(m,markers[m].ts,markers[m]);
-            if (((Number(markers[m].ts) + Number(maxage)) < d) && (markers[m].lay !== "drawing")) {
-                //if ((Number(markers[m].ts) + Number(maxage)) < d) {
+            if ((l && (l == markers[m].lay)) || (markers[m].hasOwnProperty("ts") && (Number(markers[m].ts) < d) && (markers[m].lay !== "_drawing"))) {
                 //console.log("STALE :",m);
                 layers[markers[m].lay].removeLayer(markers[m]);
                 if (typeof polygons[m] != "undefined") {
@@ -298,6 +297,10 @@ function doTidyUp() {
                     delete polygons[m+"_"];
                 }
                 delete markers[m];
+            }
+            if (l) {
+                layercontrol.removeLayer(layers[l]);
+                delete overlays[l];
             }
         }
     }
@@ -317,7 +320,9 @@ var stale = null;
 function setMaxAge() {
     maxage = document.getElementById('maxage').value;
     if (stale) { clearInterval(stale); }
-    if (maxage > 0) { stale = setInterval( function() {doTidyUp()}, (maxage*1000) ); }
+    //if (maxage > 0) {
+    stale = setInterval( function() {doTidyUp()}, 20000); // every 20 secs
+    //} //every minute
     //console.log("Stale time set :",maxage+"s");
 }
 setMaxAge();
@@ -629,12 +634,12 @@ overlays["day/night"] = layers["_daynight"];
 
 // Add the heatmap layer
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
-layers["heat"] = new L.LayerGroup().addLayer(heat);
-overlays["heatmap"] = layers["heat"];
+layers["_heat"] = new L.LayerGroup().addLayer(heat);
+overlays["heatmap"] = layers["_heat"];
 
 // Add the drawing layer for fun...
-layers["drawing"] = new L.FeatureGroup();
-overlays["drawing"] = layers["drawing"];
+layers["_drawing"] = new L.FeatureGroup();
+overlays["drawing"] = layers["_drawing"];
 var drawControl = new L.Control.Draw({
     draw: {
         polyline: { shapeOptions: { clickable:false } },
@@ -645,7 +650,7 @@ var drawControl = new L.Control.Draw({
         polygon: { shapeOptions: { clickable:true } },
     },
     edit: {
-        featureGroup: layers["drawing"],
+        featureGroup: layers["_drawing"],
         remove: true,
         edit: false
     }
@@ -656,7 +661,7 @@ map.on('draw:created', function (e) {
     //console.log(type, layer._latlngs);
     //console.log(JSON.stringify(layer.toGeoJSON()));
     ws.send(JSON.stringify({action:"draw",type:type, points:layer._latlngs}));
-    layers["drawing"].addLayer(layer);
+    layers["_drawing"].addLayer(layer);
 });
 
 // // Add the roads overlay
@@ -738,7 +743,7 @@ function setMarker(data) {
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
 
-    var lay = data.layer || "not known";
+    var lay = data.layer || "unknown";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         //layers[lay] = new L.LayerGroup().addTo(map);
         layers[lay] = new L.MarkerClusterGroup({
@@ -995,6 +1000,15 @@ function setMarker(data) {
                 words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
                 delete data.photoUrl;
             }
+            if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
+                if (data.ttl != 0) {
+                    marker.ts = parseInt(Date.now()/1000) + Number(data.ttl);
+                }
+                delete data.ttl;
+            }
+            else if (maxage != 0) {
+                marker.ts = parseInt(Date.now()/1000) + Number(maxage);
+            }
             if (data.hasOwnProperty("weblink")) {
                 if (typeof data.weblink === "string") {
                     words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
@@ -1014,7 +1028,6 @@ function setMarker(data) {
             }
             marker.bindPopup(words);
             marker._popup.dname = data.name;
-            marker.ts = parseInt(Date.now()/1000);  // save time we got this marker
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");
             marker.on('contextmenu', function(e) {
@@ -1077,10 +1090,17 @@ function setMarker(data) {
 }
 
 function doCommand(cmd) {
-    //console.log("COMMAND",cmd);
+    console.log("COMMAND",cmd);
     // ignore server side initial command if client position already saved.
     if (cmd.hasOwnProperty("init") && initialposition) {
         return;
+    }
+    if (cmd.hasOwnProperty("clear")) {
+        console.log("CLEAR",cmd.clear);
+        console.log(layers);
+        console.log(markers);
+        console.log(polygons);
+        doTidyUp(cmd.clear);
     }
     if (cmd.hasOwnProperty("panit")) {
         if (cmd.panit === "true") { panit = true; }

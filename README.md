@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.1.5 - add ttl property to set expiry time (secs) of individual marker, and let command clear:"layername" delete a complete layer.
  - v1.1.4 - Let layer control be visible or not
  - v1.1.3 - more typos.
  - v1.1.1 - fix adding layer to embedded map in iframe
@@ -58,6 +59,7 @@ Optional properties include
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
  - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
  - **iconColor** : Standard CSS color name or #rrggbb hex value.
+ - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk"}`
  - **deleted** : set to <i>true</i> to remove the named marker. (default false)
@@ -153,6 +155,7 @@ Optional properties include
    - **wms** - boolean, specifies if the data is provided by a Web Map Service
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lng Points)
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
+ - **clear** - layer name - to clear a complete layer and remove from layer menu
 
 #### For example
 
