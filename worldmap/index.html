@@ -1090,16 +1090,12 @@ function setMarker(data) {
 }
 
 function doCommand(cmd) {
-    console.log("COMMAND",cmd);
+    //console.log("COMMAND",cmd);
     // ignore server side initial command if client position already saved.
     if (cmd.hasOwnProperty("init") && initialposition) {
         return;
     }
     if (cmd.hasOwnProperty("clear")) {
-        console.log("CLEAR",cmd.clear);
-        console.log(layers);
-        console.log(markers);
-        console.log(polygons);
         doTidyUp(cmd.clear);
     }
     if (cmd.hasOwnProperty("panit")) {
