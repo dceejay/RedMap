@@ -26,7 +26,7 @@ module.exports = function(RED) {
         if (!socket) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
             socket = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
-            socket.installHandlers(RED.server, {prefix:'/worldmap/socket'});
+            socket.installHandlers(RED.server, {prefix:path.posix.join(RED.settings.httpNodeRoot,'/worldmap/socket')});
         }
         this.lat = n.lat || "";
         this.lon = n.lon || "";
@@ -93,7 +93,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         if (!socket) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
-            socket = sockjs.createServer({sockjs_url:fullPath, prefix:'/worldmap/socket'});
+            socket = sockjs.createServer({sockjs_url:fullPath, prefix:path.posix.join(RED.settings.httpNodeRoot,'/worldmap/socket')});
             socket.installHandlers(RED.server);
         }
         var node = this;

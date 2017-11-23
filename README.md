@@ -7,6 +7,8 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.1.7 - extend path correctly - Issue #28
+ - v1.1.6 - cleanup/remove excess logging
  - v1.1.5 - add ttl property to set expiry time (secs) of individual marker, and let command clear:"layername" delete a complete layer.
  - v1.1.4 - Let layer control be visible or not
  - v1.1.3 - more typos.
