@@ -1000,6 +1000,10 @@ function setMarker(data) {
                 words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
                 delete data.photoUrl;
             }
+            if (data.hasOwnProperty("videoUrl")) {
+                words += '<video controls autoplay><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
+                delete data.videoUrl;
+            }
             if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
                 if (data.ttl != 0) {
                     marker.ts = parseInt(Date.now()/1000) + Number(data.ttl);
@@ -1026,7 +1030,7 @@ function setMarker(data) {
                     }
                 }
             }
-            marker.bindPopup(words);
+            marker.bindPopup(words, {keepInView:true, minWidth:348});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");

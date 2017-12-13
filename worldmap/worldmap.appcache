@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: Oct 10th 2017 - v1.1.6
+# date: Oct 10th 2017 - v1.1.8
 
 CACHE:
 index.html
@@ -53,10 +53,7 @@ leaflet/images/spritesheet-2x.png
 leaflet/images/spritesheet.png
 leaflet/assets/shadow.png
 leaflet/assets/shadow@2x.png
-leaflet/font-awesome/fonts/FontAwesome.otf
-leaflet/font-awesome/fonts/fontawesome-webfont.eot
 leaflet/font-awesome/fonts/fontawesome-webfont.svg
-leaflet/font-awesome/fonts/fontawesome-webfont.ttf
 leaflet/font-awesome/fonts/fontawesome-webfont.woff
 leaflet/font-awesome/fonts/fontawesome-webfont.woff2
 leaflet/font-awesome/css/font-awesome.min.css
