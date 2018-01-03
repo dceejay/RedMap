@@ -1149,6 +1149,14 @@ function doCommand(cmd) {
         }
     }
     // Add a new overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }
+        overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,cmd.map.opt);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        overlays[cmd.map.overlay].addTo(map);
+    }
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
         console.log("New overlay:",cmd.map.overlay);
         if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }

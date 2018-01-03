@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.1.9 - add ability to add geoJSON layers
  - v1.1.8 - add videoUrl property to allow mp4 insert in popup
  - v1.1.7 - extend path correctly - Issue #28
  - v1.1.6 - cleanup/remove excess logging
@@ -56,20 +57,19 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g
 
 Optional properties include
 
+ - **deleted** : set to <i>true</i> to remove the named marker. (default false)
  - **layer** : specify a layer on the map to add marker to.
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
  - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
- - **iconColor** : Standard CSS color name or #rrggbb hex value.
+ - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk"}`
- - **deleted** : set to <i>true</i> to remove the named marker. (default false)
- - **addtoheatmap** : set to <i>false</i> to exlcude point from contributing to heatmap layer. (default true)
+ - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
-
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 
@@ -188,6 +188,16 @@ To add a new base layer
             url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
             opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
         };
+
+To add a new geoJSON overlay
+
+        msg.payload.command.map = {
+            overlay:"myGeoJSON",
+            geojson:{ geojson feature as an object },
+            (opt:{ optional geojson options, style, filter, onEach,Feature, etc })
+        };
+
+see http://leafletjs.com/examples/geojson/ for more details about options
 
 To add an Image Overlay
 
