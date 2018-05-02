@@ -82,6 +82,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            socket.removeListener('connection', callback);
             node.status({});
         });
         socket.on('connection', callback);
@@ -120,6 +121,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            socket.removeListener('connection', callback);
             node.status({});
         });
         socket.on('connection', callback);

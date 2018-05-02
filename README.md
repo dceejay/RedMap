@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+ - v1.1.11 - fix websocket multiple connections
  - v1.1.9 - add ability to add geoJSON layers
  - v1.1.8 - add videoUrl property to allow mp4 insert in popup
  - v1.1.7 - extend path correctly - Issue #28
