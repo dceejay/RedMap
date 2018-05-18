@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Changes
+
  - v1.1.11 - fix websocket multiple connections
  - v1.1.9 - add ability to add geoJSON layers
  - v1.1.8 - add videoUrl property to allow mp4 insert in popup
@@ -86,17 +87,17 @@ There are also several special icons...
  - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
- - **friend** : pseudo Nato style blue rectangle.
- - **hostile** : pseudo Nato style red circle.
- - **neutral** : pseudo Nato style green square.
- - **unknown** : pseudo Nato style yellow square.
+ - **friend** : pseudo NATO style blue rectangle.
+ - **hostile** : pseudo NATO style red circle.
+ - **neutral** : pseudo NATO style green square.
+ - **unknown** : pseudo NATO style yellow square.
  - **earthquake** : black circle - diameter proportional to `magnitude`.
 
 #### Areas and Lines
 
 If the payload contains an **area** property - that is an array of co-ordinates, e.g.
 
-    [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]
+    ... , area: [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ], ...
 
 then rather than draw a point and icon it draws the polygon. Likewise if it contains a
 **line** property it will draw the polyline.
@@ -109,6 +110,8 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 
 If the payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
+
+    { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
 
 As per Areas and Lines you may also specify *iconColor*, and *layer*.
 
@@ -194,8 +197,8 @@ To add a new geoJSON overlay
 
         msg.payload.command.map = {
             overlay:"myGeoJSON",
-            geojson:{ geojson feature as an object },
-            (opt:{ optional geojson options, style, filter, onEach,Feature, etc })
+            geojson:{ your geojson feature as an object },
+            (opt:{ optional geojson options, style, filter, onEach, Feature, etc })
         };
 
 see http://leafletjs.com/examples/geojson/ for more details about options
@@ -210,6 +213,10 @@ To add an Image Overlay
             bounds: imageBounds,
             opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
         };
+
+To clear a layer from the map
+
+        msg.payload.command.clear = "name of your layer/overlay to remove";
 
 
 ### Using a local Map Server (WMS server)
