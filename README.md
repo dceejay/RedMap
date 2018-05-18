@@ -8,46 +8,15 @@ map web page for plotting "things" on.
 
 ### Changes
 
- - v1.1.11 - fix websocket multiple connections
- - v1.1.9 - add ability to add geoJSON layers
- - v1.1.8 - add videoUrl property to allow mp4 insert in popup
- - v1.1.7 - extend path correctly - Issue #28
- - v1.1.6 - cleanup/remove excess logging
- - v1.1.5 - add ttl property to set expiry time (secs) of individual marker, and let command clear:"layername" delete a complete layer.
- - v1.1.4 - Let layer control be visible or not
- - v1.1.3 - more typos.
- - v1.1.1 - fix adding layer to embedded map in iframe
- - v1.1.0 - Move to sockjs (smaller than socket.io). Remove layers that are no longer served for free, Issue #24. Remove polygons as well as markers on timeout.
- - v1.0.35 - Try to better center fa-icon and remove black square (Windows) - Issue #25
- - v1.0.34 - Fix for icon not specified
- - v1.0.33 - Add fa-icon without marker
- - v1.0.32 - Add uav icon, update README
- - v1.0.31 - Add arrow and wind icons
- - v1.0.30 - Add ability to send an array of data points or commands. Add overlay map. Allow more drawing options for lines, areas, circles.
- - v1.0.29 - Add, tracks node, Fix websocket on Windows
- - v1.0.28 - Move websocket to specific path, and support satellite node
- - v1.0.26 - Add info on how to use with local WMS server
- - v1.0.24 - Add `.weblink` property to allow links out to other information.
- - v1.0.23 - Add msg.payload.command.heatmap to allow setting of heatmap config.
- - v1.0.22 - Add example how to embed into Node-RED-Dashboard template.
- - v1.0.21 - If you specify range and icon then you get a marker and a range circle, if you just specify range with no icon, you just get a circle, and vice versa.
- - v1.0.20 - Add buildings overlay.
- - v1.0.19 - Add circle mode - specify name, lat, lon and radius.
- - v1.0.18 - Correct .photourl property to match .photoUrl as per docs
- - v1.0.17 - Removed Mapquest maps. Bug fixes - reduced leakage of listeners being added.
- - v1.0.12 - Added ability to set initial start position, zoom level and base map layer.
- - v1.0.x - now uses socket.io to connect to backend - means this node now has an input connection
- (like "proper" nodes should :-), and you no longer need a websocket node in parallel.
- Obviously this is a breaking change hence the major version number bump. Also thus adds a `worldmap in`
- node to handle events coming from the map interaction.
+see [CHANGELOG](CHANGELOG).
 
-### Install
+## Install
 
-Run the following command in your Node-RED user directory - typically `~/.node-red`
+Either use the Manage Palette option in the Editor menu, or run the following command in your Node-RED user directory - typically `~/.node-red`
 
         npm i --save node-red-contrib-web-worldmap
 
-### Usage
+## Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
 
@@ -75,6 +44,8 @@ Optional properties include
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 
+### Icons
+
 You may select any of the Font Awesome set of [icons](http://fortawesome.github.io/Font-Awesome/icons/).
 If you use the name without the fa- prefix (eg male) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg fa-male) you will get the icon on it's own.
 
@@ -86,14 +57,15 @@ There are also several special icons...
  - **uav** : a small plane icon that aligns with the bearing of travel.
  - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
+ - **satellite** : a small satellite icon.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
  - **friend** : pseudo NATO style blue rectangle.
  - **hostile** : pseudo NATO style red circle.
  - **neutral** : pseudo NATO style green square.
  - **unknown** : pseudo NATO style yellow square.
- - **earthquake** : black circle - diameter proportional to `magnitude`.
+ - **earthquake** : black circle - diameter proportional to `msg.mag`.
 
-#### Areas and Lines
+### Areas and Lines
 
 If the payload contains an **area** property - that is an array of co-ordinates, e.g.
 
@@ -106,7 +78,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
  - **name** : is used as the id key - so can be redrawn/moved.
  - **layer** : declares which layer you put it on..
 
-#### Circles
+### Circles
 
 If the payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
@@ -118,7 +90,7 @@ As per Areas and Lines you may also specify *iconColor*, and *layer*.
 If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
 These are specified in the Latitude/Longitude format.
 
-#### Options
+### Options
 
 Areas, Lines and Circles can also specify more optional properties:
  - color
@@ -130,7 +102,7 @@ Areas, Lines and Circles can also specify more optional properties:
  - fillOpacity
  - clickable (if true sets the passed in name as Popup)
 
-### Drawing
+## Drawing
 
 A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
 
@@ -146,7 +118,7 @@ All these events generate messages that can be received by using a **worldmap in
     { "action": "layer", "name": "Esri Satellite" }
     { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
 
-### Control
+## Control
 
 You can also control the map via the node, by sending in a msg.payload containing a **command** object.
 
@@ -249,8 +221,7 @@ You can then add a new WMS Base layer by injecting a message like
     }
 
 
-Demo Flow
----------
+## Demo Flow
 
 The following example gets recent earthquakes from USGS, parses the result,
 formats up the msg as per above and sends to the node to plot on the map.
