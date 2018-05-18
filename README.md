@@ -165,13 +165,11 @@ Optional properties include
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu
 
-#### For example
-
-To switch layer, move map and zoom
+#### To switch layer, move map and zoom
 
         msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
 
-To draw a heavily customized Circle on a layer
+#### To draw a heavily customized Circle on a layer
 
         msg.payload.command =  {
             name:"circle",
@@ -185,7 +183,7 @@ To draw a heavily customized Circle on a layer
             clickable:true
         };
 
-To add a new base layer
+#### To add a new base layer
 
         msg.payload.command.map = {
             name:"OSMhot",
@@ -193,7 +191,7 @@ To add a new base layer
             opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
         };
 
-To add a new geoJSON overlay
+#### To add a new geoJSON overlay
 
         msg.payload.command.map = {
             overlay:"myGeoJSON",
@@ -203,7 +201,7 @@ To add a new geoJSON overlay
 
 see http://leafletjs.com/examples/geojson/ for more details about options
 
-To add an Image Overlay
+#### To add an Image Overlay
 
         var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
         msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
@@ -214,10 +212,9 @@ To add an Image Overlay
             opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
         };
 
-To clear a layer from the map
+#### To clear a layer from the map
 
         msg.payload.command.clear = "name of your layer/overlay to remove";
-
 
 ### Using a local Map Server (WMS server)
 
@@ -227,7 +224,7 @@ IMHO the easiest map server to make work is the <a href="http://www.mapserver.or
 
 Configuring that, setting up your tiles, and creating a .map file is way beyond the scope of this README so I will leave that as an exercise for the reader. Once set up you should have a cgi process you can run called `mapserv`, and a `.map` file that describes the layers available from the server.
 
-Create and edit these into a file called **mapserv**, located in this node's directory, typically
+Create and edit these into an executeable file called **mapserv**, located in this node's directory, typically
 `~/.node-red/node_modules/node-red-contrib-web-worldmap/mapserv`, for example:
 
     #! /bin/sh
