@@ -8,7 +8,7 @@ map web page for plotting "things" on.
 
 ### Changes
 
-see [CHANGELOG](CHANGELOG).
+see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md)
 
 ## Install
 
