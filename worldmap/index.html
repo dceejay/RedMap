@@ -743,6 +743,19 @@ function setMarker(data) {
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
 
+    // Replace building
+    if (data.hasOwnProperty("building")) {
+        if ((data.building === "") && layers.hasOwnProperty("buildings")) {
+            map.removeLayer(layers["buildings"]);
+            layercontrol._update();
+            layers["buildings"] = overlays["buildings"].set("");
+            return;
+        }
+        //layers["buildings"] = new OSMBuildings(map).set(data.building);
+        layers["buildings"] = overlays["buildings"].set(data.building);
+        map.addLayer(layers["buildings"]);
+        return;
+    }
     var lay = data.layer || "unknown";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         //layers[lay] = new L.LayerGroup().addTo(map);

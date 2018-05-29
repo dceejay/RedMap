@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
  - v1.1.12 - README changes, split out CHANGELOG.md
  - v1.1.11 - fix websocket multiple connections
  - v1.1.9 - add ability to add geoJSON layers
