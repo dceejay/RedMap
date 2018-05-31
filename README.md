@@ -17,13 +17,14 @@ Either use the Manage Palette option in the Editor menu, or run the following co
 
         npm i --save node-red-contrib-web-worldmap
 
+
 ## Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
 
 The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
 
-        {name:"Joe", lat:51, lon:-1.05}
+        msg.payload = { name:"Joe", lat:51.05, lon:-1.35 }
 
 `name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the point.
 
@@ -73,7 +74,7 @@ There are also several special icons...
 You can use NATO symbols via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>.
 To do this you need to supply a `msg.SIDC` instead of an icon, for example:
 
-    {   name: "Emergency Medical Operation",
+    msg.payload = { name: "Emergency Medical Operation",
         lat: 51.05,
         lon: -1.35,
         SIDC:"ENOPA-------",
@@ -88,7 +89,7 @@ The OSM Buildings layer is available in the layers menu. You can replace this wi
 sending a msg.payload containing a name and a building property. The building property should be
 a GeoJSON Feature Collection as per the OSMBuildings spec.
 
-    { name:"My Block", building: {
+    msg.payload = { name:"My Block", building: {
         "type": "FeatureCollection",
         "features": [
           {
@@ -137,7 +138,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 If the payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
 
-    { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
+    msg.payload = { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
 
 As per Areas and Lines you may also specify *iconColor*, and *layer*.
 
@@ -193,54 +194,54 @@ Optional properties include
 
 #### To switch layer, move map and zoom
 
-        msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
+    msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
 
 #### To draw a heavily customized Circle on a layer
 
-        msg.payload.command =  {
-            name:"circle",
-            lat:51.515,
-            lon:-0.1235,
-            radius:10,
-            layer:"drawing",
-            iconColor:'#464646',
-            stroke:false,
-            fillOpacity:0.8,
-            clickable:true
-        };
+    msg.payload.command =  {
+        name:"circle",
+        lat:51.515,
+        lon:-0.1235,
+        radius:10,
+        layer:"drawing",
+        iconColor:'#464646',
+        stroke:false,
+        fillOpacity:0.8,
+        clickable:true
+    };
 
 #### To add a new base layer
 
-        msg.payload.command.map = {
-            name:"OSMhot",
-            url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-            opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
-        };
+    msg.payload.command.map = {
+        name:"OSMhot",
+        url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+        opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
+    };
 
 #### To add a new geoJSON overlay
 
-        msg.payload.command.map = {
-            overlay:"myGeoJSON",
-            geojson:{ your geojson feature as an object },
-            (opt:{ optional geojson options, style, filter, onEach, Feature, etc })
-        };
+    msg.payload.command.map = {
+        overlay:"myGeoJSON",
+        geojson:{ your geojson feature as an object },
+        (opt:{ optional geojson options, style, filter, onEach, Feature, etc })
+    };
 
 see http://leafletjs.com/examples/geojson/ for more details about options
 
 #### To add an Image Overlay
 
-        var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
-        msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
-        msg.payload.command.map = {
-            overlay:"New York Historical",
-            url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
-            bounds: imageBounds,
-            opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
-        };
+    var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
+    msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
+    msg.payload.command.map = {
+        overlay:"New York Historical",
+        url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+        bounds: imageBounds,
+        opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
+    };
 
 #### To clear a layer from the map
 
-        msg.payload.command.clear = "name of your layer/overlay to remove";
+    msg.payload.command.clear = "name of your layer/overlay to remove";
 
 ### Using a local Map Server (WMS server)
 
@@ -281,7 +282,7 @@ The following example gets recent earthquakes from USGS, parses the result,
 formats up the msg as per above and sends to the node to plot on the map.
 It also shows how to zoom and move the map or add a new layer.
 
-        [{"id":"f7950c21.019f5","type":"worldmap","z":"896b28a8.437658","name":"","x":670,"y":680,"wires":[]},{"id":"bb057b8a.4fe2c8","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":640,"wires":[["b8545e85.5ba4c"]]},{"id":"b8545e85.5ba4c","type":"function","z":"896b28a8.437658","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = JSON.stringify({ maxZoom: 19, attribution: '&copy; OpenStreetMap'});\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":640,"wires":[["f7950c21.019f5"]]},{"id":"e6cc0a05.14edd8","type":"function","z":"896b28a8.437658","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"noerr":0,"x":460,"y":780,"wires":[["f7950c21.019f5"]]},{"id":"84b8388.5e943c8","type":"function","z":"896b28a8.437658","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:0,zoom:3} };\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":680,"wires":[["f7950c21.019f5"]]},{"id":"5c317188.d2f31","type":"csv","z":"896b28a8.437658","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":310,"y":720,"wires":[["e6cc0a05.14edd8"]]},{"id":"cfafad11.2f299","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":680,"wires":[["84b8388.5e943c8"]]},{"id":"f0d75b03.39d618","type":"http request","z":"896b28a8.437658","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":190,"y":780,"wires":[["5c317188.d2f31"]]},{"id":"87da03a.eb8a3","type":"inject","z":"896b28a8.437658","name":"Quakes","topic":"","payload":"","payloadType":"none","repeat":"900","crontab":"","once":false,"x":120,"y":720,"wires":[["f0d75b03.39d618"]]}]
+    [{"id":"f7950c21.019f5","type":"worldmap","z":"896b28a8.437658","name":"","x":670,"y":680,"wires":[]},{"id":"bb057b8a.4fe2c8","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":640,"wires":[["b8545e85.5ba4c"]]},{"id":"b8545e85.5ba4c","type":"function","z":"896b28a8.437658","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = JSON.stringify({ maxZoom: 19, attribution: '&copy; OpenStreetMap'});\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":640,"wires":[["f7950c21.019f5"]]},{"id":"e6cc0a05.14edd8","type":"function","z":"896b28a8.437658","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"noerr":0,"x":460,"y":780,"wires":[["f7950c21.019f5"]]},{"id":"84b8388.5e943c8","type":"function","z":"896b28a8.437658","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:0,zoom:3} };\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":680,"wires":[["f7950c21.019f5"]]},{"id":"5c317188.d2f31","type":"csv","z":"896b28a8.437658","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":310,"y":720,"wires":[["e6cc0a05.14edd8"]]},{"id":"cfafad11.2f299","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":680,"wires":[["84b8388.5e943c8"]]},{"id":"f0d75b03.39d618","type":"http request","z":"896b28a8.437658","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":190,"y":780,"wires":[["5c317188.d2f31"]]},{"id":"87da03a.eb8a3","type":"inject","z":"896b28a8.437658","name":"Quakes","topic":"","payload":"","payloadType":"none","repeat":"900","crontab":"","once":false,"x":120,"y":720,"wires":[["f0d75b03.39d618"]]}]
 
 
 Car icon made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>.</div>
