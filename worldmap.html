@@ -72,11 +72,12 @@
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="name">
 </div>
-<div class="form-tips">Tip: By default <code>ctrl-shift-m</code> will load the map in a new tab.</div>
+<div class="form-tips">Tip: By default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
 <script type="text/x-red" data-help-name="worldmap">
     <p>Plots "things" on a web map. Needs an internet connection.</p>
+    <p>Shortcut - <code>⌘⇧m</code> - ctrl-shift-m to jump to Map.</p>
     <p>The minimum <code>msg.payload</code> must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
     <pre>{name:"Joe", lat:51, lon:-1.05}</pre>
     <p><code>name</code> must be a unique identifier.</p>
@@ -88,15 +89,21 @@
         <li><code>accuracy</code> : combined with bearing, draws a polygon of possible direction.</li>
         <li><code>icon</code> : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name</li>
         <li><code>iconColor</code> : standard CSS color name or #rrggbb hex value.</li>
+        <li><code>SIDC</code> : NATO symbology code (instead of icon).</li>
+        <li><code>bulding</code> : OSMBuildings GeoJSON object.</li>
+        <li><code>ttl</code> : time to live of an individual marker.</li>
         <li><code>photoUrl</code> : adds an image pointed at by the url to the popup box.</li>
+        <li><code>videoUrl</code> : adds an mp4 (320x240) pointed at by the url to Popup box</li>
+        <li><code>weblink</code> : link to an external web page.</li>
         <li><code>deleted</code> : set to <i>true</i> to remove the named marker. (default false)</li>
     </ul>
     <p>Any other sub-properties of <code>msg.payload</code> will be added to the icon popup text box as extra information.</p>
-    <p>Icons of type <i>plane</i>, <i>ship</i> or <i>car</i> will use built in SVG icons that align to the
+    <p>Icons of type <i>plane</i>, <i>ship</i>, <i>car</i>, <i>uav</i> or <i>arrow</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
-    <p>There are some <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">extra commands</a>
-    for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and to <b>control</b> the map remotely, including how to
-    use a local map server.</p>
+    <p>Font Awesome (fa-icons 4.7) can also be used, as can NATO symbology codes (SIDC).</p>
+    <p>See the <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">README</a> for further
+    details and examples of icons and commands for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and
+    to <b>control</b> the map remotely, including how to use a local map server.</p>
 </script>
 
 <script type="text/javascript">

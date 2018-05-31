@@ -1,5 +1,6 @@
-node-red-contrib-web-worldmap
-=============================
+# node-red-contrib-web-worldmap
+
+![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
 
 A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
 map web page for plotting "things" on.
@@ -35,6 +36,8 @@ Optional properties include
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
  - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
+ - **SIDC** : NATO symbology code (instead of icon). See below.
+ - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
@@ -73,8 +76,11 @@ To do this you need to supply a `msg.SIDC` instead of an icon, for example:
     {   name: "Emergency Medical Operation",
         lat: 51.05,
         lon: -1.35,
-        SIDC:"ENOPA-------"
+        SIDC:"ENOPA-------",
+        options: { fillOpacity:0.8 }
     }
+
+There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="_new">milsymbol docs here</a>.
 
 ### Buildings
 

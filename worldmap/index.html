@@ -987,7 +987,8 @@ function setMarker(data) {
             myMarker = new ms.Symbol( data.SIDC, { uniqueDesignation:data.name });
             // Now that we have a symbol we can ask for the echelon and set the symbol size
             var opts = data.options || {};
-            opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 20;
+            opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 30;
+            opts.size = opts.size * (opts.scale || 1);
             myMarker = myMarker.setOptions(opts);
             var myicon = L.icon({
               iconUrl: myMarker.toDataURL(),
@@ -1019,6 +1020,7 @@ function setMarker(data) {
         // }
 
         // remove icon from list of properties, then add all others to popup
+        if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
         if (data.hasOwnProperty("icon") || (!data.hasOwnProperty("radius"))) {
             if (data.hasOwnProperty("icon")) { delete data.icon; }
             if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
