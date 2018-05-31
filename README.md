@@ -65,6 +65,17 @@ There are also several special icons...
  - **unknown** : pseudo NATO style yellow square.
  - **earthquake** : black circle - diameter proportional to `msg.mag`.
 
+#### NATO Symbology
+
+You can use NATO symbols via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>.
+To do this you need to supply a `msg.SIDC` instead of an icon, for example:
+
+    {   name: "Emergency Medical Operation",
+        lat: 51.05,
+        lon: -1.35,
+        SIDC:"ENOPA-------"
+    }
+
 ### Buildings
 
 The OSM Buildings layer is available in the layers menu. You can replace this with a building of your own by

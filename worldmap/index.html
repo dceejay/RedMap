@@ -46,12 +46,12 @@
     <script type="text/javascript" src="leaflet/easy-button.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.fullscreen.min.js"></script>
     <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
+    <script type="text/javascript" src="leaflet/milsymbol.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-heat.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
-    <!-- <script type="text/javascript" src="leaflet/leaflet-openweathermap.js"></script> -->
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
@@ -125,6 +125,23 @@ var showUserMenu = true;
 var showLayerMenu = true;
 var layercontrol;
 var ws;
+
+var iconSz = {
+  "Team/Crew": 5,
+  "Squad": 10,
+  "Section": 15,
+  "Platoon/detachment": 20,
+  "Company/battery/troop": 25,
+  "Battalion/squadron": 30,
+  "Regiment/group": 35,
+  "Brigade": 40,
+  "Division": 45,
+  "Corps/MEF": 50,
+  "Army": 55,
+  "Army Group/front": 60,
+  "Region/Theater": 65,
+  "Command": 70
+};
 
 // Create the socket
 var connect = function() {
@@ -673,22 +690,9 @@ map.on('draw:created', function (e) {
 //     opacity: 0.9
 // });
 //
-// overlays["rain"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/rain/{z}/{x}/{y}.png', {
-//     maxZoom: 18,
-//     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
-//     opacity: 0.5
-// });
-//
-// overlays["pressure"] = L.tileLayer('http://{s}.tile.openweathermap.org/map/pressure_cntr/{z}/{x}/{y}.png', {
-//     maxZoom: 18,
-//     attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
-//     opacity: 0.5
-// });
-//
-// overlays["weather"] = L.OWM.current({interval:30, minZoom:8, appId:"9ae11d4f6f9bed61f32fc061f715cc71"});
 
 overlays["buildings"] = new OSMBuildings(map).load();
-map.removeLayer(overlays["buildings"]);
+map.removeLayer(overlays["buildings"]);     // Hide it at start
 
 // Add the shipping navigation markers
 //var OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
@@ -977,6 +981,19 @@ function setMarker(data) {
         }
         else if (data.icon === "earthquake") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
+        }
+        else if (data.hasOwnProperty("SIDC")) {
+            // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
+            myMarker = new ms.Symbol( data.SIDC, { uniqueDesignation:data.name });
+            // Now that we have a symbol we can ask for the echelon and set the symbol size
+            var opts = data.options || {};
+            opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 20;
+            myMarker = myMarker.setOptions(opts);
+            var myicon = L.icon({
+              iconUrl: myMarker.toDataURL(),
+              iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+            });
+            marker =  L.marker(ll, { title:data.name, icon:myicon });
         }
         else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
