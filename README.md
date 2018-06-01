@@ -22,7 +22,8 @@ Either use the Manage Palette option in the Node-RED Editor menu, or run the fol
         npm i --save node-red-contrib-web-worldmap
 
 
-## Usage
+
+## Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
 
@@ -86,6 +87,8 @@ To do this you need to supply a `msg.SIDC` instead of an icon, for example:
         SIDC:"ENOPA-------",
         options: { fillOpacity:0.8 }
     }
+
+SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
 
 There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="_new">milsymbol docs here</a>.
 
