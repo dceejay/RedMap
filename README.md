@@ -7,13 +7,17 @@ map web page for plotting "things" on.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
-### Changes
+### Updates
 
-see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md)
+- v1.1.15 - Tidy of Info, Readme and NATO symbol options.
+- v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>
+- v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
+
+see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
 ## Install
 
-Either use the Manage Palette option in the Editor menu, or run the following command in your Node-RED user directory - typically `~/.node-red`
+Either use the Manage Palette option in the Node-RED Editor menu, or run the following command in your Node-RED user directory - typically `~/.node-red`
 
         npm i --save node-red-contrib-web-worldmap
 
@@ -21,6 +25,8 @@ Either use the Manage Palette option in the Editor menu, or run the following co
 ## Usage
 
 Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
+
+Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
 The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
 
@@ -30,7 +36,7 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g
 
 Optional properties include
 
- - **deleted** : set to <i>true</i> to remove the named marker. (default false)
+ - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to.
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
@@ -51,7 +57,7 @@ Any other `msg.payload` properties will be added to the icon popup text box.
 ### Icons
 
 You may select any of the Font Awesome set of [icons](http://fortawesome.github.io/Font-Awesome/icons/).
-If you use the name without the fa- prefix (eg male) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg fa-male) you will get the icon on it's own.
+If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
 
 There are also several special icons...
 
@@ -71,7 +77,7 @@ There are also several special icons...
 
 #### NATO Symbology
 
-You can use NATO symbols via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>.
+You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>.
 To do this you need to supply a `msg.SIDC` instead of an icon, for example:
 
     msg.payload = { name: "Emergency Medical Operation",
@@ -223,7 +229,7 @@ Optional properties include
     msg.payload.command.map = {
         overlay:"myGeoJSON",
         geojson:{ your geojson feature as an object },
-        (opt:{ optional geojson options, style, filter, onEach, Feature, etc })
+        opt:{ optional geojson options, style, filter, onEach, Feature, etc }
     };
 
 see http://leafletjs.com/examples/geojson/ for more details about options
