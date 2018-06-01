@@ -2,7 +2,7 @@
 
 ![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
 
-A <a href="http://nodered.org" target="_new">Node-RED</a> node to provide world
+A <a href="http://nodered.org" target="mapinfo">Node-RED</a> node to provide world
 map web page for plotting "things" on.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
@@ -10,7 +10,7 @@ map web page for plotting "things" on.
 ### Updates
 
 - v1.1.15 - Tidy of Info, Readme and NATO symbol options.
-- v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>
+- v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>
 - v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -42,7 +42,7 @@ Optional properties include
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
- - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="_new">font awesome</a> icon name.
+ - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -78,7 +78,7 @@ There are also several special icons...
 
 #### NATO Symbology
 
-You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>.
+You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>.
 To do this you need to supply a `msg.SIDC` instead of an icon, for example:
 
     msg.payload = { name: "Emergency Medical Operation",
@@ -90,7 +90,7 @@ To do this you need to supply a `msg.SIDC` instead of an icon, for example:
 
 SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
 
-There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="_new">milsymbol docs here</a>.
+There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="mapinfo">milsymbol docs here</a>.
 
 ### Buildings
 
@@ -254,7 +254,7 @@ see http://leafletjs.com/examples/geojson/ for more details about options
 
 ### Using a local Map Server (WMS server)
 
-IMHO the easiest map server to make work is the <a href="http://www.mapserver.org/" target="_new">mapserver</a> package in Ubuntu / Debian. Usually you will start with
+IMHO the easiest map server to make work is the <a href="http://www.mapserver.org/" target="mapinfo">mapserver</a> package in Ubuntu / Debian. Usually you will start with
 
     sudo apt-get install mapserver-bin cgi-mapserver gdal-bin
 
@@ -294,4 +294,4 @@ It also shows how to zoom and move the map or add a new layer.
     [{"id":"f7950c21.019f5","type":"worldmap","z":"896b28a8.437658","name":"","x":670,"y":680,"wires":[]},{"id":"bb057b8a.4fe2c8","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":640,"wires":[["b8545e85.5ba4c"]]},{"id":"b8545e85.5ba4c","type":"function","z":"896b28a8.437658","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = JSON.stringify({ maxZoom: 19, attribution: '&copy; OpenStreetMap'});\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":640,"wires":[["f7950c21.019f5"]]},{"id":"e6cc0a05.14edd8","type":"function","z":"896b28a8.437658","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"noerr":0,"x":460,"y":780,"wires":[["f7950c21.019f5"]]},{"id":"84b8388.5e943c8","type":"function","z":"896b28a8.437658","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:0,zoom:3} };\nreturn msg;","outputs":1,"noerr":0,"x":340,"y":680,"wires":[["f7950c21.019f5"]]},{"id":"5c317188.d2f31","type":"csv","z":"896b28a8.437658","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":310,"y":720,"wires":[["e6cc0a05.14edd8"]]},{"id":"cfafad11.2f299","type":"inject","z":"896b28a8.437658","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":110,"y":680,"wires":[["84b8388.5e943c8"]]},{"id":"f0d75b03.39d618","type":"http request","z":"896b28a8.437658","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":190,"y":780,"wires":[["5c317188.d2f31"]]},{"id":"87da03a.eb8a3","type":"inject","z":"896b28a8.437658","name":"Quakes","topic":"","payload":"","payloadType":"none","repeat":"900","crontab":"","once":false,"x":120,"y":720,"wires":[["f0d75b03.39d618"]]}]
 
 
-Car icon made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>.</div>
+Car icon made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="mapinfo">CC 3.0 BY</a>.</div>
