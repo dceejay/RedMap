@@ -1,7 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
  - v1.1.15 - Tidy of Info, Readme and NATO symbol options.
- - v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="_new">milsymbol.js</a>
+ - v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>
  - v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
  - v1.1.12 - README changes, split out CHANGELOG.md
  - v1.1.11 - fix websocket multiple connections

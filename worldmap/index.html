@@ -29,7 +29,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.measurecontrol.css">
     <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
-    <!-- <link rel="stylesheet" type="text/css" href="leaflet/leaflet-openweathermap.css"/> -->
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
@@ -51,6 +51,7 @@
     <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet-velocity.min.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
 
@@ -1187,6 +1188,20 @@ function doCommand(cmd) {
             existsalready = true;
         }
         overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,cmd.map.opt);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        overlays[cmd.map.overlay].addTo(map);
+    }
+    // Add a new velocity overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
+        console.log("M",cmd.map);
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            map.removeLayer(overlays[cmd.map.overlay]);
+            existsalready = true;
+        }
+        console.log("E",existsalready);
+        overlays[cmd.map.overlay] = L.velocityLayer(cmd.map.velocity);
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }

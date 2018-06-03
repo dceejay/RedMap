@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: May 30th 2018 - v1.1.15
+# date: May 30th 2018 - v1.1.16
 
 CACHE:
 index.html
@@ -27,6 +27,8 @@ leaflet/leaflet-openweathermap.css
 leaflet/leaflet-openweathermap.js
 leaflet/leaflet-slider.css
 leaflet/leaflet-slider.js
+leaflet/leaflet-velocity.min.css
+leaflet/leaflet-velocity.min.js
 leaflet/leaflet.active-layers.min.js
 leaflet/leaflet.boatmarker.js
 leaflet/leaflet.css

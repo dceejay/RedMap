@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currrents, etc)
 - v1.1.15 - Tidy of Info, Readme and NATO symbol options.
 - v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>
 - v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
@@ -236,6 +237,24 @@ Optional properties include
     };
 
 see http://leafletjs.com/examples/geojson/ for more details about options
+
+#### To add a Velocity Grid Overlay
+
+    msg.payload.command.map = {
+        overlay:"myWind",
+        velocity: { 	
+            displayValues: true,
+	        displayOptions: {
+                velocityType: 'Global Wind',
+                displayPosition: 'bottomleft',
+                displayEmptyString: 'No wind data'
+            },
+            maxVelocity: 15,
+            data: [Array of data as per format referenced below]
+        }
+    };
+
+see https://github.com/danwild/leaflet-velocity for more details about options and data examples.
 
 #### To add an Image Overlay
 
