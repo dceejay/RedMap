@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currents, etc)
  - v1.1.15 - Tidy of Info, Readme and NATO symbol options.
  - v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>
  - v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
