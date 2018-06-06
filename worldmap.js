@@ -47,7 +47,6 @@ module.exports = function(RED) {
         var callback = function(client) {
             //client.setMaxListeners(0);
             clients[client.id] = client;
-            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 if (message.action === "connected") {
@@ -68,6 +67,7 @@ module.exports = function(RED) {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length});
             });
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
         }
         node.on('input', function(msg) {
             for (var c in clients) {

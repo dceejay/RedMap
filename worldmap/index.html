@@ -71,7 +71,7 @@
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' value="10" size="2" onchange='setCluster();'/></td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster();'/></td></tr>
     <tr><td style="cursor:default"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
@@ -116,7 +116,7 @@ var marks = [];
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
-var clusterAt = 12;
+var clusterAt = 13;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2017"
@@ -169,12 +169,12 @@ var connect = function() {
             for (var prop in data) {
                 if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
                 if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
-                else { console.log("SKIP",data[prop]); }
+                else { console.log("SKIP A",data[prop]); }
             }
         }
         else {
             if (data.command) { doCommand(data.command); delete data.command; }
-            if (data.hasOwnProperty("name")) { setMarker(data); }
+            else if (data.hasOwnProperty("name")) { setMarker(data); }
             else { console.log("SKIP",data); }
         }
     };
@@ -345,12 +345,12 @@ function setMaxAge() {
 }
 setMaxAge();
 
-function setCluster() {
-    clusterAt = parseInt(document.getElementById('setclus').value) || 0;
-    console.log("clusterAt set:",clusterAt);
+function setCluster(v) {
+    clusterAt = v || 0;
+    console.log("clusterAt set:",v,clusterAt);
     showMapCurrentZoom();
 }
-setCluster();
+//setCluster();
 
 // Search for markers with names of ....
 function doSearch() {
@@ -980,7 +980,6 @@ function setMarker(data) {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data.name });
         }
         else if (data.icon === "danger") {
-            console.log("danger will robinson");
             marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data.name });
         }
         else if (data.icon === "earthquake") {
@@ -1132,9 +1131,9 @@ function setMarker(data) {
 function doCommand(cmd) {
     //console.log("COMMAND",cmd);
     // ignore server side initial command if client position already saved.
-    if (cmd.hasOwnProperty("init") && initialposition) {
-        return;
-    }
+    // if (cmd.hasOwnProperty("init") && initialposition) {
+    //     return;
+    // }
     if (cmd.hasOwnProperty("clear")) {
         doTidyUp(cmd.clear);
     }
@@ -1251,9 +1250,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
     if (cmd.hasOwnProperty("cluster")) {
-        //clusterAt = cmd.cluster;
+        clusterAt = cmd.cluster;
         document.getElementById("setclus").value = cmd.cluster;
-        setCluster();
+        setCluster(clusterAt);
     }
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
