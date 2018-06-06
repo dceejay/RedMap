@@ -202,7 +202,7 @@ if ( window.localStorage.hasOwnProperty("maxage") ) {
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
-var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright").addTo(map);
+var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright");
 
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
@@ -252,7 +252,7 @@ if (!inIframe) {
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
-//else { if (showUserMenu) { menuButton.addTo(map); } }
+else { if (showUserMenu) { menuButton.addTo(map); } }
 
 // Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
@@ -429,7 +429,6 @@ map.on('overlayadd', function(e) {
         map.addControl(drawControl);
         overlays["drawing"].bringToFront();
     }
-    //else { console.log("layer add :",e.name); }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
 
@@ -496,7 +495,7 @@ var rightmenuMap = L.popup().setContent("<input type='text' id='rinput' onkeydow
 var rclk;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
-    console.log(thing);
+    //console.log(thing);
     ws.send(JSON.stringify({action:"point", lat:rclk.lat.toFixed(5), lon:rclk.lng.toFixed(5), point:thing}));
     map.closePopup();
     var bits = thing.split(",");
@@ -583,11 +582,11 @@ var Esri_OceanBasemap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
-var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
-    maxZoom: 18,
-    attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
+// var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+//     maxZoom: 18,
+//     attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// });
+// basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
 
 // var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
 //     type: 'map',
@@ -636,13 +635,11 @@ basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
 //});
 //basemaps["CartoDB Light"] = CartoPos;
 
-// Terrain map of US only
-var usterrainmap = new L.StamenTileLayer('terrain');
-basemaps["US terrain"] = usterrainmap;
+// Terrain map by Stamen Design
+basemaps["Terrain"] = new L.StamenTileLayer('terrain');
 
 // Nice watercolour based maps by Stamen Design
-var watermap = new L.StamenTileLayer('watercolor');
-basemaps["Watercolor"] = watermap;
+basemaps["Watercolor"] = new L.StamenTileLayer('watercolor');
 
 // Now add the overlays
 
@@ -718,23 +715,26 @@ else { showLayerMenu = false;}
 
 // Delete a marker (and notify websocket)
 var delMarker = function(dname) {
-    //console.log("Deleting",dname);
     if (typeof polygons[dname] != "undefined") {
         layers[polygons[dname].lay].removeLayer(polygons[dname]);
-        ws.send(JSON.stringify({action:"delete", name:dname}));
         delete polygons[dname];
     }
+    if (typeof polygons[dname+"_"] != "undefined") {
+        layers[polygons[dname+"_"].lay].removeLayer(polygons[dname+"_"]);
+        delete polygons[dname+"_"];
+    }
     if (typeof markers[dname] != "undefined") {
-        ws.send(JSON.stringify({action:"delete", name:dname}));
         layers[markers[dname].lay].removeLayer(markers[dname]);
+        map.removeLayer(markers[dname]);
         delete markers[dname];
     }
+    ws.send(JSON.stringify({action:"delete", name:dname}));
     map.closePopup();
 }
 
 // the MAIN add something to map function
 function setMarker(data) {
-    //console.log(typeof data, data);
+    //console.log("DATA",typeof data, data);
     var ll;
     var lli = null;
     var stay = popped;
@@ -763,20 +763,23 @@ function setMarker(data) {
     }
     var lay = data.layer || "unknown";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
-        //layers[lay] = new L.LayerGroup().addTo(map);
+        //layers[lay] = new L.LayerGroup();
         layers[lay] = new L.MarkerClusterGroup({
             maxClusterRadius:50,
             spiderfyDistanceMultiplier:1.8,
-            disableClusteringAtZoom:clusterAt,
+            disableClusteringAtZoom:clusterAt
             //zoomToBoundsOnClick:false
-        }).addTo(map);
+        });
         overlays[lay] = layers[lay];
-        //if (!inIframe) {
-            layercontrol.addOverlay(layers[lay],lay);
-        //}
+        layercontrol.addOverlay(layers[lay],lay);
+        map.addLayer(overlays[lay]);
+        console.log("ADDED LAYER",lay,layers);
     }
 
-    if (typeof markers[data.name] != "undefined") { layers[lay].removeLayer(markers[data.name]); }
+    if (typeof markers[data.name] != "undefined") {
+        try {layers[lay].removeLayer(markers[data.name]); }
+        catch(e) { console.log("OOPS"); }
+    }
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
     if (data.deleted) { // remove markers we are told to
@@ -1191,21 +1194,19 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        overlays[cmd.map.overlay].addTo(map);
+        map.addLayer(overlays[cmd.map.overlay]);
     }
     // Add a new velocity overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
-        console.log("M",cmd.map);
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
             map.removeLayer(overlays[cmd.map.overlay]);
             existsalready = true;
         }
-        console.log("E",existsalready);
         overlays[cmd.map.overlay] = L.velocityLayer(cmd.map.velocity);
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        overlays[cmd.map.overlay].addTo(map);
+        map.addLayer(overlays[cmd.map.overlay]);
     }
     // Add a new overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
@@ -1231,7 +1232,7 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        overlays[cmd.map.overlay].addTo(map);
+        map.addLayer(overlays[cmd.map.overlay]);
     }
     // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
@@ -1241,7 +1242,7 @@ function doCommand(cmd) {
     }
     // Add an overlay
     if (cmd.layer && overlays.hasOwnProperty(cmd.layer)) {
-        overlays[cmd.layer].addTo(map);
+        map.addLayer(overlays[cmd.map.overlay]);
     }
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;

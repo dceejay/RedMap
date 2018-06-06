@@ -140,7 +140,7 @@ module.exports = function(RED) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
                     delete node.pointsarray[msg.payload.name];
-                    newmsg.payload.name = msg.payload.name + "_";
+                    //newmsg.payload.name = msg.payload.name + "_";
                     node.send(newmsg);  // send the track to be deleted
                     return;
                 }
