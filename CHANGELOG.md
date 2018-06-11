@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+
+ - v1.2.2 - Re-fix simultaneous command plus payload
  - v1.2.1 - Sort out map initialisation - especially clusterAt values
  - v1.2.0 - Bump version (should have done it for adding velocity layer). Tidy up deletion of marker and tracks.
  - v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currents, etc)

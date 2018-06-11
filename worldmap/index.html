@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-  Copyright 2015, 2017 IBM Corp.
+  Copyright 2015, 2018 IBM Corp.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ var menuOpen = false;
 var clusterAt = 13;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var ibmfoot = "&nbsp;&copy; IBM 2015,2017"
+var ibmfoot = "&nbsp;&copy; IBM 2015,2018"
 var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
@@ -174,7 +174,7 @@ var connect = function() {
         }
         else {
             if (data.command) { doCommand(data.command); delete data.command; }
-            else if (data.hasOwnProperty("name")) { setMarker(data); }
+            if (data.hasOwnProperty("name")) { setMarker(data); }
             else { console.log("SKIP",data); }
         }
     };
@@ -347,7 +347,7 @@ setMaxAge();
 
 function setCluster(v) {
     clusterAt = v || 0;
-    console.log("clusterAt set:",v,clusterAt);
+    console.log("clusterAt set:",clusterAt);
     showMapCurrentZoom();
 }
 //setCluster();
@@ -455,7 +455,7 @@ map.on('baselayerchange', function(e) {
 });
 
 function showMapCurrentZoom() {
-    console.log("ZOOM:",map.getZoom(),". CLUSTER:",clusterAt);
+    console.log("zoom:",map.getZoom(),". clusterAt:",clusterAt);
     for (var l in layers) {
         if (layers[l].hasOwnProperty("_zoom")) {
             if (map.getZoom() >= clusterAt) {
@@ -622,13 +622,14 @@ var NLS_OS_1919_1947 = L.tileLayer( 'http://nls-{s}.tileserver.com/nls/{z}/{x}/{
 basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
 
 //var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
-//attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
-//bounds: [[49.6, -12], [61.7, 3]],
-//minZoom: 1,
-//maxZoom: 18,
-//subdomains: '0123'
-//});
-//basemaps["UK OS 1900"] = NLS_OS_1900;
+var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
+    attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+    bounds: [[49.6, -12], [61.7, 3]],
+    minZoom: 1,
+    maxZoom: 18,
+    subdomains: '0123'
+});
+basemaps["UK OS 1900"] = NLS_OS_1900;
 
 //var CartoPos = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
 //    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
@@ -773,7 +774,7 @@ function setMarker(data) {
         overlays[lay] = layers[lay];
         layercontrol.addOverlay(layers[lay],lay);
         map.addLayer(overlays[lay]);
-        console.log("ADDED LAYER",lay,layers);
+        //console.log("ADDED LAYER",lay,layers);
     }
 
     if (typeof markers[data.name] != "undefined") {
