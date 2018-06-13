@@ -554,31 +554,31 @@ map.on('locationerror', onLocationError);
 var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 //var osmUrl='http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
 var osmAttrib='Map data © OpenStreetMap contributors';
-var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution:osmAttrib});
+var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
 basemaps["OSM grey"] = osmg;
-var osm = new L.TileLayer(osmUrl, {attribution:osmAttrib});
+var osm = new L.TileLayer(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
 basemaps["OSM"] = osm;
 
 // Extra Leaflet map layers from http://leaflet-extras.github.io/leaflet-providers/preview/
 var Esri_WorldStreetMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri'
+    attribution: 'Tiles &copy; Esri', maxNativeZoom:19, maxZoom:20
 });
 basemaps["Esri"] = Esri_WorldStreetMap;
 
 var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri'
+    attribution:'Tiles &copy; Esri', maxNativeZoom:19, maxZoom:20
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
 var Esri_WorldShadedRelief = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri',
-    maxNativeZoom: 13
+    maxNativeZoom:13
 });
 basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri',
-    maxNativeZoom: 10
+    maxNativeZoom:10
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
@@ -599,15 +599,14 @@ basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
 var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri',
-    maxNativeZoom: 12
+    maxNativeZoom:12
 });
 basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
 
 var NLS_OS_opendata = L.tileLayer('http://geo.nls.uk/maps/opendata/{z}/{x}/{y}.png', {
     attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
     bounds: [[49.6, -12], [61.7, 3]],
-    minZoom: 1,
-    maxNativeZoom: 16,
+    minZoom:1, maxNativeZoom:18, maxZoom:18,
     subdomains: '0123'
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
@@ -615,8 +614,7 @@ basemaps["UK OS Opendata"] = NLS_OS_opendata;
 var NLS_OS_1919_1947 = L.tileLayer( 'http://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
     attribution: 'Historical Maps Layer, from <a href="http://maps.nls.uk/projects/api/">NLS Maps</a>',
     bounds: [[49.6, -12], [61.7, 3]],
-    minZoom: 1,
-    maxZoom: 18,
+    minZoom:1, maxZoom:18,
     subdomains: '0123'
 });
 basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
@@ -625,8 +623,7 @@ basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
 var NLS_OS_1900 = L.tileLayer('http://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
     attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
     bounds: [[49.6, -12], [61.7, 3]],
-    minZoom: 1,
-    maxZoom: 18,
+    minZoom:1, maxNativeZoom:19, maxZoom:20,
     subdomains: '0123'
 });
 basemaps["UK OS 1900"] = NLS_OS_1900;
