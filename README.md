@@ -9,14 +9,12 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
 - v1.2.3 - Add higher maxZoom values for some layers
 - v1.2.2 - re-fix simultaneous command plus payload
 - v1.2.1 - Sort out map initialisation - especially clusterAt values
 - v1.2.0 - Bump version (should have done it for adding velocity layer). Tidy up deletion of marker and tracks.
-- v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currrents, etc)
-- v1.1.15 - Tidy of Info, Readme and NATO symbol options.
-- v1.1.14 - Add proper NATO symbology via <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>
-- v1.1.13 - Add ability to set a building using a GeoJSON Feature set. {name:"MyTower":building:{...feature sets...}}
+- v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currents, etc)
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
@@ -54,7 +52,7 @@ Optional properties include
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
- - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk"}`
+ - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
 

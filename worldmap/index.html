@@ -1050,7 +1050,8 @@ function setMarker(data) {
                 if (typeof data.weblink === "string") {
                     words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
                 } else {
-                    words += "<b><a href='"+ data.weblink.url + "' target='_new'>" + data.weblink.name + "</a></b><br/>";
+                    var tgt = data.weblink.target || "_new";
+                    words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
                 }
                 delete data.weblink;
             }
