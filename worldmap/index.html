@@ -54,6 +54,7 @@
     <script type="text/javascript" src="leaflet/leaflet-velocity.min.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
@@ -1163,6 +1164,7 @@ function doCommand(cmd) {
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
+        console.log("BASE",cmd.map);
         if (basemaps.hasOwnProperty(cmd.map.name)) { existsalready = true; }
         if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
             console.log("New WMS:",cmd.map.name);
@@ -1188,11 +1190,58 @@ function doCommand(cmd) {
             map.removeLayer(overlays[cmd.map.overlay]);
             existsalready = true;
         }
-        overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,cmd.map.opt);
+        var opt = cmd.map.opt || {style:function(feature) {return {color:feature.properties.color||feature.properties.roofColor}}};
+        //console.log("OPT",opt);
+
+        opt.onEachFeature = function (f, l) {
+            l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+        }
+        overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new KML overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            map.removeLayer(overlays[cmd.map.overlay]);
+            existsalready = true;
+        }
+        //var opt = {async:true};
+        overlays[cmd.map.overlay] = omnivore.kml.parse(cmd.map.kml);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new TOPOJSON overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            map.removeLayer(overlays[cmd.map.overlay]);
+            existsalready = true;
+        }
+        overlays[cmd.map.overlay] = omnivore.topojson.parse(cmd.map.topojson);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new GPX overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("gpx") ) {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            map.removeLayer(overlays[cmd.map.overlay]);
+            existsalready = true;
+        }
+        overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new velocity overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
@@ -1205,6 +1254,7 @@ function doCommand(cmd) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); } 
     }
     // Add a new overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
@@ -1238,9 +1288,13 @@ function doCommand(cmd) {
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
     }
-    // Add an overlay
-    if (cmd.layer && overlays.hasOwnProperty(cmd.layer)) {
-        map.addLayer(overlays[cmd.map.overlay]);
+    // Turn on an existing overlay
+    if (cmd.hasOwnProperty("showlayer") && overlays.hasOwnProperty(cmd.showlayer)) {
+        map.addLayer(overlays[cmd.showlayer]);
+    }
+    // Turn off an existing overlay
+    if (cmd.hasOwnProperty("hidelayer") && overlays.hasOwnProperty(cmd.hidelayer)) {
+        map.removeLayer(overlays[cmd.hidelayer]);
     }
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;

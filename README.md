@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.3.0 - Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
 - v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
 - v1.2.3 - Add higher maxZoom values for some layers
 - v1.2.2 - re-fix simultaneous command plus payload
@@ -101,8 +102,7 @@ The OSM Buildings layer is available in the layers menu. You can replace this wi
 sending a msg.payload containing a name and a building property. The building property should be
 a GeoJSON Feature Collection as per the OSMBuildings spec.
 
-    msg.payload = { name:"My Block", building: {
-        "type": "FeatureCollection",
+    {   "type": "FeatureCollection",
         "features": [
           {
             "type": "Feature",
@@ -126,7 +126,7 @@ a GeoJSON Feature Collection as per the OSMBuildings spec.
               ]
             }
           }
-        ] }
+        ]
     }
 
 **Note**: the object you supply will replace the whole buildings layer. To delete the building send a msg with a name and the building property set to ""  (blank string).
@@ -194,7 +194,9 @@ Optional properties include
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
- - **layer** - set map to specified layer name (can be a base layer or an overlay layer).
+ - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
+ - **showlayer** - show the named overlay - `{command:{showlayer:"foo"}}`
+ - **hidelayer** - hide the named overlay - `{command:{hidelayer:"bar"}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
@@ -206,7 +208,7 @@ Optional properties include
 
 #### To switch layer, move map and zoom
 
-    msg.payload.command =  {layer:"Esri Relief", lat:51, lon:3, zoom:10 };
+    msg.payload.command =  {layer:"Esri Satellite", lat:51, lon:3, zoom:10 };
 
 #### To draw a heavily customized Circle on a layer
 
@@ -235,10 +237,24 @@ Optional properties include
     msg.payload.command.map = {
         overlay:"myGeoJSON",
         geojson:{ your geojson feature as an object },
-        opt:{ optional geojson options, style, filter, onEach, Feature, etc }
+        opt:{ optional geojson options, style, filter, onEach, Feature, etc },
+        fit:true
     };
 
-see http://leafletjs.com/examples/geojson/ for more details about options
+
+The `fit` property is optional. If present the map will automatically zoom to fit the area relevant to the geojson.
+see http://leafletjs.com/examples/geojson/ for more details about options for opt.
+
+#### To add a new KML, GPX, or TOPOJSON overlay
+
+As per the geojson overlay you can also inject a KML layer or TOPOJSON layer. The syntax is the same but with either a `kml` property - containing the KML string - or a `topojson` property containing the topojson.
+
+    msg.payload.command.map = {
+        overlay:"myKML",
+        kml:"<kml>...your kml placemarks...</kml>"
+    };
+
+Again the `fit` property can be added to make the map zoom to the relevant area.
 
 #### To add a Velocity Grid Overlay
 

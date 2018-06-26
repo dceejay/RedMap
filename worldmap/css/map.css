@@ -51,10 +51,10 @@ a {
 
 #foot {
     position:absolute;
-    height:20px;
-    bottom:0;
-    width:100%;
-    z-index:10;
+    bottom:1px;
+    left:-1px;
+    z-index:1;
+    font-size:9px;
 }
 
 #heat {

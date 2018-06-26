@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.3.0 - Add ability to add KML and TOPOJSON overlay layers
  - v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - v1.2.3 - Add higher maxZoom values for some layers
  - v1.2.2 - Re-fix simultaneous command plus payload
