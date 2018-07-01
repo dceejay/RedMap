@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Node-RED 3D Map all the Things</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+    <script type="text/javascript" src="leaflet/sockjs.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet'/>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+<div id='map'></div>
+<script>
+
+// If you have a mapbox API key it may be better to use that - uncomment these lines and cooment out the mbstyle below.
+// mapboxgl.accessToken = 'insert your key here';
+// var mbstyle = 'mapbox://styles/mapbox/streets-v9';
+
+var mbstyle = 'https://data.osmbuildings.org/0.2/anonymous/style.json';
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: mbstyle,
+    center: [-1.3971, 51.0259],
+    zoom: 16,
+    pitch: 40,
+    bearing: 20,
+    attributionControl: true
+});
+
+var people = {};
+
+
+map.on('load', function() {
+
+    var layers = map.getStyle().layers;
+    var firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+        }
+    }
+
+    /// Add the base 3D buildings layer
+    map.addLayer({
+        'id': '3d-buildings',
+        'source': 'composite',
+        'source-layer': 'building',
+        'filter': ['==', 'extrude', 'true'],
+        'type': 'fill-extrusion',
+        'minzoom': 15,
+        'paint': {
+            'fill-extrusion-color': '#ddd',
+            'fill-extrusion-height': [
+                "interpolate", ["linear"], ["zoom"],
+                15, 0, 15.05, ["get", "height"]
+            ],
+            'fill-extrusion-base': [
+                "interpolate", ["linear"], ["zoom"],
+                15, 0, 15.05, ["get", "min_height"]
+            ],
+            'fill-extrusion-opacity': .3
+        }
+    }, firstSymbolId);
+
+    // ---- Connect to the Node-RED Events Websocket --------------------
+
+    var connect = function() {
+        ws = new SockJS(location.pathname.split("index")[0] + 'socket');
+        ws.onopen = function() {
+            console.log("CONNECTED");
+            // if (!inIframe) {
+            //     document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+            // }
+            ws.send(JSON.stringify({action:"connected"}));
+        };
+        ws.onclose = function() {
+            console.log("DISCONNECTED");
+            // if (!inIframe) {
+            //     document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+            // }
+            setTimeout(function() { connect(); }, 2500);
+        };
+        ws.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            //console.log("GOT",data);
+            if (Array.isArray(data)) {
+                //console.log("ARRAY");
+                for (var prop in data) {
+                    if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+                    if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
+                    else { console.log("SKIP A",data[prop]); }
+                }
+            }
+            else {
+                if (data.command) { doCommand(data.command); delete data.command; }
+                if (data.hasOwnProperty("name")) { setMarker(data); }
+                else { console.log("SKIP",data); }
+            }
+        };
+    }
+    console.log("CONNECT TO",location.pathname + 'socket');
+    connect();
+
+    var doCommand = function(c) {
+        console.log("CMD",c);
+        // Add our own overlay geojson layer if necessary
+        if (c.hasOwnProperty("map") && c.map.hasOwnProperty("geojson") && c.map.hasOwnProperty("overlay")) {
+            addGeo(c.map.overlay,c.map.geojson);
+        }
+        var clat,clon;
+        if (c.hasOwnProperty("lat")) { clat = c.lat; }
+        if (c.hasOwnProperty("lon")) { clon = c.lon; }
+        if (clat && clon) { map.setCenter([clon,clat]); }
+        if (c.hasOwnProperty("zoom")) { map.setZoom(c.zoom); }
+        if (c.hasOwnProperty("pitch")) { map.setPitch(c.pitch); }
+        if (c.hasOwnProperty("bearing")) { map.setBearing(c.bearing); }
+    }
+
+    var addGeo = function(o,g) {
+        map.addLayer({
+            'id': o,
+            'type': 'fill-extrusion',
+            'source': {
+                'type': 'geojson',
+                'data': g
+            },
+            'paint': {
+                // https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions
+                'fill-extrusion-color': ['get', 'color'],
+                'fill-extrusion-height': ['get', 'height'],
+                'fill-extrusion-base': ['get', 'base_height'],
+                'fill-extrusion-opacity': 0.5
+            }
+        });
+    }
+
+    var setMarker = function(d) {
+        //console.log("DATA",d);
+        if (people.hasOwnProperty(d.name)) {
+            map.getSource(d.name).setData(getPoints(d)); // Just update existing marker
+        }
+        else {  // it's a new thing
+            people[d.name] = d;
+            map.addLayer({
+                'id': d.name,
+                'type': 'fill-extrusion',
+                'source': {
+                    'type': 'geojson',
+                    'data': getPoints(d)
+                },
+                'paint': {
+                    // https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions
+                    'fill-extrusion-color': ['get', 'color'],
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-base': ['get', 'base_height'],
+                    'fill-extrusion-opacity': 1
+                }
+            },firstSymbolId);
+        }
+    }
+
+    // create the points for the marker and return the geojson
+    var getPoints = function(p) {
+        var fac = 0.000007;   // basic size for bock icon in degrees....
+        var thing = "";
+        if (p.hasOwnProperty("icon")) {
+            if (p.icon.indexOf("male") !== -1) { thing = "person"; }
+        }
+        var t = p.type || thing;
+        var base = p.height || 0;
+        if (t === "person") { tall = 3; }                       // person slightly tall and thin
+        else if (t === "bar") { base = 0; tall = p.height; }    // bar from ground to height
+        else if (t === "block") { fac = fac * 4; tall = 5; }    // block large and cube
+        else { tall = 2; fac = fac * 2; }                       // else small cube
+        console.log({p},{t},{fac},{base},{tall});
+        var fac2 = fac / Math.cos( Math.PI / 180 * p.lat );
+        var d = {
+            "type": "Feature",
+            "properties": {
+                "name": p.name,
+                "type": t,
+                "color": p.iconColor || "#910000",
+                "height": base + tall,
+                "base_height": base
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [ p.lon - fac2, p.lat - fac ],
+                        [ p.lon - fac2, p.lat + fac ],
+                        [ p.lon + fac2, p.lat + fac ],
+                        [ p.lon + fac2, p.lat - fac ],
+                        [ p.lon - fac2, p.lat - fac ],
+                    ]
+                ]
+            }
+        }
+        return d;
+    }
+
+    document.addEventListener ("keydown", function (ev) {
+        if (ev.ctrlKey  &&  ev.altKey  &&  ev.code === "Digit3") {
+            ws.close();
+            window.onbeforeunload = null;
+            window.location.href = "index.html";
+        }
+    });
+
+});
+</script>
+</body>
+</html>

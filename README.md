@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.3.0 - Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
+- v1.3.0 - Add initial 3D page (index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
 - v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
 - v1.2.3 - Add higher maxZoom values for some layers
 - v1.2.2 - re-fix simultaneous command plus payload
@@ -56,6 +56,7 @@ Optional properties include
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
+ - **popup** : set to true to automatically open the popup info box.
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 
@@ -131,6 +132,35 @@ a GeoJSON Feature Collection as per the OSMBuildings spec.
 
 **Note**: the object you supply will replace the whole buildings layer. To delete the building send a msg with a name and the building property set to ""  (blank string).
 
+#### Buildings 3D view
+
+A 3D map view has now been added as **index3d.html** using the mapbox api - the msg can support `msg.command.pitch` and `msg.command.bearing` to angle the view, for example:
+
+    msg.payload = { command: {
+            zoom:18,
+            pitch:60,
+            bearing:80
+        } }
+
+The `icon` can be specified as a person, block, bar, or "anything else" - they will render slightly differently - all units are approximate. They will be positioned at the `lat`, `lon` as normal but also at the `msg.payload.height` - where height is in meters above the surface of the map (which may or may not relate to altitude...)
+
+`msg.payload.icon` can be
+
+ - person : 1m x 1m x 2m tall
+ - block : 5m x 5m x 5m cube
+ - bar : a bar from the surface up to the specified minHeight
+ - (else) : 1.5m x 1.5m x 1.5m cube
+
+
+in addition existing male, female, fa-male and fa-female icons are all represented as the person shape.
+ `msg.iconColor` can be used to colour the icons.
+
+ **NOTES**
+
+ - There is currently no way to add labels, popups, or make the icons clickable.
+ - The 3D only really works at zoomed in scales 16+ due to the small size of the icons. They are not scale independent like icons on the normal map.
+ - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
+ - This view is a side project to the Node-RED worldmap side project so happy to take PRs but it probably won't be actively developed.
 
 ### Areas and Lines
 
