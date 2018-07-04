@@ -1066,6 +1066,11 @@ function setMarker(data) {
             }
 
             popped = stay;
+            if (data.hasOwnProperty("popup") && (data.popup == true) ) {
+                popped = true;
+                popid = data.name;
+                delete data.popup;
+            }
 
             // Add any remaining properties to the info box
             for (var i in data) {

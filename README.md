@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.3.0 - Add initial 3D page (index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
+- v1.3.1 - Allow `msg.payload.popup = true` to auto open the info popup.
+- v1.3.0 - Add initial 3D page (worldmap/index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
 - v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
 - v1.2.3 - Add higher maxZoom values for some layers
 - v1.2.2 - re-fix simultaneous command plus payload
@@ -100,41 +101,44 @@ There are lots of extra options you can specify as `msg.options` - see the <a hr
 ### Buildings
 
 The OSM Buildings layer is available in the layers menu. You can replace this with a building of your own by
-sending a msg.payload containing a name and a building property. The building property should be
-a GeoJSON Feature Collection as per the OSMBuildings spec.
+sending a `msg.payload.command.map` containing an `overlay` and a `geojson` property. The geojson property
+should be a GeoJSON Feature Collection as per the OSMBuildings spec.
 
-    {   "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "properties": {
-              "wallColor": "rgb(0,0,255)",
-              "roofColor": "rgb(128,128,255)",
-              "height": 50,
-              "minHeight": 0,
-              "piso": 0
-            },
-            "geometry": {
-              "type": "Polygon",
-              "coordinates": [
-                [
-                  [-1.398163, 51.026591],
-                  [-1.397781, 51.026597],
-                  [-1.397751, 51.025430],
-                  [-1.398148, 51.025427],
-                  [-1.398163, 51.026591]
-                ]
-              ]
-            }
-          }
-        ]
+    var geo = { "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "wall:color": "rgb(0,0,255)",
+          "roof:color": "rgb(128,128,255)",
+          "height": 20,
+          "minHeight": 0,
+          "piso": 0
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+            [-1.356221,51.048611],
+            [-1.356039,51.048672],
+            [-1.355765,51.048311],
+            [-1.355937,51.048237],
+            [-1.356221,51.048611]
+            ]
+          ]
+        }
+      }
+    ]
     }
+    var m = {overlay:"Some Name", geojson:geo, fit:true};
+    msg.payload = {command:{map:m, lat:51.0484, lon:-1.3558}};
+    return msg;
 
 **Note**: the object you supply will replace the whole buildings layer. To delete the building send a msg with a name and the building property set to ""  (blank string).
 
 #### Buildings 3D view
 
-A 3D map view has now been added as **index3d.html** using the mapbox api - the msg can support `msg.command.pitch` and `msg.command.bearing` to angle the view, for example:
+A 3D map view has now been added as **worldmap/index3d.html** using the mapbox api - the msg can support `msg.command.pitch` and `msg.command.bearing` to angle the view, for example:
 
     msg.payload = { command: {
             zoom:18,

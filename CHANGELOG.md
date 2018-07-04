@@ -1,6 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v1.3.0 - Add initial 3D page (index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit. Change all http: links to https:
+ - v1.3.1 - Allow `msg.payload.popup = true` to auto open the info popup.
+ - v1.3.0 - Add initial 3D page (worldmap/index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit. Change all http: links to https:
  - v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - v1.2.3 - Add higher maxZoom values for some layers
  - v1.2.2 - Re-fix simultaneous command plus payload
