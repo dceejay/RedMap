@@ -109,11 +109,10 @@ should be a GeoJSON Feature Collection as per the OSMBuildings spec.
       {
         "type": "Feature",
         "properties": {
-          "wall:color": "rgb(0,0,255)",
-          "roof:color": "rgb(128,128,255)",
+          "color": "rgb(0,0,255)",
+          "roofColor": "rgb(128,128,255)",
           "height": 20,
-          "minHeight": 0,
-          "piso": 0
+          "minHeight": 0
         },
         "geometry": {
           "type": "Polygon",
@@ -130,7 +129,7 @@ should be a GeoJSON Feature Collection as per the OSMBuildings spec.
       }
     ]
     }
-    var m = {overlay:"Some Name", geojson:geo, fit:true};
+    var m = {overlay:"Golf Clubhouse", geojson:geo, fit:true};
     msg.payload = {command:{map:m, lat:51.0484, lon:-1.3558}};
     return msg;
 
