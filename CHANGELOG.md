@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.3.4 - Add ISS icon
  - v1.3.3 - Bugfix for inline satellite icon
  - v1.3.2 - Bugfix for inline svg icons
  - v1.3.1 - Allow `msg.payload.popup = true` to auto open the info popup.
