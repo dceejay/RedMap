@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
 - v1.3.4 - Add ISS icon
 - v1.3.3 - Bugfix for inline satellite icon
 - v1.3.2 - Bugfix for inline svg icons
