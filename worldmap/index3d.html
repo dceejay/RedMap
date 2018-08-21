@@ -208,7 +208,7 @@ map.on('load', function() {
     document.addEventListener ("keydown", function (ev) {
         if (ev.ctrlKey  &&  ev.altKey  &&  ev.code === "Digit3") {
             ws.close();
-            window.onbeforeunload = null;
+            //window.onbeforeunload = null;
             window.location.href = "index.html";
         }
     });

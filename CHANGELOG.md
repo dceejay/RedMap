@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
  - v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
  - v1.3.4 - Add ISS icon
  - v1.3.3 - Bugfix for inline satellite icon

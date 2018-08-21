@@ -186,7 +186,7 @@ connect();
 document.addEventListener ("keydown", function (ev) {
     if (ev.ctrlKey  &&  ev.altKey  &&  ev.code === "Digit3") {
         ws.close();
-        window.onbeforeunload = null;
+        //window.onbeforeunload = null;
         window.location.href = "index3d.html";
     }
 });
@@ -230,9 +230,9 @@ if (window.self !== window.top) {
 }
 else {
     console.log("NOT in an iframe")
-    window.onbeforeunload = function(e) {
-        return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
-    };
+    // window.onbeforeunload = function(e) {
+    //     return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
+    // };
     if (!showUserMenu) {
         document.getElementById("bars").style.display="none";
     }
@@ -499,7 +499,7 @@ map.on('zoomend', function() {
 //    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 //});
 
-var rightmenuMap = L.popup().setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer)'/>");
+var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour, drag(bool))'/>");
 
 var rclk;
 var addThing = function() {
@@ -508,9 +508,11 @@ var addThing = function() {
     ws.send(JSON.stringify({action:"point", lat:rclk.lat.toFixed(5), lon:rclk.lng.toFixed(5), point:thing}));
     map.closePopup();
     var bits = thing.split(",");
-    var lay = (bits[2] || "drawing").trim();
     var icon = (bits[1] || "circle").trim();
-    var d = {name:bits[0].trim(),layer:lay,icon:icon,lat:rclk.lat,lon:rclk.lng};
+    var lay = (bits[2] || "drawing").trim();
+    var colo = (bits[3] || "#910000").trim();
+    var drag = !!(bits[4] || false);
+    var d = {name:bits[0].trim(),layer:lay,icon:icon,iconColor:colo,draggable:drag,lat:rclk.lat,lon:rclk.lng};
     setMarker(d);
     map.addLayer(layers[lay]);
 }
@@ -861,6 +863,8 @@ function setMarker(data) {
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
         var icon, q;
+        var drag = false;
+        if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
@@ -881,9 +885,9 @@ function setMarker(data) {
             myMarker = L.divIcon({
                 className:"planeicon",
                 iconAnchor: [16, 16],
-                html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             //q = 'https://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
             //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
@@ -899,7 +903,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svguav+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
@@ -912,7 +916,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgcar+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "arrow") {
             data.iconColor = data.iconColor || "black";
@@ -925,7 +929,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:"'<img src='"+svgarrow+"' style='width:32px; height:32px; -webkit-transform:translate(0px,-16px) rotate("+dir+"deg); -moz-transform:translate(0px,-16px) rotate("+dir+"deg);'/>",
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "wind") {
             data.iconColor = data.iconColor || "black";
@@ -938,7 +942,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgwind+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "satellite") {
             data.iconColor = data.iconColor || "black";
@@ -955,7 +959,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgsat+'" style="width:32px; height:32px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if ((data.icon === "iss") || (data.icon === "ISS")) {
             data.iconColor = data.iconColor || "black";
@@ -971,7 +975,7 @@ function setMarker(data) {
                 iconAnchor: [25, 25],
                 html:'<img src="'+svgiss+'" style="width:50px; height:50px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "locate") {
             data.iconColor = data.iconColor || "cyan";
@@ -988,25 +992,25 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "friend") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name, draggable:drag });
         }
         else if (data.icon === "hostile") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle h', iconSize: [16, 16] }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle h', iconSize: [16, 16] }), title: data.name, draggable:drag });
         }
         else if (data.icon === "neutral") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle n', iconSize: [16, 16] }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle n', iconSize: [16, 16] }), title: data.name, draggable:drag });
         }
         else if (data.icon === "unknown") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data.name, draggable:drag });
         }
         else if (data.icon === "danger") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data.name, draggable:drag });
         }
         else if (data.icon === "earthquake") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name, draggable:drag });
         }
         else if (data.hasOwnProperty("SIDC")) {
             // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
@@ -1020,7 +1024,7 @@ function setMarker(data) {
               iconUrl: myMarker.toDataURL(),
               iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
             });
-            marker =  L.marker(ll, { title:data.name, icon:myicon });
+            marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
         }
         else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
@@ -1029,7 +1033,7 @@ function setMarker(data) {
                 html: '<center><i class="fa fa-fw fa-2x '+data.icon+'" style="color:'+col+'"></i></center>',
                 iconSize: [30, 30]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else {
             myMarker = L.VectorMarkers.icon({
@@ -1038,12 +1042,22 @@ function setMarker(data) {
                 prefix: 'fa',
                 iconColor: 'white'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker});
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
 
         // var createLabelIcon = function(labelText) {
         //     return L.marker(new L.LatLng(51.05, -1.35), {icon:L.divIcon({ html:labelText })});
         // }
+
+        // send new position at end of move event if point is draggable
+        if (data.draggable === true) {
+            marker.name = data.name;
+            marker.icon = data.icon;
+            marker.on('dragend', function (e) {
+                ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+            });
+        }
+        if (data.draggable) { delete data.draggable; }
 
         // remove icon from list of properties, then add all others to popup
         if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }

@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
 - v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
 - v1.3.4 - Add ISS icon
 - v1.3.3 - Bugfix for inline satellite icon
@@ -47,6 +48,7 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g
 Optional properties include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
+ - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to.
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
