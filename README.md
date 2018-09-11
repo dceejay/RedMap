@@ -97,7 +97,7 @@ To do this you need to supply a `msg.SIDC` instead of an icon, for example:
     msg.payload = { name: "Emergency Medical Operation",
         lat: 51.05,
         lon: -1.35,
-        SIDC:"ENOPA-------",
+        SIDC: "ENOPA-------",
         options: { fillOpacity:0.8 }
     }
 
