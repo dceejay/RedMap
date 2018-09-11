@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.3.7 - rescale NATO symbols (less variation, not so small)
 - v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
 - v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
 - v1.3.4 - Add ISS icon
@@ -181,7 +182,9 @@ If the payload contains an **area** property - that is an array of co-ordinates,
 then rather than draw a point and icon it draws the polygon. Likewise if it contains a
 **line** property it will draw the polyline.
 
- - **iconColor** : can set the colour of the polygon or line.
+ - **color** : can set the colour of the polygon or line.
+ - **fillColor** : can set the fill colour of the polygon.
+ - **fillOpacity** : can set the opacity of the polygon fill colour.
  - **name** : is used as the id key - so can be redrawn/moved.
  - **layer** : declares which layer you put it on..
 
@@ -192,7 +195,7 @@ than draw a point it will draw a circle. The *radius* property is specified in m
 
     msg.payload = { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
 
-As per Areas and Lines you may also specify *iconColor*, and *layer*.
+As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*.
 
 If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
 These are specified in the Latitude/Longitude format.
@@ -217,7 +220,7 @@ Right-clicking on an icon will allow you to delete it.
 
 If you select the **drawing** layer you can also add polylines, polygons and rectangles.
 
-All these events generate messages that can be received by using a **worldmap in** node. For example:
+All these events generate messages that can be received by using a **worldmap in** node. Examples of messages coming FROM the map include:
 
     { "action": "connected" }
     { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "joe,male,mylayer" }
