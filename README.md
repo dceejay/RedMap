@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.4.0 - only send to specific _ sessionid if specified.
 - v1.3.7 - rescale NATO symbols (less variation, not so small)
 - v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
 - v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
@@ -17,12 +18,6 @@ map web page for plotting "things" on.
 - v1.3.2 - Bugfix for inline svg icons
 - v1.3.1 - Allow `msg.payload.popup = true` to auto open the info popup.
 - v1.3.0 - Add initial 3D page (worldmap/index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
-- v1.2.4 - Let weblink also specify target page. eg `msg.payload.weblink = {name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
-- v1.2.3 - Add higher maxZoom values for some layers
-- v1.2.2 - re-fix simultaneous command plus payload
-- v1.2.1 - Sort out map initialisation - especially clusterAt values
-- v1.2.0 - Bump version (should have done it for adding velocity layer). Tidy up deletion of marker and tracks.
-- v1.1.16 - Add Velocity layer - for velocity grid type overlays (eg wind, currents, etc)
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 

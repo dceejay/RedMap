@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.4.0 - only send to specific _ sessionid if specified.
+ - v1.3.7 - rescale NATO symbols (less variation, not so small)
  - v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
  - v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
  - v1.3.4 - Add ISS icon
