@@ -72,14 +72,12 @@ module.exports = function(RED) {
         node.on('input', function(msg) {
             if (msg.hasOwnProperty("_sessionid")) {
                 if (clients.hasOwnProperty(msg._sessionid)) {
-                    console.log("DING",msg._sessionid);
                     clients[msg._sessionid].write(JSON.stringify(msg.payload));
                 }
             }
             else {
                 for (var c in clients) {
                     if (clients.hasOwnProperty(c)) {
-                        console.log("DONG",c);
                         clients[c].write(JSON.stringify(msg.payload));
                     }
                 }

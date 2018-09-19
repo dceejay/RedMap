@@ -9,6 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.4.2 - add NVG layer capability
+- v1.4.1 - let `msg.payload.popup` set the popup contents.
 - v1.4.0 - only send to specific _ sessionid if specified.
 - v1.3.7 - rescale NATO symbols (less variation, not so small)
 - v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
@@ -16,7 +18,7 @@ map web page for plotting "things" on.
 - v1.3.4 - Add ISS icon
 - v1.3.3 - Bugfix for inline satellite icon
 - v1.3.2 - Bugfix for inline svg icons
-- v1.3.1 - Allow `msg.payload.popup = true` to auto open the info popup.
+- v1.3.1 - Allow `msg.payload.popped = true` to auto open the info popup.
 - v1.3.0 - Add initial 3D page (worldmap/index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -59,7 +61,8 @@ Optional properties include
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
- - **popup** : set to true to automatically open the popup info box.
+ - **popped** : set to true to automatically open the popup info box.
+ - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 

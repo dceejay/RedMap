@@ -47,6 +47,7 @@
     <script type="text/javascript" src="leaflet/Leaflet.fullscreen.min.js"></script>
     <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
     <script type="text/javascript" src="leaflet/milsymbol.js"></script>
+    <script type="text/javascript" src="leaflet/nvg.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-heat.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.Grayscale.js"></script>
     <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
@@ -129,20 +130,20 @@ var layercontrol;
 var ws;
 
 var iconSz = {
-  "Team/Crew": 5,
-  "Squad": 10,
-  "Section": 15,
-  "Platoon/detachment": 20,
-  "Company/battery/troop": 25,
+  "Team/Crew": 17.5,
+  "Squad": 20,
+  "Section": 22.5,
+  "Platoon/detachment": 25,
+  "Company/battery/troop": 27.5,
   "Battalion/squadron": 30,
-  "Regiment/group": 35,
-  "Brigade": 40,
-  "Division": 45,
-  "Corps/MEF": 50,
-  "Army": 55,
-  "Army Group/front": 60,
-  "Region/Theater": 65,
-  "Command": 70
+  "Regiment/group": 32.5,
+  "Brigade": 35,
+  "Division": 37.5,
+  "Corps/MEF": 40,
+  "Army": 45,
+  "Army Group/front": 50,
+  "Region/Theater": 50,
+  "Command": 50
 };
 
 // Create the socket
@@ -1018,12 +1019,12 @@ function setMarker(data) {
             // Now that we have a symbol we can ask for the echelon and set the symbol size
             var opts = data.options || {};
             opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 30;
-            opts.size = (opts.size - 30) / 2 + 30;
             opts.size = opts.size * (opts.scale || 1);
             myMarker = myMarker.setOptions(opts);
             var myicon = L.icon({
-              iconUrl: myMarker.toDataURL(),
-              iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+                iconUrl: myMarker.toDataURL(),
+                iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+                className: "natoicon",
             });
             marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
         }
@@ -1097,10 +1098,10 @@ function setMarker(data) {
             }
 
             popped = stay;
-            if (data.hasOwnProperty("popup") && (data.popup == true) ) {
+            if (data.hasOwnProperty("popped") && (data.popped == true) ) {
                 popped = true;
                 popid = data.name;
-                delete data.popup;
+                delete data.popped;
             }
 
             // Add any remaining properties to the info box
@@ -1113,6 +1114,7 @@ function setMarker(data) {
                     }
                 }
             }
+            words = data.popup || words;
             marker.bindPopup(words, {keepInView:true, minWidth:348});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
@@ -1176,7 +1178,7 @@ function setMarker(data) {
 }
 
 function doCommand(cmd) {
-    //console.log("COMMAND",cmd);
+    // console.log("COMMAND",cmd);
     // ignore server side initial command if client position already saved.
     // if (cmd.hasOwnProperty("init") && initialposition) {
     //     return;
@@ -1238,12 +1240,49 @@ function doCommand(cmd) {
             existsalready = true;
         }
         var opt = cmd.map.opt || {style:function(feature) {return {color:feature.properties.color||feature.properties.roofColor}}};
-        //console.log("OPT",opt);
-
         opt.onEachFeature = function (f, l) {
             l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
         }
         overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        map.addLayer(overlays[cmd.map.overlay]);
+        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new NVG XML overlay layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("nvg") ) {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            map.removeLayer(overlays[cmd.map.overlay]);
+            existsalready = true;
+        }
+        var parser = new NVG(cmd.map.nvg);
+        var geoj = parser.toGeoJSON();
+
+        overlays[cmd.map.overlay] = L.geoJson(geoj,{
+            style: function(feature) {
+                var st = { stroke:true, color:"black", weight:2, fill:true };
+            	if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
+                    if (feature.properties.style.hasOwnProperty('stroke')) {
+                        st.color = feature.properties.style.stroke;
+                    }
+                    if (feature.properties.style.hasOwnProperty('stroke-width')) {
+                        st.weight = feature.properties.style["stroke-width"];
+                    }
+                    if (feature.properties.style.hasOwnProperty('stroke-opacity')) {
+                        st.opacity = feature.properties.style["stroke-opacity"];
+                    }
+                    if (feature.properties.style.hasOwnProperty('fill')) {
+                        if (feature.properties.style.fill == "none") { st.fill = false; }
+                        else { st.fillColor = feature.properties.style.fill; }
+                    }
+                    if (feature.properties.style.hasOwnProperty('fill-opacity')) {
+                        st.fillOpacity = feature.properties.style["fill-opacity"];
+                    }
+                }
+                return st;
+            }
+        });
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
