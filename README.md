@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.4.3 - support custom icon for GPX and KML. Better readme for geojson.
 - v1.4.2 - add NVG layer capability
 - v1.4.1 - let `msg.payload.popup` set the popup contents.
 - v1.4.0 - only send to specific _ sessionid if specified.
@@ -278,17 +279,20 @@ Optional properties include
     msg.payload.command.map = {
         overlay:"myGeoJSON",
         geojson:{ your geojson feature as an object },
-        opt:{ optional geojson options, style, filter, onEach, Feature, etc },
+        opt:{ optional geojson options, style, etc },
         fit:true
     };
 
+The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
+
+The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
 
 The `fit` property is optional. If present the map will automatically zoom to fit the area relevant to the geojson.
 see http://leafletjs.com/examples/geojson/ for more details about options for opt.
 
 #### To add a new KML, GPX, or TOPOJSON overlay
 
-As per the geojson overlay you can also inject a KML layer or TOPOJSON layer. The syntax is the same but with either a `kml` property - containing the KML string - or a `topojson` property containing the topojson.
+As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSON layer. The syntax is the same but with either a `kml` property containing the KML string - a `gpx` property containing a GPX string - or a `topojson` property containing the topojson.
 
     msg.payload.command.map = {
         overlay:"myKML",
@@ -296,9 +300,9 @@ As per the geojson overlay you can also inject a KML layer or TOPOJSON layer. Th
     };
 
 
- For GPX layers, it is possible to define which icon to use for point markers by adding the
+ For GPX and KML layers, it is possible to define which icon to use for point markers by adding the
  following properties to `msg.payload.command.map`:
- - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="mapinfo">font awesome</a> icon name.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
 Again the `fit` property can be added to make the map zoom to the relevant area.
