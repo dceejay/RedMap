@@ -295,6 +295,12 @@ As per the geojson overlay you can also inject a KML layer or TOPOJSON layer. Th
         kml:"<kml>...your kml placemarks...</kml>"
     };
 
+
+ For GPX layers, it is possible to define which icon to use for point markers by adding the
+ following properties to `msg.payload.command.map`:
+ - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="mapinfo">font awesome</a> icon name.
+ - **iconColor** : Standard CSS colour name or #rrggbb hex value.
+
 Again the `fit` property can be added to make the map zoom to the relevant area.
 
 #### To add a Velocity Grid Overlay

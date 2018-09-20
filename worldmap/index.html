@@ -1322,7 +1322,23 @@ function doCommand(cmd) {
             map.removeLayer(overlays[cmd.map.overlay]);
             existsalready = true;
         }
-        overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx);
+
+        var customLayer = L.geoJson();
+        if (cmd.map.hasOwnProperty("icon")) {
+            var col = cmd.map.iconColor || "#910000";
+            var myMarker = L.divIcon({
+                className:"faicon",
+                html: '<center><i class="fa fa-fw '+cmd.map.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [15, 15],
+            });
+            customLayer = L.geoJson(null, {
+                pointToLayer: function(geoJsonPoint, latlng) {
+                    return L.marker(latlng, {icon: myMarker, title: geoJsonPoint.properties.name});
+                }
+            });
+        }
+        overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, customLayer);
+
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
