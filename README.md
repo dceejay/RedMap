@@ -269,11 +269,30 @@ Optional properties include
 
 #### To add a new base layer
 
+The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
+style server by adding a property `wms: true`. (see overlay example below)
+
     msg.payload.command.map = {
         name:"OSMhot",
         url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
         opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
     };
+
+#### To add a WMS overlay layer - eg US weather radar
+
+To add an overlay instead of a base layer - specify the `overlay` property instead of the `name`.
+
+    msg.payload.command.map = {
+        overlay: "NowCoast",
+        url: 'https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WmsServer?',
+        opt:  {
+            layers: '1',
+            format: 'image/png',
+            transparent: true,
+            attribution: "NOAA/NWS"
+        },
+        wms: true
+    }
 
 #### To add a new geoJSON overlay
 
