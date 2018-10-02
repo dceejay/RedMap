@@ -1412,10 +1412,10 @@ function doCommand(cmd) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }
         if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
             if (cmd.map.wms === "grey") {
-                overlays[cmd.map.name] = L.tileLayer.graywms(cmd.map.url, cmd.map.opt);
+                overlays[cmd.map.overlay] = L.tileLayer.graywms(cmd.map.url, cmd.map.opt);
             }
             else {
-                overlays[cmd.map.name] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
+                overlays[cmd.map.overlay] = L.tileLayer.wms(cmd.map.url, cmd.map.opt);
             }
         }
         else if (cmd.map.hasOwnProperty("bounds")) {            //Image Overlay in the bounds specified (2D Array)
