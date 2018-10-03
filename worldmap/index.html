@@ -326,11 +326,11 @@ function doTidyUp(l) {
                 }
                 delete markers[m];
             }
-            if (l) {
-                layercontrol.removeLayer(layers[l]);
-                delete overlays[l];
-            }
         }
+    }
+    if (l) {
+        if (layers[l]) { map.removeLayer(layers[l]); layercontrol.removeLayer(layers[l]); delete layers[l]; }
+        if (overlays[l]) { map.removeLayer(overlays[l]); layercontrol.removeLayer(overlays[l]); delete overlays[l]; }
     }
 }
 

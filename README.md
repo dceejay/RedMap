@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.4.4 - Add a couple of extra overlay layers, roads, rail, sea
+- v1.4.5 - fix clearing overlays
+- v1.4.4 - add a couple of extra overlay layers, roads, rail, sea
 - v1.4.3 - support custom icon for GPX and KML. Better readme for geojson.
 - v1.4.2 - add NVG layer capability
 - v1.4.1 - let `msg.payload.popup` set the popup contents.
