@@ -798,7 +798,9 @@ function setMarker(data) {
             //zoomToBoundsOnClick:false
         });
         overlays[lay] = layers[lay];
-        layercontrol.addOverlay(layers[lay],lay);
+        if (showLayerMenu !== false) {
+            layercontrol.addOverlay(layers[lay],lay);
+        }
         map.addLayer(overlays[lay]);
         //console.log("ADDED LAYER",lay,layers);
     }
