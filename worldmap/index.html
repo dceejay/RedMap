@@ -262,7 +262,7 @@ if (!inIframe) {
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
-else { if (showUserMenu) { menuButton.addTo(map); } }
+if (showUserMenu) { menuButton.addTo(map); }
 
 // Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
@@ -622,7 +622,6 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
     subdomains: '0123'
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
-
 
 var HikeBike_HikeBike = L.tileLayer('http://{s}.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
 	maxZoom: 19,
