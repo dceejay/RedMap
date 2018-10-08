@@ -55,7 +55,7 @@ Optional properties include
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
- - **icon** : <a href="http://fortawesome.github.io/Font-Awesome/icons/" target="mapinfo">font awesome</a> icon name.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -72,7 +72,7 @@ Any other `msg.payload` properties will be added to the icon popup text box.
 
 ### Icons
 
-You may select any of the Font Awesome set of [icons](http://fortawesome.github.io/Font-Awesome/icons/).
+You may select any of the Font Awesome set of [icons](https://fontawesome.com/v4.7.0/icons/).
 If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
 
 There are also several special icons...
