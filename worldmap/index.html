@@ -212,7 +212,15 @@ if ( window.localStorage.hasOwnProperty("maxage") ) {
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
-var menuButton = L.easyButton( 'fa-bars fa-lg', function() { toggleMenu(); }, "Toggle menu", "topright");
+var menuButton = L.easyButton({states:[{icon:'fa-bars fa-lg', onClick:function() { toggleMenu(); }, title:'Toggle menu'}], position:"topright"});
+//var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
+var redButton = L.easyButton('fa-square wm-red', function(btn) { console.log("RED",btn); })
+var blueButton = L.easyButton('fa-square wm-blue', function(btn) { console.log("BLUE",btn); })
+var greenButton = L.easyButton('fa-square wm-green', function(btn) { console.log("GREEN",btn); })
+var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { console.log("YELLOW",btn); })
+var blackButton = L.easyButton('fa-square wm-black', function(btn) { console.log("BLACK",btn); })
+var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton]);
+
 
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
@@ -262,7 +270,8 @@ if (!inIframe) {
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
-if (showUserMenu) { menuButton.addTo(map); }
+else { if (showUserMenu) { menuButton.addTo(map); } }
+
 
 // Handle the dialog for popup help
 var dialog = document.querySelector('dialog');
@@ -436,8 +445,11 @@ map.on('overlayadd', function(e) {
         layers["_daynight"].addLayer(L.terminator());
     }
     if (e.name == "drawing") {
-        map.addControl(drawControl);
         overlays["drawing"].bringToFront();
+        // And the actual draw controls
+        map.addControl(drawControl);
+        // Add the color change button
+        //colorControl.addTo(map);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -452,6 +464,7 @@ map.on('overlayremove', function(e) {
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
+        map.removeControl(colorControl);
         map.removeControl(drawControl);
     }
     //else console.log("layer del :",e.name);
