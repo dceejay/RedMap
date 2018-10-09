@@ -45,6 +45,7 @@ module.exports = function(RED) {
         //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+node;path);
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
 
+
         var callback = function(client) {
             //client.setMaxListeners(0);
             clients[client.id] = client;
@@ -91,6 +92,12 @@ module.exports = function(RED) {
                 }
             }
             sockets[this.path].removeListener('connection', callback);
+            for (var i=0; i < RED.httpNode._router.stack.length; i++) {
+                var r = RED.httpNode._router.stack[i];
+                if ((r.name === "serveStatic") && (r.regexp.test(node.path))) {
+                    RED.httpNode._router.stack.splice(i, 1)
+                }
+            }
             node.status({});
         });
         sockets[this.path].on('connection', callback);
