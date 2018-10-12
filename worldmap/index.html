@@ -670,7 +670,13 @@ basemaps["Terrain"] = new L.StamenTileLayer('terrain');
 // Nice watercolour based maps by Stamen Design
 basemaps["Watercolor"] = new L.StamenTileLayer('watercolor');
 
+
 // Now add the overlays
+
+// Add the countries (world-110m) for offline use
+var customTopoLayer = L.geoJson(null, {style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
+layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
+overlays["countries"] = layers["_countries"];
 
 // Add the day/night overlay
 layers["_daynight"] = new L.LayerGroup();

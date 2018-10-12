@@ -111,15 +111,15 @@
 </script>
 
 <script type="text/javascript">
-    // var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
-    // lnk = lnk.replace(new RegExp('\/{1,}','g'),'/');
-    // if (!RED.hasOwnProperty("actions")) {
-    //     RED.keyboard.add("*",/* m */ 77,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+lnk) });
-    // }
-    // else {
-    //     RED.keyboard.add("*","ctrl-shift-m","Show Map");
-    //     RED.actions.add("Show Map",function() { window.open(document.location.protocol+"//"+lnk) });
-    // }
+    var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
+    lnk = lnk.replace(new RegExp('\/{1,}','g'),'/');
+    if (!RED.hasOwnProperty("actions")) {
+        RED.keyboard.add("*",/* m */ 77,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+lnk) });
+    }
+    else {
+        RED.keyboard.add("*","ctrl-shift-m","Show Map");
+        RED.actions.add("Show Map",function() { window.open(document.location.protocol+"//"+lnk) });
+    }
     RED.nodes.registerType('worldmap',{
         category: 'location',
         color:"darksalmon",
