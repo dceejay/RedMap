@@ -19,15 +19,12 @@ module.exports = function(RED) {
     var path = require("path");
     var express = require("express");
     var sockjs = require('sockjs');
-    var socket;
+    var sockets = {};
+    // add the cgi module for serving local maps....
+    RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
 
     var WorldMap = function(n) {
         RED.nodes.createNode(this,n);
-        if (!socket) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
-            socket = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
-            socket.installHandlers(RED.server, {prefix:path.posix.join(RED.settings.httpNodeRoot,'/worldmap/socket')});
-        }
         this.lat = n.lat || "";
         this.lon = n.lon || "";
         this.zoom = n.zoom || "";
@@ -37,12 +34,17 @@ module.exports = function(RED) {
         this.showmenu = n.usermenu || "show";
         this.panit = n.panit || "false";
         this.layers = n.layers || "show";
+        this.path = n.path || "/worldmap";
+        if (!sockets[this.path]) {
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
+            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
+            sockets[this.path].installHandlers(RED.server, {prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket')});
+        }
         var node = this;
         var clients = {};
-        //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+"/worldmap");
-        RED.httpNode.use("/worldmap", express.static(__dirname + '/worldmap'));
-        // add the cgi module for serving local maps....
-        RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
+        //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+node;path);
+        RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
+
 
         var callback = function(client) {
             //client.setMaxListeners(0);
@@ -89,20 +91,27 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
-            socket.removeListener('connection', callback);
+            sockets[this.path].removeListener('connection', callback);
+            for (var i=0; i < RED.httpNode._router.stack.length; i++) {
+                var r = RED.httpNode._router.stack[i];
+                if ((r.name === "serveStatic") && (r.regexp.test(node.path))) {
+                    RED.httpNode._router.stack.splice(i, 1)
+                }
+            }
             node.status({});
         });
-        socket.on('connection', callback);
+        sockets[this.path].on('connection', callback);
     }
     RED.nodes.registerType("worldmap",WorldMap);
 
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
-        if (!socket) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, 'worldmap', 'leaflet', 'sockjs.min.js');
-            socket = sockjs.createServer({sockjs_url:fullPath, prefix:path.posix.join(RED.settings.httpNodeRoot,'/worldmap/socket')});
-            socket.installHandlers(RED.server);
+        this.path = n.path || "/worldmap";
+        if (!sockets[this.path]) {
+            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
+            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket')});
+            sockets[this.path].installHandlers(RED.server);
         }
         var node = this;
         var clients = {};
@@ -113,7 +122,7 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
             client.on('data', function(message) {
                 message = JSON.parse(message);
-                node.send({payload:message, topic:"worldmap", _sessionid:client.id});
+                node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id});
             });
             client.on('close', function() {
                 delete clients[client.id];
@@ -128,10 +137,10 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
-            socket.removeListener('connection', callback);
+            sockets[this.path].removeListener('connection', callback);
             node.status({});
         });
-        socket.on('connection', callback);
+        sockets[this.path].on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
 
