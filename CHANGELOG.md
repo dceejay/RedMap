@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.0 - Add multi-map capability - can now have multiple map endpoints. Issue #40 PR #51
+   - Also add built-in world countries overlay layer for offline use.
  - v1.4.6 - allow more variation in fa-icon modifiers
  - v1.4.5 - fix clearing overlays
  - v1.4.4 - add a couple of extra overlay layers, roads, rail, sea
