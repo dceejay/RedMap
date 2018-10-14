@@ -68,7 +68,7 @@
 </div>
 <div id="results">
     <span id="searchRes"></span>
-    <span id="bars" onclick='toggleMenu()' onmouseover='toggleMenu()'><i class="fa fa-bars fa-2x fa-inverse"></i></span>
+    <span id="bars" onclick='toggleMenu()'><i class="fa fa-bars fa-2x fa-inverse"></i></span>
 </div>
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
@@ -513,7 +513,7 @@ map.on('zoomend', function() {
 //    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 //});
 
-var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
+var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
 
 var rclk;
 var addThing = function() {
@@ -534,8 +534,8 @@ var addThing = function() {
     else {
         d = {name:bits[0].trim(),layer:lay,icon:icon,iconColor:colo,draggable:drag,lat:rclk.lat,lon:rclk.lng};
     }
-    map.addLayer(layers[lay]);
     setMarker(d);
+    map.addLayer(layers[lay]);
     d.action = "point";
     ws.send(JSON.stringify(d));
 }
@@ -1102,10 +1102,12 @@ function setMarker(data) {
         // send new position at end of move event if point is draggable
         if (data.draggable === true) {
             marker.name = data.name;
-            marker.icon = data.icon;
-            marker.iconColor = data.iconColor;
-            marker.SIDC = data.SIDC;
+            if (data.icon) { marker.icon = data.icon; }
+            if (data.iconCOlor) { marker.iconColor = data.iconColor; }
+            if (data.SIDC) { marker.SIDC = data.SIDC; }
             marker.on('dragend', function (e) {
+                var l = marker.getLatLng().toString().replace('Lng(',', Lon : ').replace(')','')
+                marker.setPopupContent(marker.getPopup().getContent().split("Lat, Lon")[0] + l);
                 ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
             });
         }
@@ -1155,6 +1157,8 @@ function setMarker(data) {
             }
 
             // Add any remaining properties to the info box
+            delete data.lat;
+            delete data.lon;
             for (var i in data) {
                 if ((i != "name") && (i != "length")) {
                     if (typeof data[i] === "object") {
@@ -1165,10 +1169,10 @@ function setMarker(data) {
                 }
             }
             words = data.popup || words;
-            marker.bindPopup(words, {keepInView:true, minWidth:348});
+            marker.bindPopup(words + marker.getLatLng().toString().replace('Lng(',', Lon : ').replace(')',''), {keepInView:true, minWidth:348});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
-            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button onclick='delMarker(\""+data.name+"\");'>Delete</button>");
+            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\");'>Delete</button>");
             marker.on('contextmenu', function(e) {
                 rightmenuMarker.setLatLng(e.latlng);
                 map.openPopup(rightmenuMarker);

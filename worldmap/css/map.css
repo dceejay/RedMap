@@ -109,6 +109,14 @@ a {
     width:237px;
 }
 
+#delbutton {
+    font-size: 14px;
+    margin-top: 4px;
+    border-radius: 4px;
+    background-color: #910000;
+    color: white;
+}
+
 .circle {
     background-color:rgba(255,255,40,0.7);
     border-color:darkgrey;
