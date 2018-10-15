@@ -35,14 +35,16 @@ module.exports = function(RED) {
         this.panit = n.panit || "false";
         this.layers = n.layers || "show";
         this.path = n.path || "/worldmap";
+        if (this.path.charAt(0) != "/") this.path = "/" + this.path;
         if (!sockets[this.path]) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
             sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
-            sockets[this.path].installHandlers(RED.server, {prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket')});
+            var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
+            this.log("Serving map "+this.path+" from "+__dirname+" as "+fullPath+" and socket "+sockPath);
+            sockets[this.path].installHandlers(RED.server, {prefix:sockPath});
         }
         var node = this;
         var clients = {};
-        //node.log("Serving map from "+__dirname+" as "+RED.settings.httpNodeRoot.slice(0,-1)+node;path);
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
 
 
@@ -108,6 +110,7 @@ module.exports = function(RED) {
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         this.path = n.path || "/worldmap";
+        if (this.path.charAt(0) != "/") this.path = "/" + this.path;
         if (!sockets[this.path]) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
             sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket')});

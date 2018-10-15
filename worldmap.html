@@ -76,12 +76,15 @@
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="name">
 </div>
-<!-- <div class="form-tips">Tip: By default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>-->
+<div class="form-tips">Tip: If <i>Path</i> is left empty,
+then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
 <script type="text/x-red" data-help-name="worldmap">
     <p>Plots "things" on a web map. Needs an internet connection.</p>
-    <!-- <p>Shortcut - <code>⌘⇧m</code> - ctrl-shift-m to jump to Map.</p> -->
+    <p>It is possible to instantiate multiple worldmap nodes but each one must be given a unique
+        path. Worldmap-in nodes are matched to worldmap nodes by having exactly the same path.
+    <p>Shortcut - <code>⌘⇧m</code> - ctrl-shift-m to jump to the default Map (<tt>/worldmap</tt>).</p>
     <p>The minimum <code>msg.payload</code> must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
     <pre>{name:"Joe", lat:51, lon:-1.05}</pre>
     <p><code>name</code> must be a unique identifier.</p>
