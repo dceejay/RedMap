@@ -53,6 +53,7 @@
     <script type="text/javascript" src="leaflet/TileLayer.GrayscaleWMS.js"></script>
     <script type="text/javascript" src="leaflet/L.Terminator.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-velocity.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet-side-by-side.js"></script>
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
@@ -126,6 +127,7 @@ var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
+var sidebyside;
 var layercontrol;
 var ws;
 
@@ -1474,6 +1476,20 @@ function doCommand(cmd) {
         map.removeLayer(basemaps[baselayername]);
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
+    }
+    // Add side by side control
+    if (cmd.side) { console.log("SIDE",cmd.side); }
+    if (cmd.side && (cmd.side === "none")) {
+        sidebyside.remove();
+        map.removeLayer(basemaps[sidebyside.lay]);
+        sidebyside = undefined;
+    }
+    if (cmd.side && basemaps.hasOwnProperty(cmd.side)) {
+        if (sidebyside) { sidebyside.removeFrom(map); }
+        basemaps[cmd.side].addTo(map);
+        sidebyside = L.Control.sideBySide(basemaps[baselayername], basemaps[cmd.side]);
+        sidebyside.addTo(map);
+        sidebyside.lay = cmd.side;
     }
     // Turn on an existing overlay
     if (cmd.hasOwnProperty("showlayer") && overlays.hasOwnProperty(cmd.showlayer)) {

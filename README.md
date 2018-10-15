@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.3 - Make manually added icons moveable by default.
+- v1.5.3 - Add side by side mode (via `msg.command` only).
+- v1.5.2 - Make manually added icons moveable by default.
 - v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
   - Also add built-in world countries overlay layer for offline use.
 - v1.4.6 - allow more variation in fa-icon modifiers, so fa-3x and fa-spin work.
@@ -245,6 +246,7 @@ Optional properties include
  - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
  - **showlayer** - show the named overlay - `{command:{showlayer:"foo"}}`
  - **hidelayer** - hide the named overlay - `{command:{hidelayer:"bar"}}`
+ - **side** - add a second map alongside with slide between them. Use the name of the *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer

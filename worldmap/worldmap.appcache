@@ -24,6 +24,7 @@ leaflet/fullscreen@2x.png
 leaflet/l.ellipse.min.js
 leaflet/leaflet-heat.js
 leaflet/leaflet-omnivore.min.js
+leaflet/leaflet-side-by-side.js
 leaflet/leaflet-slider.css
 leaflet/leaflet-slider.js
 leaflet/leaflet-velocity.min.css
