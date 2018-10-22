@@ -247,6 +247,7 @@ Optional properties include
  - **showlayer** - show the named overlay - `{command:{showlayer:"foo"}}`
  - **hidelayer** - hide the named overlay - `{command:{hidelayer:"bar"}}`
  - **side** - add a second map alongside with slide between them. Use the name of the *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
+ - **search** - add dynamic search control. Object contains the string to be searched and if it contains **clear** then it clears the search results. 
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
