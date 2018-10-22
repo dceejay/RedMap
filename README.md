@@ -8,7 +8,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
-
+- v1.5.4 - Add search command and clear search functionality.
 - v1.5.3 - Add side by side mode (via `msg.command` only).
 - v1.5.2 - Make manually added icons moveable by default.
 - v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
