@@ -78,6 +78,11 @@ L.Control.SideBySide = L.Control.extend({
       return this
   },
 
+  setSplit: function(s) {
+      this._range.value = s/100;
+      this._updateClip();
+  },
+
   _updateClip: function () {
     var map = this._map
     var rangeValue = this._range.value

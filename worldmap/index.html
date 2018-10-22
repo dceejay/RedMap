@@ -29,6 +29,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.measurecontrol.css">
     <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
@@ -45,6 +46,7 @@
     <script type="text/javascript" src="leaflet/leaflet.measurecontrol.js"></script>
     <script type="text/javascript" src="leaflet/easy-button.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.fullscreen.min.js"></script>
+    <script type="text/javascript" src="leaflet/Leaflet.Dialog.js"></script>
     <script type="text/javascript" src="leaflet/l.ellipse.min.js"></script>
     <script type="text/javascript" src="leaflet/milsymbol.js"></script>
     <script type="text/javascript" src="leaflet/nvg.js"></script>
@@ -167,7 +169,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        //console.log("DATA",data);
+        //console.log("DATA",typeof data,data);
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             for (var prop in data) {
@@ -179,7 +181,12 @@ var connect = function() {
         else {
             if (data.command) { doCommand(data.command); delete data.command; }
             if (data.hasOwnProperty("name")) { setMarker(data); }
-            else { console.log("SKIP",data); }
+            else if (data.hasOwnProperty("type")) { doGeojson(data); }
+            else {
+                console.log("SKIP",data);
+                // if (typeof data === "string") { doDialog(data); }
+                // else { console.log("SKIP",data); }
+            }
         }
     };
 }
@@ -222,7 +229,6 @@ var greenButton = L.easyButton('fa-square wm-green', function(btn) { console.log
 var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { console.log("YELLOW",btn); })
 var blackButton = L.easyButton('fa-square wm-black', function(btn) { console.log("BLACK",btn); })
 var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton]);
-
 
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
@@ -345,6 +351,18 @@ function doTidyUp(l) {
     }
 }
 
+// Call tidyup every {maxage} seconds - default 10 mins
+var stale = null;
+function setMaxAge() {
+    maxage = document.getElementById('maxage').value;
+    if (stale) { clearInterval(stale); }
+    //if (maxage > 0) {
+    stale = setInterval( function() { doTidyUp() }, 20000); // every 20 secs
+    //} //every minute
+    //console.log("Stale time set :",maxage+"s");
+}
+setMaxAge();
+
 // move the daylight / nighttime boundary (if enabled) every minute
 function moveTerminator() { // if terminator line plotted move it every minute
     if (layers["_daynight"].getLayers().length > 0) {
@@ -352,26 +370,13 @@ function moveTerminator() { // if terminator line plotted move it every minute
         layers["_daynight"].addLayer(L.terminator());
     }
 }
-setInterval( function() {moveTerminator()}, 60000 );
-
-// Call tidyup every {maxage} seconds - default 10 mins
-var stale = null;
-function setMaxAge() {
-    maxage = document.getElementById('maxage').value;
-    if (stale) { clearInterval(stale); }
-    //if (maxage > 0) {
-    stale = setInterval( function() {doTidyUp()}, 20000); // every 20 secs
-    //} //every minute
-    //console.log("Stale time set :",maxage+"s");
-}
-setMaxAge();
+setInterval( function() { moveTerminator() }, 60000 );
 
 function setCluster(v) {
     clusterAt = v || 0;
     console.log("clusterAt set:",clusterAt);
     showMapCurrentZoom();
 }
-//setCluster();
 
 // Search for markers with names of ....
 function doSearch() {
@@ -439,7 +444,6 @@ map.on('overlayadd', function(e) {
         overlays["satellite"].bringToBack();
     }
     if (e.name == "heatmap") { // show heatmap button when it's layer is added.
-        //document.getElementById("heat").style.display = 'block';
         clrHeat.addTo(map);
     }
     if (e.name == "day/night") {
@@ -458,7 +462,6 @@ map.on('overlayadd', function(e) {
 
 map.on('overlayremove', function(e) {
     if (e.name == "heatmap") { // hide heatmap button when it's layer is removed.
-        //document.getElementById("heat").style.display = 'none';
         clrHeat.removeFrom(map);
     }
     if (e.name == "day/night") {
@@ -515,12 +518,12 @@ map.on('zoomend', function() {
 //    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 //});
 
+// single right click to add a marker
 var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
 
 var rclk;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
-    //console.log(thing);
     map.closePopup();
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
@@ -528,22 +531,22 @@ var addThing = function() {
     var colo = (bits[3] || "#910000").trim();
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{4}.*/;  // if it looks like a SIDC code
-    var d;
+    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng};
     if (regi.test(icon)) {
-        icon = (icon+"------------").substr(0,12);
-        d = {name:bits[0].trim(),layer:lay,SIDC:icon,draggable:drag,lat:rclk.lat,lon:rclk.lng};
+        d.SIDC = (icon+"------------").substr(0,12);
     }
     else {
-        d = {name:bits[0].trim(),layer:lay,icon:icon,iconColor:colo,draggable:drag,lat:rclk.lat,lon:rclk.lng};
+        d.icon = icon;
+        d.iconColor = colo;
     }
+    ws.send(JSON.stringify(d));
+    delete d.action;
     setMarker(d);
     map.addLayer(layers[lay]);
-    d.action = "point";
-    ws.send(JSON.stringify(d));
 }
 
 // allow double right click to zoom out
-// single right click opens a message window that sends to the socket.
+// single right click opens a message window that adds a marker
 var rclicked = false;
 var rtout = null;
 map.on('contextmenu', function(e) {
@@ -768,6 +771,17 @@ layercontrol = L.control.layers(basemaps, overlays);
 // Add the layers control widget
 if (!inIframe) { layercontrol.addTo(map); }
 else { showLayerMenu = false;}
+
+// Add the dialog box for messages
+var dialogue = L.control.dialog().addTo(map);
+dialogue.freeze();
+dialogue.close();
+
+var doDialog = function(d) {
+    //console.log("DIALOGUE",d);
+    dialogue.setContent(d);
+    dialogue.open();
+}
 
 // Delete a marker (and notify websocket)
 var delMarker = function(dname) {
@@ -1233,6 +1247,7 @@ function setMarker(data) {
     }
 }
 
+// handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
     // console.log("COMMAND",cmd);
     // ignore server side initial command if client position already saved.
@@ -1478,19 +1493,19 @@ function doCommand(cmd) {
         basemaps[baselayername].addTo(map);
     }
     // Add side by side control
-    if (cmd.side) { console.log("SIDE",cmd.side); }
     if (cmd.side && (cmd.side === "none")) {
         sidebyside.remove();
         map.removeLayer(basemaps[sidebyside.lay]);
         sidebyside = undefined;
     }
     if (cmd.side && basemaps.hasOwnProperty(cmd.side)) {
-        if (sidebyside) { sidebyside.removeFrom(map); }
+        if (sidebyside) { sidebyside.remove(); map.removeLayer(basemaps[sidebyside.lay]); }
         basemaps[cmd.side].addTo(map);
         sidebyside = L.Control.sideBySide(basemaps[baselayername], basemaps[cmd.side]);
         sidebyside.addTo(map);
         sidebyside.lay = cmd.side;
     }
+    if (cmd.split && sidebyside && (cmd.split <= 100) && (cmd.split >= 0)) { console.log("DING",cmd.split); sidebyside.setSplit(cmd.split); }
     // Turn on an existing overlay
     if (cmd.hasOwnProperty("showlayer") && overlays.hasOwnProperty(cmd.showlayer)) {
         map.addLayer(overlays[cmd.showlayer]);
@@ -1519,6 +1534,30 @@ function doCommand(cmd) {
         heat.redraw();
     }
     map.setView([clat,clon],czoom);
+}
+
+// handle any incoming GEOJSON directly - may style badly
+function doGeojson(g) {
+    console.log("GEOJSON",g);
+    if (!basemaps["geojson"]) {
+        var opt = { style: function(feature) {
+                var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
+                if (feature.hasOwnProperty("properties")) {
+                    console.log("GPROPS", feature.properties)
+                }
+                if (feature.hasOwnProperty("style")) {
+                    console.log("GSTYLE", feature.style)
+                }
+                return st;
+            }
+        }
+        opt.onEachFeature = function (f,l) {
+            if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
+        }
+        overlays["geojson"] = L.geoJson(g,opt);
+        layercontrol.addOverlay(overlays["geojson"],"geojson");
+    }
+    overlays["geojson"].addData(g);
 }
 </script>
 </body>

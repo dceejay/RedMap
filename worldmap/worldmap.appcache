@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: Oct 15th 2018 - v1.5.3
+# date: Oct 17th 2018 - v1.5.4
 
 CACHE:
 index.html
@@ -8,6 +8,8 @@ images/node-red.png
 images/world-50m-flat.json
 css/map.css
 leaflet/L.Terminator.js
+leaflet/Leaflet.Dialog.css
+leaflet/Leaflet.Dialog.js
 leaflet/Leaflet.fullscreen.min.js
 leaflet/Leaflet.vector-markers.css
 leaflet/Leaflet.vector-markers.min.js

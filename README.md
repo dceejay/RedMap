@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.4 - allow remote update of the split position via `msg.command.split`
 - v1.5.3 - Add side by side mode (via `msg.command` only).
 - v1.5.2 - Make manually added icons moveable by default.
 - v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
@@ -247,6 +248,7 @@ Optional properties include
  - **showlayer** - show the named overlay - `{command:{showlayer:"foo"}}`
  - **hidelayer** - hide the named overlay - `{command:{hidelayer:"bar"}}`
  - **side** - add a second map alongside with slide between them. Use the name of the *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
+ - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{command:{split:50}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
