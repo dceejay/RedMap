@@ -30,11 +30,14 @@
     <link rel="stylesheet",type="text/css" href="leaflet/easy-button.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
     <script type="text/javascript" src="leaflet/sockjs.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="Control.Geocoder.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.markercluster.js"></script>
@@ -171,7 +174,10 @@ var connect = function() {
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             for (var prop in data) {
-                if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+                if (data[prop].command) {
+                  console.log("DATA", data[prop].command);
+                  doCommand(data[prop].command); delete data[prop].command; }
+
                 if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
                 else { console.log("SKIP A",data[prop]); }
             }
@@ -179,7 +185,7 @@ var connect = function() {
         else {
             if (data.command) { doCommand(data.command); delete data.command; }
             if (data.hasOwnProperty("name")) { setMarker(data); }
-            else { console.log("SKIP",data); }
+            else { console.log("SKIP ",data); }
         }
     };
 }
@@ -223,6 +229,23 @@ var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { console.l
 var blackButton = L.easyButton('fa-square wm-black', function(btn) { console.log("BLACK",btn); })
 var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton]);
 
+// var control = L.Routing.control(L.extend(window.lrmConfig, {
+// 	waypoints: [
+// 		L.latLng(57.74, 11.94),
+// 		L.latLng(57.6792, 11.949)
+// 	],
+// 	geocoder: L.Control.Geocoder.nominatim(),
+// 	routeWhileDragging: true,
+// 	reverseWaypoints: true,
+// 	showAlternatives: true,
+// 	altLineOptions: {
+// 		styles: [
+// 			{color: 'black', opacity: 0.15, weight: 9},
+// 			{color: 'white', opacity: 0.8, weight: 6},
+// 			{color: 'blue', opacity: 0.5, weight: 2}
+// 		]
+// 	}
+// })).addTo(map);
 
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
@@ -403,6 +426,34 @@ function moveToMarks() {
     }
 }
 
+// Clear Search With Marker names
+function clearSearch()
+{
+  var value = document.getElementById('search').value;
+  marks = [];
+  marksIndex = 0;
+  for (var key in markers) {
+      if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+          marks.push(markers[key]);
+      }
+  }
+  removeMarks();
+  if (lockit) {
+      document.getElementById('searchRes').innerHTML = "";
+  } else {
+      document.getElementById('searchRes').innerHTML = "";
+  }
+}
+
+function removeMarks() {
+    if (marks.length > marksIndex) {
+        var m = marks[marksIndex];
+        map.setView(m.getLatLng(), map.getZoom());
+        m.closePopup();
+        marksIndex++;
+    }
+}
+
 function toggleMenu() {
     menuOpen = !menuOpen;
     if (menuOpen) {
@@ -411,6 +462,21 @@ function toggleMenu() {
         document.getElementById("menu").style.display = 'none';
     }
 }
+
+function openMenu(){
+  if (!menuOpen) {
+      menuOpen = true;
+      document.getElementById("menu").style.display = 'block';
+  }
+}
+
+function closeMenu(){
+  if (menuOpen) {
+      menuOpen = false;
+      document.getElementById("menu").style.display = 'none';
+  }
+}
+
 document.getElementById("menu").style.display = 'none';
 
 //function clearHeat() {
@@ -1476,6 +1542,20 @@ function doCommand(cmd) {
         map.removeLayer(basemaps[baselayername]);
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
+    }
+    // Add search command
+    if (cmd.search) {
+      if(cmd.search !== "clear")
+      {
+        console.log("SEARCH",cmd.search);
+        document.getElementById('search').value = cmd.search;
+        openMenu();
+        doSearch();
+      }else {
+        document.getElementById('search').value = "";
+        closeMenu();
+        clearSearch();
+      }
     }
     // Add side by side control
     if (cmd.side) { console.log("SIDE",cmd.side); }
