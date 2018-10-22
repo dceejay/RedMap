@@ -1506,13 +1506,26 @@ function doCommand(cmd) {
         sidebyside.lay = cmd.side;
     }
     if (cmd.split && sidebyside && (cmd.split <= 100) && (cmd.split >= 0)) { console.log("DING",cmd.split); sidebyside.setSplit(cmd.split); }
-    // Turn on an existing overlay
-    if (cmd.hasOwnProperty("showlayer") && overlays.hasOwnProperty(cmd.showlayer)) {
-        map.addLayer(overlays[cmd.showlayer]);
+    // Turn on an existing overlay(s)
+    if (cmd.hasOwnProperty("showlayer")) {
+        if (typeof cmd.showlayer === "string") { cmd.showlayer = [ cmd.showlayer ]; }
+        console.log(typeof cmd.showlayer,cmd.showlayer);
+        for (var i=0; i < cmd.showlayer.length; i++) {
+            console.log(cmd.showlayer[i]);
+            if (overlays.hasOwnProperty(cmd.showlayer[i])) {
+                console.log("DING");
+                map.addLayer(overlays[cmd.showlayer[i]]);
+            }
+        }
     }
-    // Turn off an existing overlay
-    if (cmd.hasOwnProperty("hidelayer") && overlays.hasOwnProperty(cmd.hidelayer)) {
-        map.removeLayer(overlays[cmd.hidelayer]);
+    // Turn off an existing overlay(s)
+    if (cmd.hasOwnProperty("hidelayer")) {
+        if (typeof cmd.hidelayer === "string") { cmd.hidelayer = [ cmd.hidelayer ]; }
+        for (var i=0; i < cmd.hidelayer.length; i++) {
+            if (overlays.hasOwnProperty(cmd.hidelayer[i])) {
+                map.removeLayer(overlays[cmd.hidelayer[i]]);
+            }
+        }
     }
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;

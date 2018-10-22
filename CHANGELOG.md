@@ -1,6 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v1.5.4 - allow remote update of the split position via `msg.command.split`
+ - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
+ - v1.5.4 - Allow remote update of the split position via `msg.command.split`
  - v1.5.3 - Add side by side mode (via `msg.command` only).
  - v1.5.2 - Make manually added icons moveable by default.
  - v1.5.0 - Add multi-map capability - can now have multiple map endpoints. Issue #40 PR #51
