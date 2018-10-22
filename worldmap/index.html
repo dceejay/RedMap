@@ -1509,11 +1509,8 @@ function doCommand(cmd) {
     // Turn on an existing overlay(s)
     if (cmd.hasOwnProperty("showlayer")) {
         if (typeof cmd.showlayer === "string") { cmd.showlayer = [ cmd.showlayer ]; }
-        console.log(typeof cmd.showlayer,cmd.showlayer);
         for (var i=0; i < cmd.showlayer.length; i++) {
-            console.log(cmd.showlayer[i]);
             if (overlays.hasOwnProperty(cmd.showlayer[i])) {
-                console.log("DING");
                 map.addLayer(overlays[cmd.showlayer[i]]);
             }
         }
