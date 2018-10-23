@@ -8,7 +8,9 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
-- v1.5.4 - Add search command and clear search functionality.
+- v1.5.6 - Add search command and clear search functionality.
+- v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
+- v1.5.4 - Allow remote update of the split position via `msg.command.split`
 - v1.5.3 - Add side by side mode (via `msg.command` only).
 - v1.5.2 - Make manually added icons moveable by default.
 - v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
@@ -244,10 +246,11 @@ Optional properties include
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
- - **showlayer** - show the named overlay - `{command:{showlayer:"foo"}}`
- - **hidelayer** - hide the named overlay - `{command:{hidelayer:"bar"}}`
- - **side** - add a second map alongside with slide between them. Use the name of the *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
- - **search** - add dynamic search control. Object contains the string to be searched and if it contains **clear** then it clears the search results. 
+ - **search** - add dynamic search control. Object contains the string to be searched and if it contains **clear** then it clears the search results.
+ - **showlayer** - show the named overlay(s) - `{command:{showlayer:"foo"}}` or `{command:{showlayer:["foo","bar"]}}`
+ - **hidelayer** - hide the named overlay(s) - `{command:{hidelayer:"bar"}}` or `{command:{hidelayer:["bar","another"}}`
+ - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
+ - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{command:{split:50}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
