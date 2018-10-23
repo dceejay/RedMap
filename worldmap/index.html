@@ -31,14 +31,11 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
     <script type="text/javascript" src="leaflet/sockjs.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-    <script src="Control.Geocoder.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.vector-markers.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.boatmarker.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.markercluster.js"></script>
@@ -176,10 +173,7 @@ var connect = function() {
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             for (var prop in data) {
-                if (data[prop].command) {
-                  console.log("DATA", data[prop].command);
-                  doCommand(data[prop].command); delete data[prop].command; }
-
+                if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
                 if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
                 else { console.log("SKIP A",data[prop]); }
             }
