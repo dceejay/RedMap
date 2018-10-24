@@ -408,6 +408,34 @@ function moveToMarks() {
     }
 }
 
+// Clear Search With Marker names
+function clearSearch()
+{
+  var value = document.getElementById('search').value;
+  marks = [];
+  marksIndex = 0;
+  for (var key in markers) {
+      if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+          marks.push(markers[key]);
+      }
+  }
+  removeMarks();
+  if (lockit) {
+      document.getElementById('searchRes').innerHTML = "";
+  } else {
+      document.getElementById('searchRes').innerHTML = "";
+  }
+}
+
+function removeMarks() {
+    if (marks.length > marksIndex) {
+        var m = marks[marksIndex];
+        map.setView(m.getLatLng(), map.getZoom());
+        m.closePopup();
+        marksIndex++;
+    }
+}
+
 function toggleMenu() {
     menuOpen = !menuOpen;
     if (menuOpen) {
@@ -416,6 +444,21 @@ function toggleMenu() {
         document.getElementById("menu").style.display = 'none';
     }
 }
+
+function openMenu(){
+  if (!menuOpen) {
+      menuOpen = true;
+      document.getElementById("menu").style.display = 'block';
+  }
+}
+
+function closeMenu(){
+  if (menuOpen) {
+      menuOpen = false;
+      document.getElementById("menu").style.display = 'none';
+  }
+}
+
 document.getElementById("menu").style.display = 'none';
 
 //function clearHeat() {
@@ -1494,6 +1537,20 @@ function doCommand(cmd) {
         map.removeLayer(basemaps[baselayername]);
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
+    }
+    // Add search command
+    if (cmd.search) {
+      if(cmd.search !== "clear")
+      {
+        console.log("SEARCH",cmd.search);
+        document.getElementById('search').value = cmd.search;
+        openMenu();
+        doSearch();
+      }else {
+        document.getElementById('search').value = "";
+        closeMenu();
+        clearSearch();
+      }
     }
     // Add side by side control
     if (cmd.side && (cmd.side === "none")) {

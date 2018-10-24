@@ -8,7 +8,7 @@ map web page for plotting "things" on.
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
-
+- v1.5.6 - Add search command and clear search functionality.
 - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
 - v1.5.4 - Allow remote update of the split position via `msg.command.split`
 - v1.5.3 - Add side by side mode (via `msg.command` only).
@@ -246,6 +246,7 @@ Optional properties include
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
+ - **search** - add dynamic search control. Object contains the string to be searched and if it contains **clear** then it clears the search results.
  - **showlayer** - show the named overlay(s) - `{command:{showlayer:"foo"}}` or `{command:{showlayer:["foo","bar"]}}`
  - **hidelayer** - hide the named overlay(s) - `{command:{hidelayer:"bar"}}` or `{command:{hidelayer:["bar","another"}}`
  - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
