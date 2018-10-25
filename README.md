@@ -23,14 +23,7 @@ map web page for plotting "things" on.
 - v1.4.2 - add NVG layer capability
 - v1.4.1 - let `msg.payload.popup` set the popup contents.
 - v1.4.0 - only send to specific \_sessionid if specified.
-- v1.3.7 - rescale NATO symbols (less variation, not so small)
-- v1.3.6 - setting `msg.payload.draggable = true` will allow a marker to be moved and create a move event on the input node.
-- v1.3.5 - parse numeric inputs (speed, bearing etc) to remove any extra text.
-- v1.3.4 - Add ISS icon
-- v1.3.3 - Bugfix for inline satellite icon
-- v1.3.2 - Bugfix for inline svg icons
-- v1.3.1 - Allow `msg.payload.popped = true` to auto open the info popup.
-- v1.3.0 - Add initial 3D page (worldmap/index3d.html), Add ability to add KML, GPX and TOPOJSON overlay layers and optional zoom to fit.
+- ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
@@ -44,21 +37,21 @@ Either use the Manage Palette option in the Node-RED Editor menu, or run the fol
 
 ## Usage
 
-Plots "things" on a map. The map will be served from `{httpRoot}/worldmap`
+Plots "things" on a map. By default the map will be served from `{httpRoot}/worldmap`
 
 Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
 The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
 
-        msg.payload = { name:"Joe", lat:51.05, lon:-1.35 }
+        msg.payload = { name:"Jason", lat:51.05, lon:-1.35 }
 
-`name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the point.
+`name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
 
 Optional properties include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
- - **layer** : specify a layer on the map to add marker to.
+ - **layer** : specify a layer on the map to add marker to. (default <i>unknown</i>)
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
