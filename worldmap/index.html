@@ -573,13 +573,13 @@ var addThing = function() {
     map.closePopup();
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
-    var lay = (bits[2] || "drawing").trim();
+    var lay = (bits[2] || "_drawing").trim();
     var colo = (bits[3] || "#910000").trim();
     var drag = true;
-    var regi = /^[S,G,E,I,O][A-Z]{4}.*/;  // if it looks like a SIDC code
+    var regi = /^[S,G,E,I,O][A-Z]{4}.*/i;  // if it looks like a SIDC code
     var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng};
     if (regi.test(icon)) {
-        d.SIDC = (icon+"------------").substr(0,12);
+        d.SIDC = (icon.toUpperCase()+"------------").substr(0,12);
     }
     else {
         d.icon = icon;
@@ -1123,7 +1123,7 @@ function setMarker(data) {
         }
         else if (data.hasOwnProperty("SIDC")) {
             // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
-            myMarker = new ms.Symbol( data.SIDC, { uniqueDesignation:data.name });
+            myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:data.name });
             // Now that we have a symbol we can ask for the echelon and set the symbol size
             var opts = data.options || {};
             opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 30;
@@ -1166,14 +1166,13 @@ function setMarker(data) {
             marker.name = data.name;
             if (data.icon) { marker.icon = data.icon; }
             if (data.iconCOlor) { marker.iconColor = data.iconColor; }
-            if (data.SIDC) { marker.SIDC = data.SIDC; }
+            if (data.SIDC) { marker.SIDC = data.SIDC.toUpperCase(); }
             marker.on('dragend', function (e) {
-                var l = marker.getLatLng().toString().replace('Lng(',', Lon : ').replace(')','')
-                marker.setPopupContent(marker.getPopup().getContent().split("Lat, Lon")[0] + l);
-                ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+                var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
+                marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
+                ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
             });
         }
-        if (data.draggable) { delete data.draggable; }
 
         // remove icon from list of properties, then add all others to popup
         if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
@@ -1221,6 +1220,7 @@ function setMarker(data) {
             // Add any remaining properties to the info box
             delete data.lat;
             delete data.lon;
+            if (data.draggable) { delete data.draggable; }
             for (var i in data) {
                 if ((i != "name") && (i != "length")) {
                     if (typeof data[i] === "object") {
@@ -1231,7 +1231,7 @@ function setMarker(data) {
                 }
             }
             words = data.popup || words;
-            marker.bindPopup(words + marker.getLatLng().toString().replace('Lng(',', Lon : ').replace(')',''), {keepInView:true, minWidth:348});
+            marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\");'>Delete</button>");

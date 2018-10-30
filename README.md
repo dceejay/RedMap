@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.7 - tidy up sidc entry, and drag-ability of nodes on drawing layer.
 - v1.5.6 - Add search command and clear search functionality.
 - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
 - v1.5.4 - Allow remote update of the split position via `msg.command.split`
