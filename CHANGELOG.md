@@ -1,6 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v1.5.7 - tidy up sidc entry, and drag-ability of nodes on drawing layer.
+ - v1.5.9 - Allow latest mark added to open popup, and allow `popped=false` to close.
+ - v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
  - v1.5.6 - Add search command and clear search functionality.
  - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
  - v1.5.4 - Allow remote update of the split position via `msg.command.split`

@@ -112,6 +112,7 @@ var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
 var startzoom = 10;
 
 var map;
+var allData = {};
 var markers = {};
 var polygons = {};
 var layers = {};
@@ -844,6 +845,7 @@ var delMarker = function(dname) {
         map.removeLayer(markers[dname]);
         delete markers[dname];
     }
+    delete allData[dname];
     ws.send(JSON.stringify({action:"delete", name:dname}));
     map.closePopup();
 }
@@ -851,9 +853,9 @@ var delMarker = function(dname) {
 // the MAIN add something to map function
 function setMarker(data) {
     //console.log("DATA",typeof data, data);
+    data = allData[data.name] = Object.assign(allData[data.name]||{},data);
     var ll;
     var lli = null;
-    var stay = popped;
     var opt = {};
     opt.color = data.color || "#910000";
     opt.fillColor = data.fillColor || "#910000";
@@ -1210,11 +1212,16 @@ function setMarker(data) {
                 delete data.weblink;
             }
 
-            popped = stay;
-            if (data.hasOwnProperty("popped") && (data.popped == true) ) {
+            if (data.hasOwnProperty("popped") && (data.popped === true)) {
                 popped = true;
                 popid = data.name;
                 delete data.popped;
+            }
+            if (data.hasOwnProperty("popped") && (data.popped === false)) {
+                if ((popid == data.name) && (popmark)) {
+                    popped = false;
+                    popmark.closePopup();
+                }
             }
 
             // Add any remaining properties to the info box
@@ -1245,7 +1252,6 @@ function setMarker(data) {
             markers[data.name] = marker;
             layers[lay].addLayer(marker);
         }
-
         if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
         if (data.bearing != null) {  // if there is a heading
             if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
@@ -1284,10 +1290,17 @@ function setMarker(data) {
             }
         }
         if (panit) {
-            map.setView(ll,map.getZoom());
+            if (popped) {
+                map.setView(ll,map.getZoom());
+                popped = true;
+            }
+            else { map.setView(ll,map.getZoom()); }
         }
-        if (popped) {
-            if (popid == data.name) { marker.openPopup(); }
+        if (popped === true) {
+            if (popid == data.name) {
+                if (popmark) { popmark.closePopup(); }
+                marker.openPopup();
+            }
             else { popmark.openPopup(); }
         }
     }

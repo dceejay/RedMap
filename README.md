@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.7 - tidy up sidc entry, and drag-ability of nodes on drawing layer.
+- v1.5.9 - Allow latest mark added to open popup, and allow `popped=false` to close.
+- v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
 - v1.5.6 - Add search command and clear search functionality.
 - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
 - v1.5.4 - Allow remote update of the split position via `msg.command.split`
@@ -66,7 +67,7 @@ Optional properties include
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
- - **popped** : set to true to automatically open the popup info box.
+ - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
 
 Any other `msg.payload` properties will be added to the icon popup text box.
