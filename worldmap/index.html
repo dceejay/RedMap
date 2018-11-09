@@ -77,9 +77,9 @@
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
     <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster();'/></td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' name='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' name='lockit' onclick='doLock();'/> Lock Map</td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' name='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock();'/> Lock Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
     <tr><td style="cursor:default"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
@@ -847,7 +847,7 @@ var delMarker = function(dname) {
     }
     delete allData[dname];
     ws.send(JSON.stringify({action:"delete", name:dname}));
-    map.closePopup();
+    //map.closePopup();
 }
 
 // the MAIN add something to map function
@@ -1218,10 +1218,11 @@ function setMarker(data) {
                 delete data.popped;
             }
             if (data.hasOwnProperty("popped") && (data.popped === false)) {
-                if ((popid == data.name) && (popmark)) {
+                if (popid == data.name) {
+                    if (popmark) { popmark.closePopup(); }
                     popped = false;
-                    popmark.closePopup();
                 }
+                delete data.popped;
             }
 
             // Add any remaining properties to the info box
@@ -1290,7 +1291,7 @@ function setMarker(data) {
             }
         }
         if (panit) {
-            if (popped) {
+            if (popped === true) {
                 map.setView(ll,map.getZoom());
                 popped = true;
             }
@@ -1302,6 +1303,7 @@ function setMarker(data) {
                 marker.openPopup();
             }
             else { popmark.openPopup(); }
+            popped = true;
         }
     }
 }
@@ -1317,8 +1319,9 @@ function doCommand(cmd) {
         doTidyUp(cmd.clear);
     }
     if (cmd.hasOwnProperty("panit")) {
-        if (cmd.panit === "true") { panit = true; }
+        if (cmd.panit == "true") { panit = true; }
         else { panit = false; }
+        document.getElementById("panit").checked = panit;
     }
     if (cmd.hasOwnProperty("showmenu")) {
         if ((cmd.showmenu === "hide") && (showUserMenu === true)) {
@@ -1612,6 +1615,7 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("heatmap")) {
         heat.setOptions(cmd.heatmap);
+        document.getElementById("heatall").checked = !!cmd.heatmap;
         heat.redraw();
     }
     map.setView([clat,clon],czoom);

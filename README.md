@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.9 - Allow latest mark added to open popup, and allow `popped=false` to close.
+- v1.5.10 - Allow latest mark added to open popup, and allow `popped=false` to close.
 - v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
 - v1.5.6 - Add search command and clear search functionality.
 - v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
