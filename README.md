@@ -64,7 +64,7 @@ Optional properties include
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
- - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"news.bbc.co.uk", target:"_new"}`
+ - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"http://news.bbc.co.uk", target:"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
