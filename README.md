@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.11 - Let search also try geocoding lookup if not marks found.
 - v1.5.10 - Allow latest mark added to open popup, and allow `popped=false` to close.
 - v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
 - v1.5.6 - Add search command and clear search functionality.
@@ -242,7 +243,7 @@ Optional properties include
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
- - **search** - search markers on map for name containing `string`. An empty string `""` clears the search results. - `{command:{search:"Dave"}}`
+ - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{command:{search:"Dave"}}`
  - **showlayer** - show the named overlay(s) - `{command:{showlayer:"foo"}}` or `{command:{showlayer:["foo","bar"]}}`
  - **hidelayer** - hide the named overlay(s) - `{command:{hidelayer:"bar"}}` or `{command:{hidelayer:["bar","another"}}`
  - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`

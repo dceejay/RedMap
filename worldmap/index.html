@@ -391,10 +391,36 @@ function doSearch() {
         }
     }
     moveToMarks();
-    if (lockit) {
-        document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results within bounds.</font>";
-    } else {
-        document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results.</font>";
+    if (marks.length === 0) {
+        // If no markers found let's try a geolookup...
+        var protocol = location.protocol;
+        if (protocol == "file:") { protocol = "https:"; }
+        var searchUrl = protocol + "//nominatim.openstreetmap.org/search?format=json&limit=1&q=";
+
+        fetch(searchUrl + value) // Call the fetch function passing the url of the API as a parameter
+        .then((resp) => resp.json())
+        .then(function(data) {
+            if (data.length > 0) {
+                var bb = data[0].boundingbox;
+                map.fitBounds([ [bb[0],bb[2]], [bb[1],bb[3]] ]);
+                map.panTo([data[0].lat, data[0].lon]);
+            }
+            else {
+                document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
+            }
+        })
+        .catch(function(err) {
+            if (err.toString() === "TypeError: Failed to fetch") {
+                document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
+            }
+        });
+    }
+    else {
+        if (lockit) {
+            document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results within bounds.</font>";
+        } else {
+            document.getElementById('searchRes').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results.</font>";
+        }
     }
 }
 
