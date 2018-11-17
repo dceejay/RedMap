@@ -1272,6 +1272,9 @@ function setMarker(data) {
                 rightmenuMarker.setLatLng(e.latlng);
                 map.openPopup(rightmenuMarker);
             });
+            marker.on('click', function(e) {
+                ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+            });
             if ((data.addtoheatmap !== "false") || (!data.hasOwnProperty("addtoheatmap"))) { // Added to give ability to control if points from active layer contribute to heatmap
                 if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
             }

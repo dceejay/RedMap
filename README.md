@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.11 - Let search also try geocoding lookup if not marks found.
+- v1.5.12 - Send click message to websocket on marker click - Issue #56
+- v1.5.11 - Let search also try geocoding lookup if not found in marks.
 - v1.5.10 - Allow latest mark added to open popup, and allow `popped=false` to close.
 - v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
 - v1.5.6 - Add search command and clear search functionality.
@@ -19,14 +20,7 @@ map web page for plotting "things" on.
 - v1.5.2 - Make manually added icons moveable by default.
 - v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
   - Also add built-in world countries overlay layer for offline use.
-- v1.4.6 - allow more variation in fa-icon modifiers, so fa-3x and fa-spin work.
-- v1.4.5 - fix clearing overlays
-- v1.4.4 - add a couple of extra overlay layers, roads, rail, sea
-- v1.4.3 - support custom icon for GPX and KML. Better readme for geojson.
-- v1.4.2 - add NVG layer capability
-- v1.4.1 - let `msg.payload.popup` set the popup contents.
-- v1.4.0 - only send to specific \_sessionid if specified.
-- ...
+  - ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
