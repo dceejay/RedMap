@@ -1184,6 +1184,7 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
+        marker.name = data.name;
 
         // var createLabelIcon = function(labelText) {
         //     return L.marker(new L.LatLng(51.05, -1.35), {icon:L.divIcon({ html:labelText })});
@@ -1191,7 +1192,6 @@ function setMarker(data) {
 
         // send new position at end of move event if point is draggable
         if (data.draggable === true) {
-            marker.name = data.name;
             if (data.icon) { marker.icon = data.icon; }
             if (data.iconCOlor) { marker.iconColor = data.iconColor; }
             if (data.SIDC) { marker.SIDC = data.SIDC.toUpperCase(); }

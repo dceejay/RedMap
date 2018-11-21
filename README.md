@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.12 - Send click message to websocket on marker click - Issue #56
+- v1.5.13 - Send click message to websocket on marker click - Issue #56, #57
 - v1.5.11 - Let search also try geocoding lookup if not found in marks.
 - v1.5.10 - Allow latest mark added to open popup, and allow `popped=false` to close.
 - v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
