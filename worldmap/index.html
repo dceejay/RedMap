@@ -592,7 +592,7 @@ map.on('zoomend', function() {
 //});
 
 // single right click to add a marker
-var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
+var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
 
 var rclk;
 var addThing = function() {
@@ -857,7 +857,8 @@ var doDialog = function(d) {
 }
 
 // Delete a marker (and notify websocket)
-var delMarker = function(dname) {
+var delMarker = function(dname,note) {
+    if (note) { map.closePopup(); }
     if (typeof polygons[dname] != "undefined") {
         layers[polygons[dname].lay].removeLayer(polygons[dname]);
         delete polygons[dname];
@@ -872,7 +873,7 @@ var delMarker = function(dname) {
         delete markers[dname];
     }
     delete allData[dname];
-    ws.send(JSON.stringify({action:"delete", name:dname}));
+    if (note) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
     //map.closePopup();
 }
 
@@ -1267,7 +1268,7 @@ function setMarker(data) {
             marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
-            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\");'>Delete</button>");
+            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
                 rightmenuMarker.setLatLng(e.latlng);
                 map.openPopup(rightmenuMarker);
