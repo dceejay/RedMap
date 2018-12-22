@@ -880,7 +880,11 @@ var delMarker = function(dname,note) {
 // the MAIN add something to map function
 function setMarker(data) {
     //console.log("DATA",typeof data, data);
-    data = allData[data.name] = Object.assign(allData[data.name]||{},data);
+    if (data.deleted) { // remove markers we are told to
+        delMarker(data.name);
+        return;
+    }
+    data = allData[data.name] = Object.assign(allData[data.name] || {}, data);
     var ll;
     var lli = null;
     var opt = {};
@@ -908,13 +912,17 @@ function setMarker(data) {
     }
     var lay = data.layer || "unknown";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
-        //layers[lay] = new L.LayerGroup();
-        layers[lay] = new L.MarkerClusterGroup({
-            maxClusterRadius:50,
-            spiderfyDistanceMultiplier:1.8,
-            disableClusteringAtZoom:clusterAt
-            //zoomToBoundsOnClick:false
-        });
+        if (clusterAt > 0) {
+            layers[lay] = new L.MarkerClusterGroup({
+                maxClusterRadius:50,
+                spiderfyDistanceMultiplier:1.8,
+                disableClusteringAtZoom:clusterAt
+                //zoomToBoundsOnClick:false
+            });
+        }
+        else {
+            layers[lay] = new L.LayerGroup();
+        }
         overlays[lay] = layers[lay];
         if (showLayerMenu !== false) {
             layercontrol.addOverlay(layers[lay],lay);
@@ -929,10 +937,7 @@ function setMarker(data) {
     }
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
-    if (data.deleted) { // remove markers we are told to
-        delMarker(data.name);
-    }
-    else if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
+    if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
         delete opt.fill;
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
@@ -1194,7 +1199,7 @@ function setMarker(data) {
         // send new position at end of move event if point is draggable
         if (data.draggable === true) {
             if (data.icon) { marker.icon = data.icon; }
-            if (data.iconCOlor) { marker.iconColor = data.iconColor; }
+            if (data.iconColor) { marker.iconColor = data.iconColor; }
             if (data.SIDC) { marker.SIDC = data.SIDC.toUpperCase(); }
             marker.on('dragend', function (e) {
                 var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
