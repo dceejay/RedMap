@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
 - v1.5.15 - Allow setting clusterAt to 0 to fully disable it - Issue #61
 - v1.5.14 - Stop delete marker feedback to allow updating multiple maps - Issue #59
 - v1.5.13 - Send click message to websocket on marker click - Issue #56, #57
@@ -231,7 +232,7 @@ All these events generate messages that can be received by using a **worldmap in
 
 ## Control
 
-You can also control the map via the node, by sending in a msg.payload containing a **command** object.
+You can also control the map via the node, by sending in a msg.payload containing a **command** object. Multiple parameters can be specified in one command.
 
 Optional properties include
 
@@ -252,6 +253,9 @@ Optional properties include
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lng Points)
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu
+ - **panlock** - lock the map area to the current visible area. - `{command:{panlock:true}}`
+ - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{command:{zoomlock:true}}`
+ - **hiderightclick** - disables the right click that allows adding points to the map - `{command:{hiderightclick:true}}`
 
 #### To switch layer, move map and zoom
 

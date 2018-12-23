@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
+ - v1.5.15 - Allow setting clusterAt to 0 to fully disable it - Issue #61
  - v1.5.14 - Stop delete marker feedback to allow updating multiple maps - Issue #59
  - v1.5.13 - Send click message to websocket on marker click - Issue #56, #57
  - v1.5.11 - Let search also try geocoding lookup if not found in marks.

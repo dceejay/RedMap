@@ -32,8 +32,10 @@ module.exports = function(RED) {
         this.cluster = n.cluster || "";
         this.maxage = n.maxage || "";
         this.showmenu = n.usermenu || "show";
-        this.panit = n.panit || "false";
         this.layers = n.layers || "show";
+        this.panlock = n.panlock || "false";
+        this.zoomlock = n.zoomlock || "false";
+        this.panit = n.panit || "false";
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
@@ -63,6 +65,8 @@ module.exports = function(RED) {
                     if (node.maxage && node.maxage.length > 0) { c.maxage = node.maxage; }
                     c.showmenu = node.showmenu;
                     c.panit = node.panit;
+                    c.panlock = node.panlock;
+                    c.zoomlock = node.zoomlock;
                     c.showlayers = node.layers;
                     client.write(JSON.stringify({command:c}));
                 }
