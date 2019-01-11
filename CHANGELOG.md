@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
  - v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
  - v1.5.15 - Allow setting clusterAt to 0 to fully disable it - Issue #61
  - v1.5.14 - Stop delete marker feedback to allow updating multiple maps - Issue #59

@@ -31,6 +31,7 @@ module.exports = function(RED) {
         this.layer = n.layer || "";
         this.cluster = n.cluster || "";
         this.maxage = n.maxage || "";
+        if (n.maxage == 0) { this.maxage = "0"; }
         this.showmenu = n.usermenu || "show";
         this.layers = n.layers || "show";
         this.panlock = n.panlock || "false";
