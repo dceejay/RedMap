@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
 - v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
 - v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
 - v1.5.15 - Allow setting clusterAt to 0 to fully disable it - Issue #61
