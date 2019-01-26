@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <!--
-  Copyright 2015, 2018 IBM Corp.
+  Copyright 2015, 2019 IBM Corp.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -111,6 +111,7 @@
 var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
 var startzoom = 10;
 
+var ws;
 var map;
 var allData = {};
 var markers = {};
@@ -125,14 +126,13 @@ var menuOpen = false;
 var clusterAt = 13;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var ibmfoot = "&nbsp;&copy; IBM 2015,2018"
+var ibmfoot = "&nbsp;&copy; IBM 2015,2019"
 var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
 var sidebyside;
 var layercontrol;
-var ws;
 
 var iconSz = {
   "Team/Crew": 17.5,
@@ -398,7 +398,7 @@ function doSearch() {
         var searchUrl = protocol + "//nominatim.openstreetmap.org/search?format=json&limit=1&q=";
 
         fetch(searchUrl + value) // Call the fetch function passing the url of the API as a parameter
-        .then((resp) => resp.json())
+        .then(function(resp) { return resp.json(); })
         .then(function(data) {
             if (data.length > 0) {
                 var bb = data[0].boundingbox;
@@ -1387,7 +1387,10 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("showmenu")) {
         if ((cmd.showmenu === "hide") && (showUserMenu === true)) {
             showUserMenu = false;
-            map.removeControl(menuButton);
+            if (menuButton) {
+                try { map.removeControl(menuButton); }
+                catch(e) {}
+            }
         }
         else if ((cmd.showmenu === "show") && (showUserMenu === false)) {
             showUserMenu = true;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015, 2018 IBM Corp.
+ * Copyright 2015, 2019 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ module.exports = function(RED) {
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() {}, transports:"xhr-polling"});
+            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() {}});
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
             this.log("Serving "+__dirname+" as "+this.path); // +" and socket "+sockPath);
             sockets[this.path].installHandlers(RED.server, {prefix:sockPath});
