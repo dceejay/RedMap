@@ -158,7 +158,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         icon: "white-globe.png",
         align: "right",
         label: function() {
-            return this.name||this.path.substr(1)||"world map";
+            return this.name||(this.path.charAt(0)==='/'?this.path.substr(1):this.path)||"world map";
         },
         labelStyle: function() {
             return this.name?"node_label_italic":"";
