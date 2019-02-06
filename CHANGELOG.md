@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.20 - Let worldmap in node send message after out node has initialised
  - v1.5.19 - Fix map path label
  - v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
  - v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
