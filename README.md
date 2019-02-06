@@ -9,6 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.20 - Let worldmap in node send message after out node has initialised
+- v1.5.19 - Fix map path label
 - v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
 - v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
 - v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60

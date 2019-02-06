@@ -130,7 +130,7 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
             client.on('data', function(message) {
                 message = JSON.parse(message);
-                node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id});
+                setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
             });
             client.on('close', function() {
                 delete clients[client.id];

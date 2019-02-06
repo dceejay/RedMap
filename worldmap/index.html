@@ -171,7 +171,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        //console.log("DATA",typeof data,data);
+        console.log("DATA",typeof data,data);
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             for (var prop in data) {
