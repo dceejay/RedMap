@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
 - v1.5.20 - Let worldmap in node send message after out node has initialised
 - v1.5.19 - Fix map path label
 - v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
@@ -63,7 +64,7 @@ Optional properties include
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
- - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting)
+ - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
  - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"http://news.bbc.co.uk", target:"_new"}`
@@ -71,6 +72,7 @@ Optional properties include
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
+ - **label** : displays the contents of label next to the icon.
 
 Any other `msg.payload` properties will be added to the icon popup text box.
 

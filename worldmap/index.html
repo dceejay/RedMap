@@ -32,6 +32,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.label.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
@@ -60,6 +61,7 @@
     <script type="text/javascript" src="leaflet/tile.stamen.js"></script>
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
+    <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
@@ -171,7 +173,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        console.log("DATA",typeof data,data);
+        //console.log("DATA",typeof data,data);
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             for (var prop in data) {
@@ -383,7 +385,7 @@ function setCluster(v) {
 // Search for markers with names of ....
 function doSearch() {
     var value = document.getElementById('search').value;
-    console.log("Search for :",value);
+    console.log("search for :",value);
     marks = [];
     marksIndex = 0;
     for (var key in markers) {
@@ -1278,6 +1280,11 @@ function setMarker(data) {
             words = data.popup || words;
             marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
+            // If .label then use that rather than name tooltip
+            if (data.label && data.label.length > 0) {
+                marker.bindLabel(data.label, { noHide:true, offset:[20,-8] });
+                delete marker.options.title;
+            }
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
@@ -1644,7 +1651,7 @@ function doCommand(cmd) {
         sidebyside.addTo(map);
         sidebyside.lay = cmd.side;
     }
-    if (cmd.split && sidebyside && (cmd.split <= 100) && (cmd.split >= 0)) { console.log("DING",cmd.split); sidebyside.setSplit(cmd.split); }
+    if (cmd.split && sidebyside && (cmd.split <= 100) && (cmd.split >= 0)) { sidebyside.setSplit(cmd.split); }
     // Turn on an existing overlay(s)
     if (cmd.hasOwnProperty("showlayer")) {
         if (typeof cmd.showlayer === "string") { cmd.showlayer = [ cmd.showlayer ]; }

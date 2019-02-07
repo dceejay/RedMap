@@ -20,6 +20,7 @@ module.exports = function(RED) {
     var express = require("express");
     var sockjs = require('sockjs');
     var sockets = {};
+    RED.log.info("Worldmap version " + require('./package.json').version );
     // add the cgi module for serving local maps....
     RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
 
@@ -41,15 +42,15 @@ module.exports = function(RED) {
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() {}});
+            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
-            this.log("Serving "+__dirname+" as "+this.path); // +" and socket "+sockPath);
             sockets[this.path].installHandlers(RED.server, {prefix:sockPath});
         }
+        //this.log("Serving "+__dirname+" as "+this.path);
+        this.log("started at "+this.path);
         var node = this;
         var clients = {};
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
-
 
         var callback = function(client) {
             //client.setMaxListeners(0);
@@ -118,7 +119,8 @@ module.exports = function(RED) {
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket')});
+            // sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
+            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function(){return}, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket'), });
             sockets[this.path].installHandlers(RED.server);
         }
         var node = this;
