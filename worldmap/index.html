@@ -505,10 +505,6 @@ map.on('popupopen', function(e) {
     popid = e.popup.dname;
 });
 
-map.on('popupclose', function(e) {
-    popped = false;
-});
-
 map.on('overlayadd', function(e) {
     if (typeof overlays[e.name].bringToFront === "function") {
         overlays[e.name].bringToFront();
@@ -573,12 +569,14 @@ function showMapCurrentZoom() {
     setTimeout( function() {
         for (var key in markers) {
             if (polygons[key]) {
-                var vis = layers[markers[key].lay].getVisibleParent(markers[key]);
-                if ((vis) && (vis.hasOwnProperty("lay"))) {
-                    polygons[key].setStyle({opacity:1});
-                }
-                else {
-                    polygons[key].setStyle({opacity:0});
+                if (typeof layers[markers[key].lay].getVisibleParent === 'function') {
+                    var vis = layers[markers[key].lay].getVisibleParent(markers[key]);
+                    if ((vis) && (vis.hasOwnProperty("lay"))) {
+                        polygons[key].setStyle({opacity:1});
+                    }
+                    else {
+                        polygons[key].setStyle({opacity:0});
+                    }
                 }
                 polygons[key].redraw();
             }
@@ -1009,7 +1007,7 @@ function setMarker(data) {
         else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.latitude*1), (data.longitude*1), (data.intensity*1)); }
         else { lli = ll }
 
-        var words="<b>"+data.name+"</b><br/>";
+        var words="<b>"+data.name+"</b><button style=\"float:right;\" onclick='popped=false;popmark.closePopup();'><b>x</b></button><br/>";
 
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
@@ -1278,13 +1276,14 @@ function setMarker(data) {
                 }
             }
             words = data.popup || words;
-            marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {keepInView:true, minWidth:250});
+            marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
             // If .label then use that rather than name tooltip
             if (data.label && data.label.length > 0) {
                 marker.bindLabel(data.label, { noHide:true, offset:[20,-8] });
                 delete marker.options.title;
             }
+
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
@@ -1323,24 +1322,25 @@ function setMarker(data) {
                 } else {
                     var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
                     var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
-                    var lla = new L.LatLng(ya,xa);
-                    polygon = L.polygon([ ll1, lla ], {weight:2, color:'#f30', clickable:false});
+                    if (!isNaN(x) && !isNaN(y)) {
+                        var lla = new L.LatLng(ya,xa);
+                        polygon = L.polygon([ ll1, lla ], {weight:2, color:'#f30', clickable:false});
+                    }
                 }
                 if (typeof layers[lay].getVisibleParent === 'function') {
                     var vis = layers[lay].getVisibleParent(marker);
                     if ((polygon !== null) && (vis !== null) && (!vis.hasOwnProperty("lay"))) {
                         polygon.setStyle({opacity:0});
                     }
-                    polygons[data.name] = polygon;
-                    polygons[data.name].lay = lay;
-                    layers[lay].addLayer(polygon);
                 }
+                polygons[data.name] = polygon;
+                polygons[data.name].lay = lay;
+                layers[lay].addLayer(polygon);
             }
         }
         if (panit) {
             if (popped === true) {
                 map.setView(ll,map.getZoom());
-                popped = true;
             }
             else { map.setView(ll,map.getZoom()); }
         }
