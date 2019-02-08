@@ -1012,6 +1012,7 @@ function setMarker(data) {
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
         var icon, q;
+        var labelOffset = [20,-8];
         var drag = false;
         if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
@@ -1142,6 +1143,7 @@ function setMarker(data) {
                 html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [20,-12];
         }
         else if (data.icon === "friend") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name, draggable:drag });
@@ -1186,6 +1188,7 @@ function setMarker(data) {
                 iconSize: [30, 30]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [14,-16];
         }
         else {
             myMarker = L.VectorMarkers.icon({
@@ -1195,6 +1198,7 @@ function setMarker(data) {
                 iconColor: 'white'
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [14,-16];
         }
         marker.name = data.name;
 
@@ -1262,9 +1266,23 @@ function setMarker(data) {
                 delete data.popped;
             }
 
+            // If .label then use that rather than name tooltip
+            if (data.label) {
+                if (typeof data.label === "boolean" && data.label === true) {
+                    marker.bindLabel(data.name, { noHide:true, offset:labelOffset });
+                }
+                else if (typeof data.label === "string" && data.label.length > 0) {
+                    marker.bindLabel(data.label, { noHide:true, offset:labelOffset });
+                }
+                delete marker.options.title;
+                delete data.label;
+            }
+
             // Add any remaining properties to the info box
+            var llc = data.lineColor;
             delete data.lat;
             delete data.lon;
+            delete data.lineColor;
             if (data.draggable) { delete data.draggable; }
             for (var i in data) {
                 if ((i != "name") && (i != "length")) {
@@ -1278,11 +1296,6 @@ function setMarker(data) {
             words = data.popup || words;
             marker.bindPopup(words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''), {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
-            // If .label then use that rather than name tooltip
-            if (data.label && data.label.length > 0) {
-                marker.bindLabel(data.label, { noHide:true, offset:[20,-8] });
-                delete marker.options.title;
-            }
 
             marker.lay = lay;                       // and the layer it is on
             var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
@@ -1304,7 +1317,7 @@ function setMarker(data) {
             if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
             if (data.length != null) {
                 if (polygons[data.name] != null) { map.removeLayer(polygons[data.name]); }
-                var x = ll.lng; // X coordinate
+                var x = ll.lng * 1; // X coordinate
                 var y = ll.lat * 1; // Y coordinate
                 var ll1 = ll;
                 var angle = parseFloat(data.bearing);
@@ -1318,14 +1331,12 @@ function setMarker(data) {
                     var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
                     var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
                     var ll3 = new L.LatLng(y3,x3);
-                    polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:'#f30', fillOpacity:0.06, clickable:false});
+                    polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:llc||'#f30', fillOpacity:0.06, clickable:false});
                 } else {
                     var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
                     var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
-                    if (!isNaN(x) && !isNaN(y)) {
-                        var lla = new L.LatLng(ya,xa);
-                        polygon = L.polygon([ ll1, lla ], {weight:2, color:'#f30', clickable:false});
-                    }
+                    var lla = new L.LatLng(ya,xa);
+                    polygon = L.polygon([ ll1, lla ], {weight:2, color:llc||'#f30', clickable:false});
                 }
                 if (typeof layers[lay].getVisibleParent === 'function') {
                     var vis = layers[lay].getVisibleParent(marker);

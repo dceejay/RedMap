@@ -9,9 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
 - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
-- v1.5.20 - Let worldmap in node send message after out node has initialised
-- v1.5.19 - Fix map path label
 - v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
 - v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
 - v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
@@ -60,6 +59,7 @@ Optional properties include
  - **speed** : combined with bearing, draws a vector.
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
+ - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (instead of icon). See below.

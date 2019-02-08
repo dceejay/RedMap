@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
  - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
  - v1.5.20 - Let worldmap in node send message after out node has initialised
  - v1.5.19 - Fix map path label
