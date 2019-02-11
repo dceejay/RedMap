@@ -1,12 +1,13 @@
 CACHE MANIFEST
-# date: Feb 8th 2019 - v1.5.22
+# date: Feb 11th 2019 - v1.5.23
 
 CACHE:
 index.html
 favicon.ico
+css/map.css
+images/emoji.js
 images/node-red.png
 images/world-50m-flat.json
-css/map.css
 leaflet/L.Terminator.js
 leaflet/Leaflet.Dialog.css
 leaflet/Leaflet.Dialog.js
@@ -38,6 +39,8 @@ leaflet/leaflet.draw.css
 leaflet/leaflet.draw.js
 leaflet/leaflet.fullscreen.css
 leaflet/leaflet.js
+leaflet/leaflet.label.css
+leaflet/leaflet.label.js
 leaflet/leaflet.markercluster.js
 leaflet/leaflet.markercluster.freezable-src.js
 leaflet/leaflet.measurecontrol.css

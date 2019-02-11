@@ -64,6 +64,7 @@
     <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
+    <script type="text/javascript" src="images/emoji.js"></script>
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
@@ -600,6 +601,7 @@ var hiderightclick = false;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     map.closePopup();
+    popped = false;
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
@@ -1189,6 +1191,17 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [14,-16];
+        }
+        else if (data.icon && (data.icon.match(/^:.*:$/g))) {
+            var em = emojify(data.icon);
+            var col = data.iconColor || "#910000";
+            myMarker = L.divIcon({
+                className:"emicon",
+                html: '<center><span style="font-size:2em; color:'+col+'">'+em+'</span></center>',
+                iconSize: [32, 32]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [20,-12];
         }
         else {
             myMarker = L.VectorMarkers.icon({

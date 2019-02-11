@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.23 - Let icon support use of emoji specified as :emoji name:  
 - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
 - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
 - v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
@@ -60,7 +61,7 @@ Optional properties include
  - **bearing** : combined with speed, draws a vector.
  - **accuracy** : combined with bearing, draws a polygon of possible direction.
  - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, or :emoji name:
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -80,6 +81,8 @@ Any other `msg.payload` properties will be added to the icon popup text box.
 
 You may select any of the Font Awesome set of [icons](https://fontawesome.com/v4.7.0/icons/).
 If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
+
+You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
 There are also several special icons...
 
