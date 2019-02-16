@@ -42,13 +42,14 @@ Either use the Manage Palette option in the Node-RED Editor menu, or run the fol
 
 ## Usage
 
-Plots "things" on a map. By default the map will be served from `{httpRoot}/worldmap`
+Plots "things" on a map. By default the map will be served from `{httpRoot}/worldmap`, but this
+can be configured in the configuration panel.
 
 Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
 The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
 
-        msg.payload = { name:"Jason", lat:51.05, lon:-1.35 }
+        msg.payload = { "name":"Jason", "lat":51.05, "lon":-1.35 }
 
 `name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
 
@@ -57,25 +58,26 @@ Optional properties include
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to. (default <i>unknown</i>)
- - **speed** : combined with bearing, draws a vector.
- - **bearing** : combined with speed, draws a vector.
- - **accuracy** : combined with bearing, draws a polygon of possible direction.
+ - **speed** : when combined with bearing, draws a vector.
+ - **bearing** : when combined with speed, draws a vector.
+ - **accuracy** : when combined with bearing, draws a polygon of possible direction.
  - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, or :emoji name:
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
- - **SIDC** : NATO symbology code (instead of icon). See below.
+ - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
- - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{name:"BBC News", url:"http://news.bbc.co.uk", target:"_new"}`
- - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to heatmap layer. (default true)
- - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on heatmap layer. (default 1.0)
+ - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"http://news.bbc.co.uk", "target":"_new"}`
+ - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to the heatmap layer. (default true)
+ - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
  - **label** : displays the contents of label next to the icon.
 
-Any other `msg.payload` properties will be added to the icon popup text box.
+Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
+by using the **popup** property to supply your own html content.
 
 ### Icons
 
@@ -119,9 +121,10 @@ There are lots of extra options you can specify as `msg.options` - see the <a hr
 
 ### Buildings
 
-The OSM Buildings layer is available in the layers menu. You can replace this with a building of your own by
-sending a `msg.payload.command.map` containing an `overlay` and a `geojson` property. The geojson property
-should be a GeoJSON Feature Collection as per the OSMBuildings spec.
+The OSM Buildings layer is available in the layers menu. You can replace this with a
+building of your own by sending a `msg.payload.command.map` containing an `overlay`
+and a `geojson` property. The geojson property should be a GeoJSON Feature Collection
+as per the OSMBuildings spec.
 
     var geo = { "type": "FeatureCollection",
     "features": [
@@ -159,9 +162,9 @@ should be a GeoJSON Feature Collection as per the OSMBuildings spec.
 A 3D map view has now been added as **worldmap/index3d.html** using the mapbox api - the msg can support `msg.command.pitch` and `msg.command.bearing` to angle the view, for example:
 
     msg.payload = { command: {
-            zoom:18,
-            pitch:60,
-            bearing:80
+            zoom: 18,
+            pitch: 60,
+            bearing: 80
         } }
 
 The `icon` can be specified as a person, block, bar, or "anything else" - they will render slightly differently - all units are approximate. They will be positioned at the `lat`, `lon` as normal but also at the `msg.payload.height` - where height is in meters above the surface of the map (which may or may not relate to altitude...)
@@ -182,13 +185,13 @@ in addition existing male, female, fa-male and fa-female icons are all represent
  - There is currently no way to add labels, popups, or make the icons clickable.
  - The 3D only really works at zoomed in scales 16+ due to the small size of the icons. They are not scale independent like icons on the normal map.
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
- - This view is a side project to the Node-RED worldmap side project so happy to take PRs but it probably won't be actively developed.
+ - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
 
 ### Areas and Lines
 
-If the payload contains an **area** property - that is an array of co-ordinates, e.g.
+If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
 
-    ... , area: [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ], ...
+    ... , "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ], ...
 
 then rather than draw a point and icon it draws the polygon. Likewise if it contains a
 **line** property it will draw the polyline.
@@ -201,7 +204,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 
 ### Circles
 
-If the payload contains a **radius** property, as well as name, lat and lon, then rather
+If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
 
     msg.payload = { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
@@ -231,15 +234,23 @@ Right-clicking on an icon will allow you to delete it.
 
 If you select the **drawing** layer you can also add polylines, polygons and rectangles.
 
-All these events generate messages that can be received by using a **worldmap in** node. Examples of messages coming FROM the map include:
+## Events from the map
 
-    { "action": "connected" }
+The **worldmap in** node can be used to receive various events from the map. Examples of messages coming FROM the map include:
+
+    { "action": "connected" }    // useful to trigger delivery or redraw of points
+    { "action": "click", ... }   // when a marker is clicked
+    { "action": "move", ... }    // when a marker is moved
+
     { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "joe,male,mylayer" }
-    { "action": "delete", "name": "joe" }
-    { "action": "layer", "name": "Esri Satellite" }
     { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
+    { "action": "delete", "name": "joe" }  // when a point or shape is deleted
 
-## Control
+    { "action": "layer", "name": "myLayer" }      // when a map layer is changed
+    { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
+    { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
+
+## Controlling the map
 
 You can also control the map via the node, by sending in a msg.payload containing a **command** object. Multiple parameters can be specified in one command.
 
@@ -248,40 +259,40 @@ Optional properties include
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
- - **layer** - set map to specified base layer name - `{command:{layer:"Esri"}}`
- - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{command:{search:"Dave"}}`
- - **showlayer** - show the named overlay(s) - `{command:{showlayer:"foo"}}` or `{command:{showlayer:["foo","bar"]}}`
- - **hidelayer** - hide the named overlay(s) - `{command:{hidelayer:"bar"}}` or `{command:{hidelayer:["bar","another"}}`
- - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{command:{side:"Esri Satellite"}}`
- - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{command:{split:50}}`
+ - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
+ - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{"command":{"search":"Winchester"}}`
+ - **showlayer** - show the named overlay(s) - `{"command":{"showlayer":"foo"}}` or `{"command":{"showlayer":["foo","bar"]}}`
+ - **hidelayer** - hide the named overlay(s) - `{"command":{"hidelayer":"bar"}}` or `{"command":{"hidelayer":["bar","another"}}`
+ - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{"command":{"side":"Esri Satellite"}}`
+ - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{"command":{"split":50}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
    - **wms** - boolean, specifies if the data is provided by a Web Map Service
-   - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lng Points)
+   - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu
- - **panlock** - lock the map area to the current visible area. - `{command:{panlock:true}}`
- - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{command:{zoomlock:true}}`
- - **hiderightclick** - disables the right click that allows adding points to the map - `{command:{hiderightclick:true}}`
+ - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
+ - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
+ - **hiderightclick** - disables the right click that allows adding points to the map - `{"command":{"hiderightclick":true}}`
 
 #### To switch layer, move map and zoom
 
-    msg.payload.command =  {layer:"Esri Satellite", lat:51, lon:3, zoom:10 };
+    msg.payload.command = { layer:"Esri Satellite", lat:51, lon:3, zoom:10 };
 
 #### To draw a heavily customized Circle on a layer
 
     msg.payload.command =  {
-        name:"circle",
-        lat:51.515,
-        lon:-0.1235,
-        radius:10,
-        layer:"drawing",
-        iconColor:'#464646',
-        stroke:false,
-        fillOpacity:0.8,
-        clickable:true
+        name: "circle",
+        lat: 51.515,
+        lon: -0.1235,
+        radius: 10,
+        layer: "drawing",
+        iconColor: '#464646',
+        stroke: false,
+        fillOpacity: 0.8,
+        clickable: true
     };
 
 #### To add a new base layer
@@ -314,10 +325,10 @@ To add an overlay instead of a base layer - specify the `overlay` property inste
 #### To add a new geoJSON overlay
 
     msg.payload.command.map = {
-        overlay:"myGeoJSON",
-        geojson:{ your geojson feature as an object },
-        opt:{ optional geojson options, style, etc },
-        fit:true
+        overlay: "myGeoJSON",
+        geojson: { your geojson feature as an object },
+        opt: { optional geojson options, style, etc },
+        fit: true
     };
 
 The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
@@ -325,6 +336,7 @@ The geojson features may contain a `properties` property. That may also include 
 The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
 
 The `fit` property is optional. If present the map will automatically zoom to fit the area relevant to the geojson.
+
 see http://leafletjs.com/examples/geojson/ for more details about options for opt.
 
 #### To add a new KML, GPX, or TOPOJSON overlay
@@ -332,13 +344,13 @@ see http://leafletjs.com/examples/geojson/ for more details about options for op
 As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSON layer. The syntax is the same but with either a `kml` property containing the KML string - a `gpx` property containing a GPX string - or a `topojson` property containing the topojson.
 
     msg.payload.command.map = {
-        overlay:"myKML",
-        kml:"<kml>...your kml placemarks...</kml>"
+        overlay: "myKML",
+        kml: "<kml>...your kml placemarks...</kml>"
     };
-
 
  For GPX and KML layers, it is possible to define which icon to use for point markers by adding the
  following properties to `msg.payload.command.map`:
+
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
@@ -347,7 +359,7 @@ Again the `fit` property can be added to make the map zoom to the relevant area.
 #### To add a Velocity Grid Overlay
 
     msg.payload.command.map = {
-        overlay:"myWind",
+        overlay: "myWind",
         velocity: { 	
             displayValues: true,
 	        displayOptions: {
@@ -367,10 +379,10 @@ see https://github.com/danwild/leaflet-velocity for more details about options a
     var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
     msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
     msg.payload.command.map = {
-        overlay:"New York Historical",
-        url:'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+        overlay: "New York Historical",
+        url: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
         bounds: imageBounds,
-        opt:{ opacity:1.0, attribution:"&copy; University of Texas" }
+        opt: { opacity:1.0, attribution:"&copy; University of Texas" }
     };
 
 #### To clear a layer from the map

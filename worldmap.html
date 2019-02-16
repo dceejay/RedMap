@@ -98,7 +98,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         path. Worldmap-in nodes are matched to worldmap nodes by having exactly the same path.
     <p>Shortcut - <code>⌘⇧m</code> - ctrl-shift-m to jump to the default Map (<tt>/worldmap</tt>).</p>
     <p>The minimum <code>msg.payload</code> must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
-    <pre>{name:"Joe", lat:51, lon:-1.05}</pre>
+    <pre>{"name":"Joe", "lat":51, "lon":-1.05}</pre>
     <p><code>name</code> must be a unique identifier.</p>
     <p>Optional properties include</p>
     <ul>
@@ -191,7 +191,21 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </script>
 
 <script type="text/x-red" data-help-name="worldmap in">
-    <p>Receives events from a worldmap web page.</p>
+    <p>Receives actions from a worldmap web page.</p>
+    <p>Actions include
+    <ul><li><b>connected</b> - when a new client connects
+        <li><b>click</b> - when a marker is clicked</li>
+        <li><b>move</b> - when a marker is dragged/moved</li>
+        <li><b>point</b> - when a point is added manually using right-click</li>
+        <li><b>draw</b> - when a shape is added manually to the drawing layer</li>
+        <li><b>delete</b> - when a point or shape is deleted</li>
+        <li><b>layer</b> - when a base layer is changed</li>
+        <li><b>addlayer</b> - when an overlay is added to the map</li>
+        <li><b>dellayer</b> - when an overlay is removed from the map</li>
+    </ul>
+    Use the debug node to see the complete payload of the msg returned. Further information
+    can be found in the <a href="https://github.com/dceejay/RedMap/blob/master/README.md#events-from-the-map" target="_new">Events section</a>
+    of the README.</p>
 </script>
 
 <script type="text/javascript">
@@ -234,7 +248,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     <p>Holds all the points in memory, so if you have a lot of points held for a
     large depth then memory usage may become excessive.</p>
     <p>To delete a track send a msg.payload containing both the name of the object and
-    set <code>msg.payload.deleted = true</code></p>
+    set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code></p>
 </script>
 
 <script type="text/javascript">
