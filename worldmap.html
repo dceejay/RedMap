@@ -194,6 +194,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     <p>Receives actions from a worldmap web page.</p>
     <p>Actions include
     <ul><li><b>connected</b> - when a new client connects
+        <li><b>disconnect</b> - when a client disconnects
         <li><b>click</b> - when a marker is clicked</li>
         <li><b>move</b> - when a marker is dragged/moved</li>
         <li><b>point</b> - when a point is added manually using right-click</li>
@@ -203,8 +204,11 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <li><b>addlayer</b> - when an overlay is added to the map</li>
         <li><b>dellayer</b> - when an overlay is removed from the map</li>
     </ul>
-    Use the debug node to see the complete payload of the msg returned. Further information
-    can be found in the <a href="https://github.com/dceejay/RedMap/blob/master/README.md#events-from-the-map" target="_new">Events section</a>
+    Use the debug node to see the complete payload of the msg returned.</p>
+    <p>All actions also include a <code>msg._sessionid</code> property that indicates which client session the
+    action came from. Any outgoing msg that includes this property will only go back to that session.</p>
+    <p>Further information can be found in the
+    <a href="https://github.com/dceejay/RedMap/blob/master/README.md#events-from-the-map" target="_new">Events section</a>
     of the README.</p>
 </script>
 

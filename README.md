@@ -238,9 +238,11 @@ If you select the **drawing** layer you can also add polylines, polygons and rec
 
 The **worldmap in** node can be used to receive various events from the map. Examples of messages coming FROM the map include:
 
-    { "action": "connected" }    // useful to trigger delivery or redraw of points
-    { "action": "click", ... }   // when a marker is clicked
-    { "action": "move", ... }    // when a marker is moved
+    { "action": "connected" }  // useful to trigger delivery or redraw of points
+    { "action": "disconnect", "clients": 1 }  // when a client disconnects - reports number remaining
+
+    { "action": "click", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.024985, "lon":-1.39698 }   // when a marker is clicked
+    { "action": "move", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.044632, "lon":-1.359901 }    // when a marker is moved
 
     { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "joe,male,mylayer" }
     { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
@@ -249,6 +251,8 @@ The **worldmap in** node can be used to receive various events from the map. Exa
     { "action": "layer", "name": "myLayer" }      // when a map layer is changed
     { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
     { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
+
+All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that include this will ONLY to that session - so you can target map updates to certain sessions only if required.
 
 ## Controlling the map
 
