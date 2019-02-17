@@ -243,10 +243,10 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "click", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.024985, "lon":-1.39698 }   // when a marker is clicked
     { "action": "move", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.044632, "lon":-1.359901 }    // when a marker is moved
+    { "action": "delete", "name": "Jason" }  // when a point or shape is deleted
 
-    { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "joe,male,mylayer" }
+    { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "Jason,male,gps" }
     { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
-    { "action": "delete", "name": "joe" }  // when a point or shape is deleted
 
     { "action": "layer", "name": "myLayer" }      // when a map layer is changed
     { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
