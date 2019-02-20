@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.24 - ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
 - v1.5.23 - Let icon support use of emoji specified as :emoji name:  
 - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
 - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
