@@ -110,11 +110,11 @@ There are also several special icons...
 You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>.
 To do this you need to supply a `msg.SIDC` instead of an icon, for example:
 
-    msg.payload = { name: "Emergency Medical Operation",
-        lat: 51.05,
-        lon: -1.35,
-        SIDC: "ENOPA-------",
-        options: { fillOpacity:0.8 }
+    msg.payload = { "name": "Emergency Medical Operation",
+        "lat": 51.05,
+        "lon": -1.35,
+        "SIDC": "ENOPA-------",
+        "options": { "fillOpacity":0.8 }
     }
 
 SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
@@ -126,7 +126,7 @@ There are lots of extra options you can specify as `msg.options` - see the <a hr
 The OSM Buildings layer is available in the layers menu. You can replace this with a
 building of your own by sending a `msg.payload.command.map` containing an `overlay`
 and a `geojson` property. The geojson property should be a GeoJSON Feature Collection
-as per the OSMBuildings spec.
+as per the OSMBuildings spec. For example in a function node:
 
     var geo = { "type": "FeatureCollection",
     "features": [
@@ -163,11 +163,7 @@ as per the OSMBuildings spec.
 
 A 3D map view has now been added as **worldmap/index3d.html** using the mapbox api - the msg can support `msg.command.pitch` and `msg.command.bearing` to angle the view, for example:
 
-    msg.payload = { command: {
-            zoom: 18,
-            pitch: 60,
-            bearing: 80
-        } }
+    msg.payload = { "command": { "zoom":18, "pitch":60, "bearing":80 } }
 
 The `icon` can be specified as a person, block, bar, or "anything else" - they will render slightly differently - all units are approximate. They will be positioned at the `lat`, `lon` as normal but also at the `msg.payload.height` - where height is in meters above the surface of the map (which may or may not relate to altitude...)
 
@@ -209,7 +205,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
 If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
 
-    msg.payload = { lat:51.05, lon:-1.35, name:"A3090", radius:3000 }
+    msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
 
 As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*.
 
@@ -290,32 +286,32 @@ Optional properties include
 
 #### To switch layer, move map and zoom
 
-    msg.payload.command = { layer:"Esri Satellite", lat:51, lon:3, zoom:10 };
+    msg.payload.command = { "layer":"Esri Satellite", "lat":51, "lon":3, "zoom":10 };
 
-#### To add and remove a user button to the map
+#### To add and remove a user defined button
 
 to add a button bottom right
 
-    msg.payload.command = { button: { name:"My Fancy Button", icon: "fa-star", position:"bottomright" } };
+    msg.payload.command = { "button": { "name":"My Fancy Button", "icon": "fa-star", "position":"bottomright" } };
 
 When clicked the button will send an event to the `worldmap in` node containing `{"action":"button", "name","My Fancy Button"}` - this can then be used to trigger other map commands or flows.
 
 to remove
 
-    msg.payload.command = { button: { name:"My Fancy Button" } };
+    msg.payload.command = { "button": { "name":"My Fancy Button" } };
 
 #### To draw a heavily customized Circle on a layer
 
     msg.payload.command =  {
-        name: "circle",
-        lat: 51.515,
-        lon: -0.1235,
-        radius: 10,
-        layer: "drawing",
-        iconColor: '#464646',
-        stroke: false,
-        fillOpacity: 0.8,
-        clickable: true
+        "name": "circle",
+        "lat": 51.515,
+        "lon": -0.1235,
+        "radius": 10,
+        "layer": "drawing",
+        "iconColor": '#464646',
+        "stroke": false,
+        "fillOpacity": 0.8,
+        "clickable": true
     };
 
 #### To add a new base layer
@@ -324,9 +320,9 @@ The layer will be called `name`. By default it expects a leaflet Tilelayer style
 style server by adding a property `wms: true`. (see overlay example below)
 
     msg.payload.command.map = {
-        name:"OSMhot",
-        url:'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-        opt:{ maxZoom:19, attribution:"&copy; OpenStreetMap" }
+        "name":"OSMhot",
+        "url":"http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+        "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
 
 #### To add a WMS overlay layer - eg US weather radar
@@ -334,24 +330,24 @@ style server by adding a property `wms: true`. (see overlay example below)
 To add an overlay instead of a base layer - specify the `overlay` property instead of the `name`.
 
     msg.payload.command.map = {
-        overlay: "NowCoast",
-        url: 'https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WmsServer?',
-        opt:  {
-            layers: '1',
-            format: 'image/png',
-            transparent: true,
-            attribution: "NOAA/NWS"
+        "overlay": "NowCoast",
+        "url": "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WmsServer?",
+        "opt":  {
+            "layers": "1",
+            "format": 'image/png",
+            "transparent": true,
+            "attribution": "NOAA/NWS"
         },
-        wms: true
+        "wms": true
     }
 
 #### To add a new geoJSON overlay
 
     msg.payload.command.map = {
-        overlay: "myGeoJSON",
-        geojson: { your geojson feature as an object },
-        opt: { optional geojson options, style, etc },
-        fit: true
+        "overlay": "myGeoJSON",
+        "geojson": { your geojson feature as an object },
+        "opt": { optional geojson options, style, etc },
+        "fit": true
     };
 
 The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
@@ -367,8 +363,8 @@ see http://leafletjs.com/examples/geojson/ for more details about options for op
 As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSON layer. The syntax is the same but with either a `kml` property containing the KML string - a `gpx` property containing a GPX string - or a `topojson` property containing the topojson.
 
     msg.payload.command.map = {
-        overlay: "myKML",
-        kml: "<kml>...your kml placemarks...</kml>"
+        "overlay": "myKML",
+        "kml": "<kml>...your kml placemarks...</kml>"
     };
 
  For GPX and KML layers, it is possible to define which icon to use for point markers by adding the
@@ -382,16 +378,16 @@ Again the `fit` property can be added to make the map zoom to the relevant area.
 #### To add a Velocity Grid Overlay
 
     msg.payload.command.map = {
-        overlay: "myWind",
-        velocity: { 	
-            displayValues: true,
-	        displayOptions: {
-                velocityType: 'Global Wind',
-                displayPosition: 'bottomleft',
-                displayEmptyString: 'No wind data'
+        "overlay": "myWind",
+        "velocity": { 	
+            "displayValues": true,
+	        "displayOptions": {
+                "velocityType": "Global Wind",
+                "displayPosition": "bottomleft",
+                "displayEmptyString": "No wind data"
             },
-            maxVelocity: 15,
-            data: [Array of data as per format referenced below]
+            "maxVelocity": 15,
+            "data": [Array of data as per format referenced below]
         }
     };
 
@@ -399,8 +395,10 @@ see https://github.com/danwild/leaflet-velocity for more details about options a
 
 #### To add an Image Overlay
 
+in a function node:
+
     var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
-    msg.payload = { command : {lat:40.74, lon:-74.175, zoom:13 } };
+    msg.payload = { command : { lat:40.74, lon:-74.175, zoom:13 } };
     msg.payload.command.map = {
         overlay: "New York Historical",
         url: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
@@ -433,15 +431,15 @@ Create and edit these into an executeable file called **mapserv**, located in th
 You can then add a new WMS Base layer by injecting a message like
 
     msg.payload.command.map = {
-        name: "Local WMS",
-        url: 'http://localhost:1880/cgi-bin/mapserv',   // we will serve the tiles from this node locally.
-        opt: {
-            layers: 'gb',                               // specifies a layer in your map file
-            format: 'image/png',
-            transparent: true,
-            attribution: "© Ordnance Survey, UK"
+        "name": "Local WMS",
+        "url": "http://localhost:1880/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
+        "opt": {
+            "layers": "gb",                               // specifies a layer in your map file
+            "format": "image/png",
+            "transparent": true,
+            "attribution": "© Ordnance Survey, UK"
         },
-        wms: true                                       // set to true for WMS type mapserver
+        "wms": true                                       // set to true for WMS type mapserver
     }
 
 
