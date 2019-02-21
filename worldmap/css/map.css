@@ -6,6 +6,15 @@ body {
     font:14px Verdana, Arial, sans-serif;
 }
 
+p, h1, h2, h3, h4 {
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+}
+
+b {
+    font-size: larger;
+}
+
 a {
     color:#444;
     text-decoration:none;
