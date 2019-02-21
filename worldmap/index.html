@@ -124,6 +124,7 @@ var layers = {};
 var overlays = {};
 var basemaps = {};
 var marks = [];
+var buttons = {};
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
@@ -1308,7 +1309,7 @@ function setMarker(data) {
             }
 
             words = data.popup || words;
-            words = "<b>"+data.name+"</b><button style=\"float:right;\" onclick='popped=false;popmark.closePopup();'><b>x</b></button><br/>" + words;
+            words = "<b>"+data.name+"</b><button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
             words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','');
             marker.bindPopup(words, {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
@@ -1442,6 +1443,21 @@ function doCommand(cmd) {
         else if ((cmd.showlayers === "show") && (showLayerMenu === false)) {
             showLayerMenu = true;
             layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+        }
+    }
+    if (cmd.hasOwnProperty("button")) {
+        if (cmd.button.icon) {
+            if (!buttons[cmd.button.name]) {
+                buttons[cmd.button.name] = L.easyButton( cmd.button.icon, function() {
+                    ws.send(JSON.stringify({action:"button",name:cmd.button.name}));
+                }, cmd.button.name, { position:cmd.button.position||'topright' }).addTo(map);
+            }
+        }
+        else {
+            if (buttons[cmd.button.name]) {
+                buttons[cmd.button.name].removeFrom(map);
+                delete buttons[cmd.button.name];
+            }
         }
     }
     var existsalready = false;

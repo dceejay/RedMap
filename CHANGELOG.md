@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.25 - Add button command to allow user to add and remove buttons
  - v1.5.24 - ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
  - v1.5.23 - Let icon support use of emoji specified as :emoji name:  
  - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines

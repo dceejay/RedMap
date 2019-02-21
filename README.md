@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.24 - ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
+- v1.5.25 - Add button command to allow user to add and remove buttons
+- v1.5.24 - Ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
 - v1.5.23 - Let icon support use of emoji specified as :emoji name:  
 - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
 - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
@@ -253,6 +254,8 @@ The **worldmap in** node can be used to receive various events from the map. Exa
     { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
     { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
 
+    { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
+
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that include this will ONLY to that session - so you can target map updates to certain sessions only if required.
 
 ## Controlling the map
@@ -281,10 +284,25 @@ Optional properties include
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding points to the map - `{"command":{"hiderightclick":true}}`
+ - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
+ a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft',
+ 'topleft' or 'topright' (default).
 
 #### To switch layer, move map and zoom
 
     msg.payload.command = { layer:"Esri Satellite", lat:51, lon:3, zoom:10 };
+
+#### To add and remove a user button to the map
+
+to add a button bottom right
+
+    msg.payload.command = { button: { name:"My Fancy Button", icon: "fa-star", position:"bottomright" } };
+
+When clicked the button will send an event to the `worldmap in` node containing `{"action":"button", "name","My Fancy Button"}` - this can then be used to trigger other map commands or flows.
+
+to remove
+
+    msg.payload.command = { button: { name:"My Fancy Button" } };
 
 #### To draw a heavily customized Circle on a layer
 
