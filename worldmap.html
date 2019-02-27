@@ -75,9 +75,14 @@
 </div>
 <div class="form-row">
     <label for="node-input-panit"><i class="fa fa-arrows-alt"></i> Auto-pan</label>
-    <select id="node-input-panit" style="width:64px;">
-        <option value="false">False</option>
-        <option value="true">True</option>
+    <select id="node-input-panit" style="width:72px;">
+        <option value="true">Enable</option>
+        <option value="false">Disable</option>
+    </select>
+    <i class="fa fa-hand-o-right" style="margin-left:22px;"></i> Right click
+    <select id="node-input-hiderightclick" style="width:72px;">
+        <option value="false">Enable</option>
+        <option value="true">Disable</option>
     </select>
 </div>
 <div class="form-row">
@@ -153,6 +158,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             panit: {value:"false"},
             panlock: {value:"false"},
             zoomlock: {value:"false"},
+            hiderightclick: {value:"false"},
             path: {value:"/worldmap"}
         },
         inputs:1,
@@ -172,6 +178,10 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             if ($("#node-input-path").val() === undefined) {
                 $("#node-input-path").val("worldmap");
                 this.path = "worldmap";
+            }
+            if ($("#node-input-hiderightclick").val() === null) {
+                $("#node-input-hiderightclick").val("false");
+                this.hiderightclick = "false";
             }
             $("#node-input-zoom").spinner({min:0, max:18});
             $("#node-input-cluster").spinner({min:0, max:19});

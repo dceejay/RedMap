@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.27 - Add hide right click option to config panel
 - v1.5.26 - Ensure all map tiles loaded over https
 - v1.5.25 - Add button command to allow user to add and remove buttons
 - v1.5.24 - Ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
@@ -280,7 +281,7 @@ Optional properties include
  - **clear** - layer name - to clear a complete layer and remove from layer menu
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
- - **hiderightclick** - disables the right click that allows adding points to the map - `{"command":{"hiderightclick":true}}`
+ - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft',
  'topleft' or 'topright' (default).
