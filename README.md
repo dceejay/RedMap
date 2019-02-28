@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
 - v1.5.27 - Add hide right click option to config panel
 - v1.5.26 - Ensure all map tiles loaded over https
 - v1.5.25 - Add button command to allow user to add and remove buttons

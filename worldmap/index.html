@@ -164,6 +164,7 @@ var connect = function() {
             document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
         }
         ws.send(JSON.stringify({action:"connected"}));
+        onoffline();
     };
     ws.onclose = function() {
         console.log("DISCONNECTED");
@@ -197,6 +198,10 @@ var connect = function() {
 }
 console.log("CONNECT TO",location.pathname + 'socket');
 connect();
+
+var onoffline = function() {
+    if (!navigator.onLine) {  map.addLayer(layers["_countries"]); }
+}
 
 document.addEventListener ("keydown", function (ev) {
     if (ev.ctrlKey  &&  ev.altKey  &&  ev.code === "Digit3") {
@@ -1195,18 +1200,6 @@ function setMarker(data) {
             });
             marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
         }
-        else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
-            var col = data.iconColor || "#910000";
-            var imod = "";
-            if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
-            myMarker = L.divIcon({
-                className:"faicon",
-                html: '<center><i class="fa fa-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
-                iconSize: [30, 30]
-            });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [14,-16];
-        }
         else if (data.icon && (data.icon.match(/^:.*:$/g))) {
             var em = emojify(data.icon);
             var col = data.iconColor || "#910000";
@@ -1217,6 +1210,29 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [20,-12];
+        }
+        else if (data.icon && (data.icon.match(/^https?:.*$/))) {
+            myMarker = L.icon({
+                iconUrl: data.icon,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16],
+                popupAnchor: [0, -16]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [20,-12];
+        }
+        else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
+            var col = data.iconColor || "#910000";
+            var imod = "";
+            if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
+            myMarker = L.divIcon({
+                className:"faicon",
+                html: '<center><i class="fa fa-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [32, 32],
+                popupAnchor: [0, -16]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [16,-16];
         }
         else {
             myMarker = L.VectorMarkers.icon({
@@ -1310,7 +1326,8 @@ function setMarker(data) {
             var llc = data.lineColor;
             delete data.lat;
             delete data.lon;
-            delete data.lineColor;
+            if (data.layer) { delete data.layer; }
+            if (data.lineColor) { delete data.lineColor; }
             if (data.draggable) { delete data.draggable; }
             for (var i in data) {
                 if ((i != "name") && (i != "length")) {
@@ -1390,7 +1407,10 @@ function setMarker(data) {
         }
         if (popped === true) {
             if (popid == data.name) {
-                if (popmark) { popmark.closePopup(); }
+                if (popmark) {
+                    popmark.closePopup();
+                    setTimeout(function() { marker.openPopup(); },100);
+                }
                 marker.openPopup();
             }
             else { popmark.openPopup(); }
