@@ -924,6 +924,7 @@ function setMarker(data) {
     opt.fillOpacity = data.fillOpacity || 0.2;
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
+	if (data.hasOwnProperty("dashArray"))  opt.dashArray = data.dashArray;
 
     // Replace building
     if (data.hasOwnProperty("building")) {
