@@ -178,11 +178,18 @@ var connect = function() {
         //console.log("DATA",typeof data,data);
         if (Array.isArray(data)) {
             //console.log("ARRAY");
+            // map.closePopup();
+            // popped = false;
+            // var bnds= L.latLngBounds([0,0]);
             for (var prop in data) {
                 if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
-                if (data[prop].hasOwnProperty("name")) { setMarker(data[prop]); }
+                if (data[prop].hasOwnProperty("name")) {
+                    setMarker(data[prop]);
+                    // bnds.extend(markers[data[prop].name].getLatLng());
+                }
                 else { console.log("SKIP A",data[prop]); }
             }
+            // map.fitBounds(bnds.pad(0.25));
         }
         else {
             if (data.command) { doCommand(data.command); delete data.command; }
@@ -1050,7 +1057,7 @@ function setMarker(data) {
         else if (data.icon === "plane") {
             data.iconColor = data.iconColor || "black";
             if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
             icon += '<path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
             var dir = parseFloat(data.hdg || data.bearing || "0");
@@ -1066,7 +1073,7 @@ function setMarker(data) {
         else if (data.icon === "uav") {
             data.iconColor = data.iconColor || "black";
             if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
             icon+= '<path d="M62 82h-8V64h36c0-5-4-9-9-9H54v-8c0-3 4-5 4-11.1 0-4.4-3.6-8-8-8-4.4 0-8 3.6-8 8 0 5.1 4 8.1 4 11.1V55h-27c-5 0-9 4-9 9h36v18H38c-2.4 0-5 2.3-5 5L50 92l17-5C67 84.3 64.4 82 62 82z" fill="'+data.iconColor+'"/></svg>';
             var svguav = "data:image/svg+xml;base64," + btoa(icon);
             var dir = parseFloat(data.hdg || data.bearing || "0");
@@ -1079,7 +1086,7 @@ function setMarker(data) {
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47 47">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47 47">';
             icon += '<path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
             var dir = parseFloat(data.hdg || data.bearing || "0");
@@ -1092,7 +1099,7 @@ function setMarker(data) {
         }
         else if (data.icon === "arrow") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
             icon += '<path d="m16.2 0.6l-10.9 31 10.7-11.1 10.5 11.1 -10.3-31z" fill="'+data.iconColor+'"/></svg>';
             var svgarrow = "data:image/svg+xml;base64," + btoa(icon);
             var dir = parseFloat(data.hdg || data.bearing || "0");
@@ -1105,7 +1112,7 @@ function setMarker(data) {
         }
         else if (data.icon === "wind") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
             icon += '<path d="M16.7 31.7l7-6.9c0.4-0.4 0.4-1 0-1.4 -0.4-0.4-1-0.4-1.4 0l-5.3 5.2V17.3l6.7-6.6c0.2-0.2 0.3-0.5 0.3-0.7v-9c0-0.9-1.1-1.3-1.7-0.7l-6.3 6.2L9.7 0.3C9.1-0.3 8 0.1 8 1.1v8.8c0 0.3 0.1 0.6 0.3 0.8l6.7 6.6v11.3l-5.3-5.2c-0.4-0.4-1-0.4-1.4 0 -0.4 0.4-0.4 1 0 1.4l7 6.9c0.2 0.2 0.5 0.3 0.7 0.3C16.2 32 16.5 31.9 16.7 31.7zM10 9.6V3.4l5 4.9v6.2L10 9.6zM17 8.3l5-4.9v6.2l-5 4.9V8.3z" fill="'+data.iconColor+'"/></svg>';
             var svgwind = "data:image/svg+xml;base64," + btoa(icon);
             var dir = parseFloat(data.hdg || data.bearing || "0");
@@ -1118,7 +1125,7 @@ function setMarker(data) {
         }
         else if (data.icon === "satellite") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
             icon += '<polygon points="38.17 39.4 45.24 32.33 43.34 27.92 24.21 8.78 14.59 18.4 33.72 37.53" fill="'+data.iconColor+'"/>';
             icon += '<path d="M69.22 44.57L54.38 29.73c-1.1-1.1-2.91-1.1-4.01 0L35.53 44.57c-1.1 1.1-1.1 2.91 0 4.01l14.84 14.84c1.1 1.1 2.91 1.1 4.01 0l14.84-14.84C70.32 47.47 70.32 45.67 69.22 44.57z" fill="'+data.iconColor+'"/>';
             icon += '<polygon points="71.04 55.61 66.58 53.75 59.52 60.82 61.42 65.23 80.55 84.36 90.17 74.75" fill="'+data.iconColor+'"/>';
@@ -1135,7 +1142,7 @@ function setMarker(data) {
         }
         else if ((data.icon === "iss") || (data.icon === "ISS")) {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" viewBox="0 0 48 48">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 48 48">';
             icon += '<path id="iss" d="m4.55 30.97l6.85-12.68 0.59 0.32 -6.85 12.68 4.27 2.3 6.85-12.68 0.49 0.27 -0.81 1.5c-0.26 0.48-0.07 1.1 0.44 1.37l5.09 2.75c0.5 0.27 1.12 0.1 1.38-0.39l0.81-1.5 0.72 0.39 -1.49 2.75c-0.41 0.76-0.38 1.58 0.08 1.82l4.61 2.49c0.45 0.24 1.15-0.18 1.56-0.94l1.49-2.75 0.69 0.37 -6.85 12.68 4.26 2.3 6.85-12.68 0.59 0.32 -6.85 12.69 4.26 2.3 14.46-26.78 -4.26-2.3 -6.88 12.74 -0.59-0.32 6.88-12.74 -4.26-2.3 -6.88 12.74 -0.69-0.37 1.49-2.75c0.41-0.76 ';
             icon += '0.38-1.58-0.08-1.82l-1.4-0.75 0.5-0.92c1.02 0.17 2.09-0.32 2.62-1.3 0.67-1.23 0.22-2.76-0.99-3.42 -1.21-0.65-2.74-0.19-3.4 1.05 -0.53 0.98-0.35 2.14 0.35 2.9l-0.5 0.92 -1.8-0.97c-0.45-0.24-1.15 0.17-1.57 0.94l-1.49 2.75 -0.72-0.39 0.81-1.5c0.26-0.48 0.07-1.1-0.44-1.36l-5.09-2.75c-0.5-0.27-1.12-0.1-1.38 0.39l-0.81 1.5 -0.49-0.27 6.88-12.74 -4.26-2.3 -6.88 12.74 -0.59-0.32 6.88-12.74 -4.26-2.3 -14.46 26.78 4.26 2.3zm14.26-11.72c0.2-0.37 0.68-0.51 1.06-0.3l3.93 ';
             icon += '2.12c0.39 0.21 0.54 0.68 0.34 1.05l-1.81 3.35c-0.2 0.37-0.68 0.51-1.06 0.3l-3.93-2.12c-0.38-0.21-0.53-0.68-0.33-1.05l1.81-3.35zm12.01-1.46c0.45-0.83 1.47-1.14 2.28-0.7 0.81 0.44 1.11 1.46 0.66 2.29 -0.44 0.83-1.47 1.14-2.28 0.7 -0.81-0.44-1.11-1.46-0.66-2.29zm-3.78 4.26c0.35-0.66 0.93-1.04 1.28-0.85l3.57 1.93c0.35 0.19 0.35 0.88-0.01 1.53l-3.19 5.91c-0.35 0.66-0.93 1.04-1.28 0.85l-3.56-1.92c-0.35-0.19-0.35-0.88 0.01-1.53l3.19-5.91zm0.19 7.49c-0.26 0.49-0.87 ';
@@ -1151,7 +1158,7 @@ function setMarker(data) {
         }
         else if (data.icon === "locate") {
             data.iconColor = data.iconColor || "cyan";
-            icon = '<svg xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
             icon += '<polygon points="32 32 104 32 104 0 0 0 0 104 32 104" fill="'+data.iconColor+'"/>';
             icon += '<polygon points="468 0 364 0 364 32 436 32 436 104 468 104" fill="'+data.iconColor+'"/>';
             icon += '<polygon points="0 468 104 468 104 436 32 436 32 364 0 364" fill="'+data.iconColor+'"/>';
@@ -1338,10 +1345,9 @@ function setMarker(data) {
                     }
                 }
             }
-
-            words = data.popup || words;
+            if (data.popup) { words = data.popup; }
+            else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
             words = "<b>"+data.name+"</b><button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
-            words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','');
             marker.bindPopup(words, {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
 
