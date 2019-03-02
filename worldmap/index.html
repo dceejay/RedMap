@@ -1769,7 +1769,7 @@ function doCommand(cmd) {
         document.getElementById("heatall").checked = !!cmd.heatmap;
         heat.redraw();
     }
-    map.setView([clat,clon],czoom);
+    if (cmd.hasOwnProperty("center")) map.setView([clat,clon],czoom);
 }
 
 // handle any incoming GEOJSON directly - may style badly
