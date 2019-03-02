@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.29 - remove lat/lon from popup if using .popup property
+- v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
 - v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
 - v1.5.27 - Add hide right click option to config panel
 - v1.5.26 - Ensure all map tiles loaded over https
@@ -68,7 +68,7 @@ Optional properties include
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
  - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, or :emoji name:
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, :emoji name:, or http://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -91,6 +91,8 @@ You may select any of the Font Awesome set of [icons](https://fontawesome.com/v4
 If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
+
+Or you can specify an image to load as an icon by setting the icon to http(s)://... It will be scaled to 32x32 pixels. For example `"https://img.icons8.com/windows/32/000000/bird.png"`
 
 There are also several special icons...
 
@@ -201,6 +203,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
  - **color** : can set the colour of the polygon or line.
  - **fillColor** : can set the fill colour of the polygon.
  - **fillOpacity** : can set the opacity of the polygon fill colour.
+ - **dashArray** : optional dash array for polyline.
  - **name** : is used as the id key - so can be redrawn/moved.
  - **layer** : declares which layer you put it on..
 
@@ -226,6 +229,7 @@ Areas, Lines and Circles can also specify more optional properties:
  - opacity
  - fill
  - fillOpacity
+ - dashArray
  - clickable (if true sets the passed in name as Popup)
 
 ## Drawing
