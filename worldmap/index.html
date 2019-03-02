@@ -199,6 +199,12 @@ var connect = function() {
 console.log("CONNECT TO",location.pathname + 'socket');
 connect();
 
+var saveData = function() {
+       window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
+       window.localStorage.setItem("lastzoom", map.getZoom());
+       window.localStorage.setItem("lastlayer", baselayername);
+}
+
 var onoffline = function() {
     if (!navigator.onLine) {  map.addLayer(layers["_countries"]); }
 }
@@ -264,6 +270,8 @@ else {
         document.getElementById("bars").style.display="none";
     }
 }
+
+map.on('moveend',saveData);
 
 if (!inIframe) {
     // Add the fullscreen button
