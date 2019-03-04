@@ -2,7 +2,7 @@
 
 ![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
 
-A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide world
+A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
@@ -18,22 +18,6 @@ map web page for plotting "things" on.
 - v1.5.23 - Let icon support use of emoji specified as :emoji name:  
 - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
 - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
-- v1.5.18 - Update Leaflet.vector-markers to 0.0.6 (https://github.com/hiasinho/Leaflet.vector-markers)
-- v1.5.17 - Allow setting maxage to 0 (infinite) correctly - Issue #64
-- v1.5.16 - Allow setting panlock, zoomlock and hiderightclick via commands - Issue #60
-- v1.5.15 - Allow setting clusterAt to 0 to fully disable it - Issue #61
-- v1.5.14 - Stop delete marker feedback to allow updating multiple maps - Issue #59
-- v1.5.13 - Send click message to websocket on marker click - Issue #56, #57
-- v1.5.11 - Let search also try geocoding lookup if not found in marks.
-- v1.5.10 - Allow latest mark added to open popup, and allow `popped=false` to close.
-- v1.5.7 - Tidy up sidc entry, and drag-ability of nodes on drawing layer.
-- v1.5.6 - Add search command and clear search functionality.
-- v1.5.5 - Allow multiple overlays to be enabled at once - Issue #53
-- v1.5.4 - Allow remote update of the split position via `msg.command.split`
-- v1.5.3 - Add side by side mode (via `msg.command` only).
-- v1.5.2 - Make manually added icons moveable by default.
-- v1.5.0 - Add multi-map capability - can now have multiple map endpoints.
-  - Also add built-in world countries overlay layer for offline use.
   - ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -53,7 +37,7 @@ can be configured in the configuration panel.
 
 Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
-The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, e.g.
+The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, for example
 
         msg.payload = { "name":"Jason", "lat":51.05, "lon":-1.35 }
 
