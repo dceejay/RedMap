@@ -634,6 +634,10 @@ var addThing = function() {
     map.addLayer(layers[lay]);
 }
 
+var feedback = function(n,v) {
+    ws.send(JSON.stringify({action:"feedback", name:n, value:v}));
+}
+
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
 var rclicked = false;
