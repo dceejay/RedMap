@@ -409,6 +409,20 @@ in a function node:
         opt: { opacity:1.0, attribution:"&copy; University of Texas" }
     };
 
+#### To add a Lat/Lon Graticule overlay 
+
+in a function node:
+
+    msg.payload.command.grid = {
+        showGrid: true,
+        opt: { 
+			showLabel:true, 
+			dashArray: [5, 5],
+			fontColor: "#aaa"
+		}
+    };
+see https://github.com/cloudybay/leaflet.latlng-graticule for more details about options and demo.
+	
 #### To clear a layer from the map
 
     msg.payload.command.clear = "name of your layer/overlay to remove";

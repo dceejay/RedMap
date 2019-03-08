@@ -61,6 +61,7 @@
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
+	<script type="text/javascript" src="leaflet/leaflet.latlng-graticule.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <script type="text/javascript" src="images/emoji.js"></script>
@@ -265,6 +266,20 @@ else {
     }
 }
 
+//Grid
+var showGrid = true;
+var Lgrid = L.latlngGraticule({
+    showLabel: false,
+	fontColor: "#555",
+    zoomInterval: [
+		{start: 2, end: 2, interval: 40},
+		{start: 3, end: 3, interval: 20},
+		{start: 4, end: 4, interval: 10},
+		{start: 5, end: 6, interval: 5},
+		{start: 7, end: 8, interval: 1},
+		{start: 9, end: 20, interval: 0.5}
+	]
+}).addTo(map);
 if (!inIframe) {
     // Add the fullscreen button
     L.control.fullscreen().addTo(map);
@@ -1478,6 +1493,25 @@ function doCommand(cmd) {
             showLayerMenu = true;
             layercontrol = L.control.layers(basemaps, overlays).addTo(map);
         }
+    }
+	if (cmd.hasOwnProperty("grid")) {
+		if (cmd.grid.hasOwnProperty("showGrid")) {
+	    	var changed = false;
+	    	if ((cmd.grid.showGrid == "true" || cmd.grid.showGrid == true ) && !showGrid) { changed = true; }
+			if ((cmd.grid.showGrid == "false" || cmd.grid.showGrid == false ) && showGrid) { changed = true; }
+        	if (changed) {
+				showGrid = !showGrid;
+				if (showGrid) Lgrid.addTo(map);
+				else {Lgrid.removeFrom(map)};
+			}
+		}
+		if (cmd.grid.hasOwnProperty("opt")) {
+			Lgrid.initialize(cmd.grid.opt);
+			if (showGrid) {
+				Lgrid.removeFrom(map);
+				Lgrid.addTo(map);
+			}
+		}
     }
     if (cmd.hasOwnProperty("button")) {
         if (cmd.button.icon) {
