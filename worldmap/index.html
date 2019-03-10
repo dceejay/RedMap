@@ -1333,6 +1333,14 @@ function setMarker(data) {
                 delete marker.options.title;
                 delete data.label;
             }
+            // otherwise check for .tooltip then use that rather than name tooltip
+            else if (data.tooltip) {
+                if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
+                    marker.bindLabel(data.tooltip, { direction:"left", offset:[22,-16] });
+                    delete marker.options.title;
+                    delete data.tooltip;
+                }
+            }
 
             // Add any remaining properties to the info box
             var llc = data.lineColor;
@@ -1357,7 +1365,7 @@ function setMarker(data) {
             marker._popup.dname = data.name;
 
             marker.lay = lay;                       // and the layer it is on
-            var rightmenuMarker = L.popup().setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
                 if (hiderightclick !== true) {
                     rightmenuMarker.setLatLng(e.latlng);

@@ -64,7 +64,8 @@ Optional properties include
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
- - **label** : displays the contents of label next to the icon.
+ - **label** : displays the contents as a permanent label next to the marker, or
+ - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
 by using the **popup** property to supply your own html content.
@@ -243,6 +244,10 @@ The **worldmap in** node can be used to receive various events from the map. Exa
     { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
 
     { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
+
+    { "action": "feedback", "name": "some name", "value": "some value" } // when a user calls the feedback function - see below
+
+There is a function available to make sending date to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two parameters, name and value, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
 
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that include this will ONLY to that session - so you can target map updates to certain sessions only if required.
 

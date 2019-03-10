@@ -114,7 +114,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <li><code>icon</code> : <a href="https://fontawesome.com/v4.7.0/icons/" target="_new">font awesome</a> icon name or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>, or url of icon image.</li>
         <li><code>iconColor</code> : standard CSS color name or #rrggbb hex value.</li>
         <li><code>SIDC</code> : NATO symbology code (instead of icon).</li>
-        <li><code>label</code> : permanent label next to icon.</li>
+        <li><code>label</code> : permanent label next to marker, or</li>
+        <li><code>tooltip</code> : hover over text for marker. (alternative to label)</li>
         <li><code>bulding</code> : OSMBuildings GeoJSON object.</li>
         <li><code>ttl</code> : time to live of an individual marker before deletion.</li>
         <li><code>photoUrl</code> : adds an image pointed at by the url to the popup box.</li>
@@ -122,7 +123,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <li><code>weblink</code> : link to an external web page.</li>
         <li><code>deleted</code> : set to <i>true</i> to remove the named marker. (default false)</li>
     </ul>
-    <p>Any other sub-properties of <code>msg.payload</code> will be added to the icon popup text box as extra information.</p>
+    <p>Any other sub-properties of <code>msg.payload</code> will be added to the marker popup text box as extra information.</p>
     <p>Icons of type <i>plane</i>, <i>ship</i>, <i>car</i>, <i>uav</i> or <i>arrow</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
     <p>Font Awesome (<a href="https://fontawesome.com/v4.7.0/icons/" target="_new">fa-icons 4.7</a>) can also be used, as can
@@ -214,6 +215,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <li><b>layer</b> - when a base layer is changed</li>
         <li><b>addlayer</b> - when an overlay is added to the map</li>
         <li><b>dellayer</b> - when an overlay is removed from the map</li>
+        <li><b>feedback</b> - when a user calls the feedback() function in the browser</li>
     </ul>
     Use the debug node to see the complete payload of the msg returned.</p>
     <p>All actions also include a <code>msg._sessionid</code> property that indicates which client session the
