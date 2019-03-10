@@ -33,6 +33,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.label.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.coordinates.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
@@ -61,6 +62,7 @@
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
+    <script type="text/javascript" src="leaflet/Leaflet.coordinates.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <script type="text/javascript" src="images/emoji.js"></script>
@@ -135,6 +137,7 @@ var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
+var showMouseCoords = false;
 var sidebyside;
 var layercontrol;
 
@@ -884,6 +887,17 @@ layercontrol = L.control.layers(basemaps, overlays);
 if (!inIframe) { layercontrol.addTo(map); }
 else { showLayerMenu = false;}
 
+var coords = L.control.coordinates({
+	position:"bottomleft", //optional default "bootomright"
+	decimals:4, //optional default 4
+	decimalSeperator:".", //optional default "."
+	labelTemplateLat:"&nbsp;Lat: {y}", //optional default "Lat: {y}"
+	labelTemplateLng:"&nbsp;Lon: {x}", //optional default "Lng: {x}"
+	enableUserInput:false, //optional default true
+	useDMS:true, //optional default false
+	useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+});
+
 // Add the dialog box for messages
 var dialogue = L.control.dialog().addTo(map);
 dialogue.freeze();
@@ -1513,6 +1527,23 @@ function doCommand(cmd) {
             }
         }
     }
+    if (cmd.hasOwnProperty("coords")) {
+        if (cmd.coords === "dms" && showMouseCoords === false) {
+            coords.options.useDMS = true;
+            showMouseCoords = true;
+            coords.addTo(map);
+        }
+        if (cmd.coords === "deg" && showMouseCoords === false) {
+            coords.options.useDMS = false;
+            showMouseCoords = true;
+            coords.addTo(map);
+        }
+        if (cmd.coords === "none" && showMouseCoords === true) {
+            showMouseCoords = false
+            coords.removeFrom(map);
+        }
+    }
+
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {

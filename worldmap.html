@@ -86,6 +86,14 @@
     </select>
 </div>
 <div class="form-row">
+    <label for="node-input-coords"><i class="fa fa-compass"></i> Co-ordinates</label>
+    <select id="node-input-coords" style="width:95px;">
+        <option value="none">Not shown</option>
+        <option value="deg">Degrees</option>
+        <option value="dms">D.M.S</option>
+    </select>
+</div>
+<div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
     <input type="text" id="node-input-path" placeholder="worldmap">
 </div>
@@ -161,6 +169,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             panlock: {value:"false"},
             zoomlock: {value:"false"},
             hiderightclick: {value:"false"},
+            coords: {value: "false"},
             path: {value:"/worldmap"}
         },
         inputs:1,
@@ -184,6 +193,10 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             if ($("#node-input-hiderightclick").val() === null) {
                 $("#node-input-hiderightclick").val("false");
                 this.hiderightclick = "false";
+            }
+            if ($("#node-input-coords").val() === null) {
+                $("#node-input-coords").val("none");
+                this.coords = "none";
             }
             $("#node-input-zoom").spinner({min:0, max:18});
             $("#node-input-cluster").spinner({min:0, max:19});

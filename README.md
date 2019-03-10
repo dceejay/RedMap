@@ -277,6 +277,7 @@ Optional properties include
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
+ - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft',
  'topleft' or 'topright' (default).

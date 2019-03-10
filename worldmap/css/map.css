@@ -60,7 +60,7 @@ a {
 
 #foot {
     position:absolute;
-    bottom:1px;
+    bottom:-1px;
     left:-1px;
     z-index:1;
     font-size:9px;
