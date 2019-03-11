@@ -323,6 +323,10 @@ style server by adding a property `wms: true`. (see overlay example below)
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
 
+Note: you can use the name "none" to completely remove the base layer for example.
+
+   msg.payload = {"command":{"layer":"none"}};
+
 #### To add a WMS overlay layer - eg US weather radar
 
 To add an overlay instead of a base layer - specify the `overlay` property instead of the `name`.

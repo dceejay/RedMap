@@ -1379,7 +1379,7 @@ function setMarker(data) {
             marker.bindPopup(words, {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
-            
+
             var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
                 if (hiderightclick !== true) {
@@ -1755,6 +1755,10 @@ function doCommand(cmd) {
         map.removeLayer(basemaps[baselayername]);
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
+    }
+    if (cmd.layer && (cmd.layer === "none")) {
+        map.removeLayer(basemaps[baselayername]);
+        baselayername = cmd.layer;
     }
     // Add search command
     if (cmd.hasOwnProperty("search") && (typeof cmd.search === "string")) {
