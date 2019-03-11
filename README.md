@@ -319,7 +319,7 @@ style server by adding a property `wms: true`. (see overlay example below)
 
     msg.payload.command.map = {
         "name":"OSMhot",
-        "url":"http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+        "url":"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
 
@@ -399,7 +399,7 @@ in a function node:
     msg.payload = { command : { lat:40.74, lon:-74.175, zoom:13 } };
     msg.payload.command.map = {
         overlay: "New York Historical",
-        url: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+        url: 'https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
         bounds: imageBounds,
         opt: { opacity:1.0, attribution:"&copy; University of Texas" }
     };

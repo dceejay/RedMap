@@ -349,7 +349,6 @@ function doTidyUp(l) {
     var d = parseInt(Date.now()/1000);
     for (var m in markers) {
         if ((l && (l == markers[m].lay)) || typeof markers[m].ts != "undefined") {
-            //console.log(m,markers[m].ts,markers[m]);
             if ((l && (l == markers[m].lay)) || (markers[m].hasOwnProperty("ts") && (Number(markers[m].ts) < d) && (markers[m].lay !== "_drawing"))) {
                 //console.log("STALE :",m);
                 layers[markers[m].lay].removeLayer(markers[m]);
@@ -401,11 +400,13 @@ function setCluster(v) {
 // Search for markers with names of ....
 function doSearch() {
     var value = document.getElementById('search').value;
-    console.log("search for :",value);
     marks = [];
     marksIndex = 0;
     for (var key in markers) {
         if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+            marks.push(markers[key]);
+        }
+        if (markers[key].icon === value) {
             marks.push(markers[key]);
         }
     }
@@ -1377,8 +1378,8 @@ function setMarker(data) {
             words = "<b>"+data.name+"</b><button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
             marker.bindPopup(words, {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
             marker._popup.dname = data.name;
-
             marker.lay = lay;                       // and the layer it is on
+            
             var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
             marker.on('contextmenu', function(e) {
                 if (hiderightclick !== true) {
