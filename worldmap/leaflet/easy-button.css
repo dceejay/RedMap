@@ -3,8 +3,9 @@
   background-color: #fff;
   border: none;
   border-bottom: 1px solid #ccc;
-  min-width: 26px;
-  min-height: 26px;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
   display: block;
   text-align: center;
   text-decoration: none;
@@ -46,6 +47,7 @@
   height: 100%;
   position: relative;
 }
+
 
 .leaflet-touch .leaflet-bar button {
   width: 30px;

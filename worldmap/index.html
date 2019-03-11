@@ -32,7 +32,6 @@
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
-    <link rel="stylesheet",type="text/css" href="leaflet/leaflet.label.css">
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.coordinates.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
@@ -61,7 +60,6 @@
     <script type="text/javascript" src="leaflet/leaflet-side-by-side.js"></script>
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
-    <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
     <script type="text/javascript" src="leaflet/Leaflet.coordinates.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
@@ -1340,18 +1338,20 @@ function setMarker(data) {
             // If .label then use that rather than name tooltip
             if (data.label) {
                 if (typeof data.label === "boolean" && data.label === true) {
-                    marker.bindLabel(data.name, { noHide:true, offset:labelOffset });
+                    marker.bindTooltip(data.name, { permanent:true, direction:"right", offset:labelOffset });
                 }
                 else if (typeof data.label === "string" && data.label.length > 0) {
-                    marker.bindLabel(data.label, { noHide:true, offset:labelOffset });
+                    marker.bindTooltip(data.label, { permanent:true, direction:"right", offset:labelOffset });
                 }
+                console.log("M1",marker);
                 delete marker.options.title;
                 delete data.label;
             }
             // otherwise check for .tooltip then use that rather than name tooltip
             else if (data.tooltip) {
                 if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
-                    marker.bindLabel(data.tooltip, { direction:"left", offset:[22,-16] });
+                    marker.bindTooltip(data.tooltip, { direction:"left", offset:[22,-16] });
+                    console.log("M2",marker);
                     delete marker.options.title;
                     delete data.tooltip;
                 }

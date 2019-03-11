@@ -1,22 +1,24 @@
 L.Control.Dialog = L.Control.extend({
   options: {
-    size: [ 200, 160 ],
-    minSize: [ 200, 100 ],
-    maxSize: [ 400, 800 ],
-    anchor: [ 44, -165 ],
-    position: "topright",
+    size: [ 300, 300 ],
+    minSize: [ 100, 100 ],
+    maxSize: [ 350, 350 ],
+    anchor: [ 250, 250 ],
+    position: "topleft",
     initOpen: true
   },
 
   initialize: function(options) {
     this.options = JSON.parse(JSON.stringify(this.options));
     L.setOptions(this, options);
+
     this._attributions = {};
   },
 
   onAdd: function(map) {
     this._initLayout();
     this._map = map;
+
     this.update();
 
     if (!this.options.initOpen) {
@@ -176,17 +178,14 @@ L.Control.Dialog = L.Control.extend({
   },
 
   _initLayout: function() {
-    var className = "leaflet-control-dialog";
-    var container = (this._container = L.DomUtil.create("div", className));
+    var className = "leaflet-control-dialog",
+      container = (this._container = L.DomUtil.create("div", className));
 
     container.style.width = this.options.size[0] + "px";
-    //container.style.height = this.options.size[1] + "px";
+    container.style.height = this.options.size[1] + "px";
 
     container.style.top = this.options.anchor[0] + "px";
-    // container.style.left = this.options.anchor[1] + "px";
-    container.style.right = "0px";
-    // container.style.display = "flex";
-    // container.style["flex-direction"] = "column";
+    container.style.left = this.options.anchor[1] + "px";
 
     var stop = L.DomEvent.stopPropagation;
     L.DomEvent.on(container, "click", stop)
@@ -361,11 +360,10 @@ L.Control.Dialog = L.Control.extend({
 
   _updateLayout: function() {
     this._container.style.width = this.options.size[0] + "px";
-    //this._container.style.height = this.options.size[1] + "px";
+    this._container.style.height = this.options.size[1] + "px";
 
     this._container.style.top = this.options.anchor[0] + "px";
-    //this._container.style.left = this.options.anchor[1] + "px";
-    this._container.style.right = "0px";
+    this._container.style.left = this.options.anchor[1] + "px";
   }
 });
 

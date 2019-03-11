@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# date: Mar 2nd 2019 - v1.5.30
+# date: Mar 11th 2019 - v2.0.0b
 
 CACHE:
 index.html
@@ -39,8 +39,6 @@ leaflet/leaflet.draw.css
 leaflet/leaflet.draw.js
 leaflet/leaflet.fullscreen.css
 leaflet/leaflet.js
-leaflet/leaflet.label.css
-leaflet/leaflet.label.js
 leaflet/leaflet.markercluster.js
 leaflet/leaflet.markercluster.freezable-src.js
 leaflet/leaflet.measurecontrol.css
