@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
 - v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
 - v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
 - v1.5.27 - Add hide right click option to config panel
@@ -284,7 +285,11 @@ Optional properties include
 
 #### To switch layer, move map and zoom
 
-    msg.payload.command = { "layer":"Esri Satellite", "lat":51, "lon":3, "zoom":10 };
+    msg.payload = { "command": { "layer":"Esri Satellite", "lat":51, "lon":3, "zoom":10 }};
+
+You can also use the name "none" to completely remove the base layer,
+
+    msg.payload = { "command": { "layer":"none" }};
 
 #### To add and remove a user defined button
 
@@ -322,10 +327,6 @@ style server by adding a property `wms: true`. (see overlay example below)
         "url":"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
-
-Note: you can use the name "none" to completely remove the base layer for example.
-
-   msg.payload = {"command":{"layer":"none"}};
 
 #### To add a WMS overlay layer - eg US weather radar
 
@@ -405,10 +406,10 @@ in a function node:
         overlay: "New York Historical",
         url: 'https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
         bounds: imageBounds,
-        opt: { opacity:1.0, attribution:"&copy; University of Texas" }
+        opt: { opacity:0.8, attribution:"&copy; University of Texas" }
     };
 
-#### To clear a layer from the map
+#### To clear all markers from a layer, or an overlay from the map
 
     msg.payload.command.clear = "name of your layer/overlay to remove";
 
