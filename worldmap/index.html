@@ -1343,7 +1343,6 @@ function setMarker(data) {
                 else if (typeof data.label === "string" && data.label.length > 0) {
                     marker.bindTooltip(data.label, { permanent:true, direction:"right", offset:labelOffset });
                 }
-                console.log("M1",marker);
                 delete marker.options.title;
                 delete data.label;
             }
@@ -1351,7 +1350,6 @@ function setMarker(data) {
             else if (data.tooltip) {
                 if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
                     marker.bindTooltip(data.tooltip, { direction:"left", offset:[22,-16] });
-                    console.log("M2",marker);
                     delete marker.options.title;
                     delete data.tooltip;
                 }
@@ -1781,7 +1779,7 @@ function doCommand(cmd) {
     if (cmd.side && basemaps.hasOwnProperty(cmd.side)) {
         if (sidebyside) { sidebyside.remove(); map.removeLayer(basemaps[sidebyside.lay]); }
         basemaps[cmd.side].addTo(map);
-        sidebyside = L.Control.sideBySide(basemaps[baselayername], basemaps[cmd.side]);
+        sidebyside = L.control.sideBySide(basemaps[baselayername], basemaps[cmd.side]);
         sidebyside.addTo(map);
         sidebyside.lay = cmd.side;
     }
