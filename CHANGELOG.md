@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
  - v1.5.30 - Add tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
  - v1.5.29 - remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
  - v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
