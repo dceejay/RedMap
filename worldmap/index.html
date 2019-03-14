@@ -512,12 +512,18 @@ document.getElementById("menu").style.display = 'none';
 //}
 //document.getElementById("heat").style.display = 'none';
 
-var popped = false;
-var popmark = null;
+// var popped = false;
+// var popmark = null;
+// map.on('popupopen', function(e) {
+//     popped = true;
+//     popmark = e.popup._source;
+//     popid = e.popup.dname;
+// });
 map.on('popupopen', function(e) {
-    popped = true;
-    popmark = e.popup._source;
-    popid = e.popup.dname;
+    console.log("OPEN",e);
+});
+map.on('popupclose', function(e) {
+    console.log("CLOSE",e);
 });
 
 map.on('overlayadd', function(e) {
@@ -615,7 +621,7 @@ var hiderightclick = false;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     map.closePopup();
-    popped = false;
+    //popped = false;
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
@@ -1059,7 +1065,7 @@ function setMarker(data) {
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
         var icon, q;
-        var labelOffset = [20,-8];
+        var labelOffset = [12,0];
         var drag = false;
         if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
@@ -1190,7 +1196,7 @@ function setMarker(data) {
                 html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [20,-12];
+            labelOffset = [12,-4];
         }
         else if (data.icon === "friend") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name, draggable:drag });
@@ -1234,7 +1240,7 @@ function setMarker(data) {
                 iconSize: [32, 32]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [20,-12];
+            labelOffset = [12,-4];
         }
         else if (data.icon && (data.icon.match(/^https?:.*$/))) {
             myMarker = L.icon({
@@ -1244,7 +1250,7 @@ function setMarker(data) {
                 popupAnchor: [0, -16]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [20,-12];
+            labelOffset = [12,-4];
         }
         else if (data.icon && (data.icon.substr(0,3) === "fa-")) {
             var col = data.iconColor || "#910000";
@@ -1257,7 +1263,7 @@ function setMarker(data) {
                 popupAnchor: [0, -16]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [16,-16];
+            labelOffset = [8,-8];
         }
         else {
             myMarker = L.VectorMarkers.icon({
@@ -1267,7 +1273,7 @@ function setMarker(data) {
                 iconColor: 'white'
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-            labelOffset = [14,-16];
+            labelOffset = [6,-6];
         }
         marker.name = data.name;
 
@@ -1322,19 +1328,6 @@ function setMarker(data) {
                 }
                 delete data.weblink;
             }
-            if (data.hasOwnProperty("popped") && (data.popped === true)) {
-                popped = true;
-                popid = data.name;
-                delete data.popped;
-            }
-            if (data.hasOwnProperty("popped") && (data.popped === false)) {
-                if (popid == data.name) {
-                    if (popmark) { popmark.closePopup(); }
-                    popped = false;
-                }
-                delete data.popped;
-            }
-
             // If .label then use that rather than name tooltip
             if (data.label) {
                 if (typeof data.label === "boolean" && data.label === true) {
@@ -1349,10 +1342,22 @@ function setMarker(data) {
             // otherwise check for .tooltip then use that rather than name tooltip
             else if (data.tooltip) {
                 if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
-                    marker.bindTooltip(data.tooltip, { direction:"left", offset:[22,-16] });
+                    marker.bindTooltip(data.tooltip, { direction:"bottom", offset:[0,4] });
                     delete marker.options.title;
                     delete data.tooltip;
                 }
+            }
+            // customise right click context menu
+            var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            if (data.contextmenu && (typeof data.contextmenu === "string")) {
+                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
+                console.log("RC",rightcontext);
+                delete data.contextmenu;
+            }
+            var openpop;
+            if (data.hasOwnProperty("popped") && (typeof data.popped === "boolean")) {
+                openpop = data.popped;
+                delete data.popped;
             }
 
             // Add any remaining properties to the info box
@@ -1373,12 +1378,12 @@ function setMarker(data) {
             }
             if (data.popup) { words = data.popup; }
             else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
-            words = "<b>"+data.name+"</b><button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
-            marker.bindPopup(words, {closeButton:false, closeOnClick:false, keepInView:true, minWidth:250});
+            words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+            marker.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, keepInView:true, minWidth:200});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
             marker.on('contextmenu', function(e) {
                 if (hiderightclick !== true) {
                     rightmenuMarker.setLatLng(e.latlng);
@@ -1392,6 +1397,7 @@ function setMarker(data) {
                 if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
             }
             markers[data.name] = marker;
+            console.log("LAY",lay,layers);
             layers[lay].addLayer(marker);
         }
         if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
@@ -1432,22 +1438,25 @@ function setMarker(data) {
             }
         }
         if (panit) {
-            if (popped === true) {
-                map.setView(ll,map.getZoom());
-            }
-            else { map.setView(ll,map.getZoom()); }
+            map.setView(ll,map.getZoom());
+            // if (popped === true) {
+            //     map.setView(ll,map.getZoom());
+            // }
+            // else { map.setView(ll,map.getZoom()); }
         }
-        if (popped === true) {
-            if (popid == data.name) {
-                if (popmark) {
-                    popmark.closePopup();
-                    setTimeout(function() { marker.openPopup(); },100);
-                }
-                marker.openPopup();
-            }
-            else { popmark.openPopup(); }
-            popped = true;
-        }
+        if (openpop === true) { marker.opemPopup(); }
+        if (openpop === false) { marker.closePopup(); }
+        // if (popped === true) {
+        //     if (popid == data.name) {
+        //         if (popmark) {
+        //             popmark.closePopup();
+        //             setTimeout(function() { marker.openPopup(); },100);
+        //         }
+        //         marker.openPopup();
+        //     }
+        //     else { popmark.openPopup(); }
+        //     popped = true;
+        // }
     }
 }
 

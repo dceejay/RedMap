@@ -25,6 +25,10 @@ a {
     vertical-align:middle;
 }
 
+.leaflet-tooltip {
+    padding: 1px 4px !important;
+}
+
 #topbar {
     color:#c7c7c7;
     background-color:black;

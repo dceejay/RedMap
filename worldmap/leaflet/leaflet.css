@@ -553,7 +553,14 @@
 .leaflet-div-icon {
 	background: #fff;
 	border: 1px solid #666;
-	}
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 6px !important;
+}
+.leaflet-popup-content {
+    margin: 6px 8px !important;
+}
 
 
 /* Tooltip */
