@@ -69,7 +69,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.send(JSON.stringify({'action':'end'}));">
+<body onunload="ws.send(JSON.stringify({'action':'end'})); ws.disconnect;">
 <div id="topbar">
     <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
@@ -82,9 +82,9 @@
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
     <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster();'/></td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit();'/> Auto Pan Map</td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock();'/> Lock Map</td></tr>
-    <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll();'/> Heatmap all layers</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit(this.checked);'/> Auto Pan Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock(this.checked);'/> Lock Map</td></tr>
+    <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll(this.checked);'/> Heatmap all layers</td></tr>
     <tr><td style="cursor:default"><span id="showHelp" ><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr>
 </table></div>
 <div id="map"></div>
@@ -310,26 +310,25 @@ document.getElementById('exitHelp').onclick = function() {
 };
 
 var panit = false;
-function doPanit() {
-    panit = !panit;
+function doPanit(v) {
+    if (v !== undefined) { panit = v; }
     console.log("Panit set :",panit);
 }
 
 var heatAll = false;
-function doHeatAll() {
-    heatAll = !heatAll;
+function doHeatAll(v) {
+    if (v !== undefined) { heatall = v; }
     console.log("Heatall set :",heatAll);
 }
 
 var lockit = false;
 var mb = new L.LatLngBounds([[-120,-360],[120,360]]);
-function doLock() {
-    if (lockit === true) {
-        lockit = false;
+function doLock(v) {
+    if (v !== undefined) { lockit = v;
+    if (lockit === false) {
         mb = new L.LatLngBounds([[-120,-360],[120,360]]);
     }
     else {
-        lockit = true;
         mb = map.getBounds();
         window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
         window.localStorage.setItem("lastzoom", map.getZoom());
@@ -1386,13 +1385,15 @@ function setMarker(data) {
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
-            marker.on('contextmenu', function(e) {
-                if (hiderightclick !== true) {
-                    rightmenuMarker.setLatLng(e.latlng);
-                    map.openPopup(rightmenuMarker);
-                }
-            });
+            if (rightcontext.length > 0) {
+                var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
+                marker.on('contextmenu', function(e) {
+                    if (hiderightclick !== true) {
+                        rightmenuMarker.setLatLng(e.latlng);
+                        map.openPopup(rightmenuMarker);
+                    }
+                });
+            }
             marker.on('click', function(e) {
                 ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
             });
@@ -1794,9 +1795,9 @@ function doCommand(cmd) {
     }
 
     if (cmd.hasOwnProperty("panlock")) {
-        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = false; }
-        else { lockit = true; doLock(); }
-        document.getElementById("lockit").checked = !lockit;
+        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = true; }
+        else { lockit = false; doLock(false); }
+        document.getElementById("lockit").checked = lockit;
     }
     // move to a new position
     var clat = map.getCenter().lat;
@@ -1821,7 +1822,7 @@ function doCommand(cmd) {
         document.getElementById("heatall").checked = !!cmd.heatmap;
         heat.redraw();
     }
-    if (cmd.hasOwnProperty("panlock") && lockit === false) { doLock(); }
+    if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
     if (cmd.hasOwnProperty("zoomlock")) {
         if (cmd.zoomlock == "true" || cmd.zoomlock == true) {
             if (map.doubleClickZoom.enabled()) { map.removeControl(map.zoomControl); }
