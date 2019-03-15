@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
 - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
 - v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
 - v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
@@ -68,6 +69,7 @@ Optional properties include
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
+ - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
 by using the **popup** property to supply your own html content.

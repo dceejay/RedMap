@@ -324,7 +324,7 @@ function doHeatAll(v) {
 var lockit = false;
 var mb = new L.LatLngBounds([[-120,-360],[120,360]]);
 function doLock(v) {
-    if (v !== undefined) { lockit = v;
+    if (v !== undefined) { lockit = v; }
     if (lockit === false) {
         mb = new L.LatLngBounds([[-120,-360],[120,360]]);
     }
