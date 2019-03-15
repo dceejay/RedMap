@@ -67,7 +67,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.send(JSON.stringify({'action':'end'}));">
+<body onunload="ws.send(JSON.stringify({'action':'end'}));ws.close();">
 <div id="topbar">
     <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
@@ -1444,7 +1444,7 @@ function setMarker(data) {
             // }
             // else { map.setView(ll,map.getZoom()); }
         }
-        if (openpop === true) { marker.opemPopup(); }
+        if (openpop === true) { marker.openPopup(); }
         if (openpop === false) { marker.closePopup(); }
         // if (popped === true) {
         //     if (popid == data.name) {
