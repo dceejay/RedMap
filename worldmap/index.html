@@ -1356,6 +1356,12 @@ function setMarker(data) {
                     delete data.tooltip;
                 }
             }
+            // customise right click context menu
+            var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            if (data.contextmenu && (typeof data.contextmenu === "string")) {
+                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
+                delete data.contextmenu;
+            }
 
             // Add any remaining properties to the info box
             var llc = data.lineColor;
@@ -1380,7 +1386,7 @@ function setMarker(data) {
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
             marker.on('contextmenu', function(e) {
                 if (hiderightclick !== true) {
                     rightmenuMarker.setLatLng(e.latlng);
