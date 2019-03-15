@@ -131,7 +131,6 @@ var clusterAt = 13;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2019"
-var initialposition = false;
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -219,21 +218,22 @@ document.addEventListener ("keydown", function (ev) {
     }
 });
 
-if ( window.localStorage.hasOwnProperty("lastpos") ) {
-    initialposition = true;
-    var sp = JSON.parse(window.localStorage.getItem("lastpos"));
-    startpos = [ sp.lat, sp.lng ];
-}
-if ( window.localStorage.hasOwnProperty("lastzoom") ) {
-    startzoom = window.localStorage.getItem("lastzoom");
-}
-// if ( window.localStorage.hasOwnProperty("clusterat") ) {
-//     clusterAt = window.localStorage.getItem("clusterat");
-//     document.getElementById("setclus").value = clusterAt;
-// }
-if ( window.localStorage.hasOwnProperty("maxage") ) {
-    maxage = window.localStorage.getItem("maxage");
-    document.getElementById("maxage").value = maxage;
+if (showUserMenu) {
+    if ( window.localStorage.hasOwnProperty("lastpos") ) {
+        var sp = JSON.parse(window.localStorage.getItem("lastpos"));
+        startpos = [ sp.lat, sp.lng ];
+    }
+    if ( window.localStorage.hasOwnProperty("lastzoom") ) {
+        startzoom = window.localStorage.getItem("lastzoom");
+    }
+    // if ( window.localStorage.hasOwnProperty("clusterat") ) {
+    //     clusterAt = window.localStorage.getItem("clusterat");
+    //     document.getElementById("setclus").value = clusterAt;
+    // }
+    if ( window.localStorage.hasOwnProperty("maxage") ) {
+        maxage = window.localStorage.getItem("maxage");
+        document.getElementById("maxage").value = maxage;
+    }
 }
 
 // Create the Initial Map object.
@@ -264,7 +264,7 @@ if (window.self !== window.top) {
     (document.getElementById("menu").style.borderRadius="6px");
 }
 else {
-    console.log("NOT in an iframe")
+    console.log("NOT in an iframe");
     // window.onbeforeunload = function(e) {
     //     return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
     // };
@@ -276,12 +276,10 @@ else {
 if (!inIframe) {
     // Add the fullscreen button
     L.control.fullscreen().addTo(map);
-
     // map.on('fullscreenchange', function () {
     //     if (map.isFullscreen()) { console.log('entered fullscreen') }
     //     else { console.log('exited fullscreen'); }
     // });
-
     // Add the locate my position button
     L.easyButton( 'fa-crosshairs fa-lg', function() {
         map.locate({setView:true, maxZoom:16});
@@ -877,9 +875,11 @@ overlays["ship nav"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}
     attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
 });
 
-if ( window.localStorage.hasOwnProperty("lastlayer") ) {
-    if ( basemaps[window.localStorage.getItem("lastlayer")] ) {
-        baselayername = window.localStorage.getItem("lastlayer");
+if (showUserMenu) {
+    if ( window.localStorage.hasOwnProperty("lastlayer") ) {
+        if ( basemaps[window.localStorage.getItem("lastlayer")] ) {
+            baselayername = window.localStorage.getItem("lastlayer");
+        }
     }
 }
 basemaps[baselayername].addTo(map);
@@ -1463,10 +1463,6 @@ function setMarker(data) {
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
     //console.log("COMMAND",cmd);
-    // ignore server side initial command if client position already saved.
-    // if (cmd.hasOwnProperty("init") && initialposition) {
-    //     return;
-    // }
     if (cmd.hasOwnProperty("clear")) {
         doTidyUp(cmd.clear);
     }
@@ -1475,39 +1471,27 @@ function doCommand(cmd) {
         else { panit = false; }
         document.getElementById("panit").checked = panit;
     }
-    if (cmd.hasOwnProperty("panlock")) {
-        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = false; }
-        else { lockit = true; }
-        doLock();
-        document.getElementById("lockit").checked = !lockit;
-    }
     if (cmd.hasOwnProperty("hiderightclick")) {
         if (cmd.hiderightclick == "true" || cmd.hiderightclick == true) { hiderightclick = true; }
         else { hiderightclick = false; }
     }
-    if (cmd.hasOwnProperty("zoomlock")) {
-        if (cmd.zoomlock == "true" || cmd.zoomlock == true) {
-            if (map.doubleClickZoom.enabled()) { map.removeControl(map.zoomControl); }
-            map.doubleClickZoom.disable();
-            map.scrollWheelZoom.disable();
-        }
-        else {
-            if (!map.doubleClickZoom.enabled()) { map.addControl(map.zoomControl); }
-            map.doubleClickZoom.enable();
-            map.scrollWheelZoom.enable();
-        }
-    }
     if (cmd.hasOwnProperty("showmenu")) {
         if ((cmd.showmenu === "hide") && (showUserMenu === true)) {
             showUserMenu = false;
-            if (menuButton) {
-                try { map.removeControl(menuButton); }
-                catch(e) {}
+            if (inIframe) {
+                if (menuButton) {
+                    try { map.removeControl(menuButton); }
+                    catch(e) {}
+                }
             }
+            else { document.getElementById("bars").style.display="none"; }
         }
         else if ((cmd.showmenu === "show") && (showUserMenu === false)) {
             showUserMenu = true;
-            map.addControl(menuButton);
+            if (inIframe) {
+                map.addControl(menuButton);
+            }
+            else { document.getElementById("bars").style.display="unset";  }
         }
     }
     if (cmd.hasOwnProperty("showlayers")) {
@@ -1536,19 +1520,17 @@ function doCommand(cmd) {
         }
     }
     if (cmd.hasOwnProperty("coords")) {
-        if (cmd.coords === "dms" && showMouseCoords === false) {
+        try { coords.removeFrom(map); }
+        catch(e) {}
+        if (cmd.coords == "dms") {
             coords.options.useDMS = true;
-            showMouseCoords = true;
+            showMouseCoords = "dms";
             coords.addTo(map);
         }
-        if (cmd.coords === "deg" && showMouseCoords === false) {
+        if (cmd.coords == "deg") {
             coords.options.useDMS = false;
-            showMouseCoords = true;
+            showMouseCoords = "deg";
             coords.addTo(map);
-        }
-        if (cmd.coords === "none" && showMouseCoords === true) {
-            showMouseCoords = false
-            coords.removeFrom(map);
         }
     }
 
@@ -1811,12 +1793,21 @@ function doCommand(cmd) {
             }
         }
     }
+
+    if (cmd.hasOwnProperty("panlock")) {
+        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = false; }
+        else { lockit = true; doLock(); }
+        document.getElementById("lockit").checked = !lockit;
+    }
+    // move to a new position
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;
     var czoom = map.getZoom();
     if (cmd.hasOwnProperty("lat")) { clat = cmd.lat; }
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
+    map.setView([clat,clon],czoom);
+
     if (cmd.hasOwnProperty("cluster")) {
         clusterAt = cmd.cluster;
         document.getElementById("setclus").value = cmd.cluster;
@@ -1831,7 +1822,19 @@ function doCommand(cmd) {
         document.getElementById("heatall").checked = !!cmd.heatmap;
         heat.redraw();
     }
-    map.setView([clat,clon],czoom);
+    if (cmd.hasOwnProperty("panlock") && lockit === false) { doLock(); }
+    if (cmd.hasOwnProperty("zoomlock")) {
+        if (cmd.zoomlock == "true" || cmd.zoomlock == true) {
+            if (map.doubleClickZoom.enabled()) { map.removeControl(map.zoomControl); }
+            map.doubleClickZoom.disable();
+            map.scrollWheelZoom.disable();
+        }
+        else {
+            if (!map.doubleClickZoom.enabled()) { map.addControl(map.zoomControl); }
+            map.doubleClickZoom.enable();
+            map.scrollWheelZoom.enable();
+        }
+    }
 }
 
 // handle any incoming GEOJSON directly - may style badly
