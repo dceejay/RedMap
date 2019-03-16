@@ -69,7 +69,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.send(JSON.stringify({'action':'end'})); ws.disconnect;">
+<body onunload="ws.send(JSON.stringify({'action':'end'})); ws.close();">
 <div id="topbar">
     <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
@@ -89,7 +89,6 @@
 </table></div>
 <div id="map"></div>
 <div id="foot"></div>
-<!-- <div id="heat"><button type="button" onclick="clearHeat();">Clear Heatmap</button></div> -->
 
 <dialog id="helpWindow">
     <h3>Node-RED - Map all the things</h3>
@@ -209,13 +208,13 @@ console.log("CONNECT TO",location.pathname + 'socket');
 connect();
 
 var onoffline = function() {
-    if (!navigator.onLine) {  map.addLayer(layers["_countries"]); }
+    if (!navigator.onLine) { map.addLayer(layers["_countries"]); }
 }
 
+// Set Ctl-Alt-3 to switch to 3d view
 document.addEventListener ("keydown", function (ev) {
-    if (ev.ctrlKey  &&  ev.altKey  &&  ev.code === "Digit3") {
+    if (ev.ctrlKey && ev.altKey && ev.code === "Digit3") {
         ws.close();
-        //window.onbeforeunload = null;
         window.location.href = "index3d.html";
     }
 });
@@ -278,15 +277,10 @@ else {
 if (!inIframe) {
     // Add the fullscreen button
     L.control.fullscreen().addTo(map);
-    // map.on('fullscreenchange', function () {
-    //     if (map.isFullscreen()) { console.log('entered fullscreen') }
-    //     else { console.log('exited fullscreen'); }
-    // });
     // Add the locate my position button
     L.easyButton( 'fa-crosshairs fa-lg', function() {
         map.locate({setView:true, maxZoom:16});
     }, "Locate me").addTo(map);
-
     // Add the measure/ruler button
     L.Control.measureControl().addTo(map);
 
@@ -299,7 +293,7 @@ if (!inIframe) {
 else { if (showUserMenu) { menuButton.addTo(map); } }
 
 
-// Handle the dialog for popup help
+// Handle the dialog for help box
 var dialog = document.querySelector('dialog');
 dialogPolyfill.registerDialog(dialog);
 document.getElementById('showHelp').onclick = function() {
@@ -373,7 +367,7 @@ function setMaxAge() {
     maxage = document.getElementById('maxage').value;
     if (stale) { clearInterval(stale); }
     //if (maxage > 0) {
-    stale = setInterval( function() { doTidyUp() }, 20000); // every 20 secs
+    stale = setInterval( function() { doTidyUp() }, 20000); // check every 20 secs
     //} //every minute
     //console.log("Stale time set :",maxage+"s");
 }
@@ -394,7 +388,7 @@ function setCluster(v) {
     showMapCurrentZoom();
 }
 
-// Search for markers with names of ....
+// Search for markers with names of ... or icons of ...
 function doSearch() {
     var value = document.getElementById('search').value;
     marks = [];
@@ -489,18 +483,18 @@ function toggleMenu() {
     }
 }
 
-function openMenu(){
-  if (!menuOpen) {
-      menuOpen = true;
-      document.getElementById("menu").style.display = 'block';
-  }
+function openMenu() {
+    if (!menuOpen) {
+        menuOpen = true;
+        document.getElementById("menu").style.display = 'block';
+    }
 }
 
-function closeMenu(){
-  if (menuOpen) {
-      menuOpen = false;
-      document.getElementById("menu").style.display = 'none';
-  }
+function closeMenu() {
+    if (menuOpen) {
+        menuOpen = false;
+        document.getElementById("menu").style.display = 'none';
+    }
 }
 
 document.getElementById("menu").style.display = 'none';
@@ -533,7 +527,6 @@ map.on('overlayadd', function(e) {
         clrHeat.addTo(map);
     }
     if (e.name == "day/night") {
-        //console.log("add daynight");
         layers["_daynight"].addLayer(L.terminator());
     }
     if (e.name == "drawing") {
@@ -551,14 +544,12 @@ map.on('overlayremove', function(e) {
         clrHeat.removeFrom(map);
     }
     if (e.name == "day/night") {
-        //console.log("del daynight");
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
         //map.removeControl(colorControl);
         map.removeControl(drawControl);
     }
-    //else console.log("layer del :",e.name);
     ws.send(JSON.stringify({action:"dellayer", name:e.name}));
 });
 
@@ -809,11 +800,6 @@ overlays["countries"] = layers["_countries"];
 layers["_daynight"] = new L.LayerGroup();
 overlays["day/night"] = layers["_daynight"];
 
-// Add the heatmap layer
-var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
-layers["_heat"] = new L.LayerGroup().addLayer(heat);
-overlays["heatmap"] = layers["_heat"];
-
 // Add the drawing layer for fun...
 layers["_drawing"] = new L.FeatureGroup();
 overlays["drawing"] = layers["_drawing"];
@@ -822,7 +808,7 @@ var drawControl = new L.Control.Draw({
         polyline: { shapeOptions: { clickable:false } },
         marker: false,
         circle: false,
-        //circle: { shapeOptions: { clickable:false } },
+        // circle: { shapeOptions: { clickable:false } },
         rectangle: { shapeOptions: { clickable:true } },
         polygon: { shapeOptions: { clickable:true } },
     },
@@ -841,7 +827,12 @@ map.on('draw:created', function (e) {
     layers["_drawing"].addLayer(layer);
 });
 
+// Add the heatmap layer
+var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
+layers["_heat"] = new L.LayerGroup().addLayer(heat);
+overlays["heatmap"] = layers["_heat"];
 
+// Add the buildings layer
 overlays["buildings"] = new OSMBuildings(map).load();
 map.removeLayer(overlays["buildings"]);     // Hide it at start
 
