@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
 - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
 - v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates

@@ -33,7 +33,7 @@
     <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Dialog.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-velocity.min.css">
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.label.css">
-    <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.coordinates.css">
+    <link rel="stylesheet",type="text/css" href="leaflet/Leaflet.Coordinates.css">
 
     <link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
 
@@ -62,7 +62,7 @@
     <script type="text/javascript" src="leaflet/OSMBuildings-Leaflet.js"></script>
     <script type="text/javascript" src="leaflet/leaflet-omnivore.min.js"></script>
     <script type="text/javascript" src="leaflet/leaflet.label.js"></script>
-    <script type="text/javascript" src="leaflet/Leaflet.coordinates.js"></script>
+    <script type="text/javascript" src="leaflet/Leaflet.Coordinates.js"></script>
 
     <script type="text/javascript" src="leaflet/dialog-polyfill.js"></script>
     <script type="text/javascript" src="images/emoji.js"></script>
@@ -91,21 +91,22 @@
 <div id="foot"></div>
 
 <dialog id="helpWindow">
-    <h3>Node-RED - Map all the things</h3>
-    <p><i class="fa fa-search fa-lg fa-fw"></i> Search - You may enter a name or partial name of an object to search for.<br/>
-    The map will then jump to centre on each of the results.</p>
-    <p><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age - You can set the time after which points
+    <h3>Node-RED - Map all the things</h3><br/>
+    <p><i class="fa fa-search fa-lg fa-fw"></i> <b>Search</b> - You may enter a name, or partial name, or icon name of an object to search for.
+    The map will then jump to centre on each of the results in turn. If nothing is found locally it will try to
+    search for a place name if connected to a network.</p>
+    <p><i class="fa fa-spinner fa-lg fa-fw"></i> <b>Set Max Age</b> - You can set the time after which points
     that haven't been updated get removed.</p>
-    <p><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom - by default multiple objects will be clustered at zoom levels less than 12.</p>
-    <p><i class="fa fa-arrows fa-lg fa-fw"></i> Auto Pan - When selected, the map will
+    <p><i class="fa fa-search-plus fa-lg fa-fw"></i> <b>Cluster at zoom</b> - lower numbers mean less clustering. 0 means disable totally.</p>
+    <p><i class="fa fa-arrows fa-lg fa-fw"></i> <b>Auto Pan</b> - When selected, the map will
     automatically move to centre on each data point as they arrive.</p>
-    <p><i class="fa fa-lock fa-lg fa-fw"></i> Lock Map - When selected will save the
-    currently displayed area and basemap.<br/>
-    Reloading the map in the current browser will return to the same view.<br/>
-    This can be used to set your initial start position.<br/>
-    While active it also restricts the "auto pan" to within that area.</p>
-    <p><i class="fa fa-globe fa-lg fa-fw"></i> Heatmap all layers - When selected
-    all layers whether hidden or not will contribute to the heatmap.<br/>
+    <p><i class="fa fa-lock fa-lg fa-fw"></i> <b>Lock Map</b> - When selected will save the
+    currently displayed area and basemap.
+    Reloading the map in the current browser will return to the same view.
+    This can be used to set your initial start position.
+    While active it also restricts the "auto pan" and "search" to within that area.</p>
+    <p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected
+    all layers whether hidden or not will contribute to the heatmap.
     The default is that only visible layers add to the heatmap.</p>
     <button id="exitHelp">Close</button>
 </dialog>
@@ -1348,7 +1349,7 @@ function setMarker(data) {
             }
             // customise right click context menu
             var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
-            if (data.contextmenu && (typeof data.contextmenu === "string")) {
+            if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
                 rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
                 delete data.contextmenu;
             }
@@ -1376,7 +1377,10 @@ function setMarker(data) {
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            if (rightcontext.length > 0) {
+            if (rightcontext.length === 0) {
+                marker.on('contextmenu', function() { return; });
+            }
+            else {
                 var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
                 marker.on('contextmenu', function(e) {
                     if (hiderightclick !== true) {

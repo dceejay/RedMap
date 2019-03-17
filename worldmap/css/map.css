@@ -20,6 +20,23 @@ a {
     text-decoration:none;
 }
 
+dialog {
+    z-index: 9999;
+    width: 60% !important;
+    border-radius: 6px !important;
+    border-width: 1px !important;
+    line-height: 1.4em !important;
+}
+dialog > p > b {
+    font-size: unset;
+}
+dialog > button {
+    margin-top: 5px;
+    height: 24px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
 .topbar {
     font-size:16px;
     vertical-align:middle;
@@ -87,7 +104,7 @@ a {
     top:40px;
     right:0px;
     width:200px;
-    z-index:9999;
+    z-index:9998;
 }
 
 #menu td {
