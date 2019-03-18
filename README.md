@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
 - v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
 - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
@@ -70,7 +71,7 @@ Optional properties include
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
- - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable.
+ - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable just this instance.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
 by using the **popup** property to supply your own html content.
@@ -284,8 +285,8 @@ Optional properties include
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
- a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft',
- 'topleft' or 'topright' (default).
+ a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default).
+ - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
 
 #### To switch layer, move map and zoom
 

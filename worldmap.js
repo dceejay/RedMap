@@ -79,9 +79,9 @@ module.exports = function(RED) {
             });
             client.on('close', function() {
                 delete clients[client.id];
-                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length});
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
             });
-            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
         }
         node.on('input', function(msg) {
             if (msg.hasOwnProperty("_sessionid")) {
@@ -133,15 +133,15 @@ module.exports = function(RED) {
         var callback = function(client) {
             //client.setMaxListeners(0);
             clients[client.id] = client;
-            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length});
+            node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
             });
             client.on('close', function() {
                 delete clients[client.id];
-                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length});
-                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:"worldmap"});
+                node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
+                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:"worldmap", _sessionid:client.id});
             });
         }
 
