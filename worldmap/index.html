@@ -599,7 +599,8 @@ map.on('zoomend', function() {
 //});
 
 // single right click to add a marker
-var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
+var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>";
+var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
 var rclk;
 var hiderightclick = false;
@@ -647,7 +648,7 @@ map.on('contextmenu', function(e) {
         rclicked = true;
         rtout = setTimeout( function() {
             rclicked = false;
-            if (hiderightclick !== true) {
+            if ((hiderightclick !== true) && (addmenu.length > 0)) {
                 rclk = e.latlng;
                 rightmenuMap.setLatLng(e.latlng);
                 map.openPopup(rightmenuMap);
@@ -1512,6 +1513,12 @@ function doCommand(cmd) {
                 buttons[cmd.button.name].removeFrom(map);
                 delete buttons[cmd.button.name];
             }
+        }
+    }
+    if (cmd.hasOwnProperty("contextmenu")) {
+        if (typeof cmd.contextmenu === "string") {
+            addmenu = cmd.contextmenu;
+            rightmenuMap.setContent(addmenu);
         }
     }
     if (cmd.hasOwnProperty("coords")) {
