@@ -20,6 +20,25 @@ a {
     text-decoration:none;
 }
 
+dialog {
+    top: 50px;
+    z-index: 9999;
+    width: 60% !important;
+    border-radius: 4px !important;
+    border-width: 0px !important;
+    line-height: 1.4em !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65) !important;
+}
+dialog > p > b {
+    font-size: unset;
+}
+dialog > button {
+    margin-top: 6px;
+    height: 24px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
 .topbar {
     font-size:16px;
     vertical-align:middle;
@@ -88,10 +107,12 @@ a {
     color:#fff;
     background-color:#000;
     position:fixed;
-    top:40px;
+    top:38px;
     right:0px;
     width:200px;
-    z-index:9999;
+    z-index:9998;
+    border-radius: 4px;
+    padding: 2px 4px 6px 0px;
 }
 
 #menu td {

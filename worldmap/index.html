@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<html manifest="worldmap.appcache">
+<html>
 <head>
     <title>Node-RED map all the things</title>
     <meta name="mobile-web-app-capable" content="yes">
@@ -67,7 +67,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.send(JSON.stringify({'action':'end'})); ws.close();">
+<body onunload="if (ws) ws.close();">
 <div id="topbar">
     <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
@@ -89,21 +89,22 @@
 <div id="foot"></div>
 
 <dialog id="helpWindow">
-    <h3>Node-RED - Map all the things</h3>
-    <p><i class="fa fa-search fa-lg fa-fw"></i> Search - You may enter a name or partial name of an object to search for.<br/>
-    The map will then jump to centre on each of the results.</p>
-    <p><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age - You can set the time after which points
+    <h3>Node-RED - Map all the things</h3><br/>
+    <p><i class="fa fa-search fa-lg fa-fw"></i> <b>Search</b> - You may enter a name, or partial name, or icon name of an object to search for.
+    The map will then jump to centre on each of the results in turn. If nothing is found locally it will try to
+    search for a place name if connected to a network.</p>
+    <p><i class="fa fa-spinner fa-lg fa-fw"></i> <b>Set Max Age</b> - You can set the time after which points
     that haven't been updated get removed.</p>
-    <p><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom - by default multiple objects will be clustered at zoom levels less than 12.</p>
-    <p><i class="fa fa-arrows fa-lg fa-fw"></i> Auto Pan - When selected, the map will
+    <p><i class="fa fa-search-plus fa-lg fa-fw"></i> <b>Cluster at zoom</b> - lower numbers mean less clustering. 0 means disable totally.</p>
+    <p><i class="fa fa-arrows fa-lg fa-fw"></i> <b>Auto Pan</b> - When selected, the map will
     automatically move to centre on each data point as they arrive.</p>
-    <p><i class="fa fa-lock fa-lg fa-fw"></i> Lock Map - When selected will save the
-    currently displayed area and basemap.<br/>
-    Reloading the map in the current browser will return to the same view.<br/>
-    This can be used to set your initial start position.<br/>
-    While active it also restricts the "auto pan" to within that area.</p>
-    <p><i class="fa fa-globe fa-lg fa-fw"></i> Heatmap all layers - When selected
-    all layers whether hidden or not will contribute to the heatmap.<br/>
+    <p><i class="fa fa-lock fa-lg fa-fw"></i> <b>Lock Map</b> - When selected will save the
+    currently displayed area and basemap.
+    Reloading the map in the current browser will return to the same view.
+    This can be used to set your initial start position.
+    While active it also restricts the "auto pan" and "search" to within that area.</p>
+    <p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected
+    all layers whether hidden or not will contribute to the heatmap.
     The default is that only visible layers add to the heatmap.</p>
     <button id="exitHelp">Close</button>
 </dialog>
@@ -602,7 +603,8 @@ map.on('zoomend', function() {
 //});
 
 // single right click to add a marker
-var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent("<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>");
+var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>";
+var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
 var rclk;
 var hiderightclick = false;
@@ -650,7 +652,7 @@ map.on('contextmenu', function(e) {
         rclicked = true;
         rtout = setTimeout( function() {
             rclicked = false;
-            if (hiderightclick !== true) {
+            if ((hiderightclick !== true) && (addmenu.length > 0)) {
                 rclk = e.latlng;
                 rightmenuMap.setLatLng(e.latlng);
                 map.openPopup(rightmenuMap);
@@ -743,12 +745,12 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
-//https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
-var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-basemaps["Hike Bike"] = HikeBike_HikeBike;
+// //https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
+// var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+// 	maxZoom: 19,
+// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// });
+// basemaps["Hike Bike"] = HikeBike_HikeBike;
 
 var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
     attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
@@ -1338,17 +1340,6 @@ function setMarker(data) {
                     delete data.tooltip;
                 }
             }
-            // customise right click context menu
-            var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
-            if (data.contextmenu && (typeof data.contextmenu === "string")) {
-                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
-                delete data.contextmenu;
-            }
-            var openpop;
-            if (data.hasOwnProperty("popped") && (typeof data.popped === "boolean")) {
-                openpop = data.popped;
-                delete data.popped;
-            }
 
             // Add any remaining properties to the info box
             var llc = data.lineColor;
@@ -1373,15 +1364,13 @@ function setMarker(data) {
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            if (rightcontext.length > 0) {
-                var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
-                marker.on('contextmenu', function(e) {
-                    if (hiderightclick !== true) {
-                        rightmenuMarker.setLatLng(e.latlng);
-                        map.openPopup(rightmenuMarker);
-                    }
-                });
-            }
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
+            marker.on('contextmenu', function(e) {
+                if (hiderightclick !== true) {
+                    rightmenuMarker.setLatLng(e.latlng);
+                    map.openPopup(rightmenuMarker);
+                }
+            });
             marker.on('click', function(e) {
                 ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
             });
@@ -1511,6 +1500,12 @@ function doCommand(cmd) {
             }
         }
     }
+    if (cmd.hasOwnProperty("contextmenu")) {
+        if (typeof cmd.contextmenu === "string") {
+            addmenu = cmd.contextmenu;
+            rightmenuMap.setContent(addmenu);
+        }
+    }
     if (cmd.hasOwnProperty("coords")) {
         try { coords.removeFrom(map); }
         catch(e) {}
@@ -1549,6 +1544,20 @@ function doCommand(cmd) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
     }
+
+    // Remove one or more map layers (base or overlay)
+    if (cmd.map && cmd.map.hasOwnProperty("delete")) {
+        if (!Array.isArray(cmd.map.delete)) { cmd.map.delete = [cmd.map.delete]; }
+        for (var a=0; a < cmd.map.delete.length; a++) {
+            if (basemaps.hasOwnProperty(cmd.map.delete[a])) { delete basemaps[cmd.map.delete[a]]; }
+            if (overlays.hasOwnProperty(cmd.map.delete[a])) { delete overlays[cmd.map.delete[a]]; }
+        }
+        if (showLayerMenu) {
+            layercontrol.removeFrom(map);
+            layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+        }
+    }
+
     // Add a new geojson overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {

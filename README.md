@@ -9,6 +9,11 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
+- v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
+- v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
+- v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
+- v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
 - v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
 - v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
 - v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
@@ -67,6 +72,7 @@ Optional properties include
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
+ - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable just this instance.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
 by using the **popup** property to supply your own html content.
@@ -273,6 +279,7 @@ Optional properties include
    - **opt** - options object for the new layer
    - **wms** - boolean, specifies if the data is provided by a Web Map Service
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
+   - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
@@ -280,8 +287,8 @@ Optional properties include
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
- a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft',
- 'topleft' or 'topright' (default).
+ a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default).
+ - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
 
 #### To switch layer, move map and zoom
 
@@ -326,6 +333,15 @@ style server by adding a property `wms: true`. (see overlay example below)
         "name":"OSMhot",
         "url":"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
+    };
+
+#### To remove base or overlay layers
+
+To remove several layers, either base layers or overlays, you can pass an array of names as follows.
+This can be useful tidy up the initial selections available to the user layer menu.
+
+    msg.payload.command.map = {
+        "delete":["Watercolor","Ship Nav","Heatmap"]
     };
 
 #### To add a WMS overlay layer - eg US weather radar
