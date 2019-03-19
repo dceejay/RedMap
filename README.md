@@ -335,6 +335,15 @@ style server by adding a property `wms: true`. (see overlay example below)
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
 
+#### To remove base or overlay layers
+
+To remove several layers, either base layers or overlays, you can pass an array of names as follows.
+This can be useful tidy up the initial selections available to the user layer menu.
+
+    msg.payload.command.map = {
+        "delete":["Watercolor","Ship Nav","Heatmap"]
+    };
+
 #### To add a WMS overlay layer - eg US weather radar
 
 To add an overlay instead of a base layer - specify the `overlay` property instead of the `name`.
