@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
 - v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
 - v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
@@ -278,6 +279,7 @@ Optional properties include
    - **opt** - options object for the new layer
    - **wms** - boolean, specifies if the data is provided by a Web Map Service
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
+   - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`

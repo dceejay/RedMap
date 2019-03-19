@@ -741,12 +741,12 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
-//https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
-var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-});
-basemaps["Hike Bike"] = HikeBike_HikeBike;
+// //https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
+// var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+// 	maxZoom: 19,
+// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// });
+// basemaps["Hike Bike"] = HikeBike_HikeBike;
 
 var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
     attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
@@ -1559,6 +1559,20 @@ function doCommand(cmd) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
     }
+
+    // Remove one or more map layers (base or overlay)
+    if (cmd.map && cmd.map.hasOwnProperty("delete")) {
+        if (!Array.isArray(cmd.map.delete)) { cmd.map.delete = [cmd.map.delete]; }
+        for (var a=0; a < cmd.map.delete.length; a++) {
+            if (basemaps.hasOwnProperty(cmd.map.delete[a])) { delete basemaps[cmd.map.delete[a]]; }
+            if (overlays.hasOwnProperty(cmd.map.delete[a])) { delete overlays[cmd.map.delete[a]]; }
+        }
+        if (showLayerMenu) {
+            layercontrol.removeFrom(map);
+            layercontrol = L.control.layers(basemaps, overlays).addTo(map);
+        }
+    }
+
     // Add a new geojson overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
