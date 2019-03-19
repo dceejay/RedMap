@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<html manifest="worldmap.appcache">
+<html>
 <head>
     <title>Node-RED map all the things</title>
     <meta name="mobile-web-app-capable" content="yes">
@@ -69,7 +69,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/dialog-polyfill.css"/>
 </head>
 
-<body onunload="ws.send(JSON.stringify({'action':'end'})); ws.close();">
+<body onunload="if (ws) ws.close();">
 <div id="topbar">
     <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
