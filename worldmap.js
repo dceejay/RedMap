@@ -43,10 +43,10 @@ module.exports = function(RED) {
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
+            var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
-            sockets[this.path].installHandlers(RED.server, {prefix:sockPath});
+            sockets[this.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
+            sockets[this.path].installHandlers(RED.server);
         }
         //this.log("Serving "+__dirname+" as "+this.path);
         this.log("started at "+this.path);
@@ -103,6 +103,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            clients = {};
             sockets[this.path].removeListener('connection', callback);
             for (var i=0; i < RED.httpNode._router.stack.length; i++) {
                 var r = RED.httpNode._router.stack[i];
@@ -122,9 +123,9 @@ module.exports = function(RED) {
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            // sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function(){return}, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket'), });
+            var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
+            var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
+            sockets[this.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
             sockets[this.path].installHandlers(RED.server);
         }
         var node = this;
@@ -151,6 +152,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            clients = {};
             sockets[this.path].removeListener('connection', callback);
             node.status({});
         });
