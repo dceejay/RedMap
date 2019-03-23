@@ -442,24 +442,24 @@ Create and edit these into an executeable file called **mapserv**, located in th
 
     #! /bin/sh
     # set this to the path of your WMS map file (which in turn points to your tiles)
-    MS_MAPFILE=~/Data/maps/uk.map
+    MS_MAPFILE=/home/pi/maps/gb.map
     export MS_MAPFILE
     # and set this to the path of your cgi-mapserv executable
     /usr/bin/mapserv
 
 You can then add a new WMS Base layer by injecting a message like
 
-    msg.payload.command.map = {
+    msg.payload = { command : { map : {
         "name": "Local WMS",
-        "url": "http://localhost:1880/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
+        "url": "/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
         "opt": {
-            "layers": "gb",                               // specifies a layer in your map file
+            "layers": "gb",                         // specifies a layer in your map file
             "format": "image/png",
             "transparent": true,
             "attribution": "© Ordnance Survey, UK"
         },
-        "wms": true                                       // set to true for WMS type mapserver
-    }
+        "wms": true                                 // set to true for WMS type mapserver
+    }}}
 
 
 ## Demo Flow
