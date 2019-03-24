@@ -1351,7 +1351,7 @@ function setMarker(data) {
             // customise right click context menu
             var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
             if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
-                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
+                rightcontext = data.contextmenu.replace(/\$name/g,data.name);
                 delete data.contextmenu;
             }
 
