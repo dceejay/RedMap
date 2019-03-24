@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.36 - Fix contextmenu $name substitution
 - v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
 - v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
 - v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
