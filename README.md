@@ -9,8 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.36 - Fix contextmenu $name substitution
-- v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
+- v1.5.36 - Fix contextmenu $name substitution. Issue #84
+- v1.5.35 - Add msg.delete command to remove any layers not needed at start (array of names). Issue #83.
 - v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
 - v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
@@ -257,7 +257,7 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
 There is a function available to make sending date to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two parameters, name and value, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
 
-All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that include this will ONLY to that session - so you can target map updates to certain sessions only if required.
+All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to certain sessions only if required.
 
 ## Controlling the map
 
@@ -311,7 +311,23 @@ to remove
 
     msg.payload.command = { "button": { "name":"My Fancy Button" } };
 
-#### To draw a heavily customized Circle on a layer
+#### To add a custom popup or contextmenu
+
+You can customise a marker's popup, or context menu (right click), by setting the
+appropriate property to an html string. Often you will need some embedded javascript
+in order to make it do something when you click a button for example. You need to be
+careful escaping quotes, and that they remain matched.
+
+For example a popup with a slider (note the \ escaping the internal ' )
+
+    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value)\' style="width:250px;">'
+
+Or a contextmenu with a button
+
+    contextmenu: '<button name="Clicker" onclick=\'feedback(this.name)\'>Click me</button>'
+
+
+#### To draw a heavily customised Circle on a layer
 
     msg.payload.command =  {
         "name": "circle",
@@ -339,7 +355,7 @@ style server by adding a property `wms: true`. (see overlay example below)
 #### To remove base or overlay layers
 
 To remove several layers, either base layers or overlays, you can pass an array of names as follows.
-This can be useful tidy up the initial selections available to the user layer menu.
+This can be used to tidy up the initial selections available to the user layer menu.
 
     msg.payload.command.map = {
         "delete":["Watercolor","Ship Nav","Heatmap"]
