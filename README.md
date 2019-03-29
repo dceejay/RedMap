@@ -278,7 +278,7 @@ Optional properties include
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
-   - **wms** - boolean, specifies if the data is provided by a Web Map Service
+   - **wms** - true/false/grey, specifies if the data is provided by a Web Map Service (if grey sets layer to greyscale)
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
@@ -344,7 +344,8 @@ Or a contextmenu with a button
 #### To add a new base layer
 
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
-style server by adding a property `wms: true`. (see overlay example below)
+style server by adding a property `wms: true`. You can also set `wms: "grey"` to set the layer to greyscale which
+may let you markers be more visible. (see overlay example below).
 
     msg.payload.command.map = {
         "name":"OSMhot",
@@ -477,6 +478,8 @@ You can then add a new WMS Base layer by injecting a message like
         },
         "wms": true                                 // set to true for WMS type mapserver
     }}}
+
+Optionally set `"wms":"grey"` to make the layer to greyscale which may make your markers more visible.
 
 
 ## Demo Flow
