@@ -35,8 +35,9 @@ L.TileLayer.GrayWMS = L.TileLayer.WMS.extend({
             var imgd = ctx.getImageData(0, 0, this._layer.options.tileSize, this._layer.options.tileSize);
             var pix = imgd.data;
             for (var i = 0, n = pix.length; i < n; i += 4) {
-                pix[i] = pix[i + 1] = pix[i + 2] = (3 * pix[i] + 4 * pix[i + 1] + pix[i + 2]) / 8;
-                //pix[i] = pix[i + 1] = pix[i + 2] = (2 * pix[i] + 3 * pix[i + 1] + 3 * pix[i + 2]) / 6;
+                //pix[i] = pix[i + 1] = pix[i + 2] = (3 * pix[i] + 4 * pix[i + 1] + pix[i + 2]) / 8;
+                // Lighten the scale slightly to make markers more obvious
+                pix[i] = pix[i + 1] = pix[i + 2] = (3 * pix[i] + 4 * pix[i + 1] + pix[i + 2]) / 8 * 3 / 4 + 64;
             }
             ctx.putImageData(imgd, 0, 0);
             this.removeAttribute("crossorigin");
