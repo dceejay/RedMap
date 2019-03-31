@@ -930,7 +930,7 @@ function setMarker(data) {
         delMarker(data.name);
         return;
     }
-    data = allData[data.name] = Object.assign(allData[data.name] || {}, data);
+    delete data.action;
     var ll;
     var lli = null;
     var opt = {};
@@ -957,6 +957,7 @@ function setMarker(data) {
         map.addLayer(layers["buildings"]);
         return;
     }
+
     var lay = data.layer || "unknown";
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         if (clusterAt > 0) {
@@ -979,8 +980,13 @@ function setMarker(data) {
     }
 
     if (typeof markers[data.name] != "undefined") {
-        try {layers[lay].removeLayer(markers[data.name]); }
-        catch(e) { console.log("OOPS"); }
+        if (markers[data.name].lay !== data.layer) {
+            delMarker(data.name);
+        }
+        else {
+            try {layers[lay].removeLayer(markers[data.name]); }
+            catch(e) { console.log("OOPS"); }
+        }
     }
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
@@ -1048,11 +1054,16 @@ function setMarker(data) {
         else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.latitude*1), (data.longitude*1), (data.intensity*1)); }
         else { lli = ll }
 
-        var words="";
+        // if (!allData.hasOwnProperty(data.name)) { allData[data.name] = {}; }
+        // var foo = Object.assign(allData[data.name], data);
+        // allData[data.name] = foo;
+        // data = foo;
+        // console.log("A1",foo,allData);
 
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
         var icon, q;
+        var words="";
         var labelOffset = [20,-8];
         var drag = false;
         if (data.draggable === true) { drag = true; }
