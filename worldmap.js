@@ -163,8 +163,9 @@ module.exports = function(RED) {
 
     var WorldMapTracks = function(n) {
         RED.nodes.createNode(this,n);
-        this.depth = Number(n.depth) || 20;
+        this.depth = parseInt(Number(n.depth) || 20);
         this.pointsarray = {};
+        this.layer = n.layer || "combined"; // separate, single
         var node = this;
 
         node.on("input", function(msg) {
@@ -179,6 +180,16 @@ module.exports = function(RED) {
                 if (!node.pointsarray.hasOwnProperty(msg.payload.name)) {
                     node.pointsarray[msg.payload.name] = [];
                 }
+                if (msg.payload.hasOwnProperty("trackpoints") && !isNaN(parseInt(msg.payload.trackpoints)) ) {
+                    var tl = parseInt(msg.payload.trackpoints);
+                    if (tl < 0) { tl = 0; }
+                    if (node.pointsarray[msg.payload.name].length > tl) {
+                        node.pointsarray[msg.payload.name] = node.pointsarray[msg.payload.name].slice(-tl);
+                    }
+                    node.depth = tl;
+                }
+                if (node.depth < 2) { return; } // if set less than 2 then don't bother.
+
                 node.pointsarray[msg.payload.name].push(msg.payload);
                 if (node.pointsarray[msg.payload.name].length > node.depth) {
                     node.pointsarray[msg.payload.name].shift();
@@ -204,6 +215,15 @@ module.exports = function(RED) {
                 if (line.length > 1) { // only send track if two points or more
                     newmsg.payload.line = line;
                     newmsg.payload.name = msg.payload.name + "_";
+                    if (node.layer === "separate") {
+                        newmsg.payload.layer = msg.payload.layer + " tracks";
+                        if (newmsg.payload.layer.indexOf('_') === 0) {
+                            newmsg.payload.layer = newmsg.payload.layer.substr(1);
+                        }
+                    }
+                    if (node.layer === "single") {
+                        newmsg.payload.layer = "Tracks";
+                    }
                     node.send(newmsg);  // send the track
                 }
             }
