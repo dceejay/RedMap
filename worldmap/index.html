@@ -958,7 +958,7 @@ function setMarker(data) {
     }
 
     var lay = data.layer || "unknown";
-    if (data.hasOwnProperty("action") && data.action.indexOf("layer") === -1) {
+    if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
         if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
             if (clusterAt > 0) {
                 layers[lay] = new L.MarkerClusterGroup({
