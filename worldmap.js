@@ -177,6 +177,7 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track to be deleted
                     return;
                 }
+                if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
                 if (!node.pointsarray.hasOwnProperty(msg.payload.name)) {
                     node.pointsarray[msg.payload.name] = [];
                 }
@@ -190,9 +191,16 @@ module.exports = function(RED) {
                 }
                 if (node.depth < 2) { return; } // if set less than 2 then don't bother.
 
-                node.pointsarray[msg.payload.name].push(msg.payload);
-                if (node.pointsarray[msg.payload.name].length > node.depth) {
-                    node.pointsarray[msg.payload.name].shift();
+                var still = false;
+                if (node.pointsarray[msg.payload.name].length > 0) {
+                    var oldlat = node.pointsarray[msg.payload.name][node.pointsarray[msg.payload.name].length-1].lat;
+                    var oldlon = node.pointsarray[msg.payload.name][node.pointsarray[msg.payload.name].length-1].lon;
+                    if (msg.payload.lat === oldlat && msg.payload.lon === oldlon) { still = true; }
+                }
+                if (!still) { node.pointsarray[msg.payload.name].push(msg.payload);
+                    if (node.pointsarray[msg.payload.name].length > node.depth) {
+                        node.pointsarray[msg.payload.name].shift();
+                    }
                 }
                 var line = [];
                 for (var i=0; i<node.pointsarray[msg.payload.name].length; i++) {
