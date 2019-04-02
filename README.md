@@ -372,7 +372,7 @@ To add an overlay instead of a base layer - specify the `overlay` property inste
         "url": "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WmsServer?",
         "opt":  {
             "layers": "1",
-            "format": 'image/png",
+            "format": "image/png",
             "transparent": true,
             "attribution": "NOAA/NWS"
         },
