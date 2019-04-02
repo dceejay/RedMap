@@ -81,7 +81,7 @@
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster();'/></td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster(this.value);'/></td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit(this.checked);'/> Auto Pan Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock(this.checked);'/> Lock Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll(this.checked);'/> Heatmap all layers</td></tr>
