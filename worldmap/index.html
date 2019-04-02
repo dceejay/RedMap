@@ -930,7 +930,6 @@ function setMarker(data) {
         delMarker(data.name);
         return;
     }
-    delete data.action;
     var ll;
     var lli = null;
     var opt = {};
@@ -959,25 +958,28 @@ function setMarker(data) {
     }
 
     var lay = data.layer || "unknown";
-    if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
-        if (clusterAt > 0) {
-            layers[lay] = new L.MarkerClusterGroup({
-                maxClusterRadius:50,
-                spiderfyDistanceMultiplier:1.8,
-                disableClusteringAtZoom:clusterAt
-                //zoomToBoundsOnClick:false
-            });
+    if (data.hasOwnProperty("action") && data.action.indexOf("layer") === -1) {
+        if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
+            if (clusterAt > 0) {
+                layers[lay] = new L.MarkerClusterGroup({
+                    maxClusterRadius:50,
+                    spiderfyDistanceMultiplier:1.8,
+                    disableClusteringAtZoom:clusterAt
+                    //zoomToBoundsOnClick:false
+                });
+            }
+            else {
+                layers[lay] = new L.LayerGroup();
+            }
+            overlays[lay] = layers[lay];
+            if (showLayerMenu !== false) {
+                layercontrol.addOverlay(layers[lay],lay);
+            }
+            map.addLayer(overlays[lay]);
+            //console.log("ADDED LAYER",lay,layers);
         }
-        else {
-            layers[lay] = new L.LayerGroup();
-        }
-        overlays[lay] = layers[lay];
-        if (showLayerMenu !== false) {
-            layercontrol.addOverlay(layers[lay],lay);
-        }
-        map.addLayer(overlays[lay]);
-        //console.log("ADDED LAYER",lay,layers);
     }
+    delete data.action;
 
     if (typeof markers[data.name] != "undefined") {
         if (markers[data.name].lay !== data.layer) {
@@ -1034,7 +1036,6 @@ function setMarker(data) {
                 layers[lay].addLayer(polycirc);
             }
         }
-        //console.log("handling",data.name);
         if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
         else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
             data.lat = data.position.lat*1;
