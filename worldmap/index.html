@@ -700,17 +700,28 @@ var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
-var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
-    maxNativeZoom:13
+var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
 });
-basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
+basemaps["Esri Topography"] = Esri_WorldTopoMap;
+
+// var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+//     attribution: 'Tiles &copy; Esri',
+//     maxNativeZoom:13
+// });
+// basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
-    maxNativeZoom:10
+	attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+	maxZoom: 13
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
+
+var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+	maxZoom: 16
+});
+basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
 
 // var OpenMapSurfer_Roads = L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
 //     maxZoom: 18,
@@ -741,12 +752,11 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
-// //https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
-// var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-// 	maxZoom: 19,
-// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-// });
-// basemaps["Hike Bike"] = HikeBike_HikeBike;
+var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+basemaps["Hike Bike"] = HikeBike_HikeBike;
 
 var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
     attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
@@ -1309,7 +1319,7 @@ function setMarker(data) {
                 delete data.photoUrl;
             }
             if (data.hasOwnProperty("videoUrl")) {
-                words += '<video controls autoplay><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
+                words += '<video controls muted autoplay width="320"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
                 delete data.videoUrl;
             }
             if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
