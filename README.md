@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.39 - Add weather-lite icons
 - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
 - v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
 - v1.5.36 - Fix contextmenu $name substitution. Issue #84
@@ -18,15 +19,6 @@ map web page for plotting "things" on.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
 - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
 - v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
-- v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
-- v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
-- v1.5.27 - Add hide right click option to config panel
-- v1.5.26 - Ensure all map tiles loaded over https
-- v1.5.25 - Add button command to allow user to add and remove buttons
-- v1.5.24 - Ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
-- v1.5.23 - Let icon support use of emoji specified as :emoji name:  
-- v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
-- v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
   - ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -61,7 +53,7 @@ Optional properties include
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
  - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, :emoji name:, or http://
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or http://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -83,7 +75,7 @@ by using the **popup** property to supply your own html content.
 ### Icons
 
 You may select any of the Font Awesome set of [icons](https://fontawesome.com/v4.7.0/icons/).
-If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
+If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own. Likewise you can use any of the [Weather-lite](https://github.com/Paul-Reed/weather-icons-lite) icons by using the wi- prefix. These map to icons returned by common weather API such as DarkSky and OpenWeatherMap - for example `"wi-owm-"+msg.payload.weather[0].icon` will pickup the icon returned from the OpenWeatherMap API.
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 

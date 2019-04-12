@@ -1,6 +1,8 @@
 ### Change Log for Node-RED Worldmap
 
- - v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
+ - v1.5.39 - Add weather-lite icons
+ - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
+ - v1.5.37 - Add .trackpoints to override default number in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
  - v1.5.36 - Fix contextmenu $name substitution
  - v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
  - v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).

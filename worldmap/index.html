@@ -23,6 +23,7 @@
     <link rel="stylesheet",type="text/css" href="css/map.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet",type="text/css" href="leaflet/weather-icons-lite/css/weather-icons-lite.min.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-vector-markers.css">
     <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.css">
     <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.Default.css">
@@ -1271,6 +1272,19 @@ function setMarker(data) {
             myMarker = L.divIcon({
                 className:"faicon",
                 html: '<center><i class="fa fa-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [32, 32],
+                popupAnchor: [0, -16]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [16,-16];
+        }
+        else if (data.icon && (data.icon.substr(0,3) === "wi-")) {
+            var col = data.iconColor || "#910000";
+            var imod = "";
+            if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
+            myMarker = L.divIcon({
+                className:"wiicon",
+                html: '<center><i class="wi wi-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
                 iconSize: [32, 32],
                 popupAnchor: [0, -16]
             });
