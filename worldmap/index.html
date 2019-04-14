@@ -23,6 +23,7 @@
     <link rel="stylesheet",type="text/css" href="css/map.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet",type="text/css" href="leaflet/weather-icons-lite/css/weather-icons-lite.min.css"/>
     <link rel="stylesheet",type="text/css" href="leaflet/leaflet-vector-markers.css">
     <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.css">
     <link rel="stylesheet",type="text/css" href="leaflet/MarkerCluster.Default.css">
@@ -79,7 +80,7 @@
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster();'/></td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster(this.value);'/></td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit(this.checked);'/> Auto Pan Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock(this.checked);'/> Lock Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll(this.checked);'/> Heatmap all layers</td></tr>
@@ -127,7 +128,7 @@ var buttons = {};
 var marksIndex = 0;
 var popid = "";
 var menuOpen = false;
-var clusterAt = 13;
+var clusterAt = 0;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var ibmfoot = "&nbsp;&copy; IBM 2015,2019"
@@ -139,20 +140,20 @@ var sidebyside;
 var layercontrol;
 
 var iconSz = {
-  "Team/Crew": 17.5,
-  "Squad": 20,
-  "Section": 22.5,
-  "Platoon/detachment": 25,
-  "Company/battery/troop": 27.5,
+  "Team/Crew": 24,
+  "Squad": 24,
+  "Section": 24,
+  "Platoon/detachment": 26,
+  "Company/battery/troop": 28,
   "Battalion/squadron": 30,
-  "Regiment/group": 32.5,
-  "Brigade": 35,
-  "Division": 37.5,
-  "Corps/MEF": 40,
-  "Army": 45,
-  "Army Group/front": 50,
-  "Region/Theater": 50,
-  "Command": 50
+  "Regiment/group": 32,
+  "Brigade": 34,
+  "Division": 36,
+  "Corps/MEF": 36,
+  "Army": 40,
+  "Army Group/front": 40,
+  "Region/Theater": 44,
+  "Command": 44
 };
 
 // Create the socket
@@ -704,17 +705,28 @@ var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
-var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
-    maxNativeZoom:13
+var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
 });
-basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
+basemaps["Esri Topography"] = Esri_WorldTopoMap;
+
+// var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+//     attribution: 'Tiles &copy; Esri',
+//     maxNativeZoom:13
+// });
+// basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
-    maxNativeZoom:10
+	attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+	maxZoom: 13
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
+
+var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+	maxZoom: 16
+});
+basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
 
 // var OpenMapSurfer_Roads = L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
 //     maxZoom: 18,
@@ -745,12 +757,11 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
-// //https://tiles.wmflabs.org/hikebike/{zoom}/{x}/{y}.png
-// var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-// 	maxZoom: 19,
-// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-// });
-// basemaps["Hike Bike"] = HikeBike_HikeBike;
+var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+basemaps["Hike Bike"] = HikeBike_HikeBike;
 
 var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
     attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
@@ -935,7 +946,7 @@ function setMarker(data) {
         delMarker(data.name);
         return;
     }
-    data = allData[data.name] = Object.assign(allData[data.name] || {}, data);
+
     var ll;
     var lli = null;
     var opt = {};
@@ -962,30 +973,46 @@ function setMarker(data) {
         map.addLayer(layers["buildings"]);
         return;
     }
+
     var lay = data.layer || "unknown";
-    if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
-        if (clusterAt > 0) {
-            layers[lay] = new L.MarkerClusterGroup({
-                maxClusterRadius:50,
-                spiderfyDistanceMultiplier:1.8,
-                disableClusteringAtZoom:clusterAt
-                //zoomToBoundsOnClick:false
-            });
+    if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
+        if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
+            if (clusterAt > 0) {
+                layers[lay] = new L.MarkerClusterGroup({
+                    maxClusterRadius:50,
+                    spiderfyDistanceMultiplier:1.8,
+                    disableClusteringAtZoom:clusterAt
+                    //zoomToBoundsOnClick:false
+                });
+            }
+            else {
+                layers[lay] = new L.LayerGroup();
+            }
+            overlays[lay] = layers[lay];
+            if (showLayerMenu !== false) {
+                layercontrol.addOverlay(layers[lay],lay);
+            }
+            map.addLayer(overlays[lay]);
+            //console.log("ADDED LAYER",lay,layers);
         }
-        else {
-            layers[lay] = new L.LayerGroup();
-        }
-        overlays[lay] = layers[lay];
-        if (showLayerMenu !== false) {
-            layercontrol.addOverlay(layers[lay],lay);
-        }
-        map.addLayer(overlays[lay]);
-        //console.log("ADDED LAYER",lay,layers);
+        if (!allData.hasOwnProperty(data.name)) { allData[data.name] = {}; }
+        delete data.action;
+        Object.keys(data).forEach(key => {
+            if (data[key] == null) { delete allData[data.name][key]; }
+            else { allData[data.name][key] = data[key]; }
+        });
+        data = Object.assign({},allData[data.name]);
     }
+    delete data.action;
 
     if (typeof markers[data.name] != "undefined") {
-        try {layers[lay].removeLayer(markers[data.name]); }
-        catch(e) { console.log("OOPS"); }
+        if (markers[data.name].lay !== data.layer) {
+            delMarker(data.name);
+        }
+        else {
+            try {layers[lay].removeLayer(markers[data.name]); }
+            catch(e) { console.log("OOPS"); }
+        }
     }
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
@@ -1033,7 +1060,6 @@ function setMarker(data) {
                 layers[lay].addLayer(polycirc);
             }
         }
-        //console.log("handling",data.name);
         if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
         else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
             data.lat = data.position.lat*1;
@@ -1052,8 +1078,6 @@ function setMarker(data) {
         else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.lat*1), (data.lon*1), (data.intensity*1)); }
         else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.latitude*1), (data.longitude*1), (data.intensity*1)); }
         else { lli = ll }
-
-        var words="";
 
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
@@ -1258,6 +1282,19 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [8,-8];
         }
+        else if (data.icon && (data.icon.substr(0,3) === "wi-")) {
+            var col = data.iconColor || "#910000";
+            var imod = "";
+            if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
+            myMarker = L.divIcon({
+                className:"wiicon",
+                html: '<center><i class="wi wi-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
+                iconSize: [32, 32],
+                popupAnchor: [0, -16]
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [16,-16];
+        }
         else {
             myMarker = L.VectorMarkers.icon({
                 icon: data.icon || "circle",
@@ -1300,7 +1337,7 @@ function setMarker(data) {
                 delete data.photoUrl;
             }
             if (data.hasOwnProperty("videoUrl")) {
-                words += '<video controls autoplay><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
+                words += '<video controls muted autoplay width="320"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
                 delete data.videoUrl;
             }
             if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
@@ -1340,6 +1377,12 @@ function setMarker(data) {
                     delete data.tooltip;
                 }
             }
+            // customise right click context menu
+            var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
+                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
+                delete data.contextmenu;
+            }
 
             // Add any remaining properties to the info box
             var llc = data.lineColor;
@@ -1347,6 +1390,11 @@ function setMarker(data) {
             delete data.lon;
             if (data.layer) { delete data.layer; }
             if (data.lineColor) { delete data.lineColor; }
+            if (data.color) { delete data.color; }
+            if (data.weight) { delete data.weight; }
+            if (data.tracklength) { delete data.tracklength; }
+            if (data.dashArray) { delete data.dashArray; }
+            if (data.fill) { delete data.fill; }
             if (data.draggable) { delete data.draggable; }
             for (var i in data) {
                 if ((i != "name") && (i != "length")) {

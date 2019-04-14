@@ -43,10 +43,10 @@ module.exports = function(RED) {
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
+            var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
-            sockets[this.path].installHandlers(RED.server, {prefix:sockPath});
+            sockets[this.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
+            sockets[this.path].installHandlers(RED.server);
         }
         //this.log("Serving "+__dirname+" as "+this.path);
         this.log("started at "+this.path);
@@ -103,6 +103,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            clients = {};
             sockets[this.path].removeListener('connection', callback);
             for (var i=0; i < RED.httpNode._router.stack.length; i++) {
                 var r = RED.httpNode._router.stack[i];
@@ -122,9 +123,9 @@ module.exports = function(RED) {
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
-            var fullPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            // sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function() { return; }});
-            sockets[this.path] = sockjs.createServer({sockjs_url:fullPath, log:function(){return}, prefix:path.posix.join(RED.settings.httpNodeRoot,this.path,'socket'), });
+            var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
+            var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
+            sockets[this.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
             sockets[this.path].installHandlers(RED.server);
         }
         var node = this;
@@ -141,7 +142,7 @@ module.exports = function(RED) {
             client.on('close', function() {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
-                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:"worldmap", _sessionid:client.id});
+                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
             });
         }
 
@@ -151,6 +152,7 @@ module.exports = function(RED) {
                     clients[c].end();
                 }
             }
+            clients = {};
             sockets[this.path].removeListener('connection', callback);
             node.status({});
         });
@@ -161,8 +163,9 @@ module.exports = function(RED) {
 
     var WorldMapTracks = function(n) {
         RED.nodes.createNode(this,n);
-        this.depth = Number(n.depth) || 20;
+        this.depth = parseInt(Number(n.depth) || 20);
         this.pointsarray = {};
+        this.layer = n.layer || "combined"; // separate, single
         var node = this;
 
         node.on("input", function(msg) {
@@ -174,12 +177,30 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track to be deleted
                     return;
                 }
+                if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
                 if (!node.pointsarray.hasOwnProperty(msg.payload.name)) {
                     node.pointsarray[msg.payload.name] = [];
                 }
-                node.pointsarray[msg.payload.name].push(msg.payload);
-                if (node.pointsarray[msg.payload.name].length > node.depth) {
-                    node.pointsarray[msg.payload.name].shift();
+                if (msg.payload.hasOwnProperty("trackpoints") && !isNaN(parseInt(msg.payload.trackpoints)) ) {
+                    var tl = parseInt(msg.payload.trackpoints);
+                    if (tl < 0) { tl = 0; }
+                    if (node.pointsarray[msg.payload.name].length > tl) {
+                        node.pointsarray[msg.payload.name] = node.pointsarray[msg.payload.name].slice(-tl);
+                    }
+                    node.depth = tl;
+                }
+                if (node.depth < 2) { return; } // if set less than 2 then don't bother.
+
+                var still = false;
+                if (node.pointsarray[msg.payload.name].length > 0) {
+                    var oldlat = node.pointsarray[msg.payload.name][node.pointsarray[msg.payload.name].length-1].lat;
+                    var oldlon = node.pointsarray[msg.payload.name][node.pointsarray[msg.payload.name].length-1].lon;
+                    if (msg.payload.lat === oldlat && msg.payload.lon === oldlon) { still = true; }
+                }
+                if (!still) { node.pointsarray[msg.payload.name].push(msg.payload);
+                    if (node.pointsarray[msg.payload.name].length > node.depth) {
+                        node.pointsarray[msg.payload.name].shift();
+                    }
                 }
                 var line = [];
                 for (var i=0; i<node.pointsarray[msg.payload.name].length; i++) {
@@ -202,6 +223,15 @@ module.exports = function(RED) {
                 if (line.length > 1) { // only send track if two points or more
                     newmsg.payload.line = line;
                     newmsg.payload.name = msg.payload.name + "_";
+                    if (node.layer === "separate") {
+                        newmsg.payload.layer = msg.payload.layer + " tracks";
+                        if (newmsg.payload.layer.indexOf('_') === 0) {
+                            newmsg.payload.layer = newmsg.payload.layer.substr(1);
+                        }
+                    }
+                    if (node.layer === "single") {
+                        newmsg.payload.layer = "Tracks";
+                    }
                     node.send(newmsg);  // send the track
                 }
             }

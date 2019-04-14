@@ -9,21 +9,16 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.35 - Add msp.delete command to remove any layers not needed at start (array of names). Issue #83.
+- v1.5.39 - Add weather-lite icons
+- v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
+- v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
+- v1.5.36 - Fix contextmenu $name substitution. Issue #84
+- v1.5.35 - Add msg.delete command to remove any layers not needed at start (array of names). Issue #83.
 - v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
 - v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
 - v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
 - v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
 - v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
-- v1.5.29 - Remove lat/lon from popup if using .popup property. Allow icon to be loaded from http.
-- v1.5.28 - Tidy up popup location and timing. Auto add countries overlay if no internet.
-- v1.5.27 - Add hide right click option to config panel
-- v1.5.26 - Ensure all map tiles loaded over https
-- v1.5.25 - Add button command to allow user to add and remove buttons
-- v1.5.24 - Ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
-- v1.5.23 - Let icon support use of emoji specified as :emoji name:  
-- v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
-- v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
   - ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -58,7 +53,7 @@ Optional properties include
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
  - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, :emoji name:, or http://
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or http://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -80,7 +75,7 @@ by using the **popup** property to supply your own html content.
 ### Icons
 
 You may select any of the Font Awesome set of [icons](https://fontawesome.com/v4.7.0/icons/).
-If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own.
+If you use the name without the fa- prefix (eg `male`) you will get the icon inside a generic marker shape. If you use the fa- prefix (eg `fa-male`) you will get the icon on its own. Likewise you can use any of the [Weather-lite](https://github.com/Paul-Reed/weather-icons-lite) icons by using the wi- prefix. These map to icons returned by common weather API such as DarkSky and OpenWeatherMap - for example `"wi-owm-"+msg.payload.weather[0].icon` will pickup the icon returned from the OpenWeatherMap API.
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
@@ -256,7 +251,7 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
 There is a function available to make sending date to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two parameters, name and value, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
 
-All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that include this will ONLY to that session - so you can target map updates to certain sessions only if required.
+All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to certain sessions only if required.
 
 ## Controlling the map
 
@@ -277,7 +272,7 @@ Optional properties include
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
    - **opt** - options object for the new layer
-   - **wms** - boolean, specifies if the data is provided by a Web Map Service
+   - **wms** - true/false/grey, specifies if the data is provided by a Web Map Service (if grey sets layer to greyscale)
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
@@ -310,7 +305,23 @@ to remove
 
     msg.payload.command = { "button": { "name":"My Fancy Button" } };
 
-#### To draw a heavily customized Circle on a layer
+#### To add a custom popup or contextmenu
+
+You can customise a marker's popup, or context menu (right click), by setting the
+appropriate property to an html string. Often you will need some embedded javascript
+in order to make it do something when you click a button for example. You need to be
+careful escaping quotes, and that they remain matched.
+
+For example a popup with a slider (note the \ escaping the internal ' )
+
+    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value)\' style="width:250px;">'
+
+Or a contextmenu with a button
+
+    contextmenu: '<button name="Clicker" onclick=\'feedback(this.name)\'>Click me</button>'
+
+
+#### To draw a heavily customised Circle on a layer
 
     msg.payload.command =  {
         "name": "circle",
@@ -327,7 +338,8 @@ to remove
 #### To add a new base layer
 
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
-style server by adding a property `wms: true`. (see overlay example below)
+style server by adding a property `wms: true`. You can also set `wms: "grey"` to set the layer to greyscale which
+may let you markers be more visible. (see overlay example below).
 
     msg.payload.command.map = {
         "name":"OSMhot",
@@ -338,7 +350,7 @@ style server by adding a property `wms: true`. (see overlay example below)
 #### To remove base or overlay layers
 
 To remove several layers, either base layers or overlays, you can pass an array of names as follows.
-This can be useful tidy up the initial selections available to the user layer menu.
+This can be used to tidy up the initial selections available to the user layer menu.
 
     msg.payload.command.map = {
         "delete":["Watercolor","Ship Nav","Heatmap"]
@@ -353,7 +365,7 @@ To add an overlay instead of a base layer - specify the `overlay` property inste
         "url": "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WmsServer?",
         "opt":  {
             "layers": "1",
-            "format": 'image/png",
+            "format": "image/png",
             "transparent": true,
             "attribution": "NOAA/NWS"
         },
@@ -442,24 +454,26 @@ Create and edit these into an executeable file called **mapserv**, located in th
 
     #! /bin/sh
     # set this to the path of your WMS map file (which in turn points to your tiles)
-    MS_MAPFILE=~/Data/maps/uk.map
+    MS_MAPFILE=/home/pi/maps/gb.map
     export MS_MAPFILE
     # and set this to the path of your cgi-mapserv executable
     /usr/bin/mapserv
 
 You can then add a new WMS Base layer by injecting a message like
 
-    msg.payload.command.map = {
+    msg.payload = { command : { map : {
         "name": "Local WMS",
-        "url": "http://localhost:1880/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
+        "url": "/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
         "opt": {
-            "layers": "gb",                               // specifies a layer in your map file
+            "layers": "gb",                         // specifies a layer in your map file
             "format": "image/png",
             "transparent": true,
             "attribution": "© Ordnance Survey, UK"
         },
-        "wms": true                                       // set to true for WMS type mapserver
-    }
+        "wms": true                                 // set to true for WMS type mapserver
+    }}}
+
+Optionally set `"wms":"grey"` to make the layer to greyscale which may make your markers more visible.
 
 
 ## Demo Flow
