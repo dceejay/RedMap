@@ -180,7 +180,6 @@ var connect = function() {
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             // map.closePopup();
-            // popped = false;
             // var bnds= L.latLngBounds([0,0]);
             for (var prop in data) {
                 if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
@@ -936,7 +935,6 @@ var delMarker = function(dname,note) {
     }
     delete allData[dname];
     if (note) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
-    //map.closePopup();
 }
 
 // the MAIN add something to map function
@@ -1082,8 +1080,10 @@ function setMarker(data) {
         // Create the icons... handle plane, car, ship, wind, earthquake as specials
         var marker, myMarker;
         var icon, q;
+        var words="";
         var labelOffset = [12,0];
         var drag = false;
+
         if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
         if (data.icon === "ship") {
@@ -1358,6 +1358,16 @@ function setMarker(data) {
                 }
                 delete data.weblink;
             }
+            var p;
+            if (data.hasOwnProperty("popped") && (data.popped === true)) {
+                p = true;
+                delete data.popped;
+            }
+            if (data.hasOwnProperty("popped") && (data.popped === false)) {
+                marker.closePopup();
+                p = false;
+                delete data.popped;
+            }
             // If .label then use that rather than name tooltip
             if (data.label) {
                 if (typeof data.label === "boolean" && data.label === true) {
@@ -1408,7 +1418,7 @@ function setMarker(data) {
             if (data.popup) { words = data.popup; }
             else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
             words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
-            marker.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, keepInView:true, minWidth:200});
+            marker.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
@@ -1426,7 +1436,6 @@ function setMarker(data) {
                 if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
             }
             markers[data.name] = marker;
-            console.log("LAY",lay,layers);
             layers[lay].addLayer(marker);
         }
         if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
@@ -1468,24 +1477,8 @@ function setMarker(data) {
         }
         if (panit) {
             map.setView(ll,map.getZoom());
-            // if (popped === true) {
-            //     map.setView(ll,map.getZoom());
-            // }
-            // else { map.setView(ll,map.getZoom()); }
         }
-        if (openpop === true) { marker.openPopup(); }
-        if (openpop === false) { marker.closePopup(); }
-        // if (popped === true) {
-        //     if (popid == data.name) {
-        //         if (popmark) {
-        //             popmark.closePopup();
-        //             setTimeout(function() { marker.openPopup(); },100);
-        //         }
-        //         marker.openPopup();
-        //     }
-        //     else { popmark.openPopup(); }
-        //     popped = true;
-        // }
+        if (p === true) { marker.openPopup(); }
     }
 }
 
@@ -1592,7 +1585,6 @@ function doCommand(cmd) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
     }
-
     // Remove one or more map layers (base or overlay)
     if (cmd.map && cmd.map.hasOwnProperty("delete")) {
         if (!Array.isArray(cmd.map.delete)) { cmd.map.delete = [cmd.map.delete]; }
@@ -1605,7 +1597,6 @@ function doCommand(cmd) {
             layercontrol = L.control.layers(basemaps, overlays).addTo(map);
         }
     }
-
     // Add a new geojson overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
@@ -1689,7 +1680,6 @@ function doCommand(cmd) {
         map.addLayer(overlays[cmd.map.overlay]);
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
-
     var custIco = function() {
         var customLayer = L.geoJson();
         if (cmd.map.hasOwnProperty("icon")) {
@@ -1707,7 +1697,6 @@ function doCommand(cmd) {
         }
         return customLayer;
     }
-
     // Add a new KML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
@@ -1842,7 +1831,7 @@ function doCommand(cmd) {
             }
         }
     }
-
+    // Lock the pan so map can be moved
     if (cmd.hasOwnProperty("panlock")) {
         if (cmd.panlock == "true" || cmd.panlock == true) { lockit = true; }
         else { lockit = false; doLock(false); }
