@@ -279,10 +279,28 @@ else {
 if (!inIframe) {
     // Add the fullscreen button
     L.control.fullscreen().addTo(map);
+    
     // Add the locate my position button
     L.easyButton( 'fa-crosshairs fa-lg', function() {
         map.locate({setView:true, maxZoom:16});
     }, "Locate me").addTo(map);
+    function onLocationFound(e) {
+        var radius = e.accuracy;
+        //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+        L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
+        if (e.hasOwnProperty("heading")) {
+            var lengthAsDegrees = e.speed * 60 / 110540;
+            var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
+            var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
+            var lla = new L.LatLng(ya,xa);
+            L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
+        }
+        ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
+    }
+    function onLocationError(e) { console.log(e.message); }
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+
     // Add the measure/ruler button
     L.Control.measureControl().addTo(map);
 
@@ -660,24 +678,6 @@ map.on('contextmenu', function(e) {
         }, 300);
     }
 });
-
-function onLocationFound(e) {
-    var radius = e.accuracy;
-    //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
-    if (e.hasOwnProperty("heading")) {
-        var lengthAsDegrees = e.speed * 60 / 110540;
-        var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
-        var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
-        var lla = new L.LatLng(ya,xa);
-        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
-    }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
-}
-function onLocationError(e) { console.log(e.message); }
-map.on('locationfound', onLocationFound);
-map.on('locationerror', onLocationError);
-
 
 // Add all the base layer maps
 
