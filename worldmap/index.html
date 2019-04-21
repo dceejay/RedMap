@@ -837,7 +837,7 @@ map.on('draw:created', function (e) {
     var layer = e.layer;
     //console.log(type, layer._latlngs);
     //console.log(JSON.stringify(layer.toGeoJSON()));
-    ws.send(JSON.stringify({action:"draw" type:type, points:layer._latlngs}));
+    ws.send(JSON.stringify({action:"draw", type:type, points:layer._latlngs}));
     layers["_drawing"].addLayer(layer);
 });
 

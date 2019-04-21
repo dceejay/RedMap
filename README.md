@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v1.5.40 - Only enable on.location function when not in an iframe. Tidy html.
 - v1.5.39 - Add weather-lite icons
 - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
 - v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
