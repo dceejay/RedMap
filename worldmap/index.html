@@ -648,8 +648,8 @@ var addThing = function() {
     map.addLayer(layers[lay]);
 }
 
-var feedback = function(n,v,p,a) {
-    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, property:p}));
+var feedback = function(n,v,a) {
+    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v}));
 }
 
 // allow double right click to zoom out (if enabled)
