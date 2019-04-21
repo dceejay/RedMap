@@ -1,7 +1,8 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.0.1-beta - Add optional graticule
  - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
- - v1.5.40 - Only enable on.location function when not in an iframe. Tidy html.
+ - v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
  - v1.5.39 - Add weather-lite icons
  - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
  - v1.5.37 - Add .trackpoints to override default number in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85

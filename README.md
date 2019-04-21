@@ -9,8 +9,9 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.1-beta - Add optional graticule
 - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
-- v1.5.40 - Only enable on.location function when not in an iframe. Tidy html.
+- v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
 - v1.5.39 - Add weather-lite icons
 - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
 - v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
@@ -438,6 +439,18 @@ in a function node:
         bounds: imageBounds,
         opt: { opacity:0.8, attribution:"&copy; University of Texas" }
     };
+
+#### To add a Lat/Lon Graticule overlay
+
+A graticule can be enabled via the node configuration, and can also be set dynamically,
+for example in a function node:
+
+    msg.payload = { command : { grid : {
+        showgrid: true,
+        opt: { showLabel:true, dashArray:[5, 5], fontColor:"#900" }
+    };
+
+see https://github.com/cloudybay/leaflet.latlng-graticule for more details about options and demo.
 
 #### To clear all markers from a layer, or an overlay from the map
 

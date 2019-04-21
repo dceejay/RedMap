@@ -95,6 +95,11 @@
         <option value="deg">Degrees</option>
         <option value="dms">D.M.S</option>
     </select>
+    <i class="fa fa-th" style="margin-left:22px;"></i> Graticule
+    <select id="node-input-showgrid" style="width:95px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
 </div>
 <div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
@@ -172,7 +177,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             panlock: {value:"false"},
             zoomlock: {value:"false"},
             hiderightclick: {value:"false"},
-            coords: {value: "false"},
+            coords: {value:"false"},
+            showgrid: {value:"false"},
             path: {value:"/worldmap"}
         },
         inputs:1,
