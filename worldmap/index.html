@@ -17,6 +17,7 @@
 <html>
 <head>
     <title>Node-RED map all the things</title>
+    <meta charset="UTF-8">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -70,7 +71,7 @@
 
 <body onunload="if (ws) ws.close();">
 <div id="topbar">
-    <a href="https://nodered.org"><img src="images/node-red.png" width="60px" height="24px"/></a>
+    <a href="https://nodered.org"><img src="images/node-red.png" width="60" height="24" alt="NRed"/></a>
     <span class="topbar"> Node-RED - map all the things</span>
 </div>
 <div id="results">
@@ -80,7 +81,7 @@
 <div id="menu"><table>
     <tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
     <tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom <<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster(this.value);'/></td></tr>
+    <tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom &lt;<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster(this.value);'/></td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit(this.checked);'/> Auto Pan Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock(this.checked);'/> Lock Map</td></tr>
     <tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll(this.checked);'/> Heatmap all layers</td></tr>
@@ -110,7 +111,7 @@
     <button id="exitHelp">Close</button>
 </dialog>
 
-<script language="javascript" type="text/javascript">
+<script>
 
 var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
 var startzoom = 10;
@@ -176,7 +177,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        //console.log("DATA",typeof data,data);
+        //console.log("DATA" typeof data,data);
         if (Array.isArray(data)) {
             //console.log("ARRAY");
             // map.closePopup();
@@ -276,10 +277,28 @@ else {
 if (!inIframe) {
     // Add the fullscreen button
     L.control.fullscreen().addTo(map);
+
     // Add the locate my position button
     L.easyButton( 'fa-crosshairs fa-lg', function() {
         map.locate({setView:true, maxZoom:16});
     }, "Locate me").addTo(map);
+    function onLocationFound(e) {
+        var radius = e.accuracy;
+        //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+        L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
+        if (e.hasOwnProperty("heading")) {
+            var lengthAsDegrees = e.speed * 60 / 110540;
+            var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
+            var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
+            var lla = new L.LatLng(ya,xa);
+            L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
+        }
+        ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
+    }
+    function onLocationError(e) { console.log(e.message); }
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+
     // Add the measure/ruler button
     L.Control.measureControl().addTo(map);
 
@@ -632,8 +651,8 @@ var addThing = function() {
     map.addLayer(layers[lay]);
 }
 
-var feedback = function(n,v) {
-    ws.send(JSON.stringify({action:"feedback", name:n, value:v}));
+var feedback = function(n,v,a) {
+    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v}));
 }
 
 // allow double right click to zoom out (if enabled)
@@ -663,24 +682,6 @@ map.on('contextmenu', function(e) {
         }, 300);
     }
 });
-
-function onLocationFound(e) {
-    var radius = e.accuracy;
-    //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
-    if (e.hasOwnProperty("heading")) {
-        var lengthAsDegrees = e.speed * 60 / 110540;
-        var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
-        var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
-        var lla = new L.LatLng(ya,xa);
-        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
-    }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
-}
-function onLocationError(e) { console.log(e.message); }
-map.on('locationfound', onLocationFound);
-map.on('locationerror', onLocationError);
-
 
 // Add all the base layer maps
 
@@ -840,7 +841,7 @@ map.on('draw:created', function (e) {
     var layer = e.layer;
     //console.log(type, layer._latlngs);
     //console.log(JSON.stringify(layer.toGeoJSON()));
-    ws.send(JSON.stringify({action:"draw",type:type, points:layer._latlngs}));
+    ws.send(JSON.stringify({action:"draw" type:type, points:layer._latlngs}));
     layers["_drawing"].addLayer(layer);
 });
 
@@ -939,7 +940,7 @@ var delMarker = function(dname,note) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-    //console.log("DATA",typeof data, data);
+    //console.log("DATA" typeof data, data);
     if (data.deleted) { // remove markers we are told to
         delMarker(data.name);
         return;

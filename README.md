@@ -249,9 +249,9 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "feedback", "name": "some name", "value": "some value" } // when a user calls the feedback function - see below
 
-There is a function available to make sending date to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two parameters, name and value, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
+There is a function available to make sending data to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
 
-All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to certain sessions only if required.
+All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
 
 ## Controlling the map
 
