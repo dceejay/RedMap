@@ -1035,7 +1035,7 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
-        if (opt.clickable) { 
+        if (opt.clickable) {
             var words = "<b>"+data.name+"</b>";
             if (data.popup) { var words = words + "<br/>" + data.popup; }
             polyln.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
@@ -1060,13 +1060,10 @@ function setMarker(data) {
         if (!data.hasOwnProperty("fillColor")) { opt.fillColor = "blue"; }
         delete opt.clickable;
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
-        if (data.clickable != false) {
-            ellipse.on('click', function(e) {
-                var popup = L.popup()
-                    .setLatLng(new L.LatLng((data.lat*1), (data.lon*1)))
-                    .setContent('<p><b>'+data.name+'</b><br/>lat : '+data.lat+'<br/>lon : '+data.lon+'</p>')
-                    .openOn(map);
-            });
+        if (opt.clickable) {
+            var words = "<b>"+data.name+"</b>";
+            if (data.popup) { var words = words + "<br/>" + data.popup; }
+            ellipse.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
         }
         polygons[data.name] = ellipse;
         polygons[data.name].lay = lay;
@@ -1075,8 +1072,18 @@ function setMarker(data) {
     else {
         if (data.hasOwnProperty("radius")) {
             if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
-                var polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
-                if (opt.clickable) { polycirc.bindPopup(data.name); }
+                var polycirc;
+                if (Array.isArray(data.radius)) {
+                    polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0]*Math.cos(data.lat*Math.PI/180), data.radius[1]], data.tilt || 0, opt);
+                }
+                else {
+                    polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
+                }
+                if (opt.clickable) {
+                    var words = "<b>"+data.name+"</b>";
+                    if (data.popup) { var words = words + "<br/>" + data.popup; }
+                    polycirc.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
+                }
                 polygons[data.name] = polycirc;
                 polygons[data.name].lay = lay;
                 layers[lay].addLayer(polycirc);

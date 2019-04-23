@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.3-beta - Let circles have popups. Better drawing of ellipses
 - v2.0.2-beta - Let lines and areas also have popups
 - v2.0.1-beta - Add optional graticule
 - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
@@ -200,7 +201,7 @@ then rather than draw a point and icon it draws the polygon. Likewise if it cont
  - **clickable** : boolean - set to true to allow click to show popup.
  - **popup** : html string to display in popup (as well as name).
 
-### Circles
+### Circles and Ellipses
 
 If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
@@ -209,8 +210,11 @@ than draw a point it will draw a circle. The *radius* property is specified in m
 
 As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*.
 
-If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
-These are specified in the Latitude/Longitude format.
+If the **radius** property is an array of two numbers, these specify the minor and major radii
+of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
+a number of degrees.
+
+    msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
 
 ### Options
 
@@ -224,7 +228,7 @@ Areas, Lines and Circles can also specify more optional properties:
  - fillOpacity
  - dashArray
  - clickable - if true sets the passed in name as popup
- - popup - extra html string to display as part of popup
+ - popup - extra html string to display inside the popup
 
 ## Drawing
 
