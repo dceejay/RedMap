@@ -281,11 +281,11 @@ var Lgrid = L.latlngGraticule({
 	font: "Verdana",
     fontColor: "#666",
     zoomInterval: [
-		{start: 2, end: 2, interval: 40},
-		{start: 3, end: 3, interval: 20},
-		{start: 4, end: 4, interval: 10},
-		{start: 5, end: 7, interval: 5},
-		{start: 8, end: 20, interval: 1}
+		{start:1, end:2, interval:40},
+		{start:3, end:3, interval:20},
+		{start:4, end:4, interval:10},
+		{start:5, end:7, interval:5},
+		{start:8, end:20, interval:1}
 	]
 });
 
@@ -1035,14 +1035,22 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
-        if (opt.clickable) { polyln.bindPopup(data.name); }
+        if (opt.clickable) { 
+            var words = "<b>"+data.name+"</b>";
+            if (data.popup) { var words = words + "<br/>" + data.popup; }
+            polyln.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
+        }
         polygons[data.name] = polyln;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polygons[data.name]);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea = L.polygon(data.area, opt);
-        if (opt.clickable) { polyarea.bindPopup(data.name); }
+        if (opt.clickable) {
+            var words = "<b>"+data.name+"</b>";
+            if (data.popup) { var words = words + "<br/>" + data.popup; }
+            polyarea.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
+        }
         polygons[data.name] = polyarea;
         polygons[data.name].lay = lay;
         layers[lay].addLayer(polygons[data.name]);

@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.2-beta - Let lines and areas also have popups
 - v2.0.1-beta - Add optional graticule
 - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
 - v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
@@ -190,12 +191,14 @@ If the msg.payload contains an **area** property - that is an array of co-ordina
 then rather than draw a point and icon it draws the polygon. Likewise if it contains a
 **line** property it will draw the polyline.
 
+ - **name** : is used as the id key - so can be redrawn/moved.
+ - **layer** : declares which layer you put it on.
  - **color** : can set the colour of the polygon or line.
  - **fillColor** : can set the fill colour of the polygon.
  - **fillOpacity** : can set the opacity of the polygon fill colour.
  - **dashArray** : optional dash array for polyline.
- - **name** : is used as the id key - so can be redrawn/moved.
- - **layer** : declares which layer you put it on..
+ - **clickable** : boolean - set to true to allow click to show popup.
+ - **popup** : html string to display in popup (as well as name).
 
 ### Circles
 
@@ -220,7 +223,8 @@ Areas, Lines and Circles can also specify more optional properties:
  - fill
  - fillOpacity
  - dashArray
- - clickable (if true sets the passed in name as Popup)
+ - clickable - if true sets the passed in name as popup
+ - popup - extra html string to display as part of popup
 
 ## Drawing
 
