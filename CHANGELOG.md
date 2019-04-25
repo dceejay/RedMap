@@ -1,6 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name.
+ - v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
  - v2.0.3-beta - Let circles have popups. Better drawing of ellipses
  - v2.0.2-beta - Let lines and areas also have popups
  - v2.0.1-beta - Add optional graticule.
