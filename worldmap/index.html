@@ -1435,7 +1435,7 @@ function setMarker(data) {
             // customise right click context menu
             var rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
             if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
-                rightcontext = data.contextmenu.replace(/$name/g,'\""+'+data.name+'+"\"');
+                rightcontext = data.contextmenu.replace(/\$name/g,data.name);
                 delete data.contextmenu;
             }
 
@@ -1467,13 +1467,18 @@ function setMarker(data) {
             marker._popup.dname = data.name;
             marker.lay = lay;                       // and the layer it is on
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/><button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>");
-            marker.on('contextmenu', function(e) {
-                if (hiderightclick !== true) {
-                    rightmenuMarker.setLatLng(e.latlng);
-                    map.openPopup(rightmenuMarker);
-                }
-            });
+            if (rightcontext.length === 0) {
+                marker.on('contextmenu', function() { return; });
+            }
+            else {
+                var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
+                marker.on('contextmenu', function(e) {
+                    if (hiderightclick !== true) {
+                        rightmenuMarker.setLatLng(e.latlng);
+                        map.openPopup(rightmenuMarker);
+                    }
+                });
+            }
             marker.on('click', function(e) {
                 ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
             });
