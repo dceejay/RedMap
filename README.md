@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.5-beta - Fix clustering on zoom (update old library)
 - v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
 - v2.0.3-beta - Let circles have popups. Better drawing of ellipses
 - v2.0.2-beta - Let lines and areas also have popups
