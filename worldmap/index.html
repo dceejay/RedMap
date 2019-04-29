@@ -1663,7 +1663,7 @@ function doCommand(cmd) {
             if (overlays.hasOwnProperty(cmd.map.delete[a])) { delete overlays[cmd.map.delete[a]]; }
         }
         if (showLayerMenu) {
-            layercontrol.removeFrom(map);
+            map.removeControl(layercontrol);
             layercontrol = L.control.layers(basemaps, overlays).addTo(map);
         }
     }
