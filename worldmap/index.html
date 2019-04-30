@@ -267,9 +267,6 @@ if (window.self !== window.top) {
 }
 else {
     console.log("NOT in an iframe");
-    // window.onbeforeunload = function(e) {
-    //     return 'Reloading will delete all the local markers, including any drawing on the "drawing" layer';
-    // };
     if (!showUserMenu) {
         document.getElementById("bars").style.display="none";
     }
@@ -570,10 +567,8 @@ map.on('overlayadd', function(e) {
     }
     if (e.name == "drawing") {
         overlays["drawing"].bringToFront();
-        // And the actual draw controls
         map.addControl(drawControl);
-        // Add the color change buttons
-        //colorControl.addTo(map);
+        //map.addControl(colorControl);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -837,24 +832,24 @@ layers["_drawing"] = new L.FeatureGroup();
 overlays["drawing"] = layers["_drawing"];
 var drawControl = new L.Control.Draw({
     draw: {
-        polyline: { shapeOptions: { clickable:false } },
+        polyline: { shapeOptions: { clickable:true } },
         marker: false,
-        circle: false,
-        // circle: { shapeOptions: { clickable:false } },
+        //circle: false,
+        circle: { shapeOptions: { clickable:false } },
         circlemarker: false,
         rectangle: { shapeOptions: { clickable:true } },
-        polygon: { shapeOptions: { clickable:true } },
+        polygon: { shapeOptions: { clickable:true } }
     },
     edit: {
         featureGroup: layers["_drawing"],
         remove: true,
-        edit: false
+        edit: true
     }
 });
 map.on('draw:created', function (e) {
     var type = e.layerType;
     var layer = e.layer;
-    //console.log(type, layer._latlngs);
+    console.log("DRAW",type, layer);
     //console.log(JSON.stringify(layer.toGeoJSON()));
     ws.send(JSON.stringify({action:"draw", type:type, points:layer._latlngs}));
     layers["_drawing"].addLayer(layer);
