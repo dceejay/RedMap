@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas.
 - v2.0.5-beta - Fix clustering on zoom (update old library)
 - v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
 - v2.0.3-beta - Let circles have popups. Better drawing of ellipses
@@ -186,23 +187,19 @@ in addition existing male, female, fa-male and fa-female icons are all represent
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
 
-### Areas and Lines
+### Areas, Lines and Rectangles
 
 If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
 
-    ... , "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ], ...
+    msg.payload = {"name": "zone1", "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]}
 
-then rather than draw a point and icon it draws the polygon. Likewise if it contains a
-**line** property it will draw the polyline.
+then rather than draw a point and icon it draws the polygon. If the "area" array only has 2
+elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
- - **name** : is used as the id key - so can be redrawn/moved.
- - **layer** : declares which layer you put it on.
- - **color** : can set the colour of the polygon or line.
- - **fillColor** : can set the fill colour of the polygon.
- - **fillOpacity** : can set the opacity of the polygon fill colour.
- - **dashArray** : optional dash array for polyline.
- - **clickable** : boolean - set to true to allow click to show popup.
- - **popup** : html string to display in popup (as well as name).
+Likewise if it contains a **line** property it will draw the polyline.
+
+There are extra optional properties you can specify - see Options below.
+
 
 ### Circles and Ellipses
 
@@ -221,17 +218,18 @@ a number of degrees.
 
 ### Options
 
-Areas, Lines and Circles can also specify more optional properties:
- - color
- - fillColor
- - stroke
- - weight
- - opacity
- - fill
- - fillOpacity
- - dashArray
- - clickable - if true sets the passed in name as popup
- - popup - extra html string to display inside the popup
+Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
+
+ - **layer** : declares which layer you put it on.
+ - **color** : can set the colour of the polygon or line.
+ - **fillColor** : can set the fill colour of the polygon.
+ - **fillOpacity** : can set the opacity of the polygon fill colour.
+ - **dashArray** : optional dash array for polyline.
+ - **clickable** : boolean - set to true to allow click to show popup.
+ - **popup** : html string to display in popup (as well as name).
+ - **weight** : the width of the line (or outline)
+
+Other properties can be found in the leaflet documentation.
 
 ## Drawing
 
@@ -239,7 +237,7 @@ A single *right click* will allow you to add a point to the map - you must speci
 
 Right-clicking on an icon will allow you to delete it.
 
-If you select the **drawing** layer you can also add polylines, polygons and rectangles.
+If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
 
 ## Events from the map
 
