@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas.
+- v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas. Make individual objects editable.
 - v2.0.5-beta - Fix clustering on zoom (update old library)
 - v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
 - v2.0.3-beta - Let circles have popups. Better drawing of ellipses
@@ -208,7 +208,7 @@ than draw a point it will draw a circle. The *radius* property is specified in m
 
     msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
 
-As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*.
+As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options below.
 
 If the **radius** property is an array of two numbers, these specify the minor and major radii
 of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
@@ -227,6 +227,8 @@ Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional pr
  - **dashArray** : optional dash array for polyline.
  - **clickable** : boolean - set to true to allow click to show popup.
  - **popup** : html string to display in popup (as well as name).
+ - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu
+ - **contextmenu** : html string to display a more complex right click contextmenu
  - **weight** : the width of the line (or outline)
 
 Other properties can be found in the leaflet documentation.
@@ -238,6 +240,7 @@ A single *right click* will allow you to add a point to the map - you must speci
 Right-clicking on an icon will allow you to delete it.
 
 If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
+Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
 
 ## Events from the map
 
@@ -261,9 +264,19 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "feedback", "name": "some name", "value": "some value" } // when a user calls the feedback function - see below
 
-There is a function available to make sending data to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
-
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+
+
+### Utility functions
+
+There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
+
+ - **feedback()** : it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
+
+ - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+
+ - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+
 
 ## Controlling the map
 
