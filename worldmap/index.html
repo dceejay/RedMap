@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css" href="leaflet/MarkerCluster.css">
     <link rel="stylesheet" type="text/css" href="leaflet/MarkerCluster.Default.css">
     <link rel="stylesheet" type="text/css" href="leaflet/leaflet.draw.css">
-    <link rel="stylesheet" type="text/css" href="leaflet/leaflet.measurecontrol.css">
+    <link rel="stylesheet" type="text/css" href="leaflet/leaflet-ruler.css">
     <link rel="stylesheet" type="text/css" href="leaflet/easy-button.css">
     <link rel="stylesheet" type="text/css" href="leaflet/leaflet.fullscreen.css">
     <link rel="stylesheet" type="text/css" href="leaflet/Leaflet.Dialog.css">
@@ -47,7 +47,7 @@
     <script src="leaflet/leaflet.active-layers.min.js"></script>
     <script src="leaflet/leaflet.select-layers.min.js"></script>
     <script src="leaflet/leaflet.draw.js"></script>
-    <script src="leaflet/leaflet.measurecontrol.js"></script>
+    <script src="leaflet/leaflet-ruler.js"></script>
     <script src="leaflet/easy-button.js"></script>
     <script src="leaflet/Leaflet.fullscreen.min.js"></script>
     <script src="leaflet/Leaflet.Dialog.js"></script>
@@ -241,7 +241,11 @@ if (showUserMenu) {
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
+// Create some buttons
 var menuButton = L.easyButton({states:[{icon:'fa-bars fa-lg', onClick:function() { toggleMenu(); }, title:'Toggle menu'}], position:"topright"});
+var fullscreenButton = L.control.fullscreen();
+var rulerButton = L.control.ruler({position:"topleft"});
+
 //var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
 var redButton = L.easyButton('fa-square wm-red', function(btn) { console.log("RED",btn); })
 var blueButton = L.easyButton('fa-square wm-blue', function(btn) { console.log("BLUE",btn); })
@@ -254,41 +258,24 @@ var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blac
 if (window.self !== window.top) {
     console.log("IN an iframe");
     inIframe = true;
-    (document.getElementById("topbar").style.display="none");
-    (document.getElementById("map").style.top="0px");
-    (document.getElementById("results").style.right="50px");
-    (document.getElementById("results").style.top="10px");
-    (document.getElementById("results").style.zIndex="1");
-    (document.getElementById("results").style.height="31px");
-    (document.getElementById("results").style.paddingTop="6px");
-    (document.getElementById("bars").style.display="none");
-    (document.getElementById("menu").style.right="8px");
-    (document.getElementById("menu").style.borderRadius="6px");
+    if (showUserMenu) { menuButton.addTo(map); }
+    document.getElementById("topbar").style.display="none";
+    document.getElementById("map").style.top="0px";
+    document.getElementById("results").style.right="50px";
+    document.getElementById("results").style.top="10px";
+    document.getElementById("results").style.zIndex="1";
+    document.getElementById("results").style.height="31px";
+    document.getElementById("results").style.paddingTop="6px";
+    document.getElementById("bars").style.display="none";
+    document.getElementById("menu").style.right="8px";
+    document.getElementById("menu").style.borderRadius="6px";
 }
 else {
     console.log("NOT in an iframe");
-    if (!showUserMenu) {
-        document.getElementById("bars").style.display="none";
-    }
-}
+    if (!showUserMenu) { document.getElementById("bars").style.display="none"; }
 
-// Add graticule
-var showGrid = false;
-var Lgrid = L.latlngGraticule({
-	font: "Verdana",
-    fontColor: "#666",
-    zoomInterval: [
-		{start:1, end:2, interval:40},
-		{start:3, end:3, interval:20},
-		{start:4, end:4, interval:10},
-		{start:5, end:7, interval:5},
-		{start:8, end:20, interval:1}
-	]
-});
-
-if (!inIframe) {
     // Add the fullscreen button
-    L.control.fullscreen().addTo(map);
+    fullscreenButton.addTo(map);
 
     // Add the locate my position button
     L.easyButton( 'fa-crosshairs fa-lg', function() {
@@ -312,7 +299,7 @@ if (!inIframe) {
     map.on('locationerror', onLocationError);
 
     // Add the measure/ruler button
-    L.Control.measureControl().addTo(map);
+    rulerButton.addTo(map);
 
     // Create the clear heatmap button
     var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
@@ -320,8 +307,20 @@ if (!inIframe) {
         heat.setLatLngs([]);
     }, "Clears the current heatmap", "bottomright");
 }
-else { if (showUserMenu) { menuButton.addTo(map); } }
 
+// Add graticule
+var showGrid = false;
+var Lgrid = L.latlngGraticule({
+	font: "Verdana",
+    fontColor: "#666",
+    zoomInterval: [
+		{start:1, end:2, interval:40},
+		{start:3, end:3, interval:20},
+		{start:4, end:4, interval:10},
+		{start:5, end:7, interval:5},
+		{start:8, end:20, interval:1}
+	]
+});
 
 // Handle the dialog for help box
 var dialog = document.querySelector('dialog');
