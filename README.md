@@ -382,6 +382,8 @@ This can be used to tidy up the initial selections available to the user layer m
         "delete":["Watercolor","ship nav","heatmap","Terrain","UK OS 1900","UK OS 1919-47"]
     };
 
+Note: layer names are case sensitive.
+
 #### To add a WMS overlay layer - eg US weather radar
 
 To add an overlay instead of a base layer - specify the `overlay` property instead of the `name`.
