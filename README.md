@@ -379,7 +379,7 @@ To remove several layers, either base layers or overlays, you can pass an array 
 This can be used to tidy up the initial selections available to the user layer menu.
 
     msg.payload.command.map = {
-        "delete":["Watercolor","Ship Nav","Heatmap"]
+        "delete":["Watercolor","ship nav","heatmap","Terrain","UK OS 1900","UK OS 1919-47"]
     };
 
 #### To add a WMS overlay layer - eg US weather radar
