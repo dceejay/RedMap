@@ -9,7 +9,15 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v1.5.40 - Only enable on.location function when not in an iframe. Tidy html.
+- v2.0.7-beta - Switch Ruler control to be independent of Draw library.
+- v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas. Make individual objects editable.
+- v2.0.5-beta - Fix clustering on zoom (update old library)
+- v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
+- v2.0.3-beta - Let circles have popups. Better drawing of ellipses
+- v2.0.2-beta - Let lines and areas also have popups
+- v2.0.1-beta - Add optional graticule
+- v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
+- v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
 - v1.5.39 - Add weather-lite icons
 - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
 - v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
@@ -88,6 +96,7 @@ There are also several special icons...
  - **ship** : a ship icon that aligns with the bearing of travel.
  - **car** : a car icon that aligns with the bearing of travel.
  - **uav** : a small plane icon that aligns with the bearing of travel.
+ - **helicopter** : a small helicopter icon that aligns with the bearing of travel.
  - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **satellite** : a small satellite icon.
@@ -179,46 +188,51 @@ in addition existing male, female, fa-male and fa-female icons are all represent
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
 
-### Areas and Lines
+### Areas, Lines and Rectangles
 
 If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
 
-    ... , "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ], ...
+    msg.payload = {"name": "zone1", "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]}
 
-then rather than draw a point and icon it draws the polygon. Likewise if it contains a
-**line** property it will draw the polyline.
+then rather than draw a point and icon it draws the polygon. If the "area" array only has 2
+elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
- - **color** : can set the colour of the polygon or line.
- - **fillColor** : can set the fill colour of the polygon.
- - **fillOpacity** : can set the opacity of the polygon fill colour.
- - **dashArray** : optional dash array for polyline.
- - **name** : is used as the id key - so can be redrawn/moved.
- - **layer** : declares which layer you put it on..
+Likewise if it contains a **line** property it will draw the polyline.
 
-### Circles
+There are extra optional properties you can specify - see Options below.
+
+
+### Circles and Ellipses
 
 If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
 than draw a point it will draw a circle. The *radius* property is specified in meters.
 
     msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
 
-As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*.
+As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options below.
 
-If the payload contains a **sdlat** and **sdlon** property instead of *radius* an ellipse will be drawn. The sdlat and sdlon propertys specify the semi-axes of the ellipse.
-These are specified in the Latitude/Longitude format.
+If the **radius** property is an array of two numbers, these specify the minor and major radii
+of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
+a number of degrees.
+
+    msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
 
 ### Options
 
-Areas, Lines and Circles can also specify more optional properties:
- - color
- - fillColor
- - stroke
- - weight
- - opacity
- - fill
- - fillOpacity
- - dashArray
- - clickable (if true sets the passed in name as Popup)
+Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
+
+ - **layer** : declares which layer you put it on.
+ - **color** : can set the colour of the polygon or line.
+ - **fillColor** : can set the fill colour of the polygon.
+ - **fillOpacity** : can set the opacity of the polygon fill colour.
+ - **dashArray** : optional dash array for polyline.
+ - **clickable** : boolean - set to true to allow click to show popup.
+ - **popup** : html string to display in popup (as well as name).
+ - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu
+ - **contextmenu** : html string to display a more complex right click contextmenu
+ - **weight** : the width of the line (or outline)
+
+Other properties can be found in the leaflet documentation.
 
 ## Drawing
 
@@ -226,7 +240,8 @@ A single *right click* will allow you to add a point to the map - you must speci
 
 Right-clicking on an icon will allow you to delete it.
 
-If you select the **drawing** layer you can also add polylines, polygons and rectangles.
+If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
+Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
 
 ## Events from the map
 
@@ -250,9 +265,19 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "feedback", "name": "some name", "value": "some value" } // when a user calls the feedback function - see below
 
-There is a function available to make sending data to Node-RED easier (e.g. from inside a user defined popup), called feedback() - it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
-
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+
+
+### Utility functions
+
+There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
+
+ - **feedback()** : it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
+
+ - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+
+ - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+
 
 ## Controlling the map
 
@@ -354,8 +379,10 @@ To remove several layers, either base layers or overlays, you can pass an array 
 This can be used to tidy up the initial selections available to the user layer menu.
 
     msg.payload.command.map = {
-        "delete":["Watercolor","Ship Nav","Heatmap"]
+        "delete":["Watercolor","ship nav","heatmap","Terrain","UK OS 1900","UK OS 1919-47"]
     };
+
+Note: layer names are case sensitive.
 
 #### To add a WMS overlay layer - eg US weather radar
 
@@ -438,6 +465,18 @@ in a function node:
         opt: { opacity:0.8, attribution:"&copy; University of Texas" }
     };
 
+#### To add a Lat/Lon Graticule overlay
+
+A graticule can be enabled via the node configuration, and can also be set dynamically,
+for example in a function node:
+
+    msg.payload = { command : { grid : {
+        showgrid: true,
+        opt: { showLabel:true, dashArray:[5, 5], fontColor:"#900" }
+    };
+
+see https://github.com/cloudybay/leaflet.latlng-graticule for more details about options and demo.
+
 #### To clear all markers from a layer, or an overlay from the map
 
     msg.payload.command.clear = "name of your layer/overlay to remove";
@@ -486,4 +525,4 @@ It also shows how to zoom and move the map or add a new layer.
     [{"id":"86457344.50e6b","type":"inject","z":"745a133b.dd6dec","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":190,"y":2420,"wires":[["9a142026.fa47f"]]},{"id":"9a142026.fa47f","type":"function","z":"745a133b.dd6dec","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = { maxZoom: 19, attribution: '&copy; OpenStreetMap'};\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":2420,"wires":[["c643e022.1816c"]]},{"id":"c643e022.1816c","type":"worldmap","z":"745a133b.dd6dec","name":"","x":750,"y":2460,"wires":[]},{"id":"2998e233.4ba64e","type":"function","z":"745a133b.dd6dec","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"noerr":0,"x":540,"y":2560,"wires":[["c643e022.1816c"]]},{"id":"e72c5732.9fa198","type":"function","z":"745a133b.dd6dec","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:0,zoom:3} };\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":2460,"wires":[["c643e022.1816c"]]},{"id":"12317723.589249","type":"csv","z":"745a133b.dd6dec","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":390,"y":2500,"wires":[["2998e233.4ba64e"]]},{"id":"10e5e5f0.8daeaa","type":"inject","z":"745a133b.dd6dec","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":190,"y":2460,"wires":[["e72c5732.9fa198"]]},{"id":"b6917d83.d1bac","type":"http request","z":"745a133b.dd6dec","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":270,"y":2560,"wires":[["12317723.589249"]]},{"id":"3842171.4d487e8","type":"inject","z":"745a133b.dd6dec","name":"Quakes","topic":"","payload":"","payloadType":"none","repeat":"900","crontab":"","once":false,"x":200,"y":2500,"wires":[["b6917d83.d1bac"]]}]
 
 
-Car icon made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="mapinfo">CC 3.0 BY</a>.</div>
+Car and Helicopter icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="mapinfo">CC 3.0 BY</a>.</div>

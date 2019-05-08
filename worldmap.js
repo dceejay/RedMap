@@ -40,6 +40,7 @@ module.exports = function(RED) {
         this.panit = n.panit || "false";
         this.hiderightclick = n.hiderightclick || "false";
         this.coords = n.coords || "none";
+        this.showgrid = n.showgrid || "false";
         this.path = n.path || "/worldmap";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
@@ -72,6 +73,7 @@ module.exports = function(RED) {
                     c.panlock = node.panlock;
                     c.zoomlock = node.zoomlock;
                     c.showlayers = node.layers;
+                    c.grid = {showgrid:node.showgrid};
                     c.hiderightclick = node.hiderightclick;
                     c.coords = node.coords;
                     client.write(JSON.stringify({command:c}));

@@ -45,6 +45,10 @@ dialog > button {
     vertical-align:middle;
 }
 
+.leaflet-tooltip {
+    padding: 1px 4px !important;
+}
+
 #topbar {
     color:#c7c7c7;
     background-color:black;
@@ -73,14 +77,14 @@ dialog > button {
 #map {
     position:fixed;
     top:40px;
-    bottom:0px;
+    bottom:1px;
     min-width:100%;
     display:block;
 }
 
 #foot {
     position:absolute;
-    bottom:-1px;
+    bottom:0px;
     left:-1px;
     z-index:1;
     font-size:9px;
