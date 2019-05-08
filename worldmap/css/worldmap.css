@@ -1,5 +1,6 @@
 body {
     width:100%;
+    height:100%;
     left:0px;
     margin:0;
     padding:0;
@@ -21,25 +22,6 @@ a {
     text-decoration:none;
 }
 
-dialog {
-    top: 50px;
-    z-index: 9999;
-    width: 60% !important;
-    border-radius: 4px !important;
-    border-width: 0px !important;
-    line-height: 1.4em !important;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.65) !important;
-}
-dialog > p > b {
-    font-size: unset;
-}
-dialog > button {
-    margin-top: 6px;
-    height: 24px;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
 .topbar {
     font-size:16px;
     vertical-align:middle;
@@ -47,6 +29,11 @@ dialog > button {
 
 .leaflet-tooltip {
     padding: 1px 4px !important;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle {
+    width:35px;
+    height:35px;
 }
 
 #topbar {
@@ -82,11 +69,11 @@ dialog > button {
     display:block;
 }
 
-#foot {
+#footer {
     position:absolute;
     bottom:0px;
     left:-1px;
-    z-index:1;
+    z-index:999;
     font-size:9px;
 }
 
