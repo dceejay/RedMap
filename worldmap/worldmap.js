@@ -1308,6 +1308,8 @@ function setMarker(data) {
         }
 
         // remove icon from list of properties, then add all others to popup
+        if (data.hasOwnProperty("alt")) { data.alt = +data.alt.toFixed(2); }
+        if (data.hasOwnProperty("speed")) { data.speed = +data.speed.toFixed(2); }
         if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
         if (data.hasOwnProperty("icon")) { delete data.icon; }
         if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
