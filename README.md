@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.9 - Only update maxage on screen once it exists
 - v2.0.8 - Drop beta flag, re-organise index, js and css files. Now using leaflet 1.4
 - v2.0.7-beta - Switch Ruler control to be independent of Draw library.
 - v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas. Make individual objects editable.

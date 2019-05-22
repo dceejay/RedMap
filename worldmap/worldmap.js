@@ -104,24 +104,6 @@ document.addEventListener ("keydown", function (ev) {
     }
 });
 
-if (showUserMenu) {
-    if ( window.localStorage.hasOwnProperty("lastpos") ) {
-        var sp = JSON.parse(window.localStorage.getItem("lastpos"));
-        startpos = [ sp.lat, sp.lng ];
-    }
-    if ( window.localStorage.hasOwnProperty("lastzoom") ) {
-        startzoom = window.localStorage.getItem("lastzoom");
-    }
-    // if ( window.localStorage.hasOwnProperty("clusterat") ) {
-    //     clusterAt = window.localStorage.getItem("clusterat");
-    //     document.getElementById("setclus").value = clusterAt;
-    // }
-    if ( window.localStorage.hasOwnProperty("maxage") ) {
-        maxage = window.localStorage.getItem("maxage");
-        document.getElementById("maxage").value = maxage;
-    }
-}
-
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
 
@@ -202,6 +184,24 @@ var helpText = `<table>
 if (!inIframe) { helpText += `<tr><td style="cursor:default"><span id="showHelp" onclick='doDialog(helpText);'><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr></table>`; }
 else { helpText += `</table>` }
 document.getElementById('menu').innerHTML = helpText;
+
+if (showUserMenu) {
+    if ( window.localStorage.hasOwnProperty("lastpos") ) {
+        var sp = JSON.parse(window.localStorage.getItem("lastpos"));
+        startpos = [ sp.lat, sp.lng ];
+    }
+    if ( window.localStorage.hasOwnProperty("lastzoom") ) {
+        startzoom = window.localStorage.getItem("lastzoom");
+    }
+    // if ( window.localStorage.hasOwnProperty("clusterat") ) {
+    //     clusterAt = window.localStorage.getItem("clusterat");
+    //     document.getElementById("setclus").value = clusterAt;
+    // }
+    if ( window.localStorage.hasOwnProperty("maxage") ) {
+        maxage = window.localStorage.getItem("maxage");
+        document.getElementById("maxage").value = maxage;
+    }
+}
 
 // Add graticule
 var showGrid = false;
