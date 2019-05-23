@@ -1054,7 +1054,6 @@ function setMarker(data) {
 
         if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
-        console.log("DATA",data);
         if (data.hasOwnProperty("icon")) {
             if (data.icon === "ship") {
                 marker = L.boatMarker(ll, {
