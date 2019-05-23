@@ -1263,18 +1263,8 @@ function setMarker(data) {
                 marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
                 labelOffset = [16,-16];
             }
-            else {
-                myMarker = L.VectorMarkers.icon({
-                    icon: data.icon || "circle",
-                    markerColor: (data.iconColor || "#910000"),
-                    prefix: 'fa',
-                    iconColor: 'white'
-                });
-                marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
-                labelOffset = [6,-6];
-            }
         }
-        if (data.hasOwnProperty("SIDC")) {
+        else if (data.hasOwnProperty("SIDC")) {
             // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
             myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:data.name });
             // Now that we have a symbol we can ask for the echelon and set the symbol size
@@ -1288,6 +1278,16 @@ function setMarker(data) {
                 className: "natoicon",
             });
             marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
+        }
+        else {
+            myMarker = L.VectorMarkers.icon({
+                icon: data.icon || "circle",
+                markerColor: (data.iconColor || "#910000"),
+                prefix: 'fa',
+                iconColor: 'white'
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            labelOffset = [6,-6];
         }
         marker.name = data.name;
 
