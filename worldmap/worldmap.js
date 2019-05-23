@@ -1054,6 +1054,7 @@ function setMarker(data) {
 
         if (data.draggable === true) { drag = true; }
         //console.log("ICON",data.icon);
+        console.log("DATA",data);
         if (data.hasOwnProperty("icon")) {
             if (data.icon === "ship") {
                 marker = L.boatMarker(ll, {
@@ -1263,6 +1264,16 @@ function setMarker(data) {
                 marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
                 labelOffset = [16,-16];
             }
+            else {
+                myMarker = L.VectorMarkers.icon({
+                    icon: data.icon || "circle",
+                    markerColor: (data.iconColor || "#910000"),
+                    prefix: 'fa',
+                    iconColor: 'white'
+                });
+                marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+                labelOffset = [6,-6];
+            }
         }
         else if (data.hasOwnProperty("SIDC")) {
             // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
@@ -1281,7 +1292,7 @@ function setMarker(data) {
         }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: data.icon || "circle",
+                icon: "circle",
                 markerColor: (data.iconColor || "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'

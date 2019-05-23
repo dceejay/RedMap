@@ -1,6 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.0.10 - Ensure default icon is in place if not specified (regression)
+ - v2.0.11 - Ensure default icon is in place if not specified (regression)
  - v2.0.9 - Only update maxage on screen once it exists
  - v2.0.8 - Drop beta flag, re-organise index, js and css files. Now using leaflet 1.4
  - v2.0.7-beta - Switch Ruler control to be independent of Draw library.
