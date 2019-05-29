@@ -20,17 +20,6 @@ map web page for plotting "things" on.
 - v2.0.2-beta - Let lines and areas also have popups
 - v2.0.1-beta - Add optional graticule
 - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
-- v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
-- v1.5.39 - Add weather-lite icons
-- v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
-- v1.5.37 - Add .trackpoints to override default in tracks node. Let tracks optionally be on different layers. Fix marker changing layers Issue #85
-- v1.5.36 - Fix contextmenu $name substitution. Issue #84
-- v1.5.35 - Add msg.delete command to remove any layers not needed at start (array of names). Issue #83.
-- v1.5.34 - Add command.contextmenu to set non-marker context menu (defaults to add marker).
-- v1.5.33 - Let blank input disable contextmenu completely. Tidy up help, update dialog polyfill.
-- v1.5.32 - Add .contextmenu custom right click menu, Fix map lock, Close websocket on unload
-- v1.5.31 - Fix pan first at start, and coords overlay. Issues #81 and #82
-- v1.5.30 - Add .tooltip option, ability to remove base layer, search on icon, show mouse pointer co-ordinates
   - ...
 
 see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
@@ -60,7 +49,7 @@ Optional properties include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
- - **layer** : specify a layer on the map to add marker to. (default <i>unknown</i>)
+ - **layer** : specify a layer on the map to add marker to. (default <i>"unknown"</i>)
  - **speed** : when combined with bearing, draws a vector.
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
