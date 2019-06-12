@@ -1501,7 +1501,7 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("showlayers")) {
         if ((cmd.showlayers === "hide") && (showLayerMenu === true)) {
             showLayerMenu = false;
-            layercontrol.removeFrom(map);
+            if (layercontrol) { layercontrol.removeFrom(map); }
         }
         else if ((cmd.showlayers === "show") && (showLayerMenu === false)) {
             showLayerMenu = true;
