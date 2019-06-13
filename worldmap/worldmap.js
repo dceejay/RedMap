@@ -917,7 +917,7 @@ function setMarker(data) {
     var ll;
     var lli = null;
     var opt = {};
-    opt.color = data.color || "#910000";
+    opt.color = data.color || data.lineColor || "#910000";
     opt.fillColor = data.fillColor || "#910000";
     opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
     opt.weight = data.weight || 2;
@@ -1386,7 +1386,7 @@ function setMarker(data) {
         marker = rightmenu(marker);
 
         // Add any remaining properties to the info box
-        var llc = data.lineColor;
+        var llc = data.lineColor || data.color;
         delete data.lat;
         delete data.lon;
         if (data.layer) { delete data.layer; }

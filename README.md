@@ -53,7 +53,7 @@ Optional properties include
  - **speed** : when combined with bearing, draws a vector.
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
- - **lineColor** : CSS color name or #rrggbb value for bearing line or accuracy polygon
+ - **color** : CSS color name or #rrggbb value for bearing line or accuracy polygon
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or http://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
