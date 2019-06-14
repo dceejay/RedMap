@@ -9,6 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.14 - Revert use of ES6 import.
+- v2.0.13 - Fix tracks colour.
 - v2.0.12 - Ensure default icon is in place if not specified (regression)
 - v2.0.9 - Only update maxage on screen once it exists
 - v2.0.8 - Drop beta flag, re-organise index, js and css files. Now using leaflet 1.4

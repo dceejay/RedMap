@@ -1,8 +1,8 @@
 [
     {
-        "id": "efb1f72f.d56a98",
+        "id": "9b2a29cc.3c53a8",
         "type": "worldmap",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
         "lat": "",
         "lon": "",
@@ -12,14 +12,14 @@
         "maxage": "",
         "usermenu": "hide",
         "panit": "true",
-        "x": 505,
-        "y": 195,
+        "x": 750,
+        "y": 420,
         "wires": []
     },
     {
-        "id": "208a3922.4fc106",
+        "id": "1714967f.e691ea",
         "type": "inject",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
         "topic": "",
         "payload": "",
@@ -28,34 +28,35 @@
         "crontab": "",
         "once": false,
         "onceDelay": "",
-        "x": 145,
-        "y": 135,
+        "x": 290,
+        "y": 360,
         "wires": [
             [
-                "59d2062e.e54db8"
+                "1b24ad2f.198453"
             ]
         ]
     },
     {
-        "id": "59d2062e.e54db8",
+        "id": "1b24ad2f.198453",
         "type": "function",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
-        "func": "// create random position\nvar lat = 51 + Math.random() * 0.2;\nvar lon = -1.45 + Math.random() * 0.2;\nmsg.payload={lat:lat, lon:lon, name:\"Mike\", icon:\"male\", url:\"<a href=\\\"../ui/#/0\\\">IBM link</a>\"};\nreturn msg;",
+        "func": "// create random position\nvar lat = 51 + Math.random() * 0.2;\nvar lon = -1.45 + Math.random() * 0.2;\nmsg.payload={\n    lat:lat, \n    lon:lon, \n    name:\"Mike\", \n    icon:\"male\", \n    color:\"#000\"};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 325,
-        "y": 195,
+        "x": 470,
+        "y": 420,
         "wires": [
             [
-                "efb1f72f.d56a98"
+                "9b2a29cc.3c53a8",
+                "de5c4044.d4e0f"
             ]
         ]
     },
     {
-        "id": "c7fd20dd.46979",
+        "id": "5af27cae.299144",
         "type": "inject",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
         "topic": "",
         "payload": "",
@@ -64,19 +65,19 @@
         "crontab": "",
         "once": true,
         "onceDelay": "",
-        "x": 125,
-        "y": 255,
+        "x": 270,
+        "y": 480,
         "wires": [
             [
-                "f88c9738.621ee8"
+                "f1be23c1.dd096"
             ]
         ]
     },
     {
-        "id": "aa27dc72.3e70a",
+        "id": "4bab3415.afdf9c",
         "type": "ui_template",
-        "z": "46213b15.1d9a74",
-        "group": "1c6852f7.95a1ed",
+        "z": "f59603d8.0a6a",
+        "group": "cd81d08b.eebb3",
         "name": "",
         "order": 0,
         "width": "6",
@@ -85,36 +86,36 @@
         "storeOutMessages": true,
         "fwdInMessages": true,
         "templateScope": "local",
-        "x": 495,
-        "y": 255,
+        "x": 640,
+        "y": 480,
         "wires": [
             []
         ]
     },
     {
-        "id": "f88c9738.621ee8",
+        "id": "f1be23c1.dd096",
         "type": "template",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
         "field": "payload",
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
         "template": "<iframe src=\"../worldmap\" height=300px ></iframe>",
-        "x": 325,
-        "y": 255,
+        "x": 470,
+        "y": 480,
         "wires": [
             [
-                "aa27dc72.3e70a"
+                "4bab3415.afdf9c"
             ]
         ]
     },
     {
-        "id": "bdb72125.35aa9",
+        "id": "de3a90c8.8179c",
         "type": "ui_button",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "",
-        "group": "1c6852f7.95a1ed",
+        "group": "cd81d08b.eebb3",
         "order": 0,
         "width": 0,
         "height": 0,
@@ -124,37 +125,52 @@
         "payload": "",
         "payloadType": "str",
         "topic": "",
-        "x": 145,
-        "y": 195,
+        "x": 290,
+        "y": 420,
         "wires": [
             [
-                "59d2062e.e54db8"
+                "1b24ad2f.198453"
             ]
         ]
     },
     {
-        "id": "b9813d1d.028ac",
+        "id": "223f301c.54ea9",
         "type": "comment",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "How to embed Map in Dashboard",
         "info": "This example shows how to embed the Worldmap \ninto a template node within the `node-red-dashboard`\n\nThe first flow creates a dashboard button that \ngenerates a randon position, with the required \nicon, and passes that to the worldmap. The\nmap is configured to automatically pan to the\nposition of any point that arrives.\n\nThe second flow initialise the dashboard template\nwith the initial map and sets it to a more square shape\nby adjusting the height.",
-        "x": 195,
-        "y": 75,
+        "x": 340,
+        "y": 300,
         "wires": []
     },
     {
-        "id": "1c6852f7.95a1ed",
+        "id": "de5c4044.d4e0f",
+        "type": "worldmap-tracks",
+        "z": "f59603d8.0a6a",
+        "name": "",
+        "depth": "5",
+        "layer": "combined",
+        "x": 610,
+        "y": 380,
+        "wires": [
+            [
+                "9b2a29cc.3c53a8"
+            ]
+        ]
+    },
+    {
+        "id": "cd81d08b.eebb3",
         "type": "ui_group",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "Default",
-        "tab": "e4c4803b.93d4",
+        "tab": "b34078e6.e60df8",
         "disp": true,
         "width": "6"
     },
     {
-        "id": "e4c4803b.93d4",
+        "id": "b34078e6.e60df8",
         "type": "ui_tab",
-        "z": "46213b15.1d9a74",
+        "z": "f59603d8.0a6a",
         "name": "Home",
         "icon": "dashboard"
     }
