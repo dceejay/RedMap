@@ -43,6 +43,37 @@ var iconSz = {
   "Command": 44
 };
 
+// Polyfill assign for IE11 for now
+if (typeof Object.assign !== 'function') {
+  // Must be writable: true, enumerable: false, configurable: true
+  Object.defineProperty(Object, "assign", {
+    value: function assign(target, varArgs) { // .length of function is 2
+      'use strict';
+      if (target === null || target === undefined) {
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var to = Object(target);
+
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+
+        if (nextSource !== null && nextSource !== undefined) {
+          for (var nextKey in nextSource) {
+            // Avoid bugs when hasOwnProperty is shadowed
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    },
+    writable: true,
+    configurable: true
+  });
+}
+
 // Create the socket
 var connect = function() {
     ws = new SockJS(location.pathname.split("index")[0] + 'socket');
@@ -174,16 +205,16 @@ else {
     }, "Clears the current heatmap", "bottomright");
 }
 
-var helpText = `<table>
-<tr><td><input type='text' name='search' id='search' size='20' style="width:150px;"/>&nbsp;<span onclick='doSearch();'><i class="fa fa-search fa-lg"></i></span></td></tr>
-<tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type='text' name='maxage' id='maxage' value="600" size="5" onchange='setMaxAge();'/>s</td></tr>
-<tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom &lt;<input type='text' name='setclus' id='setclus' size="2" onchange='setCluster(this.value);'/></td></tr>
-<tr><td style="cursor:default"><input type='checkbox' id='panit' onclick='doPanit(this.checked);'/> Auto Pan Map</td></tr>
-<tr><td style="cursor:default"><input type='checkbox' id='lockit' onclick='doLock(this.checked);'/> Lock Map</td></tr>
-<tr><td style="cursor:default"><input type='checkbox' id='heatall' onclick='doHeatAll(this.checked);'/> Heatmap all layers</td></tr>`
-if (!inIframe) { helpText += `<tr><td style="cursor:default"><span id="showHelp" onclick='doDialog(helpText);'><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr></table>`; }
-else { helpText += `</table>` }
-document.getElementById('menu').innerHTML = helpText;
+var helpMenu = '<table>'
+helpMenu += '<tr><td><input type="text" name="search" id="search" size="20" style="width:150px;"/>&nbsp;<span onclick=\'doSearch();\'><i class="fa fa-search fa-lg"></i></span></td></tr>';
+helpMenu += '<tr><td style="cursor:default"><i class="fa fa-spinner fa-lg fa-fw"></i> Set Max Age <input type="text" name="maxage" id="maxage" value="600" size="5" onchange=\'setMaxAge();\'/>s</td></tr>';
+helpMenu += '<tr><td style="cursor:default"><i class="fa fa-search-plus fa-lg fa-fw"></i> Cluster at zoom &lt;<input type="text" name="setclus" id="setclus" size="2" onchange=\'setCluster(this.value);\'/></td></tr>';
+helpMenu += '<tr><td style="cursor:default"><input type="checkbox" id="panit" onclick=\'doPanit(this.checked);\'/> Auto Pan Map</td></tr>';
+helpMenu += '<tr><td style="cursor:default"><input type="checkbox" id="lockit" onclick=\'doLock(this.checked);\'/> Lock Map</td></tr>';
+helpMenu += '<tr><td style="cursor:default"><input type="checkbox" id="heatall" onclick=\'doHeatAll(this.checked);\'/> Heatmap all layers</td></tr>';
+if (!inIframe) { helpMenu += '<tr><td style="cursor:default"><span id="showHelp" onclick=\'doDialog(helpText);\'><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr></table>'; }
+else { helpMenu += '</table>' }
+document.getElementById('menu').innerHTML = helpMenu;
 
 if (showUserMenu) {
     if ( window.localStorage.hasOwnProperty("lastpos") ) {
@@ -814,23 +845,23 @@ var doDialog = function(d) {
     dialogue.open();
 }
 
-var helpText = `<h3>Node-RED - Map all the things</h3><br/>
-<p><i class="fa fa-search fa-lg fa-fw"></i> <b>Search</b> - You may enter a name, or partial name, or icon name of an object to search for.
-The map will then jump to centre on each of the results in turn. If nothing is found locally it will try to
-search for a place name if connected to a network.</p>
-<p><i class="fa fa-spinner fa-lg fa-fw"></i> <b>Set Max Age</b> - You can set the time after which points
-that haven't been updated get removed.</p>
-<p><i class="fa fa-search-plus fa-lg fa-fw"></i> <b>Cluster at zoom</b> - lower numbers mean less clustering. 0 means disable totally.</p>
-<p><i class="fa fa-arrows fa-lg fa-fw"></i> <b>Auto Pan</b> - When selected, the map will
-automatically move to centre on each data point as they arrive.</p>
-<p><i class="fa fa-lock fa-lg fa-fw"></i> <b>Lock Map</b> - When selected will save the
-currently displayed area and basemap.
-Reloading the map in the current browser will return to the same view.
-This can be used to set your initial start position.
-While active it also restricts the "auto pan" and "search" to within that area.</p>
-<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected
-all layers whether hidden or not will contribute to the heatmap.
-The default is that only visible layers add to the heatmap.</p>`
+var helpText = '<h3>Node-RED - Map all the things</h3><br/>';
+helpText += '<p><i class="fa fa-search fa-lg fa-fw"></i> <b>Search</b> - You may enter a name, or partial name, or icon name of an object to search for.';
+helpText += 'The map will then jump to centre on each of the results in turn. If nothing is found locally it will try to';
+helpText += 'search for a place name if connected to a network.</p>';
+helpText += '<p><i class="fa fa-spinner fa-lg fa-fw"></i> <b>Set Max Age</b> - You can set the time after which points';
+helpText += 'that haven\'t been updated get removed.</p>';
+helpText += '<p><i class="fa fa-search-plus fa-lg fa-fw"></i> <b>Cluster at zoom</b> - lower numbers mean less clustering. 0 means disable totally.</p>';
+helpText += '<p><i class="fa fa-arrows fa-lg fa-fw"></i> <b>Auto Pan</b> - When selected, the map will';
+helpText += 'automatically move to centre on each data point as they arrive.</p>';
+helpText += '<p><i class="fa fa-lock fa-lg fa-fw"></i> <b>Lock Map</b> - When selected will save the';
+helpText += 'currently displayed area and basemap.';
+helpText += 'Reloading the map in the current browser will return to the same view.';
+helpText += 'This can be used to set your initial start position.';
+helpText += 'While active it also restricts the "auto pan" and "search" to within that area.</p>';
+helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected';
+helpText += 'all layers whether hidden or not will contribute to the heatmap.';
+helpText += 'The default is that only visible layers add to the heatmap.</p>';
 
 // Delete a marker (and notify websocket)
 var delMarker = function(dname,note) {
@@ -964,7 +995,7 @@ function setMarker(data) {
         }
         if (!allData.hasOwnProperty(data.name)) { allData[data.name] = {}; }
         delete data.action;
-        Object.keys(data).forEach(key => {
+        Object.keys(data).forEach(function(key) {
             if (data[key] == null) { delete allData[data.name][key]; }
             else { allData[data.name][key] = data[key]; }
         });

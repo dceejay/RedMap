@@ -1,6 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.0.14 - Revert use of ES6 import.
+ - v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while.
  - v2.0.13 - Fix tracks colour.
  - v2.0.12 - Ensure default icon is in place if not specified (regression)
  - v2.0.9 - Only update maxage on screen once it exists
