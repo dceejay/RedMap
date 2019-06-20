@@ -237,6 +237,15 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track
                 }
             }
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("command") && msg.payload.command.hasOwnProperty("clear")) {
+                for (var p in node.pointsarray) {
+                    if (node.pointsarray.hasOwnProperty(p)) {
+                        if (node.pointsarray[p][0].layer === msg.payload.command.clear) {
+                            delete node.pointsarray[p];
+                        }
+                    }
+                }
+            }
         });
 
         node.on("close", function() {

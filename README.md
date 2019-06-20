@@ -9,7 +9,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.0.14 - Revert use of ES6 import.
+- v2.0.17 - Let clear command also clear tracks from tracks node
+- v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while
 - v2.0.13 - Fix tracks colour.
 - v2.0.12 - Ensure default icon is in place if not specified (regression)
 - v2.0.9 - Only update maxage on screen once it exists
@@ -296,7 +297,7 @@ Optional properties include
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
- - **clear** - layer name - to clear a complete layer and remove from layer menu
+ - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
@@ -473,7 +474,9 @@ see https://github.com/cloudybay/leaflet.latlng-graticule for more details about
 
 #### To clear all markers from a layer, or an overlay from the map
 
-    msg.payload.command.clear = "name of your layer/overlay to remove";
+    msg.payload.command.clear = "name of the layer/overlay you wish to clear";
+
+Feeding this into the tracks node will also remove the tracks stored for that layer.
 
 ### Using a local Map Server (WMS server)
 
