@@ -18,6 +18,7 @@ module.exports = function(RED) {
     "use strict";
     var path = require("path");
     var express = require("express");
+    var compression = require("compression");
     var sockjs = require('sockjs');
     var sockets = {};
     RED.log.info("Worldmap version " + require('./package.json').version );
@@ -53,6 +54,7 @@ module.exports = function(RED) {
         this.log("started at "+this.path);
         var node = this;
         var clients = {};
+        RED.httpNode.use(compression());
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
 
         var callback = function(client) {

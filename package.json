@@ -4,6 +4,7 @@
     "description": "A Node-RED node to provide a web page of a world map for plotting things on.",
     "dependencies": {
         "cgi": "0.3.1",
+        "compression": "^1.7.4",
         "express": "^4.16.4",
         "sockjs": "^0.3.19"
     },
