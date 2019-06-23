@@ -936,6 +936,13 @@ function setMarker(data) {
                 });
             }
         }
+        else {
+            if (hiderightclick !== true) {
+                m.on('contextmenu', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                });
+            }
+        }
         return m;
     }
 
