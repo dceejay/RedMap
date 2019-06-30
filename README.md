@@ -9,7 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware. 
+- v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
 - v2.0.17 - Let clear command also clear tracks from tracks node
 - v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while
 - v2.0.13 - Fix tracks colour.
@@ -69,13 +69,15 @@ Optional properties include
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to the heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
- - **popup** : html to fill the popup if you don't want the automatic default of the properties list.
+ - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
  - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable just this instance.
 
-Any other `msg.payload` properties will be added to the icon popup text box. This can be overridden
-by using the **popup** property to supply your own html content.
+Any other `msg.payload` properties will be added to the icon popup text box. This can be
+overridden by using the **popup** property to supply your own html content. If you use the
+popup property it will completely replace the contents so photourl, videourl and weblink are
+meaningless in this mode.
 
 ### Icons
 
