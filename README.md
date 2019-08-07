@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.19 - ensure `fit` option is boolean, Issue #109. Fix tracks, Issue #110.
 - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
 - v2.0.17 - Let clear command also clear tracks from tracks node
 - v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while
@@ -411,7 +412,7 @@ The geojson features may contain a `properties` property. That may also include 
 
 The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
 
-The `fit` property is optional. If present the map will automatically zoom to fit the area relevant to the geojson.
+The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson.
 
 see http://leafletjs.com/examples/geojson/ for more details about options for opt.
 
@@ -430,7 +431,7 @@ As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSO
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
-Again the `fit` property can be added to make the map zoom to the relevant area.
+Again the boolean `fit` property can be added to make the map zoom to the relevant area.
 
 #### To add a Velocity Grid Overlay
 
