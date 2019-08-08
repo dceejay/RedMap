@@ -1678,7 +1678,7 @@ function doCommand(cmd) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         map.addLayer(overlays[cmd.map.overlay]);
-        if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new NVG XML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("nvg") ) {

@@ -1,6 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware. 
+ - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
+ - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
  - v2.0.17 - Let clear command also clear tracks from tracks node
  - v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while
  - v2.0.13 - Fix tracks colour
