@@ -1677,7 +1677,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new NVG XML overlay layer
@@ -1716,7 +1718,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     var custIco = function() {
@@ -1747,7 +1751,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new TOPOJSON overlay layer
@@ -1760,7 +1766,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new GPX overlay layer
@@ -1774,7 +1782,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new velocity overlay layer
@@ -1787,7 +1797,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new overlay layer
@@ -1814,7 +1826,9 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        map.addLayer(overlays[cmd.map.overlay]);
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            map.addLayer(overlays[cmd.map.overlay]);
+        }
     }
     // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {

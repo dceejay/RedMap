@@ -9,6 +9,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.0.21 - allow adding overlays without making them visible (visible:false) - Issue #108
 - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
 - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
 - v2.0.17 - Let clear command also clear tracks from tracks node
@@ -399,6 +400,8 @@ To add an overlay instead of a base layer - specify the `overlay` property inste
         "wms": true
     }
 
+By default the overlay will be instantly visible. To load it hidden add a property to the command.map - `visible:false`
+
 #### To add a new geoJSON overlay
 
     msg.payload.command.map = {
@@ -431,7 +434,7 @@ As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSO
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
-Again the boolean `fit` property can be added to make the map zoom to the relevant area.
+Again the boolean `fit` property can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
 
 #### To add a Velocity Grid Overlay
 
