@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.0.22 - fix SIDC missing property
  - v2.0.21 - allow adding overlays without making them visible (visible:false) - Issue #108
  - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
  - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.

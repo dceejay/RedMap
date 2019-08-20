@@ -1317,7 +1317,11 @@ function setMarker(data) {
             myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:data.name });
             // Now that we have a symbol we can ask for the echelon and set the symbol size
             var opts = data.options || {};
-            opts.size = opts.size || iconSz[myMarker.getProperties().echelon] || 30;
+            var sz = 30;
+            if (myMarker.hasOwnProperty("getProperties") && myMarker.getProperties().hasOwnProperty("echelon")) {
+                sz = iconSz[myMarker.getProperties().echelon];
+            }
+            opts.size = opts.size || sz;
             opts.size = opts.size * (opts.scale || 1);
             myMarker = myMarker.setOptions(opts);
             var myicon = L.icon({
