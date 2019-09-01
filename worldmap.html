@@ -150,6 +150,153 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     to <b>control</b> the map remotely, including how to use a local map server.</p>
 </script>
 
+
+<script type="text/x-red" data-template-name="ui_worldmap">
+<div class="form-row" id="template-row-group">
+    <label for="node-input-group"><i class="fa fa-table"></i> Group</span></label>
+    <input type="text" id="node-input-group">
+</div>
+<div class="form-row" id="template-row-size">
+    <label><i class="fa fa-object-group"></i> Size</span></label>
+    <input type="hidden" id="node-input-width">
+    <input type="hidden" id="node-input-height">
+    <button class="editor-button" id="node-input-size"></button>
+</div>
+<div class="form-row">
+    <table border="0" width="96%">
+    <tr><td width="100px"><i class="fa fa-globe"></i> Start<td>Latitude</td><td>Longitude</td><td width="60px">Zoom</td></tr>
+    <tr><td>&nbsp;</td>
+    <td><input type="text" id="node-input-lat" style="width:90px;"></td>
+    <td><input type="text" id="node-input-lon" style="width:90px;"></td>
+    <td><input type="text" id="node-input-zoom" style="width:60px;" placeholder="1 - 18"></td>
+    </tr>
+    </table>
+</div>
+<div class="form-row">
+    <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
+    <select id="node-input-layer">
+        <option value="OSM grey">OpenStreetMap Greyscale</option>
+        <option value="OSM">OpenStreetMap</option>
+        <option value="Esri">ESRI Streetmap</option>
+        <option value="Esri Satellite">ESRI Satellite</option>
+        <option value="Esri Topography">ESRI Topography</option>
+        // <option value="Esri Terrain">ESRI Terrain</option>
+        <option value="Esri Dark Grey">ESRI Dark Grey</option>
+        <option value="Esri Ocean">ESRI Ocean</option>
+        <option value="Nat Geo">National Geographic</option>
+        <option value="UK OS Opendata">UK OS Opendata</option>
+        <option value="Hike Bike">Hike Bike OSM</option>
+        <option value="Terrain">Terrain</option>
+        <option value="Watercolor">Stamen Watercolor</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-cluster"><i class="fa fa-dot-circle-o"></i>Cluster when</label>
+    zoom level is less than <input type="text" id="node-input-cluster" placeholder="0 (0,off - 19)" style="width:100px;">
+</div>
+<div class="form-row">
+    <label for="node-input-maxage"><i class="fa fa-clock-o"></i> Max age</label>
+    Remove markers after <input type="text" id="node-input-maxage" placeholder="600" style="width:67px;"> seconds
+</div>
+<div class="form-row">
+    <label for="node-input-usermenu"><i class="fa fa-user"></i> User menu</label>
+    <select id="node-input-usermenu" style="width:64px;">
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+    </select>
+    <i class="fa fa-bars" style="margin-left:30px;"></i> Layer menu
+    <select id="node-input-layers" style="width:64px;">
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-panlock"><i class="fa fa-lock"></i> Lock map</label>
+    <select id="node-input-panlock" style="width:64px;">
+        <option value="false">False</option>
+        <option value="true">True</option>
+    </select>
+    <i class="fa fa-lock" style="margin-left:30px;"></i> Lock zoom
+    <select id="node-input-zoomlock" style="width:64px;">
+        <option value="false">False</option>
+        <option value="true">True</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-panit"><i class="fa fa-arrows-alt"></i> Auto-pan</label>
+    <select id="node-input-panit" style="width:72px;">
+        <option value="true">Enable</option>
+        <option value="false">Disable</option>
+    </select>
+    <i class="fa fa-hand-o-right" style="margin-left:22px;"></i> Right click
+    <select id="node-input-hiderightclick" style="width:72px;">
+        <option value="false">Enable</option>
+        <option value="true">Disable</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-coords"><i class="fa fa-compass"></i> Co-ordinates</label>
+    <select id="node-input-coords" style="width:95px;">
+        <option value="none">Not shown</option>
+        <option value="deg">Degrees</option>
+        <option value="dms">D.M.S</option>
+    </select>
+    <i class="fa fa-th" style="margin-left:22px;"></i> Graticule
+    <select id="node-input-showgrid" style="width:95px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
+</div>
+<div class="form-row">
+    <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
+    <input type="text" id="node-input-path" placeholder="worldmap">
+</div>
+<div class="form-row">
+    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+</div>
+<div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>If <i>Path</i> is left empty,
+then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
+</script>
+
+<script type="text/x-red" data-help-name="ui_worldmap">
+    <p>Plots "things" on a map in Node-RED Dashboard. Needs an internet connection.</p>
+    <p>It is possible to instantiate multiple worldmap nodes but each one must be given a unique
+        path. Worldmap-in nodes are matched to worldmap nodes by having exactly the same path.
+    <p>Shortcut - <code>⌘⇧m</code> - ctrl-shift-m to jump to the default Map (<tt>/worldmap</tt>).</p>
+    <p>The minimum <code>msg.payload</code> must contain <code>name</code>, <code>lat</code> and <code>lon</code> properties, e.g.</p>
+    <pre>{"name":"Joe", "lat":51, "lon":-1.05}</pre>
+    <p><code>name</code> must be a unique identifier.</p>
+    <p>Optional properties include</p>
+    <ul>
+        <li><code>layer</code> : specify a layer on the map to add marker to.</li>
+        <li><code>speed</code> : combined with bearing, draws a vector.</li>
+        <li><code>bearing</code> : combined with speed, draws a vector.</li>
+        <li><code>accuracy</code> : combined with bearing, draws a polygon of possible direction.</li>
+        <li><code>icon</code> : <a href="https://fontawesome.com/v4.7.0/icons/" target="_new">font awesome</a> icon name or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>, or url of icon image.</li>
+        <li><code>iconColor</code> : standard CSS color name or #rrggbb hex value.</li>
+        <li><code>SIDC</code> : NATO symbology code (instead of icon).</li>
+        <li><code>label</code> : permanent label next to marker, or</li>
+        <li><code>tooltip</code> : hover over text for marker. (alternative to label)</li>
+        <li><code>bulding</code> : OSMBuildings GeoJSON object.</li>
+        <li><code>ttl</code> : time to live of an individual marker before deletion.</li>
+        <li><code>photoUrl</code> : adds an image pointed at by the url to the popup box.</li>
+        <li><code>videoUrl</code> : adds an mp4 (320x240) pointed at by the url to Popup box</li>
+        <li><code>weblink</code> : link to an external web page.</li>
+        <li><code>deleted</code> : set to <i>true</i> to remove the named marker. (default false)</li>
+    </ul>
+    <p>Any other sub-properties of <code>msg.payload</code> will be added to the marker popup text box as extra information.</p>
+    <p>Icons of type <i>plane</i>, <i>ship</i>, <i>car</i>, <i>uav</i> or <i>arrow</i> will use built in SVG icons that align to the
+    <code>bearing</code> value.</p>
+    <p>Font Awesome (<a href="https://fontawesome.com/v4.7.0/icons/" target="_new">fa-icons 4.7</a>) can also be used, as can
+    NATO symbology codes (SIDC), or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>,
+    or the url of a small icon image (32x32)</p>
+    <p>See the <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">README</a> for further
+    details and examples of icons and commands for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and
+    to <b>control</b> the map remotely, including how to use a local map server.</p>
+</script>
+
+
 <script type="text/javascript">
     var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
     lnk = lnk.replace(new RegExp('\/{1,}','g'),'/');
@@ -195,6 +342,77 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
         },
         oneditprepare: function() {
+            if ($("#node-input-path").val() === undefined) {
+                $("#node-input-path").val("worldmap");
+                this.path = "worldmap";
+            }
+            if ($("#node-input-hiderightclick").val() === null) {
+                $("#node-input-hiderightclick").val("false");
+                this.hiderightclick = "false";
+            }
+            if ($("#node-input-coords").val() === null) {
+                $("#node-input-coords").val("none");
+                this.coords = "none";
+            }
+            $("#node-input-zoom").spinner({min:0, max:18});
+            $("#node-input-cluster").spinner({min:0, max:19});
+        }
+    });
+
+    RED.nodes.registerType('ui_worldmap',{
+        category: 'dashboard',
+        color: 'rgb( 63, 173, 181)',
+        defaults: {
+            group: {type: 'ui_group', required:true},
+            order: {value: 0},
+            width: {
+                value: 0,
+                validate: function(v) {
+                    var valid = true
+                    var width = v||0;
+                    var currentGroup = $('#node-input-group').val()|| this.group;
+                    var groupNode = RED.nodes.node(currentGroup);
+                    valid = !groupNode || +width <= +groupNode.width;
+                    $("#node-input-size").toggleClass("input-error",!valid);
+                    return valid;
+                }},
+            height: {value: 0},
+            name: {value:""},
+            lat: {value:""},
+            lon: {value:""},
+            zoom: {value:""},
+            layer: {value:""},
+            cluster: {value:""},
+            maxage: {value:""},
+            usermenu: {value:"show"},
+            layers: {value:"show"},
+            panit: {value:"false"},
+            panlock: {value:"false"},
+            zoomlock: {value:"false"},
+            hiderightclick: {value:"false"},
+            coords: {value:"false"},
+            showgrid: {value:"false"},
+            path: {value:"/worldmap"}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "white-globe.png",
+        align: "right",
+        label: function() {
+            return this.name||(this.path.charAt(0)==='/'?this.path.substr(1):this.path)||"world map";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        info: function() {
+            return 'The map can also be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
+        },
+        oneditprepare: function() {
+            $("#node-input-size").elementSizer({
+                width: "#node-input-width",
+                height: "#node-input-height",
+                group: "#node-input-group"
+            });
             if ($("#node-input-path").val() === undefined) {
                 $("#node-input-path").val("worldmap");
                 this.path = "worldmap";
