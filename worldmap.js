@@ -127,23 +127,23 @@ module.exports = function(RED) {
 
     function HTML(ui, config) {
         var width = config.width;
-        if (width === 0) {
+        if (width == 0) {
             var group = RED.nodes.getNode(config.group);
             if (group) {
                 width = group.config.width;
             }
         }
         var height = config.height;
-        if (height === 0) {
+        if (height == 0) {
             height = 10;
         }
         var size = ui.getSizes();
-        var width = (size.sx +size.cx) *width -15;
-        var height = (size.sy +size.cy) *height -15;
+        var frameWidth = (size.sx +size.cx) *width -size.cx -10;
+        var frameHeight = (size.sy +size.cy) *height -size.cy -10;
         var url = encodeURI(config.path);
         var html = `
 <div>
-    <iframe src="${url}" width="${width}px" height="${height}px"></iframe>
+    <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border: none;"></iframe>
 </div>
 `;
         return html;

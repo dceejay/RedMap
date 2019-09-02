@@ -384,8 +384,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             layer: {value:""},
             cluster: {value:""},
             maxage: {value:""},
-            usermenu: {value:"show"},
-            layers: {value:"show"},
+            usermenu: {value:"hide"},
+            layers: {value:"hide"},
             panit: {value:"false"},
             panlock: {value:"false"},
             zoomlock: {value:"false"},
@@ -398,6 +398,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         outputs:0,
         icon: "white-globe.png",
         align: "right",
+        paletteLabel: "worldmap",
         label: function() {
             return this.name||(this.path.charAt(0)==='/'?this.path.substr(1):this.path)||"world map";
         },
