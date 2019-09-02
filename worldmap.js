@@ -124,26 +124,20 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("worldmap",WorldMap);
 
-
     function HTML(ui, config) {
         var width = config.width;
         if (width == 0) {
             var group = RED.nodes.getNode(config.group);
-            if (group) {
-                width = group.config.width;
-            }
+            if (group) { width = group.config.width; }
         }
         var height = config.height;
-        if (height == 0) {
-            height = 10;
-        }
+        if (height == 0) { height = 10; }
         var size = ui.getSizes();
-        var frameWidth = (size.sx +size.cx) *width -size.cx -10;
-        var frameHeight = (size.sy +size.cy) *height -size.cy -10;
+        var frameWidth = (size.sx +size.cx) *width - size.cx - 1;
+        var frameHeight = (size.sy +size.cy) *height - size.cy - 2;
         var url = encodeURI(config.path);
-        var html = `
-<div>
-    <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border: none;"></iframe>
+        var html = `<div style="overflow:hidden;">
+<iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border:none;"></iframe>
 </div>
 `;
         return html;
@@ -158,7 +152,7 @@ module.exports = function(RED) {
     }
 
     var ui = undefined;
-    
+
     function UIWorldMap(config) {
         try {
             var node = this;

@@ -266,9 +266,11 @@ function doLock(v) {
     if (v !== undefined) { lockit = v; }
     if (lockit === false) {
         mb = new L.LatLngBounds([[-120,-360],[120,360]]);
+        map.dragging.enable();
     }
     else {
         mb = map.getBounds();
+        map.dragging.disable();
         window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
         window.localStorage.setItem("lastzoom", map.getZoom());
         window.localStorage.setItem("lastlayer", baselayername);
