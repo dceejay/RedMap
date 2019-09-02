@@ -25,34 +25,33 @@ module.exports = function(RED) {
     // add the cgi module for serving local maps....
     RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
 
-    var WorldMap = function(n) {
-        RED.nodes.createNode(this,n);
-        this.lat = n.lat || "";
-        this.lon = n.lon || "";
-        this.zoom = n.zoom || "";
-        this.layer = n.layer || "";
-        this.cluster = n.cluster || "";
-        this.maxage = n.maxage || "";
-        if (n.maxage == 0) { this.maxage = "0"; }
-        this.showmenu = n.usermenu || "show";
-        this.layers = n.layers || "show";
-        this.panlock = n.panlock || "false";
-        this.zoomlock = n.zoomlock || "false";
-        this.panit = n.panit || "false";
-        this.hiderightclick = n.hiderightclick || "false";
-        this.coords = n.coords || "none";
-        this.showgrid = n.showgrid || "false";
-        this.path = n.path || "/worldmap";
-        if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
-        if (!sockets[this.path]) {
-            var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
-            var sockPath = path.posix.join(RED.settings.httpNodeRoot,this.path,'socket');
-            sockets[this.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
-            sockets[this.path].installHandlers(RED.server);
+    function worldMap(node, n) {
+        RED.nodes.createNode(node,n);
+        node.lat = n.lat || "";
+        node.lon = n.lon || "";
+        node.zoom = n.zoom || "";
+        node.layer = n.layer || "";
+        node.cluster = n.cluster || "";
+        node.maxage = n.maxage || "";
+        if (n.maxage == 0) { node.maxage = "0"; }
+        node.showmenu = n.usermenu || "show";
+        node.layers = n.layers || "show";
+        node.panlock = n.panlock || "false";
+        node.zoomlock = n.zoomlock || "false";
+        node.panit = n.panit || "false";
+        node.hiderightclick = n.hiderightclick || "false";
+        node.coords = n.coords || "none";
+        node.showgrid = n.showgrid || "false";
+        node.path = n.path || "/worldmap";
+        if (node.path.charAt(0) != "/") { noed.path = "/" + node.path; }
+        if (!sockets[node.path]) {
+            var libPath = path.posix.join(RED.settings.httpNodeRoot, node.path, 'leaflet', 'sockjs.min.js');
+            var sockPath = path.posix.join(RED.settings.httpNodeRoot,node.path,'socket');
+            sockets[node.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
+            sockets[node.path].installHandlers(RED.server);
         }
-        //this.log("Serving "+__dirname+" as "+this.path);
-        this.log("started at "+this.path);
-        var node = this;
+        //node.log("Serving "+__dirname+" as "+node.path);
+        node.log("started at "+node.path);
         var clients = {};
         RED.httpNode.use(compression());
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
@@ -108,7 +107,7 @@ module.exports = function(RED) {
                 }
             }
             clients = {};
-            sockets[this.path].removeListener('connection', callback);
+            sockets[node.path].removeListener('connection', callback);
             for (var i=0; i < RED.httpNode._router.stack.length; i++) {
                 var r = RED.httpNode._router.stack[i];
                 if ((r.name === "serveStatic") && (r.regexp.test(node.path))) {
@@ -117,10 +116,94 @@ module.exports = function(RED) {
             }
             node.status({});
         });
-        sockets[this.path].on('connection', callback);
+        sockets[node.path].on('connection', callback);
+    }
+
+    var WorldMap = function(n) {
+        worldMap(this, n);
     }
     RED.nodes.registerType("worldmap",WorldMap);
 
+
+    function HTML(ui, config) {
+        var width = config.width;
+        if (width == 0) {
+            var group = RED.nodes.getNode(config.group);
+            if (group) {
+                width = group.config.width;
+            }
+        }
+        var height = config.height;
+        if (height == 0) {
+            height = 10;
+        }
+        var size = ui.getSizes();
+        var frameWidth = (size.sx +size.cx) *width -size.cx -10;
+        var frameHeight = (size.sy +size.cy) *height -size.cy -10;
+        var url = encodeURI(config.path);
+        var html = `
+<div>
+    <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border: none;"></iframe>
+</div>
+`;
+        return html;
+    }
+
+    function checkConfig(node, conf) {
+        if (!conf || !conf.hasOwnProperty("group")) {
+            node.error("no group");
+            return false;
+        }
+        return true;
+    }
+
+    var ui = undefined;
+    
+    function UIWorldMap(config) {
+        try {
+            var node = this;
+            if(ui === undefined) {
+                ui = RED.require("node-red-dashboard")(RED);
+            }
+            worldMap(node, config);
+            var done = null;
+            if (checkConfig(node, config)) {
+                var html = HTML(ui, config);
+                done = ui.addWidget({
+                    node: node,
+                    order: config.order,
+                    group: config.group,
+                    width: config.width,
+                    height: config.height,
+                    format: html,
+                    templateScope: "local",
+                    emitOnlyNewValues: false,
+                    forwardInputMessages: false,
+                    storeFrontEndInputAsState: false,
+                    convertBack: function (value) {
+                        return value;
+                    },
+                    beforeEmit: function(msg, value) {
+                        return { msg: { items: value } };
+                    },
+                    beforeSend: function (msg, orig) {
+                        if (orig) { return orig.msg; }
+                    },
+                    initController: function($scope, events) {
+                    }
+                });
+            }
+         }
+        catch (e) {
+            console.log(e);
+        }
+        node.on("close", function() {
+            if (done) {
+                done();
+            }
+        });
+    }
+    RED.nodes.registerType("ui_worldmap", UIWorldMap);
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
@@ -163,7 +246,6 @@ module.exports = function(RED) {
         sockets[this.path].on('connection', callback);
     }
     RED.nodes.registerType("worldmap in",WorldMapIn);
-
 
     var WorldMapTracks = function(n) {
         RED.nodes.createNode(this,n);
