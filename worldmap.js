@@ -152,52 +152,58 @@ module.exports = function(RED) {
     }
 
     var ui = undefined;
+    try {
+        ui = RED.require("node-red-dashboard")(RED);
 
-    function UIWorldMap(config) {
-        try {
-            var node = this;
-            if(ui === undefined) {
-                ui = RED.require("node-red-dashboard")(RED);
-            }
-            worldMap(node, config);
-            var done = null;
-            if (checkConfig(node, config)) {
-                var html = HTML(ui, config);
-                done = ui.addWidget({
-                    node: node,
-                    order: config.order,
-                    group: config.group,
-                    width: config.width,
-                    height: config.height,
-                    format: html,
-                    templateScope: "local",
-                    emitOnlyNewValues: false,
-                    forwardInputMessages: false,
-                    storeFrontEndInputAsState: false,
-                    convertBack: function (value) {
-                        return value;
-                    },
-                    beforeEmit: function(msg, value) {
-                        return { msg: { items: value } };
-                    },
-                    beforeSend: function (msg, orig) {
-                        if (orig) { return orig.msg; }
-                    },
-                    initController: function($scope, events) {
+        if(ui) {
+            function UIWorldMap(config) {
+                try {
+                    var node = this;
+                    worldMap(node, config);
+                    var done = null;
+                    if (checkConfig(node, config)) {
+                        var html = HTML(ui, config);
+                        done = ui.addWidget({
+                            node: node,
+                            order: config.order,
+                            group: config.group,
+                            width: config.width,
+                            height: config.height,
+                            format: html,
+                            templateScope: "local",
+                            emitOnlyNewValues: false,
+                            forwardInputMessages: false,
+                            storeFrontEndInputAsState: false,
+                            convertBack: function (value) {
+                                return value;
+                            },
+                            beforeEmit: function(msg, value) {
+                                return { msg: { items: value } };
+                            },
+                            beforeSend: function (msg, orig) {
+                                if (orig) { return orig.msg; }
+                            },
+                            initController: function($scope, events) {
+                            }
+                        });
+                    }
+                }
+                catch (e) {
+                    console.log(e);
+                }
+                node.on("close", function() {
+                    if (done) {
+                        done();
                     }
                 });
             }
-         }
-        catch (e) {
-            console.log(e);
+            RED.nodes.registerType("ui_worldmap", UIWorldMap);
         }
-        node.on("close", function() {
-            if (done) {
-                done();
-            }
-        });
     }
-    RED.nodes.registerType("ui_worldmap", UIWorldMap);
+    catch(e) {
+        RED.log.info("Node-RED Dashboard not found.");
+        RED.log.info("ui_worldmap not installed.");
+    }
 
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
@@ -331,4 +337,8 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("worldmap-tracks",WorldMapTracks);
+
+    RED.httpNode.get("/.ui-worldmap", function(req, res) {
+        res.send(ui ? "true": "false");
+    });
 }
