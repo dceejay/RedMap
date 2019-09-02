@@ -202,6 +202,7 @@ module.exports = function(RED) {
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         this.path = n.path || "/worldmap";
+        this.events = n.events || "all";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
@@ -218,12 +219,20 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
             client.on('data', function(message) {
                 message = JSON.parse(message);
-                setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                console.log("GOT:",message);
+                if ((node.events === "connect") && message.hasOwnProperty("action") && (message.action === "connected")) {
+                    setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                } else {
+                    setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                }
             });
             client.on('close', function() {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
-                node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
+                console.log("BYE:",node.events);
+                if (node.events !== "connect") {
+                    node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
+                }
             });
         }
 

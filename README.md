@@ -1,7 +1,5 @@
 # node-red-contrib-web-worldmap
 
-![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
-
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
 
@@ -9,8 +7,9 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.1.0 - Add ui-worldmap node to make embedding in Dashboard easier.
 - v2.0.22 - fix SIDC missing property
-- v2.0.21 - allow adding overlays without making them visible (visible:false) - Issue #108
+- v2.0.21 - allow adding overlays without making them visible (visible:false). Issue #108
 - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
 - v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
 - v2.0.17 - Let clear command also clear tracks from tracks node

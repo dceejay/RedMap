@@ -438,6 +438,13 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <input type="text" id="node-input-path" placeholder="worldmap">
     </div>
     <div class="form-row">
+        <label for="node-input-events"><i class="fa fa-sign-out"></i> Output</label>
+        <select id="node-input-events" style="width:70%;">
+            <option value="all">All action events</option>
+            <option value="">Connect event only</option>
+        </select>
+    </div>
+    <div class="form-row">
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="name">
     </div>
@@ -472,7 +479,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         color:"darksalmon",
         defaults: {
             name: {value:""},
-            path: {value:"/worldmap"}
+            path: {value:"/worldmap"},
+            events: {value:"all"}
         },
         inputs:0,
         outputs:1,
