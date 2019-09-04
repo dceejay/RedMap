@@ -154,8 +154,7 @@ module.exports = function(RED) {
     var ui = undefined;
     try {
         ui = RED.require("node-red-dashboard")(RED);
-
-        if(ui) {
+        if (ui) {
             function UIWorldMap(config) {
                 try {
                     var node = this;
@@ -192,17 +191,14 @@ module.exports = function(RED) {
                     console.log(e);
                 }
                 node.on("close", function() {
-                    if (done) {
-                        done();
-                    }
+                    if (done) { done(); }
                 });
             }
             RED.nodes.registerType("ui_worldmap", UIWorldMap);
         }
     }
     catch(e) {
-        RED.log.info("Node-RED Dashboard not found.");
-        RED.log.info("ui_worldmap not installed.");
+        RED.log.info("Node-RED Dashboard not found - ui_worldmap not installed.");
     }
 
     var WorldMapIn = function(n) {
