@@ -914,7 +914,6 @@ var editPoly = function(pname) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-
     var rightmenu = function(m) {
         // customise right click context menu
         var rightcontext = "";
@@ -1065,7 +1064,8 @@ function setMarker(data) {
         //polygons[data.name] = rightmenu(polygons[data.name]); // DCJ Investigate
         layers[lay].addLayer(polygons[data.name]);
     }
-    else {
+
+
         if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
         else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
             data.lat = data.position.lat*1;
@@ -1093,7 +1093,7 @@ function setMarker(data) {
         var drag = false;
 
         if (data.draggable === true) { drag = true; }
-        //console.log("ICON",data.icon);
+
         if (data.hasOwnProperty("icon")) {
             if (data.icon === "ship") {
                 marker = L.boatMarker(ll, {
@@ -1507,7 +1507,7 @@ function setMarker(data) {
         }
         if (panit) { map.setView(ll,map.getZoom()); }
         if (p === true) { marker.openPopup(); }
-    }
+
 }
 
 // handle any incoming COMMANDS to control the map remotely

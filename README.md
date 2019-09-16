@@ -7,7 +7,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.1.0 - Add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
+- v2.1.1 - fix bug in repeated add with polygon
+- v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
 - v2.0.22 - fix SIDC missing property
 - v2.0.21 - allow adding overlays without making them visible (visible:false). Issue #108
 - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
