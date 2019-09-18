@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.1.2 - Fix layercontrol remove bug. Issue #116
  - v2.1.1 - fix bug in repeated add with polygon
  - v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
  - v2.0.22 - fix SIDC missing property
