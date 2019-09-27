@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.1.3 - Fix web page file path error
 - v2.1.2 - Fix layercontrol remove bug. Issue #116
 - v2.1.1 - fix bug in repeated add with polygon
 - v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
@@ -36,8 +37,7 @@ see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for 
 
 Either use the Manage Palette option in the Node-RED Editor menu, or run the following command in your Node-RED user directory - typically `~/.node-red`
 
-        npm i --save node-red-contrib-web-worldmap
-
+        npm i node-red-contrib-web-worldmap
 
 
 ## Usage

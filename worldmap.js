@@ -43,7 +43,7 @@ module.exports = function(RED) {
         node.coords = n.coords || "none";
         node.showgrid = n.showgrid || "false";
         node.path = n.path || "/worldmap";
-        if (node.path.charAt(0) != "/") { noed.path = "/" + node.path; }
+        if (node.path.charAt(0) != "/") { node.path = "/" + node.path; }
         if (!sockets[node.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, node.path, 'leaflet', 'sockjs.min.js');
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,node.path,'socket');
