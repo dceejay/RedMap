@@ -1102,7 +1102,11 @@ function setMarker(data) {
         }
         else if (data.icon === "plane") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
+            if (data.hasOwnProperty("squawk")) { 
+                if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
+                    data.iconColor = "red"; 
+                }
+            }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
             icon += '<path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
@@ -1118,7 +1122,11 @@ function setMarker(data) {
         }
         else if (data.icon === "helicopter") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
+            if (data.hasOwnProperty("squawk")) { 
+                if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
+                    data.iconColor = "red"; 
+                }
+            }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="314" height="314" viewBox="0 0 314.5 314.5">';
             icon += '<path d="M268.8 3c-3.1-3.1-8.3-2.9-11.7 0.5L204.9 55.7C198.5 23.3 180.8 0 159.9 0c-21.9 0-40.3 25.5-45.7 60.2L57.4 3.5c-3.4-3.4-8.6-3.6-11.7-0.5 -3.1 3.1-2.9 8.4 0.5 11.7l66.3 66.3c0 0.2 0 0.4 0 0.6 0 20.9 4.6 39.9 12.1 54.4l-78.4 78.4c-3.4 3.4-3.6 8.6-0.5 11.7 3.1 3.1 8.3 2.9 11.7-0.5l76.1-76.1c3.2 3.7 6.7 6.7 10.4 8.9v105.8l-47.7 32.2v18l50.2-22.3h26.9l50.2 22.3v-18L175.8 264.2v-105.8c2.7-1.7 5.4-3.8 7.8-6.2l73.4 73.4c3.4 3.4 8.6 3.6 11.7 0.5 3.1-3.1 2.9-8.3-0.5-11.7l-74.9-74.9c8.6-14.8 14-35.2 14-57.8 0-1.9-0.1-3.8-0.2-5.8l61.2-61.2C271.7 11.3 271.9 6.1 268.8 3z" fill="'+data.iconColor+'"/></svg>';
             var svgheli = "data:image/svg+xml;base64," + btoa(icon);
@@ -1132,7 +1140,11 @@ function setMarker(data) {
         }
         else if (data.icon === "uav") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { data.iconColor = "red"; }
+            if (data.hasOwnProperty("squawk")) { 
+                if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
+                    data.iconColor = "red"; 
+                }
+            }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
             icon+= '<path d="M62 82h-8V64h36c0-5-4-9-9-9H54v-8c0-3 4-5 4-11.1 0-4.4-3.6-8-8-8-4.4 0-8 3.6-8 8 0 5.1 4 8.1 4 11.1V55h-27c-5 0-9 4-9 9h36v18H38c-2.4 0-5 2.3-5 5L50 92l17-5C67 84.3 64.4 82 62 82z" fill="'+data.iconColor+'"/></svg>';
             var svguav = "data:image/svg+xml;base64," + btoa(icon);
