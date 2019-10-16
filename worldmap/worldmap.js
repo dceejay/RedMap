@@ -13,7 +13,6 @@ var basemaps = {};
 var marks = [];
 var buttons = {};
 var marksIndex = 0;
-var popid = "";
 var menuOpen = false;
 var clusterAt = 0;
 var maxage = 600;   // default max age of icons on map in seconds - cleared after 10 mins
@@ -27,51 +26,48 @@ var sidebyside;
 var layercontrol;
 
 var iconSz = {
-  "Team/Crew": 24,
-  "Squad": 24,
-  "Section": 24,
-  "Platoon/detachment": 26,
-  "Company/battery/troop": 28,
-  "Battalion/squadron": 30,
-  "Regiment/group": 32,
-  "Brigade": 34,
-  "Division": 36,
-  "Corps/MEF": 36,
-  "Army": 40,
-  "Army Group/front": 40,
-  "Region/Theater": 44,
-  "Command": 44
+    "Team/Crew": 24,
+    "Squad": 24,
+    "Section": 24,
+    "Platoon/detachment": 26,
+    "Company/battery/troop": 28,
+    "Battalion/squadron": 30,
+    "Regiment/group": 32,
+    "Brigade": 34,
+    "Division": 36,
+    "Corps/MEF": 36,
+    "Army": 40,
+    "Army Group/front": 40,
+    "Region/Theater": 44,
+    "Command": 44
 };
 
 // Polyfill assign for IE11 for now
 if (typeof Object.assign !== 'function') {
-  // Must be writable: true, enumerable: false, configurable: true
-  Object.defineProperty(Object, "assign", {
-    value: function assign(target, varArgs) { // .length of function is 2
-      'use strict';
-      if (target === null || target === undefined) {
-        throw new TypeError('Cannot convert undefined or null to object');
-      }
-
-      var to = Object(target);
-
-      for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
-
-        if (nextSource !== null && nextSource !== undefined) {
-          for (var nextKey in nextSource) {
-            // Avoid bugs when hasOwnProperty is shadowed
-            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-              to[nextKey] = nextSource[nextKey];
+    // Must be writable: true, enumerable: false, configurable: true
+    Object.defineProperty(Object, "assign", {
+        value: function assign(target, varArgs) { // .length of function is 2
+            'use strict';
+            if (target === null || target === undefined) {
+                throw new TypeError('Cannot convert undefined or null to object');
             }
-          }
-        }
-      }
-      return to;
-    },
-    writable: true,
-    configurable: true
-  });
+            var to = Object(target);
+            for (var index = 1; index < arguments.length; index++) {
+                var nextSource = arguments[index];
+                if (nextSource !== null && nextSource !== undefined) {
+                    for (var nextKey in nextSource) {
+                    // Avoid bugs when hasOwnProperty is shadowed
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                            to[nextKey] = nextSource[nextKey];
+                        }
+                    }
+                }
+            }
+            return to;
+        },
+        writable: true,
+        configurable: true
+    });
 }
 
 // Create the socket
@@ -615,7 +611,7 @@ var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
 var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
 });
 basemaps["Esri Topography"] = Esri_WorldTopoMap;
 
@@ -626,14 +622,14 @@ basemaps["Esri Topography"] = Esri_WorldTopoMap;
 // basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
 var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-	maxZoom: 13
+    attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+    maxZoom: 13
 });
 basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
 var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-	maxZoom: 16
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    maxZoom: 16
 });
 basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
 
@@ -667,8 +663,8 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
 var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 basemaps["Hike Bike"] = HikeBike_HikeBike;
 
@@ -786,21 +782,21 @@ map.removeLayer(overlays["buildings"]);     // Hide it at start
 
 // Add Roads
 overlays["roads"] = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/roads_and_labels/{z}/{x}/{y}.png', {
-	maxZoom: 18,
-	attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+    attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     opacity: 0.8
 });
 
 // Add Railways
 overlays["railways"] = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    maxZoom: 19,
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
 
 // Add Public Transport (Buses)
 overlays["public transport"] = L.tileLayer('https://openptmap.org/tiles/{z}/{x}/{y}.png', {
-	maxZoom: 17,
-	attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
+    maxZoom: 17,
+    attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
 });
 
 // Add the OpenSea markers layer
@@ -827,14 +823,14 @@ if (!inIframe) { layercontrol.addTo(map); }
 else { showLayerMenu = false;}
 
 var coords = L.control.coordinates({
-	position:"bottomleft", //optional default "bottomright"
-	decimals:4, //optional default 4
-	decimalSeperator:".", //optional default "."
-	labelTemplateLat:"&nbsp;Lat: {y}", //optional default "Lat: {y}"
-	labelTemplateLng:"&nbsp;Lon: {x}", //optional default "Lng: {x}"
-	enableUserInput:false, //optional default true
-	useDMS:true, //optional default false
-	useLatLngOrder: true, //ordering of labels, default false-> lng-lat
+    position:"bottomleft", //optional default "bottomright"
+    decimals:4, //optional default 4
+    decimalSeperator:".", //optional default "."
+    labelTemplateLat:"&nbsp;Lat: {y}", //optional default "Lat: {y}"
+    labelTemplateLng:"&nbsp;Lon: {x}", //optional default "Lng: {x}"
+    enableUserInput:false, //optional default true
+    useDMS:true, //optional default false
+    useLatLngOrder: true, //ordering of labels, default false-> lng-lat
 });
 
 // Add the dialog box for messages
@@ -964,7 +960,7 @@ function setMarker(data) {
     opt.fillOpacity = data.fillOpacity || 0.2;
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
-	if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
+    if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
 
     // Replace building
     if (data.hasOwnProperty("building")) {
@@ -1362,8 +1358,8 @@ function setMarker(data) {
     }
 
     // remove icon from list of properties, then add all others to popup
-    if (data.hasOwnProperty("alt")) { data.alt = +data.alt.toFixed(2); }
-    if (data.hasOwnProperty("speed")) { data.speed = +data.speed.toFixed(2); }
+    if (data.hasOwnProperty("alt")) { data.alt = (1*data.alt).toFixed(2); }
+    if (data.hasOwnProperty("speed")) { data.speed = (1*data.speed).toFixed(2); }
     if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
@@ -1697,7 +1693,7 @@ function doCommand(cmd) {
         overlays[cmd.map.overlay] = L.geoJson(geoj,{
             style: function(feature) {
                 var st = { stroke:true, color:"black", weight:2, fill:true };
-            	if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
+                if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
                     if (feature.properties.style.hasOwnProperty('stroke')) {
                         st.color = feature.properties.style.stroke;
                     }
@@ -1936,16 +1932,15 @@ function doGeojson(g) {
     console.log("GEOJSON",g);
     if (!basemaps["geojson"]) {
         var opt = { style: function(feature) {
-                var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
-                if (feature.hasOwnProperty("properties")) {
-                    console.log("GPROPS", feature.properties)
-                }
-                if (feature.hasOwnProperty("style")) {
-                    console.log("GSTYLE", feature.style)
-                }
-                return st;
+            var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
+            if (feature.hasOwnProperty("properties")) {
+                console.log("GPROPS", feature.properties)
             }
-        }
+            if (feature.hasOwnProperty("style")) {
+                console.log("GSTYLE", feature.style)
+            }
+            return st;
+        }}
         opt.onEachFeature = function (f,l) {
             if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
         }

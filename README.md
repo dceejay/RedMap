@@ -7,6 +7,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.1.4 - Fix alt and speed as strings
 - v2.1.3 - Fix web page file path error
 - v2.1.2 - Fix layercontrol remove bug. Issue #116
 - v2.1.1 - fix bug in repeated add with polygon
