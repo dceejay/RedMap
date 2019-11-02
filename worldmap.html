@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 
-<script type="text/x-red" data-template-name="worldmap">
+<script type="text/html" data-template-name="worldmap">
 <div class="form-row">
     <table border="0" width="96%">
     <tr><td width="100px"><i class="fa fa-globe"></i> Start<td>Latitude</td><td>Longitude</td><td width="60px">Zoom</td></tr>
@@ -113,7 +113,7 @@
 then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
-<script type="text/x-red" data-help-name="worldmap">
+<script type="text/html" data-help-name="worldmap">
     <p>Plots "things" on a web map. Needs an internet connection.</p>
     <p>It is possible to instantiate multiple worldmap nodes but each one must be given a unique
         path. Worldmap-in nodes are matched to worldmap nodes by having exactly the same path.
@@ -151,7 +151,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </script>
 
 
-<script type="text/x-red" data-template-name="ui_worldmap">
+<script type="text/html" data-template-name="ui_worldmap">
 <div class="form-row" id="template-row-group">
     <label for="node-input-group"><i class="fa fa-table"></i> Group</span></label>
     <input type="text" id="node-input-group">
@@ -259,7 +259,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
-<script type="text/x-red" data-help-name="ui_worldmap">
+<script type="text/html" data-help-name="ui_worldmap">
     <p>Plots "things" on a map in Node-RED Dashboard. Needs an internet connection.</p>
     <p>It is possible to instantiate multiple worldmap nodes but each one must be given a unique
         path. Worldmap-in nodes are matched to worldmap nodes by having exactly the same path.
@@ -439,7 +439,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     });
 </script>
 
-<script type="text/x-red" data-template-name="worldmap in">
+<script type="text/html" data-template-name="worldmap in">
     <div class="form-row">
         <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
         <input type="text" id="node-input-path" placeholder="worldmap">
@@ -457,7 +457,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="worldmap in">
+<script type="text/html" data-help-name="worldmap in">
     <p>Receives actions from a worldmap web page.</p>
     <p>Actions include
     <ul><li><b>connected</b> - when a new client connects
@@ -505,7 +505,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </script>
 
 
-<script type="text/x-red" data-template-name="worldmap-tracks">
+<script type="text/html" data-template-name="worldmap-tracks">
 <div class="form-row">
     <label for="node-input-depth"><i class="fa fa-map-marker"></i> Number of</label>
     points in track <input type="text" id="node-input-depth" style="width:50%" placeholder="number - default 20">
@@ -524,7 +524,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </div>
 </script>
 
-<script type="text/x-red" data-help-name="worldmap-tracks">
+<script type="text/html" data-help-name="worldmap-tracks">
     <p>Creates tracks lines based on a specified number of previous locations.</p>
     <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
     <p>You can also specify the msg.payload.color, weight, opacity and dashArray properties for the track if required.</p>

@@ -1,5 +1,8 @@
 # node-red-contrib-web-worldmap
 
+[![npm version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)](https://badge.fury.io/js/node-red-contrib-web-worldmap)
+[![GitHub license](https://github.com/dceejay/redmap/blob/master/LICENSE)](https://img.shields.io/github/license/dceejay/redmap.svg)
+
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
 
