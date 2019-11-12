@@ -10,6 +10,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.1.6 - Add legend command to allow inserting an html legend
 - v2.1.5 - Fix squawk icon color handling
 - v2.1.4 - Fix alt and speed as strings
 - v2.1.3 - Fix web page file path error
@@ -352,6 +353,12 @@ For example a popup with a slider (note the \ escaping the internal ' )
 Or a contextmenu with a button
 
     contextmenu: '<button name="Clicker" onclick=\'feedback(this.name)\'>Click me</button>'
+
+#### To add and remove a legend
+
+If you want to add a small legend overlay
+
+    msg.payload.command = { "legend": "<b>Title</b></br><i style=\"background: #477AC2\"></i> Water<br><i style=\"background: #448D40\"></i> Forest<br>" };
 
 
 #### To draw a heavily customised Circle on a layer

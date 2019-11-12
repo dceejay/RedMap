@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.1.6 - Add legend command to allow inserting an html legend
  - v2.1.5 - Fix squawk icon color handling
  - v2.1.4 - Fix alt and speed as strings
  - v2.1.3 - Fix web page file path error

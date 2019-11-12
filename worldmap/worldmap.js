@@ -833,6 +833,9 @@ var coords = L.control.coordinates({
     useLatLngOrder: true, //ordering of labels, default false-> lng-lat
 });
 
+// Add an optional legend
+var legend = L.control({ position: "bottomleft" });
+
 // Add the dialog box for messages
 var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
 dialogue.freeze();
@@ -1609,6 +1612,18 @@ function doCommand(cmd) {
             coords.options.useDMS = false;
             showMouseCoords = "deg";
             coords.addTo(map);
+        }
+    }
+    if (cmd.hasOwnProperty("legend")) {
+        try { map.removeControl(legend); }
+        catch(e) {}
+        if (typeof cmd.legend === "string" && cmd.legend.length > 0) { 
+            legend.onAdd = function() {
+                var div = L.DomUtil.create("div", "legend");
+                div.innerHTML = cmd.legend;
+                return div;
+            };
+            legend.addTo(map);
         }
     }
 
