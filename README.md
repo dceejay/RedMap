@@ -360,6 +360,7 @@ If you want to add a small legend overlay
 
     msg.payload.command = { "legend": "<b>Title</b></br><i style=\"background: #477AC2\"></i> Water<br><i style=\"background: #448D40\"></i> Forest<br>" };
 
+To remove set the legend to an empty string `""`.
 
 #### To draw a heavily customised Circle on a layer
 
