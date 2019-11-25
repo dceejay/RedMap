@@ -1,7 +1,7 @@
 # node-red-contrib-web-worldmap
 
 [![npm version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)](https://badge.fury.io/js/node-red-contrib-web-worldmap)
-[![GitHub license](https://github.com/dceejay/redmap/blob/master/LICENSE)](https://img.shields.io/github/license/dceejay/redmap.svg)
+[![GitHub license](https://img.shields.io/github/license/dceejay/redmap.svg)](https://github.com/dceejay/redmap/blob/master/LICENSE)
 
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
@@ -10,6 +10,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.2.0 - Add rangerings arcs function
 - v2.1.6 - Add legend command to allow inserting an html legend
 - v2.1.5 - Fix squawk icon color handling
 - v2.1.4 - Fix alt and speed as strings
@@ -17,34 +18,14 @@ map web page for plotting "things" on.
 - v2.1.2 - Fix layercontrol remove bug. Issue #116
 - v2.1.1 - fix bug in repeated add with polygon
 - v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
-- v2.0.22 - fix SIDC missing property
-- v2.0.21 - allow adding overlays without making them visible (visible:false). Issue #108
-- v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
-- v2.0.18 - Stop map contextmenu bleedthrough to marker. Add compress middleware.
-- v2.0.17 - Let clear command also clear tracks from tracks node
-- v2.0.16 - Revert use of ES6 import. Keep IE11 happy for while
-- v2.0.13 - Fix tracks colour.
-- v2.0.12 - Ensure default icon is in place if not specified (regression)
-- v2.0.9 - Only update maxage on screen once it exists
-- v2.0.8 - Drop beta flag, re-organise index, js and css files. Now using leaflet 1.4
-- v2.0.7-beta - Switch Ruler control to be independent of Draw library.
-- v2.0.6-beta - Re-enable editing of draw layer, add rectangles to lines and areas. Make individual objects editable.
-- v2.0.5-beta - Fix clustering on zoom (update old library)
-- v2.0.4-beta - Add helicopter icon. Correct Leaflet.Coordinates file name. Fix right contextmenu.
-- v2.0.3-beta - Let circles have popups. Better drawing of ellipses
-- v2.0.2-beta - Let lines and areas also have popups
-- v2.0.1-beta - Add optional graticule
-- v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
-  - ...
 
-see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
+- see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
 ## Install
 
 Either use the Manage Palette option in the Node-RED Editor menu, or run the following command in your Node-RED user directory - typically `~/.node-red`
 
         npm i node-red-contrib-web-worldmap
-
 
 ## Usage
 
@@ -225,6 +206,7 @@ a number of degrees.
 
     msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
 
+
 ### Options
 
 Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
@@ -242,6 +224,31 @@ Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional pr
 
 Other properties can be found in the leaflet documentation.
 
+
+### Arcs, Range Rings
+
+You can add supplemental arc(s) to an icon by adding an **arc** property as below.
+Supplemental means that you can also specify a line using a **bearing** and **length** property.
+
+```
+msg.payload = { name:"Camera01", icon:"fa-camera", lat:51.05, lon:-1.35,
+    bearing: 235,
+    length: 2200,
+    arc: {
+        ranges: [500,1000,2000],
+        pan: 228,
+        fov: 40,
+        color: '#aaaa00'
+    }
+}
+```
+
+**ranges** can be a single number or an array of arc distances from the marker.
+The **pan** is the bearing of the centre of the arc, and the **fov** (Field of view)
+specifies the angle of the arc.
+Defaults are shown above.
+
+
 ## Drawing
 
 A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
@@ -250,6 +257,7 @@ Right-clicking on an icon will allow you to delete it.
 
 If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
 Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
+
 
 ## Events from the map
 

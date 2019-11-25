@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
 var startzoom = 10;
@@ -147,6 +148,23 @@ var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { console.l
 var blackButton = L.easyButton('fa-square wm-black', function(btn) { console.log("BLACK",btn); })
 var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton]);
 
+
+function onLocationFound(e) {
+    var radius = e.accuracy;
+    //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
+    L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
+    if (e.hasOwnProperty("heading")) {
+        var lengthAsDegrees = e.speed * 60 / 110540;
+        var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
+        var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
+        var lla = new L.LatLng(ya,xa);
+        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
+    }
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
+}
+
+function onLocationError(e) { console.log(e.message); }
+
 // Move some bits around if in an iframe
 if (window.self !== window.top) {
     console.log("IN an iframe");
@@ -174,20 +192,7 @@ else {
     L.easyButton( 'fa-crosshairs fa-lg', function() {
         map.locate({setView:true, maxZoom:16});
     }, "Locate me").addTo(map);
-    function onLocationFound(e) {
-        var radius = e.accuracy;
-        //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-        L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
-        if (e.hasOwnProperty("heading")) {
-            var lengthAsDegrees = e.speed * 60 / 110540;
-            var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
-            var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
-            var lla = new L.LatLng(ya,xa);
-            L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
-        }
-        ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
-    }
-    function onLocationError(e) { console.log(e.message); }
+
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
 
@@ -233,15 +238,15 @@ if (showUserMenu) {
 // Add graticule
 var showGrid = false;
 var Lgrid = L.latlngGraticule({
-	font: "Verdana",
+    font: "Verdana",
     fontColor: "#666",
     zoomInterval: [
-		{start:1, end:2, interval:40},
-		{start:3, end:3, interval:20},
-		{start:4, end:4, interval:10},
-		{start:5, end:7, interval:5},
-		{start:8, end:20, interval:1}
-	]
+        {start:1, end:2, interval:40},
+        {start:3, end:3, interval:20},
+        {start:4, end:4, interval:10},
+        {start:5, end:7, interval:5},
+        {start:8, end:20, interval:1}
+    ]
 });
 
 var panit = false;
@@ -352,22 +357,22 @@ function doSearch() {
         var searchUrl = protocol + "//nominatim.openstreetmap.org/search?format=json&limit=1&q=";
 
         fetch(searchUrl + value) // Call the fetch function passing the url of the API as a parameter
-        .then(function(resp) { return resp.json(); })
-        .then(function(data) {
-            if (data.length > 0) {
-                var bb = data[0].boundingbox;
-                map.fitBounds([ [bb[0],bb[2]], [bb[1],bb[3]] ]);
-                map.panTo([data[0].lat, data[0].lon]);
-            }
-            else {
-                document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
-            }
-        })
-        .catch(function(err) {
-            if (err.toString() === "TypeError: Failed to fetch") {
-                document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
-            }
-        });
+            .then(function(resp) { return resp.json(); })
+            .then(function(data) {
+                if (data.length > 0) {
+                    var bb = data[0].boundingbox;
+                    map.fitBounds([ [bb[0],bb[2]], [bb[1],bb[3]] ]);
+                    map.panTo([data[0].lat, data[0].lon]);
+                }
+                else {
+                    document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
+                }
+            })
+            .catch(function(err) {
+                if (err.toString() === "TypeError: Failed to fetch") {
+                    document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
+                }
+            });
     }
     else {
         if (lockit) {
@@ -512,7 +517,16 @@ function showMapCurrentZoom() {
                         polygons[key].setStyle({opacity:0});
                     }
                 }
-                polygons[key].redraw();
+                try {
+                    if (polygons[key].hasOwnProperty("_layers")) { 
+                        polygons[key].eachLayer(function(layer) { layer.redraw(); });
+                    }
+                    else {
+                        polygons[key].redraw();
+                    }
+                } catch(e) {
+                    console.log(key,polygons[key],e)
+                }
             }
         }
     },750);
@@ -911,6 +925,26 @@ var editPoly = function(pname) {
     editHandler.enable();
 }
 
+var rangerings = function(latlng, options) {
+    options = L.extend({
+        ranges: [250,500,750,1000],
+        pan: 0,
+        fov: 60,
+        color: '#910000'
+    }, options);
+    var rings = L.featureGroup();
+    if (typeof options.ranges === "number") { options.ranges = [ options.ranges ]; }
+    for (var i = 0; i < options.ranges.length; i++) {
+        L.semiCircle(latlng, {
+            radius: options.ranges[i],
+            fill: false,
+            color: options.color,
+            weight: 1
+        }).setDirection(options.pan, options.fov).addTo(rings);
+    }
+    return rings;
+}
+
 // the MAIN add something to map function
 function setMarker(data) {
     var rightmenu = function(m) {
@@ -1019,6 +1053,7 @@ function setMarker(data) {
             catch(e) { console.log("OOPS"); }
         }
     }
+
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
     if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
@@ -1052,18 +1087,22 @@ function setMarker(data) {
             polygons[data.name] = polycirc;
         }
     }
+    else if (data.hasOwnProperty("arc")) {
+        if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
+            polygons[data.name] = rangerings(new L.LatLng((data.lat*1), (data.lon*1)), data.arc);
+        }
+    }
 
     if (polygons[data.name] !== undefined) {
         polygons[data.name].lay = lay;
         if (opt.clickable === true) {
             var words = "<b>"+data.name+"</b>";
-            if (data.popup) { var words = words + "<br/>" + data.popup; }
+            if (data.popup) { words = words + "<br/>" + data.popup; }
             polygons[data.name].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
         }
         //polygons[data.name] = rightmenu(polygons[data.name]); // DCJ Investigate
         layers[lay].addLayer(polygons[data.name]);
     }
-
 
     if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
     else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
@@ -1444,6 +1483,7 @@ function setMarker(data) {
     var llc = data.lineColor || data.color;
     delete data.lat;
     delete data.lon;
+    if (data.arc) { delete data.arc; }
     if (data.layer) { delete data.layer; }
     if (data.lineColor) { delete data.lineColor; }
     if (data.color) { delete data.color; }
@@ -1481,7 +1521,9 @@ function setMarker(data) {
     if (data.bearing != null) {  // if there is a heading
         if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
         if (data.length != null) {
-            if (polygons[data.name] != null) { map.removeLayer(polygons[data.name]); }
+            if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) { 
+                map.removeLayer(polygons[data.name]); 
+            }
             var x = ll.lng * 1; // X coordinate
             var y = ll.lat * 1; // Y coordinate
             var ll1 = ll;
@@ -1490,16 +1532,16 @@ function setMarker(data) {
             var polygon = null;
             if (data.accuracy != null) {
                 data.accuracy = Number(data.accuracy);
-                var y2 = y + Math.sin((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
-                var x2 = x + Math.cos((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                var y2 = y + Math.sin((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                var x2 = x + Math.cos((90-angle+data.accuracy)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var ll2 = new L.LatLng(y2,x2);
-                var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
-                var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
+                var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var ll3 = new L.LatLng(y3,x3);
                 polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:llc||'#f30', fillOpacity:0.06, clickable:false});
             } else {
-                var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees*Math.cos(y/180*Math.PI);
-                var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees;
+                var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees;
+                var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var lla = new L.LatLng(ya,xa);
                 polygon = L.polygon([ ll1, lla ], {weight:2, color:llc||'#f30', clickable:false});
             }
@@ -1509,7 +1551,12 @@ function setMarker(data) {
                     polygon.setStyle({opacity:0});
                 }
             }
-            polygons[data.name] = polygon;
+            if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("_layers")) {
+                polygons[data.name].addLayer(polygon); 
+            }
+            else { 
+                polygons[data.name] = polygon; 
+            }
             polygons[data.name].lay = lay;
             layers[lay].addLayer(polygon);
         }
