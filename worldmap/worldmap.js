@@ -724,6 +724,11 @@ basemaps["Watercolor"] = L.tileLayer(watercolorUrl, {
     attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
 });
 
+var AutoNaviUrl = L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    attribution: 'Tiles &copy; 高德地图',
+    maxNativeZoom:14
+});
+basemaps["AutoNavi"] = AutoNaviUrl;
 
 // Now add the overlays
 
