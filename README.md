@@ -10,6 +10,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.2.1 - Better implementation of legend create/show/hide
 - v2.2.0 - Add rangerings arcs function
 - v2.1.6 - Add legend command to allow inserting an html legend
 - v2.1.5 - Fix squawk icon color handling

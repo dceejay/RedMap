@@ -1662,15 +1662,22 @@ function doCommand(cmd) {
         }
     }
     if (cmd.hasOwnProperty("legend")) {
-        try { map.removeControl(legend); }
-        catch(e) {}
-        if (typeof cmd.legend === "string" && cmd.legend.length > 0) { 
-            legend.onAdd = function() {
-                var div = L.DomUtil.create("div", "legend");
-                div.innerHTML = cmd.legend;
-                return div;
+        if (typeof cmd.legend === "string" && cmd.legend.length > 0) {
+            if (!legend.getContainer()) {   //if legend not exist create it
+                legend.onAdd = function() {
+                    var div = L.DomUtil.create("div", "legend");
+                    div.innerHTML = cmd.legend;
+                    return div;
+                };
+                legend.addTo(map);
             };
-            legend.addTo(map);
+            legend.getContainer().style.visibility = 'visible'; // if already exist use visibility to show/hide
+            legend.getContainer().innerHTML = cmd.legend;       //  set content of legend
+        } 
+        else {
+            if (legend.getContainer()) { 
+                legend.getContainer().style.visibility = 'hidden'; //if empty string and legend already created hide it
+            }
         }
     }
 
