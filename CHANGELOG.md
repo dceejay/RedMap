@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.0 - Add colour options for drawing layer
  - v2.2.1 - Better implementation of legend create/show/hide
  - v2.2.0 - Add rangering arcs function
  - v2.1.6 - Add legend command to allow inserting an html legend

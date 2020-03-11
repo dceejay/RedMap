@@ -25,6 +25,7 @@ var showLayerMenu = true;
 var showMouseCoords = false;
 var sidebyside;
 var layercontrol;
+var drawingColour = "#910000";
 
 var iconSz = {
     "Team/Crew": 24,
@@ -141,12 +142,13 @@ var fullscreenButton = L.control.fullscreen();
 var rulerButton = L.control.ruler({position:"topleft"});
 
 //var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
-var redButton = L.easyButton('fa-square wm-red', function(btn) { console.log("RED",btn); })
-var blueButton = L.easyButton('fa-square wm-blue', function(btn) { console.log("BLUE",btn); })
-var greenButton = L.easyButton('fa-square wm-green', function(btn) { console.log("GREEN",btn); })
-var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { console.log("YELLOW",btn); })
-var blackButton = L.easyButton('fa-square wm-black', function(btn) { console.log("BLACK",btn); })
-var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton]);
+var redButton = L.easyButton('fa-square wm-red', function(btn) { changeDrawColour("#E7827F"); })
+var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#94CCE2"); })
+var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#ACD6A4"); })
+var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#F5F08B"); })
+var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#444444"); })
+var whiteButton = L.easyButton('fa-square wm-white', function(btn) { changeDrawColour("#EEEEEE"); })
+var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton,whiteButton]);
 
 
 function onLocationFound(e) {
@@ -468,7 +470,7 @@ map.on('overlayadd', function(e) {
     if (e.name == "drawing") {
         overlays["drawing"].bringToFront();
         map.addControl(drawControl);
-        //map.addControl(colorControl);
+        map.addControl(colorControl);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -481,7 +483,7 @@ map.on('overlayremove', function(e) {
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
-        //map.removeControl(colorControl);
+        map.removeControl(colorControl);
         map.removeControl(drawControl);
     }
     ws.send(JSON.stringify({action:"dellayer", name:e.name}));
@@ -746,7 +748,7 @@ var drawControl = new L.Control.Draw({
         polyline: { shapeOptions: { clickable:true } },
         marker: false,
         //circle: false,
-        circle: { shapeOptions: { clickable:false } },
+        circle: { shapeOptions: { clickable:true } },
         circlemarker: false,
         rectangle: { shapeOptions: { clickable:true } },
         polygon: { shapeOptions: { clickable:true } }
@@ -758,6 +760,14 @@ var drawControl = new L.Control.Draw({
     //     edit: true
     // }
 });
+var changeDrawColour = function(col) {
+    drawControl.setDrawingOptions({
+        polyline: { shapeOptions: { color:col } },
+        circle: { shapeOptions: { color:col } },
+        rectangle: { shapeOptions: { color:col } },
+        polygon: { shapeOptions: { color:col } }
+    });
+}
 map.on('draw:created', function (e) {
     var name = e.layerType + drawCount;
     drawCount = drawCount + 1;
