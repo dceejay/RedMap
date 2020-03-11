@@ -1095,6 +1095,8 @@ function setMarker(data) {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
             }
             polygons[data.name] = polycirc;
+            delete (data.lat);
+            delete (data.lon);
         }
     }
     else if (data.hasOwnProperty("arc")) {
@@ -1136,7 +1138,7 @@ function setMarker(data) {
     // Create the icons... handle plane, car, ship, wind, earthquake as specials
     var marker, myMarker;
     var icon, q;
-    var words="";
+    var words = "";
     var labelOffset = [12,0];
     var drag = false;
 
