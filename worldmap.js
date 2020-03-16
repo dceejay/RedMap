@@ -264,9 +264,16 @@ module.exports = function(RED) {
             if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
-                    delete node.pointsarray[msg.payload.name];
+                    if (msg.payload.name.substr(-1) === '_') {
+                        var a = node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)].pop();
+                        node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)] = [ a ];
+                        node.send(newmsg); 
+                    }
+                    else {
+                        delete node.pointsarray[msg.payload.name];
+                    }
                     //newmsg.payload.name = msg.payload.name + "_";
-                    node.send(newmsg);  // send the track to be deleted
+                    node.send(newmsg);  
                     return;
                 }
                 if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
