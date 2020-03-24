@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.2 - Add better geojson support - name plus geojson properties
  - v2.3.1 - Stop adding point when you add a circle
  - v2.3.0 - Add colour options for drawing layer
  - v2.2.1 - Better implementation of legend create/show/hide

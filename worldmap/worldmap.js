@@ -292,15 +292,15 @@ function doTidyUp(l) {
         if ((l && (l == markers[m].lay)) || typeof markers[m].ts != "undefined") {
             if ((l && (l == markers[m].lay)) || (markers[m].hasOwnProperty("ts") && (Number(markers[m].ts) < d) && (markers[m].lay !== "_drawing"))) {
                 //console.log("STALE :",m);
-                layers[markers[m].lay].removeLayer(markers[m]);
-                if (typeof polygons[m] != "undefined") {
-                    layers[markers[m].lay].removeLayer(polygons[m]);
-                    delete polygons[m];
-                }
                 if (typeof polygons[m+"_"] != "undefined") {
                     layers[polygons[m+"_"].lay].removeLayer(polygons[m+"_"]);
                     delete polygons[m+"_"];
                 }
+                if (typeof polygons[m] != "undefined") {
+                    layers[markers[m].lay].removeLayer(polygons[m]);
+                    delete polygons[m];
+                }
+                layers[markers[m].lay].removeLayer(markers[m]);
                 delete markers[m];
             }
         }
@@ -1103,6 +1103,9 @@ function setMarker(data) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
             polygons[data.name] = rangerings(new L.LatLng((data.lat*1), (data.lon*1)), data.arc);
         }
+    }
+    else if (data.hasOwnProperty("geojson")) {
+        doGeojson(data.geojson,(data.layer || "geojson"),opt);
     }
 
     if (polygons[data.name] !== undefined) {
@@ -2021,13 +2024,17 @@ function doCommand(cmd) {
 }
 
 // handle any incoming GEOJSON directly - may style badly
-function doGeojson(g) {
-    console.log("GEOJSON",g);
-    if (!basemaps["geojson"]) {
+function doGeojson(g,l,o) {
+    var glayer = l || "geojson";
+    if (!basemaps[glayer]) {
         var opt = { style: function(feature) {
             var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
+            st = Object.assign(st,o); 
             if (feature.hasOwnProperty("properties")) {
                 console.log("GPROPS", feature.properties)
+            }
+            if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && feature.geometry.type === "LineString") {
+                st.fill = false;
             }
             if (feature.hasOwnProperty("style")) {
                 console.log("GSTYLE", feature.style)
@@ -2037,10 +2044,11 @@ function doGeojson(g) {
         opt.onEachFeature = function (f,l) {
             if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
         }
-        overlays["geojson"] = L.geoJson(g,opt);
-        layercontrol.addOverlay(overlays["geojson"],"geojson");
+        overlays[glayer] = L.geoJson(g,opt);
+        //layercontrol.addOverlay(overlays[glayer],glayer);
+        map.addLayer(overlays[glayer]);
     }
-    overlays["geojson"].addData(g);
+    overlays[glayer].addData(g);
 }
 
 connect();

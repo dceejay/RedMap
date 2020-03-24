@@ -208,6 +208,12 @@ a number of degrees.
     msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
 
 
+### GeoJSON
+
+If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then rather than draw a point 
+it will render the geojson. Other optional properties (see below) can be used to style the geojson.
+
+
 ### Options
 
 Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
