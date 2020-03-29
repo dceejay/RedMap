@@ -10,6 +10,10 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.3.3 - Fix satellite view max zoom
+- v2.3.2 - Add better geojson support - name plus geojson properties
+- v2.3.1 - Stop adding point when you add a circle
+- v2.3.0 - Add colour options for drawing layer
 - v2.2.1 - Better implementation of legend create/show/hide
 - v2.2.0 - Add rangerings arcs function
 - v2.1.6 - Add legend command to allow inserting an html legend
@@ -18,7 +22,7 @@ map web page for plotting "things" on.
 - v2.1.3 - Fix web page file path error
 - v2.1.2 - Fix layercontrol remove bug. Issue #116
 - v2.1.1 - fix bug in repeated add with polygon
-- v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
+- v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier Let -in node specify connection actions only
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 
@@ -199,7 +203,19 @@ than draw a point it will draw a circle. The *radius* property is specified in m
 
     msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
 
-As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options below.
+As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options section below.
+
+    msg.payload =  {
+        "name": "circle",
+        "lat": 51.515,
+        "lon": -0.1235,
+        "radius": 1000,
+        "layer": "drawing",
+        "iconColor": '#464646',
+        "stroke": false,
+        "fillOpacity": 0.8,
+        "clickable": true
+    };
 
 If the **radius** property is an array of two numbers, these specify the minor and major radii
 of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
@@ -377,20 +393,6 @@ If you want to add a small legend overlay
 
 To remove set the legend to an empty string `""`.
 
-#### To draw a heavily customised Circle on a layer
-
-    msg.payload.command =  {
-        "name": "circle",
-        "lat": 51.515,
-        "lon": -0.1235,
-        "radius": 10,
-        "layer": "drawing",
-        "iconColor": '#464646',
-        "stroke": false,
-        "fillOpacity": 0.8,
-        "clickable": true
-    };
-
 #### To add a new base layer
 
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
@@ -550,7 +552,9 @@ You can then add a new WMS Base layer by injecting a message like
 Optionally set `"wms":"grey"` to make the layer to greyscale which may make your markers more visible.
 
 
-## Demo Flow
+## Examples and Demo Flow
+
+There are several examples included when you install the node. Navigate to the menu - Import - Examples - node-red-contrib-web-worldmap
 
 The following example gets recent earthquakes from USGS, parses the result,
 formats up the msg as per above and sends to the node to plot on the map.

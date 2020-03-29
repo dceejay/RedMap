@@ -622,7 +622,7 @@ var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/re
 basemaps["Esri"] = Esri_WorldStreetMap;
 
 var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution:'Tiles &copy; Esri', maxNativeZoom:19, maxZoom:20
+    attribution:'Tiles &copy; Esri', maxNativeZoom:17, maxZoom:20
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
 
@@ -1130,7 +1130,10 @@ function setMarker(data) {
     }
     else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
     else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude")) { ll = new L.LatLng((data.latitude*1), (data.longitude*1)); }
-    else { console.log("No location:",data); return; }
+    else { 
+        // console.log("No location:",data); 
+        return; 
+    }
 
     // Adding new L.LatLng object (lli) when optional intensity value is defined. Only for use in heatmap layer
     if (typeof data.coordinates == "object") { lli = new L.LatLng(data.coordinates[2],data.coordinates[1],data.coordinates[0]); }
