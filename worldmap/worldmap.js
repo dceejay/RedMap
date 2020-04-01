@@ -93,28 +93,30 @@ var connect = function() {
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
         //console.log("DATA" typeof data,data);
-        if (Array.isArray(data)) {
-            //console.log("ARRAY");
-            // map.closePopup();
-            // var bnds= L.latLngBounds([0,0]);
-            for (var prop in data) {
-                if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
-                if (data[prop].hasOwnProperty("name")) {
-                    setMarker(data[prop]);
-                    // bnds.extend(markers[data[prop].name].getLatLng());
+        if (data) {
+            if (Array.isArray(data)) {
+                //console.log("ARRAY");
+                // map.closePopup();
+                // var bnds= L.latLngBounds([0,0]);
+                for (var prop in data) {
+                    if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+                    if (data[prop].hasOwnProperty("name")) {
+                        setMarker(data[prop]);
+                        // bnds.extend(markers[data[prop].name].getLatLng());
+                    }
+                    else { console.log("SKIP A",data[prop]); }
                 }
-                else { console.log("SKIP A",data[prop]); }
+                // map.fitBounds(bnds.pad(0.25));
             }
-            // map.fitBounds(bnds.pad(0.25));
-        }
-        else {
-            if (data.command) { doCommand(data.command); delete data.command; }
-            if (data.hasOwnProperty("name")) { setMarker(data); }
-            else if (data.hasOwnProperty("type")) { doGeojson(data); }
             else {
-                console.log("SKIP",data);
-                // if (typeof data === "string") { doDialog(data); }
-                // else { console.log("SKIP",data); }
+                if (data.command) { doCommand(data.command); delete data.command; }
+                if (data.hasOwnProperty("name")) { setMarker(data); }
+                else if (data.hasOwnProperty("type")) { doGeojson(data); }
+                else {
+                    console.log("SKIP",data);
+                    // if (typeof data === "string") { doDialog(data); }
+                    // else { console.log("SKIP",data); }
+                }
             }
         }
     };
@@ -1179,6 +1181,22 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             //q = 'https://www.bing.com/images/search?q='+data.icon+'%20'+encodeURIComponent(data.name);
             //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
+        }
+        else if (data.icon === "bus") {
+            var dir = parseFloat(data.hdg || data.bearing || "0") - 90;
+            var sc = 1;
+            if (dir < -90 || dir >= 90) { sc = -1; }
+            data.iconColor = data.iconColor || "#910000";
+            var p = "m595.5 97.332-30.898-68.199c-11.141-24.223-35.344-39.762-62.004-39.801h-443.3c-32.738 0.035157-59.266 26.562-59.301 59.305v148.2c0 17.949 14.551 32.5 32.5 32.5h48.5c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h242c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h53.203c12.348-0.003906 23.219-8.1484 26.699-20 0.72266-2.5391 1.0898-5.1602 1.0977-7.7969v-83.5c-0.003906-7.1445-1.5391-14.203-4.5-20.703zm-545.5 12c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm80 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm110-150c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm110 0c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm30 10c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm90 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm19.199-140c-5.1836-0.46094-9.168-4.793-9.1992-10v-80.086c0-5.4727 4.4375-9.9141 9.9141-9.9141h12.684c18.824 0.050781 35.914 11.012 43.805 28.102l30.898 68.199c1.6133 3.5547 2.5 7.3984 2.6016 11.297z";
+            icon = '<svg width="640pt" height="640pt" viewBox="-20 -180 640 640" xmlns="http://www.w3.org/2000/svg">';
+            icon += '<path d="'+p+'" fill="'+data.iconColor+'"/></svg>';
+            var svgbus = "data:image/svg+xml;base64," + btoa(icon);
+            myMarker = L.divIcon({
+                className:"busicon",
+                iconAnchor: [16, 16],
+                html:'<img src="'+svgbus+'" style="width:32px; height:32px; -webkit-transform:scaleY('+sc+') rotate('+dir*sc+'deg); -moz-transform:scaleY('+sc+') rotate('+dir*sc+'deg);"/>'
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "helicopter") {
             data.iconColor = data.iconColor || "black";
