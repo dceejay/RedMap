@@ -260,7 +260,7 @@ module.exports = function(RED) {
         this.layer = n.layer || "combined"; // separate, single
         var node = this;
 
-        node.on("input", function(msg) {
+        var doTrack = function(msg) {
             if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
@@ -343,6 +343,13 @@ module.exports = function(RED) {
                     }
                 }
             }
+        }
+
+        node.on("input", function(m) {
+            if (Array.isArray(m)) { 
+                m.forEach(item => doTrack(item));
+            }
+            else { doTrack(m); }
         });
 
         node.on("close", function() {

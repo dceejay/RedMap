@@ -10,6 +10,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
 - v2.3.4 - Add bus icon
 - v2.3.3 - Fix satellite view max zoom
 - v2.3.2 - Add better geojson support - name plus geojson properties
@@ -55,7 +56,7 @@ Optional properties include
  - **bearing** : when combined with speed, draws a vector.
  - **accuracy** : when combined with bearing, draws a polygon of possible direction.
  - **color** : CSS color name or #rrggbb value for bearing line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or http://
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.

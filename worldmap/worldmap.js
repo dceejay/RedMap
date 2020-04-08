@@ -1360,7 +1360,8 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 popupAnchor: [0, -16]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            var dir = parseFloat(data.hdg || data.bearing || "0");
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
             labelOffset = [12,-4];
         }
         else if (data.icon.substr(0,3) === "fa-") {
