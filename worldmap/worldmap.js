@@ -1651,8 +1651,8 @@ function doCommand(cmd) {
             if ((cmd.grid.showgrid == "false" || cmd.grid.showgrid == false ) && showGrid) { changed = true; }
             if (changed) {
                 showGrid = !showGrid;
-                if (showGrid) { Lgrid.addTo(map); }
-                else { Lgrid.removeFrom(map); }
+                if (showGrid) { Lgrid.addTo(map); rulerButton.addTo(map); }
+                else { Lgrid.removeFrom(map); rulerButton.removeFrom(map); }
             }
         }
         if (cmd.grid.hasOwnProperty("opt")) {

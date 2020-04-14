@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.6 - show ruler if grid is turned on.
  - v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
  - v2.3.4 - Add bus icon
  - v2.3.3 - Fix satellite view max zoom

@@ -55,6 +55,7 @@ module.exports = function(RED) {
         var clients = {};
         RED.httpNode.use(compression());
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
+        // RED.httpNode.use(node.path, express.static(__dirname + '/worldmap', {maxage:3600000}));
 
         var callback = function(client) {
             //client.setMaxListeners(0);
@@ -346,10 +347,16 @@ module.exports = function(RED) {
         }
 
         node.on("input", function(m) {
-            if (Array.isArray(m)) { 
-                m.forEach(item => doTrack(item));
+            if (Array.isArray(m.payload)) {
+                m.payload.forEach(function (pay) {
+                    var n = RED.util.cloneMessage(m)
+                    n.payload = pay;
+                    doTrack(n);
+                });
             }
-            else { doTrack(m); }
+            else {
+                doTrack(m); 
+            }
         });
 
         node.on("close", function() {
