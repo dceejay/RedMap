@@ -10,6 +10,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.3.7 - show icon within circle if icon present. Issue #128
+- v2.3.6 - show ruler if grid is turned on.
 - v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
 - v2.3.4 - Add bus icon
 - v2.3.3 - Fix satellite view max zoom
@@ -17,7 +19,7 @@ map web page for plotting "things" on.
 - v2.3.1 - Stop adding point when you add a circle
 - v2.3.0 - Add colour options for drawing layer
 - v2.2.1 - Better implementation of legend create/show/hide
-- v2.2.0 - Add rangerings arcs function
+- v2.2.0 - Add range rings and arcs function
 - v2.1.6 - Add legend command to allow inserting an html legend
 - v2.1.5 - Fix squawk icon color handling
 - v2.1.4 - Fix alt and speed as strings

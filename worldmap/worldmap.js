@@ -522,7 +522,7 @@ function showMapCurrentZoom() {
                     }
                 }
                 try {
-                    if (polygons[key].hasOwnProperty("_layers")) { 
+                    if (polygons[key].hasOwnProperty("_layers")) {
                         polygons[key].eachLayer(function(layer) { layer.redraw(); });
                     }
                     else {
@@ -1097,8 +1097,10 @@ function setMarker(data) {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
             }
             polygons[data.name] = polycirc;
-            delete (data.lat);
-            delete (data.lon);
+            if (!data.hasOwnProperty("icon")) {
+                delete (data.lat);
+                delete (data.lon);
+            }
         }
     }
     else if (data.hasOwnProperty("arc")) {
@@ -1132,9 +1134,9 @@ function setMarker(data) {
     }
     else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
     else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude")) { ll = new L.LatLng((data.latitude*1), (data.longitude*1)); }
-    else { 
-        // console.log("No location:",data); 
-        return; 
+    else {
+        // console.log("No location:",data);
+        return;
     }
 
     // Adding new L.LatLng object (lli) when optional intensity value is defined. Only for use in heatmap layer
@@ -1164,9 +1166,9 @@ function setMarker(data) {
         }
         else if (data.icon === "plane") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { 
+            if (data.hasOwnProperty("squawk")) {
                 if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
-                    data.iconColor = "red"; 
+                    data.iconColor = "red";
                 }
             }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
@@ -1200,9 +1202,9 @@ function setMarker(data) {
         }
         else if (data.icon === "helicopter") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { 
+            if (data.hasOwnProperty("squawk")) {
                 if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
-                    data.iconColor = "red"; 
+                    data.iconColor = "red";
                 }
             }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="314" height="314" viewBox="0 0 314.5 314.5">';
@@ -1218,9 +1220,9 @@ function setMarker(data) {
         }
         else if (data.icon === "uav") {
             data.iconColor = data.iconColor || "black";
-            if (data.hasOwnProperty("squawk")) { 
+            if (data.hasOwnProperty("squawk")) {
                 if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
-                    data.iconColor = "red"; 
+                    data.iconColor = "red";
                 }
             }
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
@@ -1558,8 +1560,8 @@ function setMarker(data) {
     if (data.bearing != null) {  // if there is a heading
         if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
         if (data.length != null) {
-            if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) { 
-                map.removeLayer(polygons[data.name]); 
+            if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
+                map.removeLayer(polygons[data.name]);
             }
             var x = ll.lng * 1; // X coordinate
             var y = ll.lat * 1; // Y coordinate
@@ -1589,10 +1591,10 @@ function setMarker(data) {
                 }
             }
             if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("_layers")) {
-                polygons[data.name].addLayer(polygon); 
+                polygons[data.name].addLayer(polygon);
             }
-            else { 
-                polygons[data.name] = polygon; 
+            else {
+                polygons[data.name] = polygon;
             }
             polygons[data.name].lay = lay;
             layers[lay].addLayer(polygon);
@@ -1710,9 +1712,9 @@ function doCommand(cmd) {
             };
             legend.getContainer().style.visibility = 'visible'; // if already exist use visibility to show/hide
             legend.getContainer().innerHTML = cmd.legend;       //  set content of legend
-        } 
+        }
         else {
-            if (legend.getContainer()) { 
+            if (legend.getContainer()) {
                 legend.getContainer().style.visibility = 'hidden'; //if empty string and legend already created hide it
             }
         }
@@ -2051,7 +2053,7 @@ function doGeojson(g,l,o) {
     if (!basemaps[glayer]) {
         var opt = { style: function(feature) {
             var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
-            st = Object.assign(st,o); 
+            st = Object.assign(st,o);
             if (feature.hasOwnProperty("properties")) {
                 console.log("GPROPS", feature.properties)
             }
