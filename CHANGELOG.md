@@ -1,9 +1,10 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.8 - fix fa-marker offset to improve accuracy.
  - v2.3.7 - show icon within circle if icon present. Issue #128
  - v2.3.6 - show ruler if grid is turned on.
  - v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
- - v2.3.4 - Add bus icon
+ - v2.3.4 - Add aligning bus icon
  - v2.3.3 - Fix satellite view max zoom
  - v2.3.2 - Add better geojson support - name plus geojson properties
  - v2.3.1 - Stop adding point when you add a circle

@@ -1374,6 +1374,7 @@ function setMarker(data) {
                 className:"faicon",
                 html: '<center><i class="fa fa-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
                 iconSize: [32, 32],
+                iconAnchor: [16, 12],
                 popupAnchor: [0, -16]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
@@ -1387,6 +1388,7 @@ function setMarker(data) {
                 className:"wiicon",
                 html: '<center><i class="wi wi-fw '+imod+data.icon+'" style="color:'+col+'"></i></center>',
                 iconSize: [32, 32],
+                iconAnchor: [16, 16],
                 popupAnchor: [0, -16]
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
@@ -1849,7 +1851,7 @@ function doCommand(cmd) {
             var myMarker = L.divIcon({
                 className:"faicon",
                 html: '<center><i class="fa fa-fw '+cmd.map.icon+'" style="color:'+col+'"></i></center>',
-                iconSize: [15, 15],
+                iconSize: [16, 16],
             });
             customLayer = L.geoJson(null, {
                 pointToLayer: function(geoJsonPoint, latlng) {
