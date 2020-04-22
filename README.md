@@ -1,5 +1,6 @@
 # node-red-contrib-web-worldmap
 
+[![platform](https://img.shields.io/badge/platform-Node--RED-red)](https://nodered.org)
 [![npm version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)](https://badge.fury.io/js/node-red-contrib-web-worldmap)
 [![GitHub license](https://img.shields.io/github/license/dceejay/redmap.svg)](https://github.com/dceejay/redmap/blob/master/LICENSE)
 
