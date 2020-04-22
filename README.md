@@ -1,7 +1,7 @@
 # node-red-contrib-web-worldmap
 
 [![platform](https://img.shields.io/badge/platform-Node--RED-red)](https://nodered.org)
-[![npm version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)](https://badge.fury.io/js/node-red-contrib-web-worldmap)
+![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
 [![GitHub license](https://img.shields.io/github/license/dceejay/redmap.svg)](https://github.com/dceejay/redmap/blob/master/LICENSE)
 
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
