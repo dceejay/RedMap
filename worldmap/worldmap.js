@@ -111,7 +111,7 @@ var connect = function() {
             else {
                 if (data.command) { doCommand(data.command); delete data.command; }
                 if (data.hasOwnProperty("name")) { setMarker(data); }
-                else if (data.hasOwnProperty("type")) { doGeojson(data); }
+                else if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
                 else {
                     console.log("SKIP",data);
                     // if (typeof data === "string") { doDialog(data); }
@@ -1109,7 +1109,7 @@ function setMarker(data) {
         }
     }
     else if (data.hasOwnProperty("geojson")) {
-        doGeojson(data.geojson,(data.layer || "geojson"),opt);
+        doGeojson(data.name,data.geojson,(data.layer || "unknown"),opt);
     }
 
     if (polygons[data.name] !== undefined) {
@@ -2050,31 +2050,41 @@ function doCommand(cmd) {
 }
 
 // handle any incoming GEOJSON directly - may style badly
-function doGeojson(g,l,o) {
-    var glayer = l || "geojson";
-    if (!basemaps[glayer]) {
-        var opt = { style: function(feature) {
-            var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
-            st = Object.assign(st,o);
-            if (feature.hasOwnProperty("properties")) {
-                console.log("GPROPS", feature.properties)
-            }
-            if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && feature.geometry.type === "LineString") {
-                st.fill = false;
-            }
-            if (feature.hasOwnProperty("style")) {
-                console.log("GSTYLE", feature.style)
-            }
-            return st;
-        }}
-        opt.onEachFeature = function (f,l) {
-            if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
+function doGeojson(n,g,l,o) {
+    var lay = l || "unknown";
+    // if (!basemaps[lay]) {
+    var opt = { style: function(feature) {
+        var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
+        st = Object.assign(st,o);
+        if (feature.hasOwnProperty("properties")) {
+            console.log("GPROPS", feature.properties)
+            st.color = feature.properties["stroke"] || st.color;
+            st.weight = feature.properties["stroke-width"] || st.weight;
+            st.fillColor = feature.properties["fill-color"] || st.fillColor;
+            st.fillOpacity = feature.properties["fill-opacity"] || st.fillOpacity;
         }
-        overlays[glayer] = L.geoJson(g,opt);
-        //layercontrol.addOverlay(overlays[glayer],glayer);
-        map.addLayer(overlays[glayer]);
+        if (feature.hasOwnProperty("style")) {
+            console.log("GSTYLE", feature.style)
+            st.color = feature.style["stroke"] || st.color;
+            st.weight = feature.style["stroke-width"] || st.weight;
+            st.fillColor = feature.style["fill-color"] || st.fillColor;
+            st.fillOpacity = feature.style["fill-opacity"] || st.fillOpacity;
+        }
+        if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && feature.geometry.type === "LineString") {
+            st.fill = false;
+        }
+        return st;
+    }}
+    opt.onEachFeature = function (f,l) {
+        if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
     }
-    overlays[glayer].addData(g);
+    markers[n] = L.geoJson(g,opt);
+    markers[n].lay = lay;
+    if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
+        layers[lay] = new L.LayerGroup();
+    }
+    layers[lay].addLayer(markers[n]);
+    map.addLayer(layers[lay]);
 }
 
 connect();
