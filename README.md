@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.3.9 - improve geojson layer and name handling.
+- v2.3.10 - improve geojson layer and name handling.
 - v2.3.8 - fix fa-marker offset to improve accuracy.
 - v2.3.7 - show icon within circle if icon present. Issue #128
 - v2.3.6 - show ruler if grid is turned on.

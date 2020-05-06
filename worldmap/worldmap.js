@@ -2082,6 +2082,8 @@ function doGeojson(n,g,l,o) {
     markers[n].lay = lay;
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         layers[lay] = new L.LayerGroup();
+        overlays[lay] = layers[lay]; 
+        layercontrol.addOverlay(overlays[lay],lay);
     }
     layers[lay].addLayer(markers[n]);
     map.addLayer(layers[lay]);
