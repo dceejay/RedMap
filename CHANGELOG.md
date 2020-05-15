@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
  - v2.3.10  - improve geojson layer and name handling.
  - v2.3.8 - fix fa-marker offset to improve accuracy.
  - v2.3.7 - show icon within circle if icon present. Issue #128

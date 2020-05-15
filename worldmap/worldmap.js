@@ -623,7 +623,8 @@ var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/re
 });
 basemaps["Esri"] = Esri_WorldStreetMap;
 
-var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+//var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+var Esri_WorldImagery = L.tileLayer('http://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution:'Tiles &copy; Esri', maxNativeZoom:17, maxZoom:20
 });
 basemaps["Esri Satellite"] = Esri_WorldImagery;
@@ -679,6 +680,13 @@ var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.
     subdomains: '0123'
 });
 basemaps["UK OS Opendata"] = NLS_OS_opendata;
+
+var Open_Topo_Map = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    subdomains: 'abc',
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.opentopomap.org/copyright">OpenTopoMap</a> contributors'
+});
+basemaps["Open Topo Map"] = Open_Topo_Map;
 
 var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -754,8 +762,8 @@ var drawControl = new L.Control.Draw({
         circlemarker: false,
         rectangle: { shapeOptions: { clickable:true } },
         polygon: { shapeOptions: { clickable:true } }
-    },
-    edit: false
+    }
+    //edit: none
     // {
     //     featureGroup: layers["_drawing"],
     //     remove: true,
@@ -770,32 +778,56 @@ var changeDrawColour = function(col) {
         polygon: { shapeOptions: { color:col } }
     });
 }
+var shape;
 map.on('draw:created', function (e) {
     var name = e.layerType + drawCount;
     drawCount = drawCount + 1;
 
-    var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+name+"</b><br/><button onclick='editPoly(\""+name+"\",true);'>Edit</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button>");
     e.layer.on('contextmenu', function(e) {
         L.DomEvent.stopPropagation(e);
-        rightmenuMarker.setLatLng(e.latlng);
-        map.openPopup(rightmenuMarker);
+        var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
+        rmen.setContent("<input type='text' autofocus value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\",true);'>Edit points</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+        map.openPopup(rmen);
     });
 
-    var la, lo;
+    var la, lo, cent;
     if (e.layer.hasOwnProperty("_latlng")) {
         la = e.layer._latlng.lat;
         lo = e.layer._latlng.lng;
+        cent = e.layer._latlng;
+    }
+    else {
+        cent = e.layer.getBounds().getCenter();
     }
     var m = {action:"draw", name:name, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
     if (e.layer.hasOwnProperty("_latlngs")) {
         if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
         else { m.area = e.layer._latlngs[0]; }
     }
-    ws.send(JSON.stringify(m));
-    polygons[name] = e.layer;
+    
+    shape = {m:m, layer:e.layer};
+    polygons[name] = shape.layer;
     polygons[name].lay = "_drawing";
-    layers["_drawing"].addLayer(e.layer);
+    polygons[name].name = name;
+    layers["_drawing"].addLayer(shape.layer);
+
+    var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+    rightmenuMarker.setLatLng(cent);
+    setTimeout(function() {map.openPopup(rightmenuMarker)},25);
 });
+
+var sendDrawing = function(n) {
+    var thing = document.getElementById('dinput').value;
+    map.closePopup();
+    shape.m.name = thing;
+    delMarker(n,true);
+    
+    polygons[thing] = shape.layer;
+    polygons[thing].lay = "_drawing";
+    polygons[thing].name = thing;
+    layers["_drawing"].addLayer(shape.layer);
+    ws.send(JSON.stringify(shape.m));
+}
 
 // Add the heatmap layer
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
@@ -1656,7 +1688,7 @@ function doCommand(cmd) {
             if (changed) {
                 showGrid = !showGrid;
                 if (showGrid) { Lgrid.addTo(map); rulerButton.addTo(map); }
-                else { Lgrid.removeFrom(map); rulerButton.removeFrom(map); }
+                else { Lgrid.removeFrom(map); rulerButton.remove(); }
             }
         }
         if (cmd.grid.hasOwnProperty("opt")) {
