@@ -1,6 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.3.12 - Fix geoson feature properties fill color
+ - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
  - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
  - v2.3.10 - Improve geojson layer and name handling.
  - v2.3.8 - Fix fa-marker offset to improve accuracy.

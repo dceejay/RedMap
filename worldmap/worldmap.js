@@ -2094,6 +2094,11 @@ function doGeojson(n,g,l,o) {
             st.weight = feature.properties["stroke-width"] || st.weight;
             st.fillColor = feature.properties["fill-color"] || feature.properties["fill"] || st.fillColor;
             st.fillOpacity = feature.properties["fill-opacity"] || st.fillOpacity;
+            delete feature.properties["stroke"];
+            delete feature.properties["stroke-width"];
+            delete feature.properties["fill-color"];
+            delete feature.properties["fill"];
+            delete feature.properties["fill-opacity"];
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
@@ -2107,6 +2112,21 @@ function doGeojson(n,g,l,o) {
         }
         return st;
     }}
+    opt.pointToLayer = function (feature, latlng) {
+        var myMarker = L.VectorMarkers.icon({
+            icon: feature.properties["marker-symbol"] || "circle",
+            markerColor: (feature.properties["marker-color"] || "#910000"),
+            prefix: 'fa',
+            iconColor: 'white'
+        });
+        if (!feature.properties.hasOwnProperty("title")) {
+            feature.properties.title = feature.properties["marker-symbol"];
+        }
+        delete feature.properties["marker-symbol"];
+        delete feature.properties["marker-color"];
+        delete feature.properties["marker-size"];
+        return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker,});
+    }
     opt.onEachFeature = function (f,l) {
         if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
     }
