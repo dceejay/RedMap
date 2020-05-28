@@ -1447,7 +1447,7 @@ function setMarker(data) {
             sz = iconSz[myMarker.getProperties().echelon];
         }
         opts.size = opts.size || sz;
-        opts.size = opts.size * (opts.scale || 1);
+        opts.size = opts.size * 0.8 * (opts.scale || 1);
         myMarker = myMarker.setOptions(opts);
         var myicon = L.icon({
             iconUrl: myMarker.toDataURL(),
@@ -2089,17 +2089,17 @@ function doGeojson(n,g,l,o) {
         var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
         st = Object.assign(st,o);
         if (feature.hasOwnProperty("properties")) {
-            console.log("GPROPS", feature.properties)
+            //console.log("GPROPS", feature.properties)
             st.color = feature.properties["stroke"] || st.color;
             st.weight = feature.properties["stroke-width"] || st.weight;
-            st.fillColor = feature.properties["fill-color"] || st.fillColor;
+            st.fillColor = feature.properties["fill-color"] || feature.properties["fill"] || st.fillColor;
             st.fillOpacity = feature.properties["fill-opacity"] || st.fillOpacity;
         }
         if (feature.hasOwnProperty("style")) {
-            console.log("GSTYLE", feature.style)
+            //console.log("GSTYLE", feature.style)
             st.color = feature.style["stroke"] || st.color;
             st.weight = feature.style["stroke-width"] || st.weight;
-            st.fillColor = feature.style["fill-color"] || st.fillColor;
+            st.fillColor = feature.style["fill-color"] || feature.style["fill"] || st.fillColor;
             st.fillOpacity = feature.style["fill-opacity"] || st.fillOpacity;
         }
         if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && feature.geometry.type === "LineString") {

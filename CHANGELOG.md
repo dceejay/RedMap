@@ -1,10 +1,11 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.3.12 - Fix geoson feature properties fill color
  - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
- - v2.3.10  - improve geojson layer and name handling.
- - v2.3.8 - fix fa-marker offset to improve accuracy.
- - v2.3.7 - show icon within circle if icon present. Issue #128
- - v2.3.6 - show ruler if grid is turned on.
+ - v2.3.10 - Improve geojson layer and name handling.
+ - v2.3.8 - Fix fa-marker offset to improve accuracy.
+ - v2.3.7 - Show icon within circle if icon present. Issue #128
+ - v2.3.6 - Show ruler if grid is turned on.
  - v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
  - v2.3.4 - Add aligning bus icon
  - v2.3.3 - Fix satellite view max zoom
@@ -18,8 +19,8 @@
  - v2.1.4 - Fix alt and speed as strings
  - v2.1.3 - Fix web page file path error
  - v2.1.2 - Fix layercontrol remove bug. Issue #116
- - v2.1.1 - fix bug in repeated add with polygon
- - v2.1.0 - add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
+ - v2.1.1 - Fix bug in repeated add with polygon
+ - v2.1.0 - Add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
  - v2.0.22 - fix SIDC missing property
  - v2.0.21 - allow adding overlays without making them visible (visible:false). Issue #108
  - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
