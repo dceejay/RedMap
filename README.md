@@ -121,10 +121,143 @@ SIDC codes can be generated using the online tool - https://spatialillusions.com
 
 There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="mapinfo">milsymbol docs here</a>.
 
+### Areas, Lines and Rectangles
+
+If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
+
+    msg.payload = {"name": "zone1", "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]}
+
+then rather than draw a point and icon it draws the polygon. If the "area" array only has 2
+elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
+
+Likewise if it contains a **line** property it will draw the polyline.
+
+There are extra optional properties you can specify - see Options below.
+
+
+### Circles and Ellipses
+
+If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
+than draw a point it will draw a circle. The *radius* property is specified in meters.
+
+    msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
+
+As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options section below.
+
+    msg.payload =  {
+        "name": "circle",
+        "lat": 51.515,
+        "lon": -0.1235,
+        "radius": 1000,
+        "layer": "drawing",
+        "iconColor": '#464646',
+        "stroke": false,
+        "fillOpacity": 0.8,
+        "clickable": true
+    };
+
+If the **radius** property is an array of two numbers, these specify the minor and major radii
+of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
+a number of degrees.
+
+    msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
+
+
+### Arcs, Range Rings
+
+You can add supplemental arc(s) to a marker by adding an **arc** property as below.
+Supplemental means that you can also specify a line using a **bearing** and **length** property.
+
+```
+msg.payload = { name:"Camera01", icon:"fa-camera", lat:51.05, lon:-1.35,
+    bearing: 235,
+    length: 2200,
+    arc: {
+        ranges: [500,1000,2000],
+        pan: 228,
+        fov: 40,
+        color: '#aaaa00'
+    }
+}
+```
+
+**ranges** can be a single number or an array of arc distances from the marker.
+The **pan** is the bearing of the centre of the arc, and the **fov** (Field of view)
+specifies the angle of the arc.
+Defaults are shown above.
+
+### GeoJSON
+
+If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
+rather than draw a point it will render the geojson.
+
+    msg.payload = {
+        "name": "MyPolygon",
+        "geojson": {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[-180,10],[20,90],[180,-5],[-30,-90]]]
+            },
+            "style": {
+                "stroke-width": "8",
+                "stroke": "#ff00ff",
+                "fill-color": "#808000",
+                "fill-opacity": 0.2
+            }
+        }
+    }
+
+Often geojson may not have a `properties` or `style` property in which case you can specify some global optional properties (see below) in order to set some defaults for the geojson object.
+
+    msg.payload = {
+        "name": "Myline",
+        "layer": "Lines",
+        "color": "#0000ff",
+        "weight": "6",
+        "dashArray": "30 20",
+        "geojson": {
+            "type": "LineString",
+            "coordinates": [[0,0],[0,90]]
+        }
+    }
+
+**Note**: you can just send a msg.payload containing the geojson itself - but obviously you then can't style
+it, set the name, layer, etc.
+
+
+### Options
+
+Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
+
+ - **layer** : declares which layer you put it on.
+ - **color** : can set the colour of the polygon or line.
+ - **fillColor** : can set the fill colour of the polygon.
+ - **fillOpacity** : can set the opacity of the polygon fill colour.
+ - **dashArray** : optional dash array for polyline.
+ - **clickable** : boolean - set to true to allow click to show popup.
+ - **popup** : html string to display in popup (as well as name).
+ - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu
+ - **contextmenu** : html string to display a more complex right click contextmenu
+ - **weight** : the width of the line (or outline)
+
+Other properties can be found in the leaflet documentation.
+
+
+### Drawing
+
+A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
+
+Right-clicking on an icon will allow you to delete it.
+
+If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
+Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
+
+
 ### Buildings
 
-The OSM Buildings layer is available in the layers menu. You can replace this with a
-building of your own by sending a `msg.payload.command.map` containing an `overlay`
+The OSM Buildings layer is available in the layers menu. You can replace this with
+buildings of your own by sending a `msg.payload.command.map` containing an `overlay`
 and a `geojson` property. The geojson property should be a GeoJSON Feature Collection
 as per the OSMBuildings spec. For example in a function node:
 
@@ -184,135 +317,6 @@ in addition existing male, female, fa-male and fa-female icons are all represent
  - The 3D only really works at zoomed in scales 16+ due to the small size of the icons. They are not scale independent like icons on the normal map.
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
-
-### Areas, Lines and Rectangles
-
-If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
-
-    msg.payload = {"name": "zone1", "area": [ [51.05, -0.08], [51.5, -1], [51.2, -0.047] ]}
-
-then rather than draw a point and icon it draws the polygon. If the "area" array only has 2
-elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
-
-Likewise if it contains a **line** property it will draw the polyline.
-
-There are extra optional properties you can specify - see Options below.
-
-
-### Circles and Ellipses
-
-If the msg.payload contains a **radius** property, as well as name, lat and lon, then rather
-than draw a point it will draw a circle. The *radius* property is specified in meters.
-
-    msg.payload = { "name":"A3090", "lat":51.05, "lon":-1.35, "radius":3000 }
-
-As per Areas and Lines you may also specify *color*, *fillColor*, and *layer*, see Options section below.
-
-    msg.payload =  {
-        "name": "circle",
-        "lat": 51.515,
-        "lon": -0.1235,
-        "radius": 1000,
-        "layer": "drawing",
-        "iconColor": '#464646',
-        "stroke": false,
-        "fillOpacity": 0.8,
-        "clickable": true
-    };
-
-If the **radius** property is an array of two numbers, these specify the minor and major radii
-of an ellipse, in meters. A **tilt** property can also be applied to rotate the ellipse by
-a number of degrees.
-
-    msg.payload = { "name":"Bristol Channel", "lat":51.5, "lon":-2.9, "radius":[30000,70000], "tilt":45 };
-
-
-### GeoJSON
-
-If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then rather than draw a point 
-it will render the geojson.
-
-    msg.payload = {
-        "name": "MyPolygon",
-        "geojson": {
-            "type": "Feature",
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [[[-180,10],[20,90],[180,-5],[-30,-90]]]
-            },
-            "style": {
-                "stroke-width": "8",
-                "stroke": "#ff00ff",
-                "fill-color": "#808000",
-                "fill-opacity": 0.2
-            }
-        }
-    }
-
-Other optional properties (see below) can be used to style the geojson "outside" of the feature itself.
-
-    msg.payload = {
-        "name": "Myline",
-        "color": "#0000ff",
-        "weight": "6",
-        "dashArray": "30 20",
-        "geojson": {
-            "type": "LineString",
-            "coordinates": [[0,0],[0,90]]
-        }
-    }
-
-
-### Options
-
-Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional properties:
-
- - **layer** : declares which layer you put it on.
- - **color** : can set the colour of the polygon or line.
- - **fillColor** : can set the fill colour of the polygon.
- - **fillOpacity** : can set the opacity of the polygon fill colour.
- - **dashArray** : optional dash array for polyline.
- - **clickable** : boolean - set to true to allow click to show popup.
- - **popup** : html string to display in popup (as well as name).
- - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu
- - **contextmenu** : html string to display a more complex right click contextmenu
- - **weight** : the width of the line (or outline)
-
-Other properties can be found in the leaflet documentation.
-
-
-### Arcs, Range Rings
-
-You can add supplemental arc(s) to an icon by adding an **arc** property as below.
-Supplemental means that you can also specify a line using a **bearing** and **length** property.
-
-```
-msg.payload = { name:"Camera01", icon:"fa-camera", lat:51.05, lon:-1.35,
-    bearing: 235,
-    length: 2200,
-    arc: {
-        ranges: [500,1000,2000],
-        pan: 228,
-        fov: 40,
-        color: '#aaaa00'
-    }
-}
-```
-
-**ranges** can be a single number or an array of arc distances from the marker.
-The **pan** is the bearing of the centre of the arc, and the **fov** (Field of view)
-specifies the angle of the arc.
-Defaults are shown above.
-
-
-## Drawing
-
-A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
-
-Right-clicking on an icon will allow you to delete it.
-
-If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
-Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
 
 
 ## Events from the map
