@@ -58,6 +58,7 @@ module.exports = function(RED) {
         // RED.httpNode.use(node.path, express.static(__dirname + '/worldmap', {maxage:3600000}));
 
         var callback = function(client) {
+            if (!client.headers.hasOwnProperty("user-agent")) { client.close(); }
             //client.setMaxListeners(0);
             clients[client.id] = client;
             client.on('data', function(message) {
