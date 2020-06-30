@@ -545,7 +545,7 @@ map.on('zoomend', function() {
 //});
 
 // single right click to add a marker
-var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour)'/>";
+var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour, heading)'/>";
 var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
 var rclk;
@@ -558,9 +558,10 @@ var addThing = function() {
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
     var colo = (bits[3] || "#910000").trim();
+    var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{4}.*/i;  // if it looks like a SIDC code
-    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng};
+    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, bearing:hdg};
     if (regi.test(icon)) {
         d.SIDC = (icon.toUpperCase()+"------------").substr(0,12);
     }
@@ -1388,15 +1389,16 @@ function setMarker(data) {
             labelOffset = [12,-4];
         }
         else if (data.icon.match(/^https?:.*$/)) {
+            var sz = data.iconSize || 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16],
-                popupAnchor: [0, -16]
+                iconSize: [sz, sz],
+                iconAnchor: [sz/2, sz/2],
+                popupAnchor: [0, -sz/2]
             });
             var dir = parseFloat(data.hdg || data.bearing || "0");
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
-            labelOffset = [12,-4];
+            labelOffset = [iz/2-4,-4];
         }
         else if (data.icon.substr(0,3) === "fa-") {
             var col = data.iconColor || "#910000";
@@ -1480,7 +1482,11 @@ function setMarker(data) {
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
             marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
-            ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+            var b = marker.getPopup().getContent().split("bearing : ");
+            if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
+            else { b = undefined; }
+            console.log("P",marker.getPopup().getContent())
+            ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6)),bearing:b }));
         });
     }
 

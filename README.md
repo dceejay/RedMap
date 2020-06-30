@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.3.14 - Add heading to default addMarker, allow custom http icon size.
 - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
 - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
 - v2.3.10 - Improve geojson layer and name handling.
@@ -63,7 +64,7 @@ Optional properties include
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds)
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
- - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"http://news.bbc.co.uk", "target":"_new"}`
+ - **weblink** : adds a link to an external page for more information. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"}`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to the heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
@@ -84,7 +85,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to http(s)://... It will be scaled to 32x32 pixels. For example `"https://img.icons8.com/windows/32/000000/bird.png"`
+Or you can specify an image to load as an icon by setting the icon to http(s)://... By default will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
 
 There are also several special icons...
 
@@ -486,7 +487,7 @@ The `opt` property is optional. See the <a href="https://leafletjs.com/examples/
 
 The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson.
 
-see http://leafletjs.com/examples/geojson/ for more details about options for opt.
+see https://leafletjs.com/examples/geojson/ for more details about options for opt.
 
 #### To add a new KML, GPX, or TOPOJSON overlay
 
