@@ -1,6 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.3.14 - Add heading to default addMarker, allow custom http icon size.
+ - v2.3.15 - Add heading to default addMarker, allow custom http icon size.
  - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
  - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
  - v2.3.10 - Improve geojson layer and name handling.
