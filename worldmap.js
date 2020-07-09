@@ -366,6 +366,94 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("worldmap-tracks",WorldMapTracks);
 
+
+    var WorldMapHull = function(n) {
+        RED.nodes.createNode(this,n);
+        this.prop = n.prop || "layer";
+        var node = this;
+        node.hulls = {};
+
+        var convexHull = function(points) {
+            var arr = [];
+            for (const val of Object.values(points)) {
+                arr.push(val);
+            }
+  
+            arr.sort(function (a, b) {
+                return a.lat != b.lat ? a.lat - b.lat : a.lon - b.lon;
+            });
+    
+            var n = arr.length;
+            var hull = [];
+    
+            for (var i = 0; i < 2 * n; i++) {
+                var j = i < n ? i : 2 * n - 1 - i;
+                while (hull.length >= 2 && removeMiddle(hull[hull.length - 2], hull[hull.length - 1], arr[j]))
+                    hull.pop();
+                hull.push(arr[j]);
+            }
+    
+            hull.pop();
+            return hull;
+        }
+    
+        var removeMiddle = function(a, b, c) {
+            var cross = (a.lat- b.lat) * (c.lon - b.lon) - (a.lon - b.lon) * (c.lat- b.lat);
+            var dot = (a.lat- b.lat) * (c.lat- b.lat) + (a.lon - b.lon) * (c.lon - b.lon);
+            return cross < 0 || cross == 0 && dot <= 0;
+        }
+
+        var doHull = function(msg) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+                var newmsg = RED.util.cloneMessage(msg);
+                newmsg.payload = {};
+                newmsg.payload[node.prop] = msg.payload[node.prop] || "unknown";
+                if (msg.payload.deleted === true) {
+                    if (node.hulls.hasOwnProperty(newmsg.payload[node.prop])) {
+                        delete node.hulls[newmsg.payload[node.prop]][msg.payload.name];
+                    }
+                }
+                else {
+                    if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
+                    if (!node.hulls.hasOwnProperty(newmsg.payload[node.prop])) {
+                        node.hulls[newmsg.payload[node.prop]] = {};
+                    }
+                    node.hulls[newmsg.payload[node.prop]][msg.payload.name] = {lat:msg.payload.lat,lon:msg.payload.lon};
+                }
+                var convexHullPoints = convexHull(node.hulls[newmsg.payload[node.prop]]);
+                var leafletHull = convexHullPoints.map(function (element) {return ([element.lat,element.lon])})
+
+                if (leafletHull.length > 1) {
+                    // if (leafletHull.length === 2) { newmsg.payload.line = leafletHull; }
+                    // else { 
+                        newmsg.payload.area = leafletHull; 
+                    // }
+                    newmsg.payload.name = newmsg.payload[node.prop];
+                    newmsg.payload.clickable = true;
+                    node.send(newmsg);
+                }
+            }
+        }
+
+        node.on("input", function(m) {
+            if (Array.isArray(m.payload)) {
+                m.payload.forEach(function (pay) {
+                    var n = RED.util.cloneMessage(m)
+                    n.payload = pay;
+                    doHull(n);
+                });
+            }
+            else {
+                doHull(m); 
+            }
+        });
+
+        node.on("close", function() {
+            node.hulls = {};
+        });
+    }
+    RED.nodes.registerType("worldmap-hull",WorldMapHull);
+
     RED.httpNode.get("/.ui-worldmap", function(req, res) {
         res.send(ui ? "true": "false");
     });

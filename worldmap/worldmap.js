@@ -1399,6 +1399,7 @@ function setMarker(data) {
             var dir = parseFloat(data.hdg || data.bearing || "0");
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
             labelOffset = [sz/2-4,-4];
+            delete data.iconSize;
         }
         else if (data.icon.substr(0,3) === "fa-") {
             var col = data.iconColor || "#910000";

@@ -11,7 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.3.15 - Add heading to default addMarker, allow custom http icon size.
+- v2.4.1 - Add convex-hull node for grouping objects.
+- v2.3.16 - Add heading to default addMarker, allow custom http icon size.
 - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
 - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
 - v2.3.10 - Improve geojson layer and name handling.

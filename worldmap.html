@@ -504,54 +504,96 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 
 
 <script type="text/html" data-template-name="worldmap-tracks">
-<div class="form-row">
-    <label for="node-input-depth"><i class="fa fa-map-marker"></i> Number of</label>
-    points in track <input type="text" id="node-input-depth" style="width:50%" placeholder="number - default 20">
-</div>
-<div class="form-row">
-    <label for="node-input-layer"><i class="fa fa-map"></i> Track Layer</label>
-    <select id="node-input-layer">
-        <option value="combined">on marker layer</option>
-        <option value="separate">one per marker layer</option>
-        <option value="single">single Track layer</option>
-    </select>
-</div>
-<div class="form-row">
-    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="name">
-</div>
-</script>
+    <div class="form-row">
+        <label for="node-input-depth"><i class="fa fa-map-marker"></i> Number of</label>
+        points in track <input type="text" id="node-input-depth" style="width:50%" placeholder="number - default 20">
+    </div>
+    <div class="form-row">
+        <label for="node-input-layer"><i class="fa fa-map"></i> Track Layer</label>
+        <select id="node-input-layer">
+            <option value="combined">on marker layer</option>
+            <option value="separate">one per marker layer</option>
+            <option value="single">single Track layer</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    </script>
+    
+    <script type="text/html" data-help-name="worldmap-tracks">
+        <p>Creates tracks lines based on a specified number of previous locations.</p>
+        <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
+        <p>You can also specify the msg.payload.color, weight, opacity and dashArray properties for the track if required.</p>
+        <p>Holds all the points in memory, so if you have a lot of points held for a
+        large depth then memory usage may become excessive.</p>
+        <p>To delete a track send a msg.payload containing both the name of the object and
+        set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code>.</p>
+        <p>This will also delete the point. If you just want to clear the track set the msg.payload to the 
+        name+"_", for example <code>msg.payload = { "name":"Fred_", "deleted":true }</code></p>
+    </script>
+    
+    <script type="text/javascript">
+        RED.nodes.registerType('worldmap-tracks',{
+            category: 'location',
+            color:"darksalmon",
+            defaults: {
+                name: {value:""},
+                depth: {value:20},
+                layer: {value:"combined"}
+            },
+            inputs:1,
+            outputs:1,
+            icon: "white-globe.png",
+            paletteLabel: "tracks",
+            label: function() {
+                return this.name||"tracks";
+            },
+            labelStyle: function() {
+                return this.name?"node_label_italic":"";
+            }
+        });
+    </script>
 
-<script type="text/html" data-help-name="worldmap-tracks">
-    <p>Creates tracks lines based on a specified number of previous locations.</p>
-    <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
-    <p>You can also specify the msg.payload.color, weight, opacity and dashArray properties for the track if required.</p>
-    <p>Holds all the points in memory, so if you have a lot of points held for a
-    large depth then memory usage may become excessive.</p>
-    <p>To delete a track send a msg.payload containing both the name of the object and
-    set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code>.</p>
-    <p>This will also delete the point. If you just want to clear the track set the msg.payload to the 
-    name+"_", for example <code>msg.payload = { "name":"Fred_", "deleted":true }</code></p>
-</script>
 
-<script type="text/javascript">
-    RED.nodes.registerType('worldmap-tracks',{
-        category: 'location',
-        color:"darksalmon",
-        defaults: {
-            name: {value:""},
-            depth: {value:20},
-            layer: {value:"combined"}
-        },
-        inputs:1,
-        outputs:1,
-        icon: "white-globe.png",
-        paletteLabel: "tracks",
-        label: function() {
-            return this.name||"tracks";
-        },
-        labelStyle: function() {
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
+<script type="text/html" data-template-name="worldmap-hull">
+    <div class="form-row">
+        <label for="node-input-prop"><i class="fa fa-ellipsis-h"></i> Property</label>
+        <input type="text" id="node-input-prop" placeholder="payload property to group">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    </script>
+    
+    <script type="text/html" data-help-name="worldmap-hull">
+        <p>Creates a convex-hull polygon around a set of supplied points.</p>
+        <p>Points can be made part of the same shape if they have the same <code>msg.payload.layer</code>
+        by default - this can be configured to another msg.payload property if desired.</p>
+        <p><b>Note</b>: the outgoing msg only contains the polygon to draw, so this node should be wired
+        in parallel to other paths going to the worldmap node.</p>
+    </script>
+    
+    <script type="text/javascript">
+        RED.nodes.registerType('worldmap-hull',{
+            category: 'location',
+            color:"darksalmon",
+            defaults: {
+                name: {value:""},
+                prop: {value:"layer",required:true}
+            },
+            inputs:1,
+            outputs:1,
+            icon: "white-globe.png",
+            paletteLabel: "convex-hull",
+            label: function() {
+                return this.name||"convex-hull";
+            },
+            labelStyle: function() {
+                return this.name?"node_label_italic":"";
+            }
+        });
+    </script>
+    
