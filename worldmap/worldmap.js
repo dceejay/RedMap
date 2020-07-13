@@ -1572,6 +1572,9 @@ function setMarker(data) {
     if (data.dashArray) { delete data.dashArray; }
     if (data.fill) { delete data.fill; }
     if (data.draggable) { delete data.draggable; }
+    if (data.hasOwnProperty("clickable")) { delete data.clickable; }
+    if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
+    if (data.hasOwnProperty("radius")) { delete data.radius; }
     for (var i in data) {
         if ((i != "name") && (i != "length")) {
             if (typeof data[i] === "object") {
