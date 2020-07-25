@@ -998,7 +998,7 @@ function setMarker(data) {
         if (polygons[data.name] == undefined) {
             rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
-        else if (data.editable) {
+        if (data.editable) {
             rightcontext = "<button onclick='editPoly(\""+data.name+"\",true);'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
@@ -1106,19 +1106,19 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
-        polygons[data.name] = polyln;
+        polygons[data.name] = rightmenu(polyln);
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea;
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
-        polygons[data.name] = polyarea;
+        polygons[data.name] = rightmenu(polyarea);
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings
         if (!data.hasOwnProperty("fillColor")) { opt.fillColor = "blue"; }
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
-        polygons[data.name] = ellipse;
+        polygons[data.name] = rightmenu(ellipse);
     }
     else if (data.hasOwnProperty("radius")) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
@@ -1129,7 +1129,7 @@ function setMarker(data) {
             else {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
             }
-            polygons[data.name] = polycirc;
+            polygons[data.name] = rightmenu(polycirc);
             if (!data.hasOwnProperty("icon")) {
                 delete (data.lat);
                 delete (data.lon);

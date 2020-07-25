@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.4.2 - Fix editing injected shapes.
 - v2.4.1 - Add convex-hull node for grouping objects.
 - v2.3.16 - Add heading to default addMarker, allow custom http icon size.
 - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
