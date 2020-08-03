@@ -23,6 +23,7 @@ var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
 var showMouseCoords = false;
+var minimap;
 var sidebyside;
 var layercontrol;
 var drawingColour = "#910000";
@@ -1786,6 +1787,18 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
+    }
+    // Add or swap new minimap layer
+    if (cmd.map && cmd.map.hasOwnProperty("minimap")) {
+        if (minimap) { map.removeControl(minimap); }
+        if (cmd.map.minimap == false) { return; }
+        if (basemaps[cmd.map.minimap]) {
+            minimap = new L.Control.MiniMap(basemaps[cmd.map.minimap], cmd.map.opt).addTo(map);
+        }
+        else {
+            console.log("Invalid base layer for minimap:",cmd.map.minimap);
+        }
+        
     }
     // Remove one or more map layers (base or overlay)
     if (cmd.map && cmd.map.hasOwnProperty("delete")) {

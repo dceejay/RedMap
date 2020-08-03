@@ -426,7 +426,7 @@ module.exports = function(RED) {
                 if (leafletHull.length > 1) {
                     // if (leafletHull.length === 2) { newmsg.payload.line = leafletHull; }
                     // else { 
-                        newmsg.payload.area = leafletHull; 
+                    newmsg.payload.area = leafletHull; 
                     // }
                     newmsg.payload.name = newmsg.payload[node.prop];
                     newmsg.payload.clickable = true;

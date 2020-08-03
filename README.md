@@ -445,6 +445,23 @@ may let you markers be more visible. (see overlay example below).
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
 
+#### To add a minimap
+
+A minimap overview can be added by sending a suitable command. The "minimap" property
+must specify the name of an existing base layer to use. The "opt" property can contain 
+valid options from the [minimap library options](https://github.com/Norkart/Leaflet-MiniMap#available-options).
+
+    msg.payload.command.map = {
+            minimap: "OSM",
+            opt: {
+    			centerFixed: [51.05, -1.35],
+    			toggleDisplay: true
+    		}
+        }
+    };
+
+Set `msg.payload.command.map.minimap = false;` to remove the minimap.
+
 #### To remove base or overlay layers
 
 To remove several layers, either base layers or overlays, you can pass an array of names as follows.

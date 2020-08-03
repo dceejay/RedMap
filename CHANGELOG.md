@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.0 - Add minimap capability.
  - v2.4.2 - Fix editing injected shapes.
  - v2.4.1 - Add convex-hull node for grouping objects.
  - v2.3.16 - Add heading to default addMarker, allow custom http icon size.
