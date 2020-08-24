@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.1 - Add lat, lng and layer to feedback function.
  - v2.5.0 - Add minimap capability.
  - v2.4.2 - Fix editing injected shapes.
  - v2.4.1 - Add convex-hull node for grouping objects.

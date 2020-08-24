@@ -577,7 +577,8 @@ var addThing = function() {
 }
 
 var feedback = function(n,v,a) {
-    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v}));
+    var fp = markers[n]._latlng;
+    ws.send(JSON.stringify({action:a||"feedback", name:n, layer:markers[n].lay, lat:fp.lat, lon:fp.lng, value:v}));
 }
 
 // allow double right click to zoom out (if enabled)

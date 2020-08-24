@@ -196,7 +196,7 @@ module.exports = function(RED) {
                     if (done) { done(); }
                 });
             }
-            RED.nodes.registerType("ui_worldmap", UIWorldMap);
+            setImmediate(function() { RED.nodes.registerType("ui_worldmap", UIWorldMap) });
         }
     }
     catch(e) {

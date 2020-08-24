@@ -11,6 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.1 - Add lat, lng and layer to feedback function.
+- v2.5.0 - Add minimap capability.
 - v2.4.2 - Fix editing injected shapes.
 - v2.4.1 - Add convex-hull node for grouping objects.
 - v2.3.16 - Add heading to default addMarker, allow custom http icon size.
@@ -342,7 +344,7 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
 
-    { "action": "feedback", "name": "some name", "value": "some value" } // when a user calls the feedback function - see below
+    { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
 
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
 
