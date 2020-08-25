@@ -373,7 +373,7 @@ Optional properties include
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
  - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{"command":{"search":"Winchester"}}`
  - **showlayer** - show the named overlay(s) - `{"command":{"showlayer":"foo"}}` or `{"command":{"showlayer":["foo","bar"]}}`
- - **hidelayer** - hide the named overlay(s) - `{"command":{"hidelayer":"bar"}}` or `{"command":{"hidelayer":["bar","another"}}`
+ - **hidelayer** - hide the named overlay(s) - `{"command":{"hidelayer":"bar"}}` or `{"command":{"hidelayer":["bar","another"]}}`
  - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{"command":{"side":"Esri Satellite"}}`
  - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{"command":{"split":50}}`
  - **map** - Object containing details of a new map layer:
