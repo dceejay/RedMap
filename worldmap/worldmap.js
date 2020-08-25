@@ -128,11 +128,17 @@ window.onunload = function() { if (ws) ws.close(); }
 
 var onoffline = function() { if (!navigator.onLine) map.addLayer(layers["_countries"]); }
 
-// Set Ctl-Alt-3 to switch to 3d view
 document.addEventListener ("keydown", function (ev) {
+    // Set Ctl-Alt-3 to switch to 3d view
     if (ev.ctrlKey && ev.altKey && ev.code === "Digit3") {
         ws.close();
         window.location.href = "index3d.html";
+    }
+    // Set Esc key to close all open popups
+    if (ev.keyCode === 27) {
+        map.eachLayer(function (layer) {
+            layer.closePopup();
+        });
     }
 });
 
@@ -576,9 +582,10 @@ var addThing = function() {
     map.addLayer(layers[lay]);
 }
 
-var feedback = function(n,v,a) {
+var feedback = function(n,v,a,c) {
     var fp = markers[n]._latlng;
     ws.send(JSON.stringify({action:a||"feedback", name:n, layer:markers[n].lay, lat:fp.lat, lon:fp.lng, value:v}));
+    if (c === true) { map.closePopup(); }
 }
 
 // allow double right click to zoom out (if enabled)

@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
 - v2.5.1 - Add lat, lng and layer to feedback function.
 - v2.5.0 - Add minimap capability.
 - v2.4.2 - Fix editing injected shapes.
@@ -353,7 +354,7 @@ All actions also include a `msg._sessionid` property that indicates which client
 
 There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
 
- - **feedback()** : it takes two (or three) parameters, name, value, and optionally an action name (defaults to "feedback"), and can be used inside something like an input tag - `onchange='feedback(this.name,this.value)'`. Value can be a more complex object if required as long as it is serialisable.
+ - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable.
 
  - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
 
