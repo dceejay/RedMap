@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.4 - Fix delete of hulls
+ - v2.5.3 - Swap default satellite layer
  - v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
  - v2.5.1 - Add lat, lng and layer to feedback function.
  - v2.5.0 - Add minimap capability.

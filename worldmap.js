@@ -371,6 +371,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this,n);
         this.prop = n.prop || "layer";
         var node = this;
+        var oldl = 0;
         node.hulls = {};
 
         var convexHull = function(points) {
@@ -423,15 +424,31 @@ module.exports = function(RED) {
                 var convexHullPoints = convexHull(node.hulls[newmsg.payload[node.prop]]);
                 var leafletHull = convexHullPoints.map(function (element) {return ([element.lat,element.lon])})
 
-                if (leafletHull.length > 1) {
-                    // if (leafletHull.length === 2) { newmsg.payload.line = leafletHull; }
-                    // else { 
-                    newmsg.payload.area = leafletHull; 
-                    // }
-                    newmsg.payload.name = newmsg.payload[node.prop];
-                    newmsg.payload.clickable = true;
+                newmsg.payload.name = newmsg.payload[node.prop];
+                newmsg.payload.clickable = true;
+
+                if (leafletHull.length === 1 && oldl === 2) { 
+                    newmsg.payload.deleted = true;
                     node.send(newmsg);
                 }
+                if (leafletHull.length === 2 && (oldl === 1 || oldl ===3)) { 
+                    newmsg.payload.deleted = true;
+                    node.send(newmsg);
+                    delete newmsg.payload.deleted;
+                    newmsg.payload.line = leafletHull; 
+                    node.send(newmsg);
+                }
+                if (leafletHull.length === 3 && oldl === 2) { 
+                    newmsg.payload.deleted = true;
+                    node.send(newmsg);
+                    delete newmsg.payload.deleted;
+                }
+                if (leafletHull.length >= 3) {
+                    newmsg.payload.area = leafletHull; 
+                    node.send(newmsg);
+                }
+                
+                oldl = leafletHull.length;
             }
         }
 
