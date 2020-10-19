@@ -166,6 +166,14 @@ map.on('load', function() {
         }
     }
 
+    var lookupColor = function(s) {
+        var c = s.charAt(1);
+        if (c === "F") { return "#79DFFF"; }
+        if (c === "N") { return "#A4FFA3"; }
+        if (c === "U") { return "#FFFF78"; }
+        if (c === "H") { return "#FF7779"; }
+    }
+
     // create the points for the marker and return the geojson
     var getPoints = function(p) {
         var fac = 0.000007;   // basic size for bock icon in degrees....
@@ -173,13 +181,23 @@ map.on('load', function() {
         if (p.hasOwnProperty("icon")) {
             if (p.icon.indexOf("male") !== -1) { thing = "person"; }
         }
+        if (p.hasOwnProperty("SIDC")) {
+            if (p.SIDC.indexOf("SFGPU") !== -1) { thing = "person"; }
+            if (p.SIDC.indexOf("SFGPUC") !== -1) { thing = "block"; }
+            p.iconColor = lookupColor(p.SIDC);
+        }
+        if (p.hasOwnProperty("sidc")) {
+            if (p.sidc.indexOf("SFGPU") !== -1) { thing = "person"; }
+            if (p.SIDC.indexOf("SFGPUC") !== -1) { thing = "block"; }
+            p.iconColor = lookupColor(p.sidc);
+        }
         var t = p.type || thing;
         var base = p.height || 0;
         if (t === "person") { tall = 3; }                       // person slightly tall and thin
         else if (t === "bar") { base = 0; tall = p.height; }    // bar from ground to height
         else if (t === "block") { fac = fac * 4; tall = 5; }    // block large and cube
         else { tall = 2; fac = fac * 2; }                       // else small cube
-        console.log({p},{t},{fac},{base},{tall});
+        //console.log({p},{t},{fac},{base},{tall});
         var fac2 = fac / Math.cos( Math.PI / 180 * p.lat );
         var d = {
             "type": "Feature",
