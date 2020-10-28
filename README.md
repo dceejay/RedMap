@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.5 - Fix NVG import to handle symbols for points
 - v2.5.4 - Fix delete of hulls
 - v2.5.3 - Swap default satellite layer
 - v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
@@ -254,7 +255,7 @@ Other properties can be found in the leaflet documentation.
 
 ### Drawing
 
-A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.  
+A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.
 
 Right-clicking on an icon will allow you to delete it.
 
@@ -453,7 +454,7 @@ may let you markers be more visible. (see overlay example below).
 #### To add a minimap
 
 A minimap overview can be added by sending a suitable command. The "minimap" property
-must specify the name of an existing base layer to use. The "opt" property can contain 
+must specify the name of an existing base layer to use. The "opt" property can contain
 valid options from the [minimap library options](https://github.com/Norkart/Leaflet-MiniMap#available-options).
 
     msg.payload.command.map = {
@@ -534,7 +535,7 @@ Again the boolean `fit` property can be added to make the map zoom to the releva
 
     msg.payload.command.map = {
         "overlay": "myWind",
-        "velocity": { 	
+        "velocity": {
             "displayValues": true,
 	        "displayOptions": {
                 "velocityType": "Global Wind",

@@ -814,7 +814,7 @@ map.on('draw:created', function (e) {
         if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
         else { m.area = e.layer._latlngs[0]; }
     }
-    
+
     shape = {m:m, layer:e.layer};
     polygons[name] = shape.layer;
     polygons[name].lay = "_drawing";
@@ -831,7 +831,7 @@ var sendDrawing = function(n) {
     map.closePopup();
     shape.m.name = thing;
     delMarker(n,true);
-    
+
     polygons[thing] = shape.layer;
     polygons[thing].lay = "_drawing";
     polygons[thing].name = thing;
@@ -1806,7 +1806,7 @@ function doCommand(cmd) {
         else {
             console.log("Invalid base layer for minimap:",cmd.map.minimap);
         }
-        
+
     }
     // Remove one or more map layers (base or overlay)
     if (cmd.map && cmd.map.hasOwnProperty("delete")) {
@@ -1897,6 +1897,37 @@ function doCommand(cmd) {
                     }
                 }
                 return st;
+            },
+            pointToLayer: function (feature, latlng) {
+                if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('symbol')) {
+                    var sidc = feature.properties.symbol.toUpperCase().replace("APP6A:",'')//.substr(0,13);
+                    var country;
+                    if (sidc.length > 12) { country = sidc.substr(12).replace(/-/g,''); sidc = sidc.substr(0,12); }
+                    myMarker = new ms.Symbol( sidc, {
+                        uniqueDesignation:feature.properties.label,
+                        country:country,
+                        direction:feature.properties.course,
+                        additionalInformation:feature.properties.modifier,
+                        size:24
+                    });
+                    var myicon = L.icon({
+                        iconUrl: myMarker.toDataURL(),
+                        iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+                        className: "natoicon",
+                    });
+                    return L.marker(latlng, { name:feature.properties.label, icon:myicon });
+                }
+                else {
+                    var geojsonMarkerOptions = {
+                        radius: 10,
+                        fillColor: "#ff7800",
+                        color: "#000",
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    };
+                    return L.circleMarker(latlng, geojsonMarkerOptions);
+                }
             }
         });
         if (!existsalready) {
@@ -2165,7 +2196,7 @@ function doGeojson(n,g,l,o) {
     markers[n].lay = lay;
     if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
         layers[lay] = new L.LayerGroup();
-        overlays[lay] = layers[lay]; 
+        overlays[lay] = layers[lay];
         layercontrol.addOverlay(overlays[lay],lay);
     }
     layers[lay].addLayer(markers[n]);

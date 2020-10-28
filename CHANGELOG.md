@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.5 - Fix NVG import to handle symbols for points
  - v2.5.4 - Fix delete of hulls
  - v2.5.3 - Swap default satellite layer
  - v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
@@ -64,7 +65,7 @@
  - v1.5.26 - Ensure all map tiles loaded over https
  - v1.5.25 - Add button command to allow user to add and remove buttons
  - v1.5.24 - ensure hiderightclick does do that, and popup always has close button. Issue #69, #70
- - v1.5.23 - Let icon support use of emoji specified as :emoji name:  
+ - v1.5.23 - Let icon support use of emoji specified as :emoji name:
  - v1.5.22 - Slight adjust to label positions for default map marker icon. Add .lineColor for bearing lines
  - v1.5.21 - Add .label option to display permanent label. Clean up some excess debug logging
  - v1.5.20 - Let worldmap in node send message after out node has initialised
