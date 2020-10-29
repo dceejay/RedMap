@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.6 - Let node accept plain text payload kml or nvg input
 - v2.5.5 - Fix NVG import to handle symbols for points
 - v2.5.4 - Fix delete of hulls
 - v2.5.3 - Swap default satellite layer

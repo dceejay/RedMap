@@ -269,13 +269,13 @@ module.exports = function(RED) {
                     if (msg.payload.name.substr(-1) === '_') {
                         var a = node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)].pop();
                         node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)] = [ a ];
-                        node.send(newmsg); 
+                        node.send(newmsg);
                     }
                     else {
                         delete node.pointsarray[msg.payload.name];
                     }
                     //newmsg.payload.name = msg.payload.name + "_";
-                    node.send(newmsg);  
+                    node.send(newmsg);
                     return;
                 }
                 if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
@@ -356,7 +356,7 @@ module.exports = function(RED) {
                 });
             }
             else {
-                doTrack(m); 
+                doTrack(m);
             }
         });
 
@@ -379,25 +379,25 @@ module.exports = function(RED) {
             for (const val of Object.values(points)) {
                 arr.push(val);
             }
-  
+
             arr.sort(function (a, b) {
                 return a.lat != b.lat ? a.lat - b.lat : a.lon - b.lon;
             });
-    
+
             var n = arr.length;
             var hull = [];
-    
+
             for (var i = 0; i < 2 * n; i++) {
                 var j = i < n ? i : 2 * n - 1 - i;
                 while (hull.length >= 2 && removeMiddle(hull[hull.length - 2], hull[hull.length - 1], arr[j]))
                     hull.pop();
                 hull.push(arr[j]);
             }
-    
+
             hull.pop();
             return hull;
         }
-    
+
         var removeMiddle = function(a, b, c) {
             var cross = (a.lat- b.lat) * (c.lon - b.lon) - (a.lon - b.lon) * (c.lat- b.lat);
             var dot = (a.lat- b.lat) * (c.lat- b.lat) + (a.lon - b.lon) * (c.lon - b.lon);
@@ -427,27 +427,27 @@ module.exports = function(RED) {
                 newmsg.payload.name = newmsg.payload[node.prop];
                 newmsg.payload.clickable = true;
 
-                if (leafletHull.length === 1 && oldl === 2) { 
+                if (leafletHull.length === 1 && oldl === 2) {
                     newmsg.payload.deleted = true;
                     node.send(newmsg);
                 }
-                if (leafletHull.length === 2 && (oldl === 1 || oldl ===3)) { 
+                if (leafletHull.length === 2 && (oldl === 1 || oldl ===3)) {
                     newmsg.payload.deleted = true;
                     node.send(newmsg);
                     delete newmsg.payload.deleted;
-                    newmsg.payload.line = leafletHull; 
+                    newmsg.payload.line = leafletHull;
                     node.send(newmsg);
                 }
-                if (leafletHull.length === 3 && oldl === 2) { 
+                if (leafletHull.length === 3 && oldl === 2) {
                     newmsg.payload.deleted = true;
                     node.send(newmsg);
                     delete newmsg.payload.deleted;
                 }
                 if (leafletHull.length >= 3) {
-                    newmsg.payload.area = leafletHull; 
+                    newmsg.payload.area = leafletHull;
                     node.send(newmsg);
                 }
-                
+
                 oldl = leafletHull.length;
             }
         }
@@ -461,7 +461,7 @@ module.exports = function(RED) {
                 });
             }
             else {
-                doHull(m); 
+                doHull(m);
             }
         });
 
@@ -470,6 +470,7 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("worldmap-hull",WorldMapHull);
+
 
     RED.httpNode.get("/.ui-worldmap", function(req, res) {
         res.send(ui ? "true": "false");

@@ -93,7 +93,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        //console.log("DATA" typeof data,data);
+        // console.log("DATA",typeof data,data);
         if (data) {
             if (Array.isArray(data)) {
                 //console.log("ARRAY");
@@ -110,6 +110,14 @@ var connect = function() {
                 // map.fitBounds(bnds.pad(0.25));
             }
             else {
+                if (typeof data === "string" && data.indexOf("<?xml") == 0) {
+                    if (data.indexOf("<nvg") != -1) {
+                        data = {command:{map:{overlay:"NVG", nvg:data}}};
+                    }
+                    else if (data.indexOf("<kml") != -1) {
+                        data = {command:{map:{overlay:"KML", kml:data}}};
+                    }
+                }
                 if (data.command) { doCommand(data.command); delete data.command; }
                 if (data.hasOwnProperty("name")) { setMarker(data); }
                 else if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
