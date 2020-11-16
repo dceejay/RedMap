@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.7 - Let fillColor set color of hulls
 - v2.5.6 - Let node accept plain text payload kml or nvg input
 - v2.5.5 - Fix NVG import to handle symbols for points
 - v2.5.4 - Fix delete of hulls
@@ -25,16 +26,6 @@ map web page for plotting "things" on.
 - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
 - v2.3.10 - Improve geojson layer and name handling.
 - v2.3.8 - Fix fa-marker offset to improve accuracy.
-- v2.3.7 - Show icon within circle if icon present. Issue #128
-- v2.3.6 - Show ruler if grid is turned on.
-- v2.3.5 - Let tracks node handle array of points. Let http icons be rotated to hdg or bearing.
-- v2.3.4 - Add aligning bus icon
-- v2.3.3 - Fix satellite view max zoom
-- v2.3.2 - Add better geojson support - name plus geojson properties
-- v2.3.1 - Stop adding point when you add a circle
-- v2.3.0 - Add colour options for drawing layer
-- v2.2.1 - Better implementation of legend create/show/hide
-- v2.2.0 - Add range rings and arcs function
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
 

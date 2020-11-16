@@ -427,6 +427,11 @@ module.exports = function(RED) {
                 newmsg.payload.name = newmsg.payload[node.prop];
                 newmsg.payload.clickable = true;
 
+                if (msg.payload.fillColor) {
+                    newmsg.payload.color = msg.payload.fillColor;
+                    newmsg.payload.fillColor = msg.payload.fillColor;
+                }
+
                 if (leafletHull.length === 1 && oldl === 2) {
                     newmsg.payload.deleted = true;
                     node.send(newmsg);

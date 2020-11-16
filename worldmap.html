@@ -305,8 +305,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         RED.keyboard.add("*",/* m */ 77,{ctrl:true, shift:true},function() { window.open(document.location.protocol+"//"+lnk) });
     }
     else {
-        RED.keyboard.add("*","ctrl-shift-m","Show Map");
         RED.actions.add("Show Map",function() { window.open(document.location.protocol+"//"+lnk) });
+        RED.keyboard.add("*","ctrl-shift-m","Show Map");
     }
     RED.nodes.registerType('worldmap',{
         category: 'location',
@@ -521,7 +521,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <input type="text" id="node-input-name" placeholder="name">
     </div>
     </script>
-    
+
     <script type="text/html" data-help-name="worldmap-tracks">
         <p>Creates tracks lines based on a specified number of previous locations.</p>
         <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
@@ -530,10 +530,10 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         large depth then memory usage may become excessive.</p>
         <p>To delete a track send a msg.payload containing both the name of the object and
         set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code>.</p>
-        <p>This will also delete the point. If you just want to clear the track set the msg.payload to the 
+        <p>This will also delete the point. If you just want to clear the track set the msg.payload to the
         name+"_", for example <code>msg.payload = { "name":"Fred_", "deleted":true }</code></p>
     </script>
-    
+
     <script type="text/javascript">
         RED.nodes.registerType('worldmap-tracks',{
             category: 'location',
@@ -567,7 +567,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <input type="text" id="node-input-name" placeholder="name">
     </div>
     </script>
-    
+
     <script type="text/html" data-help-name="worldmap-hull">
         <p>Creates a convex-hull polygon around a set of supplied points.</p>
         <p>Points can be made part of the same shape if they have the same <code>msg.payload.layer</code>
@@ -575,7 +575,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <p><b>Note</b>: the outgoing msg only contains the polygon to draw, so this node should be wired
         in parallel to other paths going to the worldmap node.</p>
     </script>
-    
+
     <script type="text/javascript">
         RED.nodes.registerType('worldmap-hull',{
             category: 'location',
@@ -596,4 +596,3 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             }
         });
     </script>
-    

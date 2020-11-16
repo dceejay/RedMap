@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.7 - Let fillColor set color of hulls
  - v2.5.6 - Let node accept plain text payload kml or nvg input
  - v2.5.5 - Fix NVG import to handle symbols for points
  - v2.5.4 - Fix delete of hulls
