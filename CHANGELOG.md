@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
  - v2.5.8 - Let node name be the full page map title
  - v2.5.7 - Let fillColor set color of hulls
  - v2.5.6 - Let node accept plain text payload kml or nvg input

@@ -591,8 +591,14 @@ var addThing = function() {
 }
 
 var feedback = function(n,v,a,c) {
-    var fp = markers[n]._latlng;
-    ws.send(JSON.stringify({action:a||"feedback", name:n, layer:markers[n].lay, lat:fp.lat, lon:fp.lng, value:v}));
+    if (markers[n]) {
+        var fp = markers[n]._latlng;
+        ws.send(JSON.stringify({action:a||"feedback", name:n, layer:markers[n].lay, lat:fp.lat, lon:fp.lng, value:v}));
+    }
+    else {
+        if (n === undefined) { n = "map"; }
+        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v}));
+    }
     if (c === true) { map.closePopup(); }
 }
 
@@ -617,7 +623,8 @@ map.on('contextmenu', function(e) {
                 rightmenuMap.setLatLng(e.latlng);
                 map.openPopup(rightmenuMap);
                 setTimeout( function() {
-                    document.getElementById('rinput').focus();
+                    try { document.getElementById('rinput').focus(); }
+                    catch(e) {}
                 }, 200);
             }
         }, 300);
@@ -1019,7 +1026,7 @@ function setMarker(data) {
             rightcontext = "<button onclick='editPoly(\""+data.name+"\",true);'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
-            rightcontext = data.contextmenu.replace(/\$name/g,data.name);
+            rightcontext = data.contextmenu.replace(/\$name/g,'"'+data.name+'"');
             delete data.contextmenu;
         }
         if (rightcontext.length > 0) {

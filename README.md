@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
 - v2.5.8 - Let node name be the full page map title
 - v2.5.7 - Let fillColor set color of hulls
 - v2.5.6 - Let node accept plain text payload kml or nvg input
@@ -350,7 +351,7 @@ All actions also include a `msg._sessionid` property that indicates which client
 
 There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
 
- - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable.
+ - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `$name` to let it be substituted automatically.
 
  - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
 
@@ -416,13 +417,27 @@ appropriate property to an html string. Often you will need some embedded javasc
 in order to make it do something when you click a button for example. You need to be
 careful escaping quotes, and that they remain matched.
 
-For example a popup with a slider (note the \ escaping the internal ' )
+For example a marker popup with a slider (note the \ escaping the internal ' )
 
-    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value)\' style="width:250px;">'
+    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback($name,this.value,this.name)\' style="width:250px;">'
 
-Or a contextmenu with a button
+Or a marker contextmenu with an input box
 
-    contextmenu: '<button name="Clicker" onclick=\'feedback(this.name)\'>Click me</button>'
+    contextmenu: '<input name="channel" type="text" value="5" onchange=\'feedback($name,{"name":this.name,"value":this.value},"myFeedback")\' />'
+
+Or you can add a contextmenu to the map. Simple contextmenu with a button
+
+    msg.payload.command = {
+        contextmenu: '<button name="Clicker" onclick=\'feedback(this.name,"ping!)\'>Click me</button>'
+    }
+
+Or with an input box
+
+    msg.payload.command : {
+        contextmenu: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value,"myEventName")\' >'
+    }
+
+See the section on **Utility Functions** for details of the feedback function.
 
 #### To add and remove a legend
 
@@ -439,7 +454,7 @@ style server by adding a property `wms: true`. You can also set `wms: "grey"` to
 may let you markers be more visible. (see overlay example below).
 
     msg.payload.command.map = {
-        "name":"OSMhot",
+        "name":"OSMhot",  // use "overlay":"MyOverlayName" for an overlay rather than a base layer.
         "url":"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
