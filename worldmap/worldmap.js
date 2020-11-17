@@ -1668,6 +1668,12 @@ function setMarker(data) {
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
     //console.log("COMMAND",cmd);
+    if (cmd.hasOwnProperty("toptitle")) {
+        if (!inIframe ) {
+            document.title = cmd.toptitle;
+            document.getElementById("topwords").innerText = cmd.toptitle;
+        }
+    }
     if (cmd.hasOwnProperty("clear")) {
         doTidyUp(cmd.clear);
     }

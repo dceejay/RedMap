@@ -79,6 +79,7 @@ module.exports = function(RED) {
                     c.grid = {showgrid:node.showgrid};
                     c.hiderightclick = node.hiderightclick;
                     c.coords = node.coords;
+                    c.toptitle = node.name;
                     client.write(JSON.stringify({command:c}));
                 }
             });
