@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.6.0 - Add route capability to draw line when online
 - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
 - v2.5.8 - Let node name be the full page map title
 - v2.5.7 - Let fillColor set color of hulls
@@ -111,18 +112,19 @@ There are also several special icons...
 #### NATO Symbology
 
 You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>.
-To do this you need to supply a `msg.SIDC` instead of an icon, for example:
+To do this you need to supply a `msg.payload.SIDC` instead of an icon, for example:
 
-    msg.payload = { "name": "Emergency Medical Operation",
+    msg.payload = {
+        "name": "Emergency Medical Operation",
         "lat": 51.05,
         "lon": -1.35,
         "SIDC": "ENOPA-------",
-        "options": { "fillOpacity":0.8 }
+        "options": { "fillOpacity":0.8, "additionalInformation":"Extra info" }
     }
 
 SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
 
-There are lots of extra options you can specify as `msg.options` - see the <a href="https://github.com/spatialillusions/milsymbol/tree/master/docs" target="mapinfo">milsymbol docs here</a>.
+There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 
 ### Areas, Lines and Rectangles
 

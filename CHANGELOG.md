@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.6.0 - Add route capability to draw line when online
  - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
  - v2.5.8 - Let node name be the full page map title
  - v2.5.7 - Let fillColor set color of hulls

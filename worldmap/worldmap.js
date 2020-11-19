@@ -764,15 +764,6 @@ basemaps["Watercolor"] = L.tileLayer(watercolorUrl, {
 
 // Now add the overlays
 
-// Add the countries (world-110m) for offline use
-var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
-layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
-overlays["countries"] = layers["_countries"];
-
-// Add the day/night overlay
-layers["_daynight"] = new L.LayerGroup();
-overlays["day/night"] = layers["_daynight"];
-
 // Add the drawing layer for fun...
 layers["_drawing"] = new L.FeatureGroup();
 overlays["drawing"] = layers["_drawing"];
@@ -837,9 +828,99 @@ map.on('draw:created', function (e) {
     layers["_drawing"].addLayer(shape.layer);
 
     var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+    if (e.layer.options.fill === false && navigator.onLine) {
+        rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+    }
     rightmenuMarker.setLatLng(cent);
     setTimeout(function() {map.openPopup(rightmenuMarker)},25);
 });
+
+
+var defaultOptions = function () {
+    var options = {};
+    options.precision =  5;
+    options.factor = Math.pow(10, options.precision);
+    options.dimension = 2;
+    return options;
+};
+
+var decode = function (encoded, options) {
+    options = defaultOptions(options);
+    var flatPoints = decodeDeltas(encoded);
+    var points = [];
+    for (var i = 0, len = flatPoints.length; i + (options.dimension - 1) < len;) {
+        var point = [];
+        for (var dim = 0; dim < options.dimension; ++dim) {
+            point.push(flatPoints[i++]);
+        }
+        points.push(point);
+    }
+    return points;
+}
+
+var decodeDeltas = function (encoded, options) {
+    options = defaultOptions(options);
+    var lastNumbers = [];
+    var numbers = decodeFloats(encoded, options);
+    for (var i = 0, len = numbers.length; i < len;) {
+        for (var d = 0; d < options.dimension; ++d, ++i) {
+            numbers[i] = Math.round((lastNumbers[d] = numbers[i] + (lastNumbers[d] || 0)) * options.factor) / options.factor;
+        }
+    }
+    return numbers;
+}
+
+var decodeFloats = function (encoded, options) {
+    options = defaultOptions(options);
+    var numbers = decodeSignedIntegers(encoded);
+    for (var i = 0, len = numbers.length; i < len; ++i) {
+        numbers[i] /= options.factor;
+    }
+    return numbers;
+}
+
+var decodeSignedIntegers = function (encoded) {
+    var numbers = decodeUnsignedIntegers(encoded);
+    for (var i = 0, len = numbers.length; i < len; ++i) {
+        var num = numbers[i];
+        numbers[i] = (num & 1) ? ~(num >> 1) : (num >> 1);
+    }
+    return numbers;
+}
+
+var decodeUnsignedIntegers = function (encoded) {
+    var numbers = [];
+    var current = 0;
+    var shift = 0;
+    for (var i = 0, len = encoded.length; i < len; ++i) {
+        var b = encoded.charCodeAt(i) - 63;
+        current |= (b & 0x1f) << shift;
+        if (b < 0x20) {
+            numbers.push(current);
+            current = 0;
+            shift = 0;
+        } else {
+            shift += 5;
+        }
+    }
+    return numbers;
+}
+
+var sendRoute = function(n) {
+    var p = (polygons[n]._latlngs.map(function(x) {
+        return x.lng+","+x.lat;
+    })).join(';');
+
+    fetch('https://router.project-osrm.org/route/v1/driving/'+p)
+        .then(response => response.json())
+        .then(data => {
+            if (data.code !== "Ok") { sendDrawing(n); }
+            var r = decode(data.routes[0].geometry).map( x => L.latLng(x[0],x[1]) );
+            polygons[n]._latlngs = r;
+            shape.m.line = r;
+            sendDrawing(n);
+        });
+}
 
 var sendDrawing = function(n) {
     var thing = document.getElementById('dinput').value;
@@ -853,6 +934,15 @@ var sendDrawing = function(n) {
     layers["_drawing"].addLayer(shape.layer);
     ws.send(JSON.stringify(shape.m));
 }
+
+// Add the countries (world-110m) for offline use
+var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
+layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
+overlays["countries"] = layers["_countries"];
+
+// Add the day/night overlay
+layers["_daynight"] = new L.LayerGroup();
+overlays["day/night"] = layers["_daynight"];
 
 // Add the heatmap layer
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
