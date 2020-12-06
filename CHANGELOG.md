@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
+ - v2.6.1 - Better fit for worldmap when in ui_template
  - v2.6.0 - Add route capability to draw line when online
  - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
  - v2.5.8 - Let node name be the full page map title

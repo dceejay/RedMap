@@ -42,6 +42,7 @@ module.exports = function(RED) {
         node.hiderightclick = n.hiderightclick || "false";
         node.coords = n.coords || "none";
         node.showgrid = n.showgrid || "false";
+        node.allowFileDrop = n.allowFileDrop || "false";
         node.path = n.path || "/worldmap";
         if (node.path.charAt(0) != "/") { node.path = "/" + node.path; }
         if (!sockets[node.path]) {
@@ -78,6 +79,7 @@ module.exports = function(RED) {
                     c.showlayers = node.layers;
                     c.grid = {showgrid:node.showgrid};
                     c.hiderightclick = node.hiderightclick;
+                    c.allowFileDrop = node.allowFileDrop;
                     c.coords = node.coords;
                     c.toptitle = node.name;
                     client.write(JSON.stringify({command:c}));
@@ -139,7 +141,7 @@ module.exports = function(RED) {
         var frameWidth = (size.sx +size.cx) *width - size.cx - 1;
         var frameHeight = (size.sy +size.cy) *height - size.cy - 2;
         var url = encodeURI(config.path);
-        var html = `<div style="overflow:hidden;">
+        var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
 <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border:none;"></iframe>
 </div>
 `;
@@ -224,11 +226,14 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
             client.on('data', function(message) {
                 message = JSON.parse(message);
-                if (node.events !== "connect") {
-                    setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
-                }
-                else {
-                    if (message.hasOwnProperty("action") && (message.action === "connected")) {
+                if (message.hasOwnProperty("action")) {
+                    if ((node.events === "files") && (message.action === "file"))  {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                    }
+                    else if ((node.events === "connect") && (message.action === "connected")) {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                    }
+                    else if (node.events === "all") {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
                     }
                 }
@@ -236,7 +241,7 @@ module.exports = function(RED) {
             client.on('close', function() {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
-                if (node.events !== "connect") {
+                if (node.events !== "files") {
                     node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
                 }
             });
@@ -366,7 +371,6 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("worldmap-tracks",WorldMapTracks);
-
 
     var WorldMapHull = function(n) {
         RED.nodes.createNode(this,n);

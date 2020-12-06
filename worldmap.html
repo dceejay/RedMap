@@ -103,7 +103,12 @@
 </div>
 <div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
-    <input type="text" id="node-input-path" placeholder="worldmap">
+    <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
+    <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
+    <select id="node-input-allowFileDrop" style="width:80px;">
+        <option value="false">Disable</option>
+        <option value="true">Enable</option>
+    </select>
 </div>
 <div class="form-row">
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
@@ -250,7 +255,12 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </div>
 <div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
-    <input type="text" id="node-input-path" placeholder="worldmap">
+    <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
+    <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
+    <select id="node-input-allowFileDrop" style="width:80px;">
+        <option value="false">Disable</option>
+        <option value="true">Enable</option>
+    </select>
 </div>
 <div class="form-row">
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
@@ -297,7 +307,6 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     to <b>control</b> the map remotely, including how to use a local map server.</p>
 </script>
 
-
 <script type="text/javascript">
     var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
     lnk = lnk.replace(new RegExp('\/{1,}','g'),'/');
@@ -327,6 +336,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             hiderightclick: {value:"false"},
             coords: {value:"false"},
             showgrid: {value:"false"},
+            allowFileDrop: {value:"false"},
             path: {value:"/worldmap"}
         },
         inputs:1,
@@ -395,6 +405,7 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
                     hiderightclick: {value:"true"},
                     coords: {value:"false"},
                     showgrid: {value:"false"},
+                    allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"}
                 },
                 inputs:1,
@@ -446,7 +457,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <label for="node-input-events"><i class="fa fa-sign-out"></i> Output</label>
         <select id="node-input-events" style="width:70%;">
             <option value="all">All action events</option>
-            <option value="">Connect event only</option>
+            <option value="connect">Connect events only</option>
+            <option value="files">File events only</option>
         </select>
     </div>
     <div class="form-row">

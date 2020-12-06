@@ -11,6 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
+- v2.6.1 - Better fit for worldmap when in ui_template
 - v2.6.0 - Add route capability to draw line when online
 - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
 - v2.5.8 - Let node name be the full page map title
@@ -24,13 +26,8 @@ map web page for plotting "things" on.
 - v2.5.0 - Add minimap capability.
 - v2.4.2 - Fix editing injected shapes.
 - v2.4.1 - Add convex-hull node for grouping objects.
-- v2.3.16 - Add heading to default addMarker, allow custom http icon size.
-- v2.3.13 - Fix geoson feature properties fill color, and better marker handling
-- v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
-- v2.3.10 - Improve geojson layer and name handling.
-- v2.3.8 - Fix fa-marker offset to improve accuracy.
 
-- see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list.
+- see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
 ## Install
 
@@ -342,9 +339,13 @@ The **worldmap in** node can be used to receive various events from the map. Exa
     { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
     { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
 
+    { "action": "file", "name": "filename", "lat":51, "lon":-1, "content":"....."}   // when a file is dropped on the map - see below.
+
     { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
 
     { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
+
+If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, png and jpg. Image contents will be base64 encoded for transfer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The node-red-node-exif node can be used to extract lcoation information from a jpeg image and then geolocate it back on the map.
 
 All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
 

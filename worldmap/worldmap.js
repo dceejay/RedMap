@@ -23,6 +23,7 @@ var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
 var showMouseCoords = false;
+var allowFileDrop = false;
 var minimap;
 var sidebyside;
 var layercontrol;
@@ -94,43 +95,49 @@ var connect = function() {
     ws.onmessage = function(e) {
         var data = JSON.parse(e.data);
         // console.log("DATA",typeof data,data);
-        if (data) {
-            if (Array.isArray(data)) {
-                //console.log("ARRAY");
-                // map.closePopup();
-                // var bnds= L.latLngBounds([0,0]);
-                for (var prop in data) {
-                    if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
-                    if (data[prop].hasOwnProperty("name")) {
-                        setMarker(data[prop]);
-                        // bnds.extend(markers[data[prop].name].getLatLng());
-                    }
-                    else { console.log("SKIP A",data[prop]); }
-                }
-                // map.fitBounds(bnds.pad(0.25));
-            }
-            else {
-                if (typeof data === "string" && data.indexOf("<?xml") == 0) {
-                    if (data.indexOf("<nvg") != -1) {
-                        data = {command:{map:{overlay:"NVG", nvg:data}}};
-                    }
-                    else if (data.indexOf("<kml") != -1) {
-                        data = {command:{map:{overlay:"KML", kml:data}}};
-                    }
-                }
-                if (data.command) { doCommand(data.command); delete data.command; }
-                if (data.hasOwnProperty("name")) { setMarker(data); }
-                else if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
-                else {
-                    console.log("SKIP",data);
-                    // if (typeof data === "string") { doDialog(data); }
-                    // else { console.log("SKIP",data); }
-                }
-            }
-        }
+        if (data) { handleData(data); }
     };
 }
 console.log("CONNECT TO",location.pathname + 'socket');
+
+var handleData = function(data) {
+    if (Array.isArray(data)) {
+        //console.log("ARRAY");
+        // map.closePopup();
+        // var bnds= L.latLngBounds([0,0]);
+        for (var prop in data) {
+            if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
+            if (data[prop].hasOwnProperty("name")) {
+                setMarker(data[prop]);
+                // bnds.extend(markers[data[prop].name].getLatLng());
+            }
+            else { console.log("SKIP A",data[prop]); }
+        }
+        // map.fitBounds(bnds.pad(0.25));
+    }
+    else {
+        if (typeof data === "string" && data.indexOf("<?xml") == 0) {
+            if (data.indexOf("<nvg") != -1) {
+                data = {command:{map:{overlay:"NVG", nvg:data}}};
+            }
+            else if (data.indexOf("<kml") != -1) {
+                data = {command:{map:{overlay:"KML", kml:data}}};
+            }
+            else if (data.indexOf("<gpx") != -1) {
+                console.log("GPX")
+                data = {command:{map:{overlay:"GPX", gpx:data}}};
+            }
+        }
+        if (data.command) { doCommand(data.command); delete data.command; }
+        if (data.hasOwnProperty("name")) { setMarker(data); }
+        else if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
+        else {
+            console.log("SKIP",data);
+            // if (typeof data === "string") { doDialog(data); }
+            // else { console.log("SKIP",data); }
+        }
+    }
+}
 
 window.onunload = function() { if (ws) ws.close(); }
 
@@ -152,6 +159,66 @@ document.addEventListener ("keydown", function (ev) {
 
 // Create the Initial Map object.
 map = new L.map('map').setView(startpos, startzoom);
+
+var droplatlng;
+var target = document.getElementById("map")
+target.ondragover = function (ev) {
+    ev.preventDefault()
+    ev.dataTransfer.dropEffect = "move"
+}
+
+target.ondrop = function (ev) {
+    if (allowFileDrop === true) {
+        ev.preventDefault();
+        droplatlng = map.mouseEventToLatLng(ev);
+        handleFiles(ev.dataTransfer.files);
+    }
+}
+
+var handleFiles = function(files) {
+    ([...files]).forEach(readFile);
+}
+
+var readFile = function(file) {
+    console.log("FILE",file)
+    // Check if the file is text or kml
+    if (file.type &&
+        file.type.indexOf('text') === -1 &&
+        file.type.indexOf('kml') === -1 &&
+        file.type.indexOf('jpeg') === -1 &&
+        file.type.indexOf('png') === -1) {
+        console.log('File is not text, kml, jpeg or png.', file.type, file);
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+        var content = event.target.result;
+        var data;
+        if (content.indexOf("base64") !== -1) {
+            if (content.indexOf("image") === -1) {
+                data = atob(content.split("base64,")[1]);
+                if (data.indexOf("<gpx") !== -1) {
+                    doCommand({map:{overlay:file.name, gpx:data}});
+                }
+                else if (data.indexOf("<kml") !== -1) {
+                    doCommand({map:{overlay:file.name, kml:data}});
+                }
+                else if (data.indexOf("<nvg") !== -1) {
+                    doCommand({map:{overlay:file.name, nvg:data}});
+                }
+                else {
+                    handleData(data);
+                }
+            }
+            ws.send(JSON.stringify({action:"file", name:file.name, content:content, lat:droplatlng.lat, lon:droplatlng.lng}));
+        }
+        else {
+            console.log("NOT SURE WHAT THIS IS?",content)
+        }
+    });
+    reader.readAsDataURL(file);
+}
 
 // Create some buttons
 var menuButton = L.easyButton({states:[{icon:'fa-bars fa-lg', onClick:function() { toggleMenu(); }, title:'Toggle menu'}], position:"topright"});
@@ -1600,7 +1667,6 @@ function setMarker(data) {
             var b = marker.getPopup().getContent().split("bearing : ");
             if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             else { b = undefined; }
-            console.log("P",marker.getPopup().getContent())
             ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6)),bearing:b }));
         });
     }
@@ -1850,6 +1916,11 @@ function doCommand(cmd) {
             rightmenuMap.setContent(addmenu);
         }
     }
+    if (cmd.hasOwnProperty("allowFileDrop")) {
+        if (typeof cmd.allowFileDrop === "string") {
+            allowFileDrop = cmd.allowFileDrop === "false" ? false : true;
+        }
+    }
     if (cmd.hasOwnProperty("coords")) {
         try { coords.removeFrom(map); }
         catch(e) {}
@@ -1985,7 +2056,6 @@ function doCommand(cmd) {
         }
         var parser = new NVG(cmd.map.nvg);
         var geoj = parser.toGeoJSON();
-
         overlays[cmd.map.overlay] = L.geoJson(geoj,{
             style: function(feature) {
                 var st = { stroke:true, color:"black", weight:2, fill:true };
