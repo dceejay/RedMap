@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 /**
  * Copyright 2015, 2019 IBM Corp.
  *
@@ -228,6 +229,7 @@ module.exports = function(RED) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
                     if ((node.events === "files") && (message.action === "file"))  {
+                        message.content =  Buffer.from(message.content.split('base64,')[1], 'base64');
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
                     }
                     else if ((node.events === "connect") && (message.action === "connected")) {

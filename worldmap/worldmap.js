@@ -93,9 +93,9 @@ var connect = function() {
         setTimeout(function() { connect(); }, 2500);
     };
     ws.onmessage = function(e) {
-        var data = JSON.parse(e.data);
+        try { var data = JSON.parse(e.data); handleData(data); }
+        catch (e) { console.log("BAD DATA"); return; }
         // console.log("DATA",typeof data,data);
-        if (data) { handleData(data); }
     };
 }
 console.log("CONNECT TO",location.pathname + 'socket');
@@ -129,8 +129,8 @@ var handleData = function(data) {
             }
         }
         if (data.command) { doCommand(data.command); delete data.command; }
-        if (data.hasOwnProperty("name")) { setMarker(data); }
-        else if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
+        if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
+        else if (data.hasOwnProperty("name")) { setMarker(data); }
         else {
             console.log("SKIP",data);
             // if (typeof data === "string") { doDialog(data); }
@@ -186,8 +186,9 @@ var readFile = function(file) {
         file.type.indexOf('text') === -1 &&
         file.type.indexOf('kml') === -1 &&
         file.type.indexOf('jpeg') === -1 &&
-        file.type.indexOf('png') === -1) {
-        console.log('File is not text, kml, jpeg or png.', file.type, file);
+        file.type.indexOf('png') === -1 &&
+        file.type.indexOf('json') === -1) {
+        console.log('File is not text, kml, jpeg, png, or json', file.type, file);
         return;
     }
 
@@ -198,20 +199,28 @@ var readFile = function(file) {
         if (content.indexOf("base64") !== -1) {
             if (content.indexOf("image") === -1) {
                 data = atob(content.split("base64,")[1]);
-                if (data.indexOf("<gpx") !== -1) {
-                    doCommand({map:{overlay:file.name, gpx:data}});
-                }
-                else if (data.indexOf("<kml") !== -1) {
-                    doCommand({map:{overlay:file.name, kml:data}});
-                }
-                else if (data.indexOf("<nvg") !== -1) {
-                    doCommand({map:{overlay:file.name, nvg:data}});
+                if (data.indexOf('<?xml') !== -1) {
+                    if (data.indexOf("<gpx") !== -1) {
+                        doCommand({map:{overlay:file.name, gpx:data}});
+                    }
+                    else if (data.indexOf("<kml") !== -1) {
+                        doCommand({map:{overlay:file.name, kml:data}});
+                    }
+                    else if (data.indexOf("<nvg") !== -1) {
+                        doCommand({map:{overlay:file.name, nvg:data}});
+                    }
                 }
                 else {
-                    handleData(data);
+                    try {
+                        data = JSON.parse(data);
+                        handleData(data);
+                    }
+                    catch(e) {
+                        console.log("NOT JSON DATA",data);
+                    }
                 }
             }
-            ws.send(JSON.stringify({action:"file", name:file.name, content:content, lat:droplatlng.lat, lon:droplatlng.lng}));
+            ws.send(JSON.stringify({action:"file", name:file.name, type:file.type, content:content, lat:droplatlng.lat, lon:droplatlng.lng}));
         }
         else {
             console.log("NOT SURE WHAT THIS IS?",content)
@@ -2326,10 +2335,10 @@ function doCommand(cmd) {
 
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
-    var lay = l || "unknown";
+    var lay = l || g.name || "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
-        var st = { stroke:true, color:"#910000", weight:2, fill:true, fillColor:"#910000", fillOpacity:0.3 };
+        var st = { stroke:true, color:"#910000", weight:1, fill:true, fillColor:"#910000", fillOpacity:0.15 };
         st = Object.assign(st,o);
         if (feature.hasOwnProperty("properties")) {
             //console.log("GPROPS", feature.properties)

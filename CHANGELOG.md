@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.7.1 - Also allow geojson files to be dropped, and better png handling
  - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
  - v2.6.1 - Better fit for worldmap when in ui_template
  - v2.6.0 - Add route capability to draw line when online
