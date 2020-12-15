@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
 - v2.7.1 - Also allow geojson files to be dropped, and better png handling
 - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
 - v2.6.1 - Better fit for worldmap when in ui_template
@@ -54,10 +55,10 @@ Optional properties include
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to. (default <i>"unknown"</i>)
- - **speed** : when combined with bearing, draws a vector.
- - **bearing** : when combined with speed, draws a vector.
- - **accuracy** : when combined with bearing, draws a polygon of possible direction.
- - **color** : CSS color name or #rrggbb value for bearing line or accuracy polygon
+ - **track | hdg | heading | bearing** : when combined with speed, draws a vector. (only first will be used)
+ - **speed** : when combined with heading, draws a vector.
+ - **accuracy** : when combined with heading vector, draws a polygon of possible direction.
+ - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https://
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
@@ -90,13 +91,13 @@ Or you can specify an image to load as an icon by setting the icon to http(s)://
 
 There are also several special icons...
 
- - **plane** : a plane icon that aligns with the bearing of travel.
- - **ship** : a ship icon that aligns with the bearing of travel.
- - **car** : a car icon that aligns with the bearing of travel.
- - **bus** : a bus/coach icon that aligns with the bearing of travel.
- - **uav** : a small plane icon that aligns with the bearing of travel.
- - **helicopter** : a small helicopter icon that aligns with the bearing of travel.
- - **arrow** : a map GPS arrow type pointer that aligns with the bearing of travel.
+ - **plane** : a plane icon that aligns with the heading of travel.
+ - **ship** : a ship icon that aligns with the heading of travel.
+ - **car** : a car icon that aligns with the heading of travel.
+ - **bus** : a bus/coach icon that aligns with the heading of travel.
+ - **uav** : a small plane icon that aligns with the heading of travel.
+ - **helicopter** : a small helicopter icon that aligns with the heading of travel.
+ - **arrow** : a map GPS arrow type pointer that aligns with the heading of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **satellite** : a small satellite icon.
  - **iss** : a slightly larger icon for the ISS.

@@ -253,9 +253,9 @@ function onLocationFound(e) {
         var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
         var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
         var lla = new L.LatLng(ya,xa);
-        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.8, clickable:false}).addTo(map);
+        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
     }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", bearing:e.heading, speed:(e.speed*3.6 || undefined)}));
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 || undefined)}));
 }
 
 function onLocationError(e) { console.log(e.message); }
@@ -652,7 +652,7 @@ var addThing = function() {
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{4}.*/i;  // if it looks like a SIDC code
-    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, bearing:hdg};
+    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, hdg:hdg};
     if (regi.test(icon)) {
         d.SIDC = (icon.toUpperCase()+"------------").substr(0,12);
     }
@@ -1378,12 +1378,13 @@ function setMarker(data) {
     if (data.draggable === true) { drag = true; }
 
     if (data.hasOwnProperty("icon")) {
+        var dir = parseFloat(data.hdg || data.heading || data.bearing || "0");
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
                 color: (data.iconColor || "blue")
             });
-            marker.setHeading(parseFloat(data.hdg || data.bearing || "0"));
+            marker.setHeading(dir);
             q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
@@ -1397,7 +1398,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="310px" height="310px" viewBox="0 0 310 310">';
             icon += '<path d="M134.875,19.74c0.04-22.771,34.363-22.771,34.34,0.642v95.563L303,196.354v35.306l-133.144-43.821v71.424l30.813,24.072v27.923l-47.501-14.764l-47.501,14.764v-27.923l30.491-24.072v-71.424L3,231.66v-35.306l131.875-80.409V19.74z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"planeicon",
                 iconAnchor: [16, 16],
@@ -1408,7 +1408,7 @@ function setMarker(data) {
             //words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "bus") {
-            var dir = parseFloat(data.hdg || data.bearing || "0") - 90;
+            dir = dir - 90;
             var sc = 1;
             if (dir < -90 || dir >= 90) { sc = -1; }
             data.iconColor = data.iconColor || "#910000";
@@ -1433,7 +1433,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="314" height="314" viewBox="0 0 314.5 314.5">';
             icon += '<path d="M268.8 3c-3.1-3.1-8.3-2.9-11.7 0.5L204.9 55.7C198.5 23.3 180.8 0 159.9 0c-21.9 0-40.3 25.5-45.7 60.2L57.4 3.5c-3.4-3.4-8.6-3.6-11.7-0.5 -3.1 3.1-2.9 8.4 0.5 11.7l66.3 66.3c0 0.2 0 0.4 0 0.6 0 20.9 4.6 39.9 12.1 54.4l-78.4 78.4c-3.4 3.4-3.6 8.6-0.5 11.7 3.1 3.1 8.3 2.9 11.7-0.5l76.1-76.1c3.2 3.7 6.7 6.7 10.4 8.9v105.8l-47.7 32.2v18l50.2-22.3h26.9l50.2 22.3v-18L175.8 264.2v-105.8c2.7-1.7 5.4-3.8 7.8-6.2l73.4 73.4c3.4 3.4 8.6 3.6 11.7 0.5 3.1-3.1 2.9-8.3-0.5-11.7l-74.9-74.9c8.6-14.8 14-35.2 14-57.8 0-1.9-0.1-3.8-0.2-5.8l61.2-61.2C271.7 11.3 271.9 6.1 268.8 3z" fill="'+data.iconColor+'"/></svg>';
             var svgheli = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"heliicon",
                 iconAnchor: [16, 16],
@@ -1451,7 +1450,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">';
             icon+= '<path d="M62 82h-8V64h36c0-5-4-9-9-9H54v-8c0-3 4-5 4-11.1 0-4.4-3.6-8-8-8-4.4 0-8 3.6-8 8 0 5.1 4 8.1 4 11.1V55h-27c-5 0-9 4-9 9h36v18H38c-2.4 0-5 2.3-5 5L50 92l17-5C67 84.3 64.4 82 62 82z" fill="'+data.iconColor+'"/></svg>';
             var svguav = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"uavicon",
                 iconAnchor: [16, 16],
@@ -1464,7 +1462,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="47px" height="47px" viewBox="0 0 47 47">';
             icon += '<path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="'+data.iconColor+'"/></svg>';
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"caricon",
                 iconAnchor: [16, 16],
@@ -1477,7 +1474,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
             icon += '<path d="m16.2 0.6l-10.9 31 10.7-11.1 10.5 11.1 -10.3-31z" fill="'+data.iconColor+'"/></svg>';
             var svgarrow = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"arrowicon",
                 iconAnchor: [16, 16],
@@ -1490,7 +1486,6 @@ function setMarker(data) {
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
             icon += '<path d="M16.7 31.7l7-6.9c0.4-0.4 0.4-1 0-1.4 -0.4-0.4-1-0.4-1.4 0l-5.3 5.2V17.3l6.7-6.6c0.2-0.2 0.3-0.5 0.3-0.7v-9c0-0.9-1.1-1.3-1.7-0.7l-6.3 6.2L9.7 0.3C9.1-0.3 8 0.1 8 1.1v8.8c0 0.3 0.1 0.6 0.3 0.8l6.7 6.6v11.3l-5.3-5.2c-0.4-0.4-1-0.4-1.4 0 -0.4 0.4-0.4 1 0 1.4l7 6.9c0.2 0.2 0.5 0.3 0.7 0.3C16.2 32 16.5 31.9 16.7 31.7zM10 9.6V3.4l5 4.9v6.2L10 9.6zM17 8.3l5-4.9v6.2l-5 4.9V8.3z" fill="'+data.iconColor+'"/></svg>';
             var svgwind = "data:image/svg+xml;base64," + btoa(icon);
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             myMarker = L.divIcon({
                 className:"windicon",
                 iconAnchor: [16, 16],
@@ -1586,7 +1581,6 @@ function setMarker(data) {
                 iconAnchor: [sz/2, sz/2],
                 popupAnchor: [0, -sz/2]
             });
-            var dir = parseFloat(data.hdg || data.bearing || "0");
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
             labelOffset = [sz/2-4,-4];
             delete data.iconSize;
@@ -1670,13 +1664,32 @@ function setMarker(data) {
         if (data.icon) { marker.icon = data.icon; }
         if (data.iconColor) { marker.iconColor = data.iconColor; }
         if (data.SIDC) { marker.SIDC = data.SIDC.toUpperCase(); }
+        var oldll;
+        marker.on('dragstart', function (e) {
+            oldll = marker.getLatLng();
+            var ola = parseFloat(oldll.lat.toFixed(6));
+            var olo = parseFloat(oldll.lng.toFixed(6));
+            oldll = {lat:ola, lon:olo};
+        });
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
             marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
-            var b = marker.getPopup().getContent().split("bearing : ");
+            var b = marker.getPopup().getContent().split("heading : ");
             if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             else { b = undefined; }
-            ws.send(JSON.stringify({action:"move",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6)),bearing:b }));
+            ws.send(JSON.stringify({
+                action:"move",
+                name:marker.name,
+                layer:marker.lay,
+                lat:parseFloat(marker.getLatLng().lat.toFixed(6)),
+                lon:parseFloat(marker.getLatLng().lng.toFixed(6)),
+                hdg:b,
+                icon:marker.icon,
+                iconColor:marker.iconColor,
+                SIDC:marker.SIDC,
+                draggable:true,
+                from:oldll
+            }));
         });
     }
 
@@ -1789,8 +1802,9 @@ function setMarker(data) {
     markers[data.name] = marker;
     layers[lay].addLayer(marker);
 
-    if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
-    if (data.bearing != null) {  // if there is a heading
+    //if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
+    var track = data.track || data.hdg || data.heading || data.bearing;
+    if (track != undefined) {  // if there is a heading
         if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
         if (data.length != null) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
@@ -1799,7 +1813,7 @@ function setMarker(data) {
             var x = ll.lng * 1; // X coordinate
             var y = ll.lat * 1; // Y coordinate
             var ll1 = ll;
-            var angle = parseFloat(data.bearing);
+            var angle = parseFloat(track);
             var lengthAsDegrees = parseFloat(data.length || "0") / 110540; // metres in a degree..ish
             var polygon = null;
             if (data.accuracy != null) {
@@ -1810,12 +1824,12 @@ function setMarker(data) {
                 var y3 = y + Math.sin((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees;
                 var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var ll3 = new L.LatLng(y3,x3);
-                polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:llc||'#f30', fillOpacity:0.06, clickable:false});
+                polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:llc||'#900', fillOpacity:0.06, clickable:false});
             } else {
                 var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees;
                 var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var lla = new L.LatLng(ya,xa);
-                polygon = L.polygon([ ll1, lla ], {weight:2, color:llc||'#f30', clickable:false});
+                polygon = L.polygon([ ll1, lla ], {weight:2, color:llc||'#900', clickable:false});
             }
             if (typeof layers[lay].getVisibleParent === 'function') {
                 var vis = layers[lay].getVisibleParent(marker);
