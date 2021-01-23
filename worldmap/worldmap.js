@@ -1801,14 +1801,19 @@ function setMarker(data) {
     }
     markers[data.name] = marker;
     layers[lay].addLayer(marker);
-
-    //if ((data.hdg != null) && (data.bearing == null)) { data.bearing = data.hdg; delete data.hdg; }
-    var track = data.track || data.hdg || data.heading || data.bearing;
+    var track;
+    if (data.track !== undefined) { track = data.track; }
+    else if (data.hdg !== undefined) { track = data.hdg; }
+    else if (data.heading !== undefined) { track = data.heading; }
+    else if (data.bearing !== undefined) { track = data.bearing; }
     if (track != undefined) {  // if there is a heading
         if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
         if (data.length != null) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
                 map.removeLayer(polygons[data.name]);
+            }
+            if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("name") ) {
+                delete(layers[lay]._layers[polygons[data.name]._leaflet_id]);
             }
             var x = ll.lng * 1; // X coordinate
             var y = ll.lat * 1; // Y coordinate
@@ -1837,6 +1842,7 @@ function setMarker(data) {
                     polygon.setStyle({opacity:0});
                 }
             }
+            polygon.name = data.name;
             if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("_layers")) {
                 polygons[data.name].addLayer(polygon);
             }

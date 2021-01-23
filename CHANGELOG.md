@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
  - v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
  - v2.7.1 - Also allow geojson files to be dropped, and better png handling
  - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
