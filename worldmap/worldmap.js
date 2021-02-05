@@ -2344,11 +2344,13 @@ function doCommand(cmd) {
             if (map.doubleClickZoom.enabled()) { map.removeControl(map.zoomControl); }
             map.doubleClickZoom.disable();
             map.scrollWheelZoom.disable();
+            map.touchZoom.disable();
         }
         else {
             if (!map.doubleClickZoom.enabled()) { map.addControl(map.zoomControl); }
             map.doubleClickZoom.enable();
             map.scrollWheelZoom.enable();
+            map.touchZoom.enable();
         }
     }
 }
