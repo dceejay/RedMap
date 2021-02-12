@@ -142,7 +142,8 @@ map.on('load', function() {
     }
 
     var setMarker = function(d) {
-        //console.log("DATA",d);
+        if (d.hasOwnProperty("area")) { return; }  // ignore areas for now.
+        console.log("DATA",d);
         if (people.hasOwnProperty(d.name)) {
             map.getSource(d.name).setData(getPoints(d)); // Just update existing marker
         }
@@ -198,7 +199,14 @@ map.on('load', function() {
         else if (t === "block") { fac = fac * 4; tall = 5; }    // block large and cube
         else { tall = 2; fac = fac * 2; }                       // else small cube
         //console.log({p},{t},{fac},{base},{tall});
-        var fac2 = fac / Math.cos( Math.PI / 180 * p.lat );
+        var sin = 1;
+        var cos = 0;
+        if (p.hasOwnProperty("hdg")) {
+            sin = Math.sin((90 - p.hdg) * Math.PI / 180);
+            cos = Math.cos((90 - p.hdg) * Math.PI / 180);
+        }
+        var dx = 1 * cos - 1 * sin;
+        var dy = 1 * sin + 1 * cos;
         var d = {
             "type": "Feature",
             "properties": {
@@ -212,11 +220,11 @@ map.on('load', function() {
                 "type": "Polygon",
                 "coordinates": [
                     [
-                        [ p.lon - fac2, p.lat - fac ],
-                        [ p.lon - fac2, p.lat + fac ],
-                        [ p.lon + fac2, p.lat + fac ],
-                        [ p.lon + fac2, p.lat - fac ],
-                        [ p.lon - fac2, p.lat - fac ],
+                        [ p.lon + (fac * dx ) / Math.cos( Math.PI / 180 * p.lat ), p.lat + (fac * dy) ],
+                        [ p.lon - (fac * dy ) / Math.cos( Math.PI / 180 * p.lat ), p.lat + (fac * dx) ],
+                        [ p.lon - (fac * dx ) / Math.cos( Math.PI / 180 * p.lat ), p.lat - (fac * dy) ],
+                        [ p.lon + (fac * dy ) / Math.cos( Math.PI / 180 * p.lat ), p.lat - (fac * dx) ],
+                        [ p.lon + (fac * dx ) / Math.cos( Math.PI / 180 * p.lat ), p.lat + (fac * dy) ],
                     ]
                 ]
             }
