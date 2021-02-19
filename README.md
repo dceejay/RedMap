@@ -434,7 +434,7 @@ Or a marker contextmenu with an input box
 Or you can add a contextmenu to the map. Simple contextmenu with a button
 
     msg.payload.command = {
-        contextmenu: '<button name="Clicker" onclick=\'feedback(this.name,"ping!)\'>Click me</button>'
+        contextmenu: '<button name="Clicker" onclick=\'feedback(this.name,"ping!",null,true)\'>Click me</button>'
     }
 
 Or with an input box
