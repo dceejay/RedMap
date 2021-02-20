@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
  - v2.8.3 - Let feedback include lat lon for context menu on general map.
  - v2.8.2 - Improve direction handling of 3d objects.
  - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135

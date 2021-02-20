@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
 - v2.8.3 - Let feedback include lat lon for context menu on general map.
 - v2.8.2 - Improve direction handling of 3d objects.
 - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
@@ -360,6 +361,16 @@ All actions also include a `msg._sessionid` property that indicates which client
 There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
 
  - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `$name` to let it be substituted automatically.
+
+ - **addToForm()** : takes a property name value pair to add to a variable called form. When used with contextmenu feedback (above) you can set the feedback value to `"$form"` to substitute this accumulated value. This allows you to do things like `onChange='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"$form")` to submit them all at once. For example a simple multiple line form could be:
+
+ ```
+var menu = "Add some data <input name='foo' onchange='addToForm(this.name,this.value)'></input><br/>"
+menu += "Add more data <input name='bar' onchange='addToForm(this.name,this.value)'></input><br/>"
+menu += '<button name="my_form" onclick=\'feedback(this.name,"$form",null,true)\'>Submit</button>'
+
+msg.payload = { command: { "contextmenu":menu } }
+```
 
  - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
 

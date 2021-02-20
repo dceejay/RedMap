@@ -667,9 +667,10 @@ var addThing = function() {
 }
 
 var feedback = function(n,v,a,c) {
+    if (v === "$form") { v = form; }
     if (markers[n]) {
         var fp = markers[n]._latlng;
-        ws.send(JSON.stringify({action:a||"feedback", name:n, layer:markers[n].lay, lat:fp.lat, lon:fp.lng, value:v}));
+        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
     }
     else {
         if (n === undefined) { n = "map"; }
@@ -678,10 +679,16 @@ var feedback = function(n,v,a,c) {
     if (c === true) { map.closePopup(); }
 }
 
+var form = {};
+var addToForm = function(n,v) {
+    form[n] = v;
+}
+
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
 var rclicked = false;
 var rtout = null;
+
 map.on('contextmenu', function(e) {
     if (rclicked) {
         rclicked = false;
@@ -696,6 +703,7 @@ map.on('contextmenu', function(e) {
             rclicked = false;
             if ((hiderightclick !== true) && (addmenu.length > 0)) {
                 rclk = e.latlng;
+                form = {};
                 rightmenuMap.setLatLng(e.latlng);
                 map.openPopup(rightmenuMap);
                 setTimeout( function() {
