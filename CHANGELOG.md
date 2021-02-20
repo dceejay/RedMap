@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.8.3 - Let feedback include lat lon for context menu on general map.
+ - v2.8.2 - Improve direction handling of 3d objects.
  - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
  - v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
  - v2.7.1 - Also allow geojson files to be dropped, and better png handling

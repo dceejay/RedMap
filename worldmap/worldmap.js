@@ -673,7 +673,7 @@ var feedback = function(n,v,a,c) {
     }
     else {
         if (n === undefined) { n = "map"; }
-        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v}));
+        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng,}));
     }
     if (c === true) { map.closePopup(); }
 }
