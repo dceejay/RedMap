@@ -20,18 +20,6 @@ map web page for plotting "things" on.
 - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
 - v2.6.1 - Better fit for worldmap when in ui_template
 - v2.6.0 - Add route capability to draw line when online
-- v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
-- v2.5.8 - Let node name be the full page map title
-- v2.5.7 - Let fillColor set color of hulls
-- v2.5.6 - Let node accept plain text payload kml or nvg input
-- v2.5.5 - Fix NVG import to handle symbols for points
-- v2.5.4 - Fix delete of hulls
-- v2.5.3 - Swap default satellite layer
-- v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
-- v2.5.1 - Add lat, lng and layer to feedback function.
-- v2.5.0 - Add minimap capability.
-- v2.4.2 - Fix editing injected shapes.
-- v2.4.1 - Add convex-hull node for grouping objects.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -364,11 +352,10 @@ There are some internal functions available to make interacting with Node-RED ea
 
  - **addToForm()** : takes a property name value pair to add to a variable called form. When used with contextmenu feedback (above) you can set the feedback value to `"$form"` to substitute this accumulated value. This allows you to do things like `onChange='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"$form")` to submit them all at once. For example a simple multiple line form could be:
 
- ```
-var menu = "Add some data <input name='foo' onchange='addToForm(this.name,this.value)'></input><br/>"
-menu += "Add more data <input name='bar' onchange='addToForm(this.name,this.value)'></input><br/>"
+```
+var menu = 'Add some data <input name="foo" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
+menu += 'Add more data <input name="bar" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
 menu += '<button name="my_form" onclick=\'feedback(this.name,"$form",null,true)\'>Submit</button>'
-
 msg.payload = { command: { "contextmenu":menu } }
 ```
 
