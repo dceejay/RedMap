@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
 - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
 - v2.8.3 - Let feedback include lat lon for context menu on general map.
 - v2.8.2 - Improve direction handling of 3d objects.
@@ -618,15 +619,15 @@ You can then add a new WMS Base layer by injecting a message like
         "name": "Local WMS",
         "url": "/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
         "opt": {
-            "layers": "gb",                         // specifies a layer in your map file
+            "layers": "gb",          // specifies a layer in your map file
             "format": "image/png",
             "transparent": true,
             "attribution": "© Ordnance Survey, UK"
         },
-        "wms": true                                 // set to true for WMS type mapserver
+        "wms": true                  // set to true for WMS type mapserver
     }}}
 
-Optionally set `"wms":"grey"` to make the layer to greyscale which may make your markers more visible.
+Optionally set `"wms":"grey"` to set the layer to greyscale which may make your markers more visible.
 
 
 ## Examples and Demo Flow

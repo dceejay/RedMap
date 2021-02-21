@@ -129,7 +129,7 @@ var handleData = function(data) {
             }
         }
         if (data.command) { doCommand(data.command); delete data.command; }
-        if (data.hasOwnProperty("type")) { doGeojson("geojson",data); }
+        if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) { doGeojson("geojson",data); }
         else if (data.hasOwnProperty("name")) { setMarker(data); }
         else {
             console.log("SKIP",data);
