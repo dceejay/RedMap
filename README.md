@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.8.7 - Delay start of ui widget.
 - v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
 - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
 - v2.8.3 - Let feedback include lat lon for context menu on general map.
