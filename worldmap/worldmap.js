@@ -2381,6 +2381,7 @@ function doGeojson(n,g,l,o) {
             delete feature.properties["fill-color"];
             delete feature.properties["fill"];
             delete feature.properties["fill-opacity"];
+            delete feature.properties["stroke-opacity"];
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
@@ -2404,13 +2405,18 @@ function doGeojson(n,g,l,o) {
         if (!feature.properties.hasOwnProperty("title")) {
             feature.properties.title = feature.properties["marker-symbol"];
         }
+        if (feature.properties.hasOwnProperty("url")) {
+            feature.properties.url = "<a target='_new' href='"+feature.properties.url+"'>"+feature.properties.url+"</a>";
+        }
         delete feature.properties["marker-symbol"];
         delete feature.properties["marker-color"];
         delete feature.properties["marker-size"];
-        return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker,});
+        var nf = {title:feature.properties.title, name:feature.properties.name};
+        feature.properties = Object.assign(nf, feature.properties);
+        return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker});
     }
     opt.onEachFeature = function (f,l) {
-        if (f.properties) { l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
+        if (f.properties) { l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
     }
     markers[n] = L.geoJson(g,opt);
     markers[n].lay = lay;
