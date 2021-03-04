@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s
 - v2.8.7 - Delay start of ui widget.
 - v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
 - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
@@ -629,6 +630,12 @@ You can then add a new WMS Base layer by injecting a message like
     }}}
 
 Optionally set `"wms":"grey"` to set the layer to greyscale which may make your markers more visible.
+
+**Hint**: if can use a docker container like https://hub.docker.com/r/geodata/mapserver/ then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+```
+docker run -d --name mapserver -v $(pwd):/maps:ro -p 1881:80 geodata/mapserver
+```
+then the url should be of the form `"url": "http://localhost:1881/?map=/maps/my-app.map",` where *my-app.map* is the name of your map file. A quick test of the server would be to browse to http://localhost:1881/?map=/maps/my-app.map&mode=map
 
 
 ## Examples and Demo Flow

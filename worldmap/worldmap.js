@@ -180,14 +180,14 @@ var handleFiles = function(files) {
 }
 
 var readFile = function(file) {
-    console.log("FILE",file)
     // Check if the file is text or kml
     if (file.type &&
         file.type.indexOf('text') === -1 &&
         file.type.indexOf('kml') === -1 &&
-        file.type.indexOf('jpeg') === -1 &&
-        file.type.indexOf('png') === -1 &&
-        file.type.indexOf('json') === -1) {
+        file.type.indexOf('json') === -1 &&
+        file.type.indexOf('image/jpeg') === -1 &&
+        file.type.indexOf('image/png') === -1 &&
+        file.type.indexOf('image/tiff') === -1) {
         console.log('File is not text, kml, jpeg, png, or json', file.type, file);
         return;
     }
@@ -219,6 +219,11 @@ var readFile = function(file) {
                         console.log("NOT JSON DATA",data);
                     }
                 }
+            }
+            else if (content.indexOf("image/tiff") !== -1) {
+                data = atob(content.split("base64,")[1]);
+                console.log("Geotiff",typeof data)
+                /// we now have a geotiff image to render...
             }
             ws.send(JSON.stringify({action:"file", name:file.name, type:file.type, content:content, lat:droplatlng.lat, lon:droplatlng.lng}));
         }
@@ -1815,7 +1820,7 @@ function setMarker(data) {
     else if (data.heading !== undefined) { track = data.heading; }
     else if (data.bearing !== undefined) { track = data.bearing; }
     if (track != undefined) {  // if there is a heading
-        if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 50; }  // and a speed
+        if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 60; }  // and a speed
         if (data.length != null) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
                 map.removeLayer(polygons[data.name]);

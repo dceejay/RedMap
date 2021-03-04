@@ -173,6 +173,7 @@ map.on('load', function() {
         if (c === "N") { return "#A4FFA3"; }
         if (c === "U") { return "#FFFF78"; }
         if (c === "H") { return "#FF7779"; }
+        if (c === "S") { return "#FF7779"; }
     }
 
     // create the points for the marker and return the geojson
@@ -182,15 +183,12 @@ map.on('load', function() {
         if (p.hasOwnProperty("icon")) {
             if (p.icon.indexOf("male") !== -1) { thing = "person"; }
         }
+        p.SDIC = p.SIDC || p.sidc;
         if (p.hasOwnProperty("SIDC")) {
             if (p.SIDC.indexOf("SFGPU") !== -1) { thing = "person"; }
             if (p.SIDC.indexOf("SFGPUC") !== -1) { thing = "block"; }
+            if (p.SIDC.indexOf("GPEV") !== -1) { thing = "block"; }
             p.iconColor = lookupColor(p.SIDC);
-        }
-        if (p.hasOwnProperty("sidc")) {
-            if (p.sidc.indexOf("SFGPU") !== -1) { thing = "person"; }
-            if (p.SIDC.indexOf("SFGPUC") !== -1) { thing = "block"; }
-            p.iconColor = lookupColor(p.sidc);
         }
         var t = p.type || thing;
         var base = p.height || 0;
@@ -201,6 +199,7 @@ map.on('load', function() {
         //console.log({p},{t},{fac},{base},{tall});
         var sin = 1;
         var cos = 0;
+        p.hdg = p.hdg || p.heading;
         if (p.hasOwnProperty("hdg")) {
             sin = Math.sin((90 - p.hdg) * Math.PI / 180);
             cos = Math.cos((90 - p.hdg) * Math.PI / 180);

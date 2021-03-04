@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s
  - v2.8.7 - Delay start of ui widget.
  - v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
  - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
