@@ -11,7 +11,9 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s
+- v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
+- v2.8.9 - Only load cgi module if we have a local mapserv file.
+- v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s.
 - v2.8.7 - Delay start of ui widget.
 - v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
 - v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
@@ -629,13 +631,29 @@ You can then add a new WMS Base layer by injecting a message like
         "wms": true                  // set to true for WMS type mapserver
     }}}
 
-Optionally set `"wms":"grey"` to set the layer to greyscale which may make your markers more visible.
 
-**Hint**: if can use a docker container like https://hub.docker.com/r/geodata/mapserver/ then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+#### Using a Docker Map Server
+
+You can use a docker continaer like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
 ```
-docker run -d --name mapserver -v $(pwd):/maps:ro -p 1881:80 geodata/mapserver
+docker run -d --name camptocamp -v $(pwd):/etc/mapserver/:ro -p 1881:80 camptocamp/mapserver
 ```
-then the url should be of the form `"url": "http://localhost:1881/?map=/maps/my-app.map",` where *my-app.map* is the name of your map file. A quick test of the server would be to browse to http://localhost:1881/?map=/maps/my-app.map&mode=map
+and use a url like `"url": "http://localhost:1882/?map=/etc/mapserver/my-app.map"`
+then the url should be of the form `"url": "http://localhost:1881/?map=/etc/mapserver/my-app.map"` where *my-app.map* is the name of your map file. A quick test of the server would be to browse to http://localhost:1881/?map=/etc/mapserver/my-app.map&mode=map
+
+Or you can use a docker container like https://hub.docker.com/r/geodata/mapserver/ then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+```
+docker run -d --name mapserver -v $(pwd):/maps:ro -p 1882:80 geodata/mapserver
+```
+and use a url like `"url": "http://localhost:1882/?map=/maps/my-app.map",`
+
+
+To use a vector mbtiles server like **MapTiler** then you can download your mbtiles file into a directory and then from that directory run
+```
+docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080
+```
+and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
+
 
 
 ## Examples and Demo Flow

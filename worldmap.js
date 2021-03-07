@@ -17,14 +17,17 @@
 
 module.exports = function(RED) {
     "use strict";
+    var fs = require('fs');
     var path = require("path");
     var express = require("express");
     var compression = require("compression");
     var sockjs = require('sockjs');
     var sockets = {};
     RED.log.info("Worldmap version " + require('./package.json').version );
-    // add the cgi module for serving local maps....
-    RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
+    // add the cgi module for serving local maps.... only if mapserv exists
+    if (fs.existsSync((__dirname + '/mapserv'))) {
+        RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
+    }
 
     function worldMap(node, n) {
         RED.nodes.createNode(node,n);
