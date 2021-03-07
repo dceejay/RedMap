@@ -1734,11 +1734,22 @@ function setMarker(data) {
         marker.ts = parseInt(Date.now()/1000) + Number(maxage);
     }
     if (data.hasOwnProperty("weblink")) {
-        if (typeof data.weblink === "string") {
-            words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
+        if (!Array.isArray(data.weblink) || !data.weblink.length) {
+          if (typeof data.weblink === "string") {
+              words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
+          } else {
+              var tgt = data.weblink.target || "_new";
+              words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
+          }
         } else {
-            var tgt = data.weblink.target || "_new";
-            words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
+          data.weblink.forEach(function(weblink){
+            if (typeof weblink === "string") {
+                words += "<b><a href='"+ weblink + "' target='_new'>more information...</a></b><br/>";
+            } else {
+                var tgt = weblink.target || "_new";
+                words += "<b><a href='"+ weblink.url + "' target='"+ tgt + "'>" + weblink.name + "</a></b><br/>";
+            }
+          });
         }
         delete data.weblink;
     }
