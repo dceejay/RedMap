@@ -634,7 +634,7 @@ You can then add a new WMS Base layer by injecting a message like
 
 #### Using a Docker Map Server
 
-You can use a docker continaer like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+You can use a docker container like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
 ```
 docker run -d --name camptocamp -v $(pwd):/etc/mapserver/:ro -p 1881:80 camptocamp/mapserver
 ```
