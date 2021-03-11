@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.
  - v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
  - v2.8.9 - Only load cgi module if we have a local mapserv file
  - v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s

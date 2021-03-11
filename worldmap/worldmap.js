@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-var startpos = [51.03, -1.379];  // Start location - somewhere in UK :-)
+var startpos = [51.05, -1.38];  // Start location - somewhere in UK :-)
 var startzoom = 10;
 
 var ws;
@@ -157,8 +157,27 @@ document.addEventListener ("keydown", function (ev) {
     }
 });
 
+if ( window.self !== window.top ) { inIframe = true; }
+if (inIframe === true) {
+    if ( window.localStorage.hasOwnProperty("lastpos") ) {
+        var sp = JSON.parse(window.localStorage.getItem("lastpos"));
+        startpos = [ sp.lat, sp.lng ];
+    }
+    if ( window.localStorage.hasOwnProperty("lastzoom") ) {
+        startzoom = window.localStorage.getItem("lastzoom");
+    }
+}
+// if ( window.localStorage.hasOwnProperty("clusterat") ) {
+//     clusterAt = window.localStorage.getItem("clusterat");
+//     document.getElementById("setclus").value = clusterAt;
+// }
+// if ( window.localStorage.hasOwnProperty("maxage") ) {
+//     maxage = window.localStorage.getItem("maxage");
+//     document.getElementById("maxage").value = maxage;
+// }
+
 // Create the Initial Map object.
-map = new L.map('map').setView(startpos, startzoom);
+map = new L.map('map',{zoomSnap: 0.1}).setView(startpos, startzoom);
 
 var droplatlng;
 var target = document.getElementById("map")
@@ -266,9 +285,8 @@ function onLocationFound(e) {
 function onLocationError(e) { console.log(e.message); }
 
 // Move some bits around if in an iframe
-if (window.self !== window.top) {
+if (inIframe) {
     console.log("IN an iframe");
-    inIframe = true;
     if (showUserMenu) { menuButton.addTo(map); }
     document.getElementById("topbar").style.display="none";
     document.getElementById("map").style.top="0px";
@@ -316,24 +334,6 @@ helpMenu += '<tr><td style="cursor:default"><input type="checkbox" id="heatall" 
 if (!inIframe) { helpMenu += '<tr><td style="cursor:default"><span id="showHelp" onclick=\'doDialog(helpText);\'><i class="fa fa-info fa-lg fa-fw"></i>Help</span></td></tr></table>'; }
 else { helpMenu += '</table>' }
 document.getElementById('menu').innerHTML = helpMenu;
-
-if (showUserMenu) {
-    if ( window.localStorage.hasOwnProperty("lastpos") ) {
-        var sp = JSON.parse(window.localStorage.getItem("lastpos"));
-        startpos = [ sp.lat, sp.lng ];
-    }
-    if ( window.localStorage.hasOwnProperty("lastzoom") ) {
-        startzoom = window.localStorage.getItem("lastzoom");
-    }
-    // if ( window.localStorage.hasOwnProperty("clusterat") ) {
-    //     clusterAt = window.localStorage.getItem("clusterat");
-    //     document.getElementById("setclus").value = clusterAt;
-    // }
-    if ( window.localStorage.hasOwnProperty("maxage") ) {
-        maxage = window.localStorage.getItem("maxage");
-        document.getElementById("maxage").value = maxage;
-    }
-}
 
 // Add graticule
 var showGrid = false;
@@ -634,6 +634,10 @@ function showMapCurrentZoom() {
 
 map.on('zoomend', function() {
     showMapCurrentZoom();
+    window.localStorage.setItem("lastzoom", map.getZoom());
+});
+map.on('moveend', function() {
+    window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
 });
 
 //map.on('contextmenu', function(e) {
