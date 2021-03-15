@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.11.0 - Add option to smooth tracks using bezier curves.
 - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.
 - v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
 - v2.8.9 - Only load cgi module if we have a local mapserv file.

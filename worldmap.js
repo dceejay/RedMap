@@ -273,7 +273,9 @@ module.exports = function(RED) {
         this.depth = parseInt(Number(n.depth) || 20);
         this.pointsarray = {};
         this.layer = n.layer || "combined"; // separate, single
+        this.smooth = n.smooth || false;
         var node = this;
+        var bezierSpline = require("@turf/bezier-spline").default;
 
         var doTrack = function(msg) {
             if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
@@ -335,7 +337,13 @@ module.exports = function(RED) {
                     }
                 }
                 if (line.length > 1) { // only send track if two points or more
-                    newmsg.payload.line = line;
+                    if (node.smooth) {
+                        var curved = bezierSpline({"type":"Feature", "properties":{}, "geometry":{"type":"LineString", "coordinates":line }});
+                        newmsg.payload.line = curved.geometry.coordinates;
+                    }
+                    else {
+                        newmsg.payload.line = line;
+                    }
                     newmsg.payload.name = msg.payload.name + "_";
                     if (node.layer === "separate") {
                         newmsg.payload.layer = msg.payload.layer + " tracks";
