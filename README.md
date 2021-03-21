@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.11.1 - Better handle KML point info - add popup.
 - v2.11.0 - Add option to smooth tracks using bezier curves.
 - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.
 - v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
@@ -655,6 +656,11 @@ To use a vector mbtiles server like **MapTiler** then you can download your mbti
 docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080
 ```
 and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
+
+Other useful map servers include Geoserver, a somewhat larger image but fully featured.
+```
+docker run --name geoserver -d -v ${PWD}:/var/local/geoserver -p 1885:8080 oscarfonts/geoserver
+```
 
 ---
 

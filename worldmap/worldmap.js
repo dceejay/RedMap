@@ -2176,23 +2176,36 @@ function doCommand(cmd) {
         }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
+
     var custIco = function() {
-        var customLayer = L.geoJson();
+        var col = cmd.map.iconColor || "#910000";
+        var myMarker = L.VectorMarkers.icon({
+            icon: "circle",
+            markerColor: col,
+            prefix: 'fa',
+            iconColor: 'white'
+        });
         if (cmd.map.hasOwnProperty("icon")) {
-            var col = cmd.map.iconColor || "#910000";
-            var myMarker = L.divIcon({
+            myMarker = L.divIcon({
                 className:"faicon",
                 html: '<center><i class="fa fa-fw '+cmd.map.icon+'" style="color:'+col+'"></i></center>',
                 iconSize: [16, 16],
             });
-            customLayer = L.geoJson(null, {
-                pointToLayer: function(geoJsonPoint, latlng) {
-                    return L.marker(latlng, {icon: myMarker, title: geoJsonPoint.properties.name});
-                }
-            });
         }
+        var customLayer = L.geoJson(null, {
+            pointToLayer: function(geoJsonPoint, latlng) {
+                //console.log("KML/GPX point",geoJsonPoint)
+                var d = (geoJsonPoint.properties.description || "").trim();
+                var mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0];
+                if (geoJsonPoint.geometry.coordinates[2]) {
+                    mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon.alt : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0] + ', ' + geoJsonPoint.geometry.coordinates[2];
+                }
+                return L.marker(latlng, {icon:myMarker, title:geoJsonPoint.properties.name}).bindPopup(mypop);
+            }
+        });
         return customLayer;
     }
+
     // Add a new KML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
