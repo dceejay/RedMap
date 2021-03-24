@@ -1191,7 +1191,7 @@ var rangerings = function(latlng, options) {
             radius: options.ranges[i],
             fill: false,
             color: options.color,
-            weight: 1
+            weight: options.weight || 1
         }).setDirection(options.pan, options.fov).addTo(rings);
     }
     return rings;
