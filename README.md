@@ -11,7 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.11.2 - allow thicknesss of arc to be specified by weight
+- v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
+- v2.11.2 - Allow thicknesss of arc to be specified by weight
 - v2.11.1 - Better handle KML point info - add popup.
 - v2.11.0 - Add option to smooth tracks using bezier curves.
 - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.

@@ -430,6 +430,15 @@ function moveTerminator() { // if terminator line plotted move it every minute
 }
 setInterval( function() { moveTerminator() }, 60000 );
 
+// move the rainfall overlay (if enabled) every 10 minutes
+function moveRainfall() {
+    if (map.hasLayer(overlays["rainfall"])) {
+        overlays["rainfall"]["_url"] = 'https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png';
+        overlays["rainfall"].redraw();
+    }
+}
+setInterval( function() { moveRainfall() }, 600000 );
+
 function setCluster(v) {
     clusterAt = v || 0;
     console.log("clusterAt set:",clusterAt);
@@ -1037,39 +1046,47 @@ overlays["countries"] = layers["_countries"];
 layers["_daynight"] = new L.LayerGroup();
 overlays["day/night"] = layers["_daynight"];
 
-// Add the heatmap layer
-var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
-layers["_heat"] = new L.LayerGroup().addLayer(heat);
-overlays["heatmap"] = layers["_heat"];
+// Add live rain data
+overlays["rainfall"] = new L.TileLayer('https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png', {
+    tileSize: 256,
+    opacity: 0.4,
+    transparent: true,
+    attribution: '<a href="https://rainviewer.com" target="_blank">rainviewer.com</a>'
+});
 
 // Add the buildings layer
-overlays["buildings"] = new OSMBuildings(map).load();
-map.removeLayer(overlays["buildings"]);     // Hide it at start
+// overlays["buildings"] = new OSMBuildings(map).load();
+// map.removeLayer(overlays["buildings"]);     // Hide it at start
 
 // Add Roads
-overlays["roads"] = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/roads_and_labels/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    opacity: 0.8
-});
+// overlays["roads"] = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/roads_and_labels/{z}/{x}/{y}.png', {
+//     maxZoom: 18,
+//     attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+//     opacity: 0.8
+// });
 
-// Add Railways
-overlays["railways"] = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-});
+// // Add Railways
+// overlays["railways"] = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+//     maxZoom: 19,
+//     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+// });
 
-// Add Public Transport (Buses)
-overlays["public transport"] = L.tileLayer('https://openptmap.org/tiles/{z}/{x}/{y}.png', {
-    maxZoom: 17,
-    attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
-});
+// // Add Public Transport (Buses)
+// overlays["public transport"] = L.tileLayer('https://openptmap.org/tiles/{z}/{x}/{y}.png', {
+//     maxZoom: 17,
+//     attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
+// });
 
 // Add the OpenSea markers layer
 overlays["ship nav"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
 });
+
+// Add the heatmap layer
+var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
+layers["_heat"] = new L.LayerGroup().addLayer(heat);
+overlays["heatmap"] = layers["_heat"];
 
 if (showUserMenu) {
     if ( window.localStorage.hasOwnProperty("lastlayer") ) {
