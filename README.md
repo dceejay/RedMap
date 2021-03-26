@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.12.1 - Only show online layer options if we are online.
 - v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
 - v2.11.2 - Allow thicknesss of arc to be specified by weight
 - v2.11.1 - Better handle KML point info - add popup.
@@ -562,10 +563,13 @@ Again the boolean `fit` property can be added to make the map zoom to the releva
         "overlay": "myWind",
         "velocity": {
             "displayValues": true,
-	        "displayOptions": {
+            "displayOptions": {
                 "velocityType": "Global Wind",
                 "displayPosition": "bottomleft",
-                "displayEmptyString": "No wind data"
+                "emptyString": "No wind data",
+                "showCardinal": true,
+                "speedUnit": "k/h",
+                "angleConvention": "meteoCCW"
             },
             "maxVelocity": 15,
             "data": [Array of data as per format referenced below]
@@ -573,6 +577,8 @@ Again the boolean `fit` property can be added to make the map zoom to the releva
     };
 
 see https://github.com/danwild/leaflet-velocity for more details about options and data examples.
+
+Note: If you use his wind-js-server you need to patch it as per [issue 9](https://github.com/danwild/wind-js-server/issues/9).
 
 #### To add an Image Overlay
 

@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.12.1 - Only show online layer options if we are online.
  - v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
  - v2.11.2 - Allow thicknesss of arc to be specified by weight
  - v2.11.1 - Better handle KML point info - add popup.

@@ -432,7 +432,7 @@ setInterval( function() { moveTerminator() }, 60000 );
 
 // move the rainfall overlay (if enabled) every 10 minutes
 function moveRainfall() {
-    if (map.hasLayer(overlays["rainfall"])) {
+    if (navigator.onLine && map.hasLayer(overlays["rainfall"])) {
         overlays["rainfall"]["_url"] = 'https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png';
         overlays["rainfall"].redraw();
     }
@@ -734,134 +734,137 @@ map.on('contextmenu', function(e) {
 });
 
 // Add all the base layer maps
+if (navigator.onLine) {
 
-// Use this for OSM online maps
-var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-//var osmUrl='https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
-var osmAttrib='Map data © OpenStreetMap contributors';
-var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
-basemaps["OSM grey"] = osmg;
-var osm = new L.TileLayer(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
-basemaps["OSM"] = osm;
+    // Use this for OSM online maps
+    var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    //var osmUrl='https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+    var osmAttrib='Map data © OpenStreetMap contributors';
+    var osmg = new L.TileLayer.Grayscale(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
+    basemaps["OSM grey"] = osmg;
 
-// Extra Leaflet map layers from https://leaflet-extras.github.io/leaflet-providers/preview/
-var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri', maxNativeZoom:19, maxZoom:20
-});
-basemaps["Esri"] = Esri_WorldStreetMap;
+    var osm = new L.TileLayer(osmUrl, {attribution:osmAttrib, maxNativeZoom:19, maxZoom:20});
+    basemaps["OSM"] = osm;
 
-var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-//var Esri_WorldImagery = L.tileLayer('http://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution:'Tiles &copy; Esri', maxNativeZoom:17, maxZoom:20
-});
-basemaps["Esri Satellite"] = Esri_WorldImagery;
+    // Extra Leaflet map layers from https://leaflet-extras.github.io/leaflet-providers/preview/
+    var Esri_WorldStreetMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri', maxNativeZoom:19, maxZoom:20
+    });
+    basemaps["Esri"] = Esri_WorldStreetMap;
 
-var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-});
-basemaps["Esri Topography"] = Esri_WorldTopoMap;
+    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    //var Esri_WorldImagery = L.tileLayer('http://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution:'Tiles &copy; Esri', maxNativeZoom:17, maxZoom:20
+    });
+    basemaps["Esri Satellite"] = Esri_WorldImagery;
 
-// var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
-//     attribution: 'Tiles &copy; Esri',
-//     maxNativeZoom:13
-// });
-// basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
+    var Esri_WorldTopoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+    });
+    basemaps["Esri Topography"] = Esri_WorldTopoMap;
 
-var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-    maxZoom: 13
-});
-basemaps["Esri Ocean"] = Esri_OceanBasemap;
+    // var Esri_WorldShadedRelief = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+    //     attribution: 'Tiles &copy; Esri',
+    //     maxNativeZoom:13
+    // });
+    // basemaps["Esri Terrain"] = Esri_WorldShadedRelief;
 
-var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-    maxZoom: 16
-});
-basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
+    var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
+        maxZoom: 13
+    });
+    basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
-// var OpenMapSurfer_Roads = L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
-//     maxZoom: 18,
-//     attribution: 'Imagery from <a href="https://giscience.uni-hd.de/">University of Heidelberg</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-// });
-// basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
+    var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+        maxZoom: 16
+    });
+    basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
 
-// var MapQuestOpen_OSM = L.tileLayer('https://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
-//     type: 'map',
-//     ext: 'jpg',
-//     attribution: 'Tiles Courtesy of <a href="https://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-//     subdomains: '1234',
-//     maxNativeZoom: 17
-// });
-//basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
+    // var OpenMapSurfer_Roads = L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+    //     maxZoom: 18,
+    //     attribution: 'Imagery from <a href="https://giscience.uni-hd.de/">University of Heidelberg</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    // });
+    // basemaps["Mapsurfer"] = OpenMapSurfer_Roads;
 
-var Esri_NatGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
-    maxNativeZoom:12
-});
-basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
+    // var MapQuestOpen_OSM = L.tileLayer('https://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+    //     type: 'map',
+    //     ext: 'jpg',
+    //     attribution: 'Tiles Courtesy of <a href="https://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    //     subdomains: '1234',
+    //     maxNativeZoom: 17
+    // });
+    //basemaps["MapQuest OSM"] = MapQuestOpen_OSM;
 
-var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.png', {
-    attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
-    bounds: [[49.6, -12], [61.7, 3]],
-    minZoom:1, maxNativeZoom:18, maxZoom:18,
-    subdomains: '0123'
-});
-basemaps["UK OS Opendata"] = NLS_OS_opendata;
+    var Esri_NatGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxNativeZoom:12
+    });
+    basemaps["Nat Geo"] = Esri_NatGeoWorldMap;
 
-var Open_Topo_Map = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    subdomains: 'abc',
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.opentopomap.org/copyright">OpenTopoMap</a> contributors'
-});
-basemaps["Open Topo Map"] = Open_Topo_Map;
+    var NLS_OS_opendata = L.tileLayer('https://geo.nls.uk/maps/opendata/{z}/{x}/{y}.png', {
+        attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+        bounds: [[49.6, -12], [61.7, 3]],
+        minZoom:1, maxNativeZoom:18, maxZoom:18,
+        subdomains: '0123'
+    });
+    basemaps["UK OS Opendata"] = NLS_OS_opendata;
 
-var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-});
-basemaps["Hike Bike"] = HikeBike_HikeBike;
+    var Open_Topo_Map = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        subdomains: 'abc',
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.opentopomap.org/copyright">OpenTopoMap</a> contributors'
+    });
+    basemaps["Open Topo Map"] = Open_Topo_Map;
 
-var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
-    attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
-    bounds: [[49.6, -12], [61.7, 3]],
-    minZoom:1, maxZoom:18,
-    subdomains: '0123'
-});
-basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
+    var HikeBike_HikeBike = L.tileLayer('https://tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    basemaps["Hike Bike"] = HikeBike_HikeBike;
 
-//var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
-var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
-    attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
-    bounds: [[49.6, -12], [61.7, 3]],
-    minZoom:1, maxNativeZoom:19, maxZoom:20,
-    subdomains: '0123'
-});
-basemaps["UK OS 1900"] = NLS_OS_1900;
+    var NLS_OS_1919_1947 = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
+        attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
+        bounds: [[49.6, -12], [61.7, 3]],
+        minZoom:1, maxZoom:18,
+        subdomains: '0123'
+    });
+    basemaps["UK OS 1919-47"] = NLS_OS_1919_1947;
 
-//var CartoPos = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-//    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
-//});
-//basemaps["CartoDB Light"] = CartoPos;
+    //var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
+    var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
+        attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+        bounds: [[49.6, -12], [61.7, 3]],
+        minZoom:1, maxNativeZoom:19, maxZoom:20,
+        subdomains: '0123'
+    });
+    basemaps["UK OS 1900"] = NLS_OS_1900;
 
-// Nice terrain based maps by Stamen Design
-var terrainUrl = "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
-basemaps["Terrain"] = L.tileLayer(terrainUrl, {
-    subdomains: ['a','b','c','d'],
-    minZoom: 0,
-    maxZoom: 20,
-    type: 'jpg',
-    attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
-});
+    //var CartoPos = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    //    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+    //});
+    //basemaps["CartoDB Light"] = CartoPos;
 
-// Nice watercolour based maps by Stamen Design
-var watercolorUrl = "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
-basemaps["Watercolor"] = L.tileLayer(watercolorUrl, {
-    subdomains: ['a','b','c','d'],
-    minZoom: 0,
-    maxZoom: 20,
-    type: 'jpg',
-    attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
-});
+    // Nice terrain based maps by Stamen Design
+    var terrainUrl = "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
+    basemaps["Terrain"] = L.tileLayer(terrainUrl, {
+        subdomains: ['a','b','c','d'],
+        minZoom: 0,
+        maxZoom: 20,
+        type: 'jpg',
+        attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
+    });
+
+    // Nice watercolour based maps by Stamen Design
+    var watercolorUrl = "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
+    basemaps["Watercolor"] = L.tileLayer(watercolorUrl, {
+        subdomains: ['a','b','c','d'],
+        minZoom: 0,
+        maxZoom: 20,
+        type: 'jpg',
+        attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
+    });
+}
 
 
 // Now add the overlays
@@ -1047,41 +1050,43 @@ layers["_daynight"] = new L.LayerGroup();
 overlays["day/night"] = layers["_daynight"];
 
 // Add live rain data
-overlays["rainfall"] = new L.TileLayer('https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png', {
-    tileSize: 256,
-    opacity: 0.4,
-    transparent: true,
-    attribution: '<a href="https://rainviewer.com" target="_blank">rainviewer.com</a>'
-});
+if (navigator.onLine) {
+    overlays["rainfall"] = new L.TileLayer('https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png', {
+        tileSize: 256,
+        opacity: 0.4,
+        transparent: true,
+        attribution: '<a href="https://rainviewer.com" target="_blank">rainviewer.com</a>'
+    });
 
-// Add the buildings layer
-// overlays["buildings"] = new OSMBuildings(map).load();
-// map.removeLayer(overlays["buildings"]);     // Hide it at start
+    // Add the buildings layer
+    // overlays["buildings"] = new OSMBuildings(map).load();
+    // map.removeLayer(overlays["buildings"]);     // Hide it at start
 
-// Add Roads
-// overlays["roads"] = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/roads_and_labels/{z}/{x}/{y}.png', {
-//     maxZoom: 18,
-//     attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-//     opacity: 0.8
-// });
+    // Add Roads
+    // overlays["roads"] = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/roads_and_labels/{z}/{x}/{y}.png', {
+    //     maxZoom: 18,
+    //     attribution: 'Tiles courtesy of <a href="https://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    //     opacity: 0.8
+    // });
 
-// // Add Railways
-// overlays["railways"] = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
-//     maxZoom: 19,
-//     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-// });
+    // // Add Railways
+    // overlays["railways"] = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+    //     maxZoom: 19,
+    //     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    // });
 
-// // Add Public Transport (Buses)
-// overlays["public transport"] = L.tileLayer('https://openptmap.org/tiles/{z}/{x}/{y}.png', {
-//     maxZoom: 17,
-//     attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
-// });
+    // // Add Public Transport (Buses)
+    // overlays["public transport"] = L.tileLayer('https://openptmap.org/tiles/{z}/{x}/{y}.png', {
+    //     maxZoom: 17,
+    //     attribution: 'Map data: &copy; <a href="https://www.openptmap.org">OpenPtMap</a> contributors'
+    // });
 
-// Add the OpenSea markers layer
-overlays["ship nav"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
-});
+    // Add the OpenSea markers layer
+    overlays["ship nav"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
+    });
+}
 
 // Add the heatmap layer
 var heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
@@ -1095,7 +1100,7 @@ if (showUserMenu) {
         }
     }
 }
-basemaps[baselayername].addTo(map);
+if (navigator.onLine) { basemaps[baselayername].addTo(map); }
 
 // Layer control based on select box rather than radio buttons.
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
