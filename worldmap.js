@@ -251,7 +251,7 @@ module.exports = function(RED) {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
                 if (node.events !== "files") {
-                    node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
+                    node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip});
                 }
             });
         }
