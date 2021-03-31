@@ -82,7 +82,7 @@ var connect = function() {
         if (!inIframe) {
             document.getElementById("footer").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
         }
-        ws.send(JSON.stringify({action:"connected"}));
+        ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams)}));
         onoffline();
     };
     ws.onclose = function() {
@@ -2231,7 +2231,7 @@ function doCommand(cmd) {
     // Add a new KML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
-            map.removeLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
         //var opt = {async:true};
@@ -2240,14 +2240,14 @@ function doCommand(cmd) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].addTo(map);
         }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new TOPOJSON overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
-            map.removeLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
         overlays[cmd.map.overlay] = omnivore.topojson.parse(cmd.map.topojson);
@@ -2255,38 +2255,35 @@ function doCommand(cmd) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].addTo(map);
         }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new GPX overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("gpx") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
-            map.removeLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
         overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco());
-
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].addTo(map);
         }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new velocity overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
-            map.removeLayer(overlays[cmd.map.overlay]);
-            existsalready = true;
+            overlays[cmd.map.overlay].removeFrom(map);
+            layercontrol.removeOverlay(overlays[cmd.map.overlay]);
         }
         overlays[cmd.map.overlay] = L.velocityLayer(cmd.map.velocity);
-        if (!existsalready) {
-            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-        }
+        layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].addTo(map);
         }
         if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
@@ -2315,9 +2312,10 @@ function doCommand(cmd) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
+            overlays[cmd.map.overlay].addTo(map);
         }
     }
+
     // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
         map.removeLayer(basemaps[baselayername]);
