@@ -229,19 +229,21 @@ module.exports = function(RED) {
         var callback = function(client) {
             //client.setMaxListeners(0);
             clients[client.id] = client;
+            //get ip of user connected to the _sessionid, check to see if its proxied first
+            var sessionip = client.headers['x-real-ip'] || client.headers['x-forwarded-for'] || client.remoteAddress;
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
                     if ((node.events === "files") && (message.action === "file"))  {
                         message.content =  Buffer.from(message.content.split('base64,')[1], 'base64');
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                     else if ((node.events === "connect") && (message.action === "connected")) {
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                     else if (node.events === "all") {
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id})});
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                 }
             });
@@ -249,7 +251,7 @@ module.exports = function(RED) {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
                 if (node.events !== "files") {
-                    node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id});
+                    node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip});
                 }
             });
         }
