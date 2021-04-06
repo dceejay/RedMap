@@ -580,6 +580,9 @@ Again the boolean `fit` property can be added to make the map zoom to the releva
 see https://github.com/danwild/leaflet-velocity for more details about options and data examples.
 
 Note: If you use his wind-js-server you need to patch it as per [issue 9](https://github.com/danwild/wind-js-server/issues/9).
+Or you can use try this docker image which uses the Canadian Meterological Service model instead.
+
+    docker run -d -p 7000:7000 --name windserver theceejay/windserver:latest
 
 #### To add an Image Overlay
 
