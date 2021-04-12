@@ -1565,6 +1565,18 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
+        else if (data.icon === "mayflower") {
+            data.iconColor = data.iconColor || "white";
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="60" viewBox="0 0 4 10" aria-hidden="true" stroke-width="1.5">';
+            icon += '<path d="M2 .2L1.5 5l-1 .5L.2 4S.09 5.551.1 6.25c.01.759.1 2.25.1 2.25L.5 7l1 .3.3 2.5h.4l.3-2.5 1-.3.3 1.5s.058-1.518.1-2.25C3.945 5.455 3.8 4 3.8 4l-.3 1.5-1-.5z" fill="'+data.iconColor+'"/></svg>';
+            var svgmay = "data:image/svg+xml;base64," + btoa(icon);
+            myMarker = L.divIcon({
+                className:"mayflowericon",
+                iconAnchor: [16, 32],
+                html:'<img src="'+svgmay+'" style="width:32px; height:64px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+        }
         else if (data.icon === "locate") {
             data.iconColor = data.iconColor || "cyan";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
