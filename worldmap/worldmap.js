@@ -771,13 +771,13 @@ if (navigator.onLine) {
 
     var Esri_OceanBasemap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-        maxZoom: 13
+        maxNativeZoom:13
     });
     basemaps["Esri Ocean"] = Esri_OceanBasemap;
 
     var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-        maxZoom: 16
+        maxNativeZoom:13
     });
     basemaps["Esri Dark Grey"] = Esri_WorldGrayCanvas;
 
@@ -1566,14 +1566,14 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "mayflower") {
-            data.iconColor = data.iconColor || "white";
+            data.iconColor = data.iconColor || "#910000";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="60" viewBox="0 0 4 10" aria-hidden="true" stroke-width="1.5">';
             icon += '<path d="M2 .2L1.5 5l-1 .5L.2 4S.09 5.551.1 6.25c.01.759.1 2.25.1 2.25L.5 7l1 .3.3 2.5h.4l.3-2.5 1-.3.3 1.5s.058-1.518.1-2.25C3.945 5.455 3.8 4 3.8 4l-.3 1.5-1-.5z" fill="'+data.iconColor+'"/></svg>';
             var svgmay = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"mayflowericon",
-                iconAnchor: [16, 32],
-                html:'<img src="'+svgmay+'" style="width:32px; height:64px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [12, 24],
+                html:'<img src="'+svgmay+'" style="width:24px; height:48px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }

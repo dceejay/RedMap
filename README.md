@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.13.2 - Add mayflower icon.
 - v2.13.0 - Tidy velocity layer. Feedback any url parameters.
 - v2.12.1 - Only show online layer options if we are online.
 - v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
