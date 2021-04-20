@@ -1287,7 +1287,11 @@ function setMarker(data) {
         return;
     }
 
-    var lay = data.layer || "unknown";
+    var lll = "unknown";
+    if (markers.hasOwnProperty(data.name) && markers[data.name].hasOwnProperty("lay")) {
+        lll = markers[data.name].lay;
+    }
+    var lay = data.layer || lll;
     if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
         if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
             if (clusterAt > 0) {
