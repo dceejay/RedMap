@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.13.3 - Fix unchanged layer propagation.
 - v2.13.2 - Add mayflower icon.
 - v2.13.0 - Tidy velocity layer. Feedback any url parameters.
 - v2.12.1 - Only show online layer options if we are online.
@@ -29,10 +30,6 @@ map web page for plotting "things" on.
 - v2.8.2 - Improve direction handling of 3d objects.
 - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
 - v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
-- v2.7.1 - Also allow geojson files to be dropped, and better png handling
-- v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
-- v2.6.1 - Better fit for worldmap when in ui_template
-- v2.6.0 - Add route capability to draw line when online
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
