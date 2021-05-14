@@ -1855,7 +1855,9 @@ function setMarker(data) {
     if (data.popup) { words = data.popup; }
     else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
     words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
-    marker.bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
+    var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
+    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="auto"; }
+    marker.bindPopup(words, wopt);
     marker._popup.dname = data.name;
     marker.lay = lay;                       // and the layer it is on
 

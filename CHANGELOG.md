@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
  - v2.13.3 - Fix unchanged layer propagation.
  - v2.13.2 - Add mayflower icon.
  - v2.13.0 - Tidy velocity layer. Feedback any url parameters.

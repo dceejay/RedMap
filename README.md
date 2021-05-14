@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
 - v2.13.3 - Fix unchanged layer propagation.
 - v2.13.2 - Add mayflower icon.
 - v2.13.0 - Tidy velocity layer. Feedback any url parameters.
@@ -20,16 +21,6 @@ map web page for plotting "things" on.
 - v2.11.1 - Better handle KML point info - add popup.
 - v2.11.0 - Add option to smooth tracks using bezier curves.
 - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.
-- v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
-- v2.8.9 - Only load cgi module if we have a local mapserv file.
-- v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s.
-- v2.8.7 - Delay start of ui widget.
-- v2.8.6 - Better checking of type property before guessing it's geojson. Issue #153
-- v2.8.4 - Add addToForm(n,v) option and $form - to make contextmenu form submission easier.
-- v2.8.3 - Let feedback include lat lon for context menu on general map.
-- v2.8.2 - Improve direction handling of 3d objects.
-- v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
-- v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
