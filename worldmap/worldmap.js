@@ -2135,6 +2135,11 @@ function doCommand(cmd) {
         }};
         opt.onEachFeature = function (f,l) {
             l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+            if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
+                l.on('click', function (e) {
+                    ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
+                });
+            }
         }
         overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
         if (!existsalready) {
@@ -2488,6 +2493,11 @@ function doGeojson(n,g,l,o) {
     }
     opt.onEachFeature = function (f,l) {
         if (f.properties) { l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
+        if (o.hasOwnProperty("clickable") && o.clickable === true) {
+            l.on('click', function (e) {
+                ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
+            });
+        }
     }
     markers[n] = L.geoJson(g,opt);
     markers[n].lay = lay;

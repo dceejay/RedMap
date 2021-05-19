@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.14.0 - Let geojson features be clickable if added as overlay
 - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
 - v2.13.3 - Fix unchanged layer propagation.
 - v2.13.2 - Add mayflower icon.
@@ -217,7 +218,8 @@ Often geojson may not have a `properties` or `style` property in which case you 
         "geojson": {
             "type": "LineString",
             "coordinates": [[0,0],[0,90]]
-        }
+        },
+        clickable: true
     }
 
 **Note**: you can just send a msg.payload containing the geojson itself - but obviously you then can't style
@@ -520,13 +522,14 @@ By default the overlay will be instantly visible. To load it hidden add a proper
         "geojson": { your geojson feature as an object },
         "opt": { optional geojson options, style, etc },
         "fit": true
+        "clickable": false
     };
 
 The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
 
 The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
 
-The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson.
+The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
 
 see https://leafletjs.com/examples/geojson/ for more details about options for opt.
 
