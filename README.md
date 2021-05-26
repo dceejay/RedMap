@@ -11,14 +11,15 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.14.0 - Let geojson features be clickable if added as overlay
+- v2.15.0 - let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
+- v2.14.0 - Let geojson features be clickable if added as overlay.
 - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
 - v2.13.3 - Fix unchanged layer propagation.
 - v2.13.2 - Add mayflower icon.
 - v2.13.0 - Tidy velocity layer. Feedback any url parameters.
 - v2.12.1 - Only show online layer options if we are online.
 - v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
-- v2.11.2 - Allow thicknesss of arc to be specified by weight
+- v2.11.2 - Allow thicknesss of arc to be specified by weight.
 - v2.11.1 - Better handle KML point info - add popup.
 - v2.11.0 - Add option to smooth tracks using bezier curves.
 - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.

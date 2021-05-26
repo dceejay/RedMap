@@ -94,7 +94,7 @@ var connect = function() {
     };
     ws.onmessage = function(e) {
         try { var data = JSON.parse(e.data); handleData(data); }
-        catch (e) { console.log("BAD DATA"); return; }
+        catch (e) { if (data) { console.log("BAD DATA",data); } }
         // console.log("DATA",typeof data,data);
     };
 }
@@ -1750,7 +1750,7 @@ function setMarker(data) {
 
     // remove icon from list of properties, then add all others to popup
     if (data.hasOwnProperty("alt")) { data.alt = (1*data.alt).toFixed(2); }
-    if (data.hasOwnProperty("speed")) { data.speed = (1*data.speed).toFixed(2); }
+    //if (data.hasOwnProperty("speed")) { data.speed = parseFloat(data.speed).toFixed(2); }
     if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
@@ -1856,7 +1856,7 @@ function setMarker(data) {
     else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
     words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
-    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="auto"; }
+    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
     marker.bindPopup(words, wopt);
     marker._popup.dname = data.name;
     marker.lay = lay;                       // and the layer it is on
@@ -1875,7 +1875,15 @@ function setMarker(data) {
     else if (data.heading !== undefined) { track = data.heading; }
     else if (data.bearing !== undefined) { track = data.bearing; }
     if (track != undefined) {  // if there is a heading
-        if (data.speed != null) { data.length = parseFloat(data.speed || "0") * 60; }  // and a speed
+        if (data.speed != null && !data.length) {  // and a speed - lets convert to a leader length
+            data.length = parseFloat(data.speed || "0") * 60;
+            var re1 = new RegExp('kn|knot|kt','i');
+            var re2 = new RegExp('kph|kmh','i');
+            var re3 = new RegExp('mph','i');
+            if ( re1.test(""+data.speed) ) { data.length = data.length * 0.514444; }
+            else if ( re2.test(""+data.speed) ) { data.length = data.length * 0.44704; }
+            else if ( re3.test(""+data.speed) ) { data.length = data.length * 0.277778; }
+        }
         if (data.length != null) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
                 map.removeLayer(polygons[data.name]);
