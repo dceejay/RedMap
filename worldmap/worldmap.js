@@ -1748,9 +1748,22 @@ function setMarker(data) {
         });
     }
 
+    // tidy up altitude
+    if (data.hasOwnProperty("alt")) {
+        var reft = new RegExp('feet|ft','i');
+        var refm = new RegExp('metres|m','i');
+        if ( reft.test(""+data.alt) ) {
+            data.alt = (""+parseFloat(data.alt)).toFixed(2) + " ft";
+        }
+        else if ( refm.test(""+data.alt) ) {
+            data.alt = (""+parseFloat(data.alt)).toFixed(2) + " m";
+        }
+        else {
+            data.alt = (""+parseFloat(data.alt)).toFixed(2);
+        }
+    }
+
     // remove icon from list of properties, then add all others to popup
-    if (data.hasOwnProperty("alt")) { data.alt = (1*data.alt).toFixed(2); }
-    //if (data.hasOwnProperty("speed")) { data.speed = parseFloat(data.speed).toFixed(2); }
     if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
@@ -1763,7 +1776,7 @@ function setMarker(data) {
         delete data.photoUrl;
     }
     if (data.hasOwnProperty("videoUrl")) {
-        words += '<video controls muted autoplay width="320"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
+        words += '<video controls muted autoplay width="320" height="240"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
         delete data.videoUrl;
     }
     if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
@@ -1777,21 +1790,23 @@ function setMarker(data) {
     }
     if (data.hasOwnProperty("weblink")) {
         if (!Array.isArray(data.weblink) || !data.weblink.length) {
-          if (typeof data.weblink === "string") {
-              words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
-          } else {
-              var tgt = data.weblink.target || "_new";
-              words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
-          }
-        } else {
-          data.weblink.forEach(function(weblink){
-            if (typeof weblink === "string") {
-                words += "<b><a href='"+ weblink + "' target='_new'>more information...</a></b><br/>";
+            if (typeof data.weblink === "string") {
+                words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
             } else {
-                var tgt = weblink.target || "_new";
-                words += "<b><a href='"+ weblink.url + "' target='"+ tgt + "'>" + weblink.name + "</a></b><br/>";
+                var tgt = data.weblink.target || "_new";
+                words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
             }
-          });
+        }
+        else {
+            data.weblink.forEach(function(weblink){
+                if (typeof weblink === "string") {
+                    words += "<b><a href='"+ weblink + "' target='_new'>more information...</a></b><br/>";
+                }
+                else {
+                    var tgt = weblink.target || "_new";
+                    words += "<b><a href='"+ weblink.url + "' target='"+ tgt + "'>" + weblink.name + "</a></b><br/>";
+                }
+            });
         }
         delete data.weblink;
     }
@@ -1929,7 +1944,7 @@ function setMarker(data) {
             layers[lay].addLayer(polygon);
         }
     }
-    if (panit) { map.setView(ll,map.getZoom()); }
+    if (panit === true) { map.setView(ll,map.getZoom()); }
     if (p === true) { marker.openPopup(); }
 }
 
@@ -1946,7 +1961,7 @@ function doCommand(cmd) {
         doTidyUp(cmd.clear);
     }
     if (cmd.hasOwnProperty("panit")) {
-        if (cmd.panit == "true") { panit = true; }
+        if (cmd.panit == true || cmd.panit === "true") { panit = true; }
         else { panit = false; }
         document.getElementById("panit").checked = panit;
     }

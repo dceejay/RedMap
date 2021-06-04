@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.15.1 - Fix panit command to work, try to use alt units, popup alignments.
 - v2.15.0 - let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
 - v2.14.0 - Let geojson features be clickable if added as overlay.
 - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
@@ -394,6 +395,7 @@ Optional properties include
  - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
+ - **panit** - auto pan to the latest marker updated.  - `{"command":{"panit":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
