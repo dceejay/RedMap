@@ -318,10 +318,10 @@ else {
     rulerButton.addTo(map);
 
     // Create the clear heatmap button
-    var clrHeat = L.easyButton( '<b>Reset Heatmap</b>', function() {
+    var clrHeat = L.easyButton( 'fa-eraser', function() {
         console.log("Reset heatmap");
         heat.setLatLngs([]);
-    }, "Clears the current heatmap", "bottomright");
+    }, "Clears the current heatmap", {position:"bottomright"});
 }
 
 var helpMenu = '<table>'
@@ -1684,12 +1684,12 @@ function setMarker(data) {
         myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:data.name });
         // Now that we have a symbol we can ask for the echelon and set the symbol size
         var opts = data.options || {};
-        var sz = 30;
+        var sz = 25;
         if (myMarker.hasOwnProperty("getProperties") && myMarker.getProperties().hasOwnProperty("echelon")) {
             sz = iconSz[myMarker.getProperties().echelon];
         }
         opts.size = opts.size || sz;
-        opts.size = opts.size * 0.8 * (opts.scale || 1);
+        opts.size = opts.size * (opts.scale || 1);
         myMarker = myMarker.setOptions(opts);
         var myicon = L.icon({
             iconUrl: myMarker.toDataURL(),
@@ -1855,6 +1855,7 @@ function setMarker(data) {
     if (data.dashArray) { delete data.dashArray; }
     if (data.fill) { delete data.fill; }
     if (data.draggable) { delete data.draggable; }
+    if (!isNaN(data.speed)) { data.speed = data.speed.toFixed(2); }
     if (data.hasOwnProperty("clickable")) { delete data.clickable; }
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
