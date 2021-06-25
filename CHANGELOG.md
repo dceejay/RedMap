@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.15.4 - Let clear heatmap command do what it says.
  - v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
  - v2.15.0 - let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
  - v2.14.0 - Let geojson features be clickable if added as overlay.

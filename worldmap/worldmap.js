@@ -385,27 +385,32 @@ function doLock(v) {
 
 // Remove old markers
 function doTidyUp(l) {
-    var d = parseInt(Date.now()/1000);
-    for (var m in markers) {
-        if ((l && (l == markers[m].lay)) || typeof markers[m].ts != "undefined") {
-            if ((l && (l == markers[m].lay)) || (markers[m].hasOwnProperty("ts") && (Number(markers[m].ts) < d) && (markers[m].lay !== "_drawing"))) {
-                //console.log("STALE :",m);
-                if (typeof polygons[m+"_"] != "undefined") {
-                    layers[polygons[m+"_"].lay].removeLayer(polygons[m+"_"]);
-                    delete polygons[m+"_"];
+    if (l === "heatmap") {
+        heat.setLatLngs([]);
+    }
+    else {
+        var d = parseInt(Date.now()/1000);
+        for (var m in markers) {
+            if ((l && (l == markers[m].lay)) || typeof markers[m].ts != "undefined") {
+                if ((l && (l == markers[m].lay)) || (markers[m].hasOwnProperty("ts") && (Number(markers[m].ts) < d) && (markers[m].lay !== "_drawing"))) {
+                    //console.log("STALE :",m);
+                    if (typeof polygons[m+"_"] != "undefined") {
+                        layers[polygons[m+"_"].lay].removeLayer(polygons[m+"_"]);
+                        delete polygons[m+"_"];
+                    }
+                    if (typeof polygons[m] != "undefined") {
+                        layers[markers[m].lay].removeLayer(polygons[m]);
+                        delete polygons[m];
+                    }
+                    layers[markers[m].lay].removeLayer(markers[m]);
+                    delete markers[m];
                 }
-                if (typeof polygons[m] != "undefined") {
-                    layers[markers[m].lay].removeLayer(polygons[m]);
-                    delete polygons[m];
-                }
-                layers[markers[m].lay].removeLayer(markers[m]);
-                delete markers[m];
             }
         }
-    }
-    if (l) {
-        if (layers[l]) { map.removeLayer(layers[l]); layercontrol.removeLayer(layers[l]); delete layers[l]; }
-        if (overlays[l]) { map.removeLayer(overlays[l]); layercontrol.removeLayer(overlays[l]); delete overlays[l]; }
+        if (l) {
+            if (layers[l]) { map.removeLayer(layers[l]); layercontrol.removeLayer(layers[l]); delete layers[l]; }
+            if (overlays[l]) { map.removeLayer(overlays[l]); layercontrol.removeLayer(overlays[l]); delete overlays[l]; }
+        }
     }
 }
 
