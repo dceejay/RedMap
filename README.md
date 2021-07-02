@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.15.5 - Fix SDIC icons to accept iso-coded icons as labels.
+- v2.15.5 - Fix SDIC icons to accept unicoded icons as labels.
 - v2.15.4 - Let clear heatmap command do what it says.
 - v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
 - v2.15.0 - let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
