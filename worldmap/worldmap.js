@@ -1259,7 +1259,7 @@ function setMarker(data) {
         return m;
     }
 
-    //console.log("DATA" typeof data, data);
+    // console.log("DATA", typeof data, data);
     if (data.deleted) { // remove markers we are told to
         delMarker(data.name);
         return;
@@ -1686,7 +1686,7 @@ function setMarker(data) {
     }
     else if (data.hasOwnProperty("SIDC")) {
         // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
-        myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:data.name });
+        myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:unescape(encodeURIComponent(data.name)) });
         // Now that we have a symbol we can ask for the echelon and set the symbol size
         var opts = data.options || {};
         var sz = 25;
@@ -1695,6 +1695,11 @@ function setMarker(data) {
         }
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
+        // escape out any isocodes eg flag symbols
+        var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation"];
+        optfields.forEach(function (item) {
+            if (opts.hasOwnProperty(item)) { opts[item] = unescape(encodeURIComponent(opts[item])); }
+        });
         myMarker = myMarker.setOptions(opts);
         var myicon = L.icon({
             iconUrl: myMarker.toDataURL(),
