@@ -2085,6 +2085,12 @@ function doCommand(cmd) {
             }
         }
     }
+    if (cmd.hasOwnProperty("redirect")) {
+      if (typeof cmd.redirect === "string")  {
+          ws.close();
+          window.location.href = cmd.redirect;
+      }
+    }
 
     var existsalready = false;
     // Add a new base map layer
