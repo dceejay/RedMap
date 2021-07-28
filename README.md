@@ -68,7 +68,6 @@ Optional properties include
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
  - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable just this instance.
- - **redirect** - Redirects user to a url of your choice. `{"command":{ "redirect": "https://nodered.org/" }}` can be a relitive or absolute URL.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be
 overridden by using the **popup** property to supply your own html content. If you use the
@@ -401,6 +400,7 @@ Optional properties include
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default).
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
+ - **redirect** - Redirects user to a url of your choice. `{"command":{ "redirect": "https://nodered.org/" }}` can be a relitive or absolute URL.
 
 #### To switch layer, move map and zoom
 
