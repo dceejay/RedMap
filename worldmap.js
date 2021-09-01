@@ -142,8 +142,8 @@ module.exports = function(RED) {
         var height = config.height;
         if (height == 0) { height = 10; }
         var size = ui.getSizes();
-        var frameWidth = (size.sx +size.cx) *width - size.cx - 1;
-        var frameHeight = (size.sy +size.cy) *height - size.cy - 2;
+        var frameWidth = (size.sx +size.cx) * width - size.cx;
+        var frameHeight = (size.sy +size.cy) * height - size.cy;
         var url = encodeURI(config.path);
         var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
 <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border:none;"></iframe>
