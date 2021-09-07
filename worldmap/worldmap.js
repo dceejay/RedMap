@@ -662,7 +662,10 @@ map.on('moveend', function() {
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour, heading)'/>";
 var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
-var rclk;
+var rclk = {
+    lat:0,
+    lng:0
+};
 var hiderightclick = false;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
