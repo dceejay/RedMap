@@ -2526,8 +2526,14 @@ function doGeojson(n,g,l,o) {
         return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker});
     }
     opt.onEachFeature = function (f,l) {
-        if (f.properties) { l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>'); }
-        if (o.hasOwnProperty("clickable") && o.clickable === true) {
+        if (f.properties && Object.keys(f.properties).length > 0) {
+            var tx = JSON.stringify(f.properties,null,' ');
+            if ( tx !== "{}") {
+                l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+            }
+        }
+
+        if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
             l.on('click', function (e) {
                 ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
             });
