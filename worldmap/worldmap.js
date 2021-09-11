@@ -2532,7 +2532,6 @@ function doGeojson(n,g,l,o) {
                 l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
             }
         }
-
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
             l.on('click', function (e) {
                 ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
