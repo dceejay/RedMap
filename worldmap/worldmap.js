@@ -662,7 +662,7 @@ map.on('moveend', function() {
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour, heading)'/>";
 var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
-var rclk;
+var rclk = {};
 var hiderightclick = false;
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
@@ -697,7 +697,7 @@ var feedback = function(n,v,a,c) {
     }
     else {
         if (n === undefined) { n = "map"; }
-        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng,}));
+        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
     if (c === true) { map.closePopup(); }
 }
