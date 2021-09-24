@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.15.8 - Adjust ui check timing for UI worldmap.
  - v2.15.7 - Tidy up geoJson handling a bit more.
  - v2.15.5 - Fix SIDC icons to accept unicoded icons as labels.
  - v2.15.4 - Let clear heatmap command do what it says.

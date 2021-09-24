@@ -31,13 +31,12 @@ module.exports = function(RED) {
 
     function worldMap(node, n) {
         RED.nodes.createNode(node,n);
-        node.lat = n.lat || "";
-        node.lon = n.lon || "";
-        node.zoom = n.zoom || "";
+        node.lat = n.lat ?? "";
+        node.lon = n.lon ?? "";
+        node.zoom = n.zoom ?? "";
         node.layer = n.layer || "";
         node.cluster = n.cluster || "";
-        node.maxage = n.maxage || "";
-        if (n.maxage == 0) { node.maxage = "0"; }
+        node.maxage = n.maxage ?? "";
         node.showmenu = n.usermenu || "show";
         node.layers = n.layers || "show";
         node.panlock = n.panlock || "false";
@@ -127,7 +126,6 @@ module.exports = function(RED) {
         });
         sockets[node.path].on('connection', callback);
     }
-
     var WorldMap = function(n) {
         worldMap(this, n);
     }
@@ -161,54 +159,54 @@ module.exports = function(RED) {
     }
 
     var ui = undefined;
+    try {
+        ui = RED.require("node-red-dashboard")(RED);
+    }
+    catch(e) {
+        RED.log.info("Node-RED Dashboard not found - ui_worldmap not installed.");
+    }
     setTimeout( function() {
-        try {
-            ui = RED.require("node-red-dashboard")(RED);
-            if (ui) {
-                function UIWorldMap(config) {
-                    try {
-                        var node = this;
-                        worldMap(node, config);
-                        var done = null;
-                        if (checkConfig(node, config)) {
-                            var html = HTML(ui, config);
-                            done = ui.addWidget({
-                                node: node,
-                                order: config.order,
-                                group: config.group,
-                                width: config.width,
-                                height: config.height,
-                                format: html,
-                                templateScope: "local",
-                                emitOnlyNewValues: false,
-                                forwardInputMessages: false,
-                                storeFrontEndInputAsState: false,
-                                convertBack: function (value) {
-                                    return value;
-                                },
-                                beforeEmit: function(msg, value) {
-                                    return { msg: { items: value } };
-                                },
-                                beforeSend: function (msg, orig) {
-                                    if (orig) { return orig.msg; }
-                                },
-                                initController: function($scope, events) {
-                                }
-                            });
-                        }
+        if (ui) {
+            function UIWorldMap(config) {
+                try {
+                    var node = this;
+                    worldMap(node, config);
+                    var done = null;
+                    if (checkConfig(node, config)) {
+                        var html = HTML(ui, config);
+                        done = ui.addWidget({
+                            node: node,
+                            order: config.order,
+                            group: config.group,
+                            width: config.width,
+                            height: config.height,
+                            format: html,
+                            templateScope: "local",
+                            emitOnlyNewValues: false,
+                            forwardInputMessages: false,
+                            storeFrontEndInputAsState: false,
+                            convertBack: function (value) {
+                                return value;
+                            },
+                            beforeEmit: function(msg, value) {
+                                return { msg: { items: value } };
+                            },
+                            beforeSend: function (msg, orig) {
+                                if (orig) { return orig.msg; }
+                            },
+                            initController: function($scope, events) {
+                            }
+                        });
                     }
-                    catch (e) {
-                        console.log(e);
-                    }
-                    node.on("close", function() {
-                        if (done) { done(); }
-                    });
                 }
-                setImmediate(function() { RED.nodes.registerType("ui_worldmap", UIWorldMap) });
+                catch (e) {
+                    console.log(e);
+                }
+                node.on("close", function() {
+                    if (done) { done(); }
+                });
             }
-        }
-        catch(e) {
-            RED.log.info("Node-RED Dashboard not found - ui_worldmap not installed.");
+            setImmediate(function() { RED.nodes.registerType("ui_worldmap", UIWorldMap) });
         }
     }, 250);
 
@@ -280,7 +278,7 @@ module.exports = function(RED) {
         var bezierSpline = require("@turf/bezier-spline").default;
 
         var doTrack = function(msg) {
-            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+            if (msg?.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
                     if (msg.payload.name.substr(-1) === '_') {
@@ -359,7 +357,7 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track
                 }
             }
-            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("command") && msg.payload.command.hasOwnProperty("clear")) {
+            if (msg?.payload?.command.hasOwnProperty("clear")) {
                 for (var p in node.pointsarray) {
                     if (node.pointsarray.hasOwnProperty(p)) {
                         if (node.pointsarray[p][0].layer === msg.payload.command.clear) {
@@ -427,7 +425,7 @@ module.exports = function(RED) {
         }
 
         var doHull = function(msg) {
-            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+            if (msg?.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 newmsg.payload = {};
                 newmsg.payload[node.prop] = msg.payload[node.prop] || "unknown";
@@ -502,7 +500,6 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("worldmap-hull",WorldMapHull);
-
 
     RED.httpNode.get("/.ui-worldmap", function(req, res) {
         res.send(ui ? "true": "false");
