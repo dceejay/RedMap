@@ -1,19 +1,4 @@
 /* eslint-disable no-inner-declarations */
-/**
- * Copyright 2015, 2021 IBM Corp.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
 
 module.exports = function(RED) {
     "use strict";
@@ -47,6 +32,13 @@ module.exports = function(RED) {
         node.showgrid = n.showgrid || "false";
         node.allowFileDrop = n.allowFileDrop || "false";
         node.path = n.path || "/worldmap";
+        node.mapname = n.mapname || "";
+        node.mapurl = n.mapurl || "";
+        node.mapopt = n.mapopt || "";
+        node.mapwms = n.mapwms || false;
+        try { node.mapopt2 = JSON.parse(node.mapopt); }
+        catch(e) { node.mapopt2 = null; }
+
         if (node.path.charAt(0) != "/") { node.path = "/" + node.path; }
         if (!sockets[node.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, node.path, 'leaflet', 'sockjs.min.js');
@@ -68,11 +60,22 @@ module.exports = function(RED) {
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 if (message.action === "connected") {
+                    var m = {};
                     var c = {init:true};
+                    if (node.layer && node.layer == "Custom") {
+                        m.name = node.mapname;
+                        m.url = node.mapurl;
+                        m.opt = node.mapopt2;
+                        if (node.mapwms === true) { m.wms = true; }
+                        client.write(JSON.stringify({command:{map:m}}));
+                        c.layer = m.name;
+                    }
+                    else {
+                        if (node.layer && node.layer.length > 0) { c.layer = node.layer; }
+                    }
                     if (node.lat && node.lat.length > 0) { c.lat = node.lat; }
                     if (node.lon && node.lon.length > 0) { c.lon = node.lon; }
                     if (node.zoom && node.zoom.length > 0) { c.zoom = node.zoom; }
-                    if (node.layer && node.layer.length > 0) { c.layer = node.layer; }
                     if (node.cluster && node.cluster.length > 0) { c.cluster = node.cluster; }
                     if (node.maxage && node.maxage.length > 0) { c.maxage = node.maxage; }
                     c.showmenu = node.showmenu;

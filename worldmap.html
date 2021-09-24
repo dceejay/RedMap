@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<!--
-  Copyright 2015, 2021 IBM Corp.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
-
 <script type="text/html" data-template-name="worldmap">
 <div class="form-row">
     <table border="0" width="96%">
@@ -28,7 +12,7 @@
 </div>
 <div class="form-row">
     <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
-    <select id="node-input-layer">
+    <select id="node-input-layer" style="width:70%;">
         <option value="OSM grey">OpenStreetMap Greyscale</option>
         <option value="OSM">OpenStreetMap</option>
         <option value="Esri">ESRI Streetmap</option>
@@ -42,7 +26,19 @@
         <option value="Hike Bike">Hike Bike OSM</option>
         <option value="Terrain">Terrain</option>
         <option value="Watercolor">Stamen Watercolor</option>
+        <option value="Custom">Custom Map Provider</option>
     </select>
+</div>
+<div class="form-row" id="customMap">
+    <label for="node-input-mapname">&nbsp;&nbsp;&nbsp;Map name</label>
+    <input type="text" id="node-input-mapname" placeholder="name for Layer Menu"><br/>
+    <label for="node-input-mapurl">&nbsp;&nbsp;&nbsp;Map URL</label>
+    <input type="text" id="node-input-mapurl" placeholder="URL"><br/>
+    <label for="node-input-mapopt">&nbsp;&nbsp;&nbsp;Map options</label>
+    <input type="text" id="node-input-mapopt" placeholder="options (Leaflet JSON string)"><br/>
+    <label for="node-input-mapwms">&nbsp;&nbsp;&nbsp;</label>
+    <input type="checkbox" id="node-input-mapwms" style="display:inline-block; width:20px; vertical-align:baseline;">
+    Map server uses WMS
 </div>
 <div class="form-row">
     <label for="node-input-cluster"><i class="fa fa-dot-circle-o"></i>Cluster when</label>
@@ -90,13 +86,13 @@
 </div>
 <div class="form-row">
     <label for="node-input-coords"><i class="fa fa-compass"></i> Co-ordinates</label>
-    <select id="node-input-coords" style="width:95px;">
+    <select id="node-input-coords" style="width:101px;">
         <option value="none">Not shown</option>
         <option value="deg">Degrees</option>
         <option value="dms">D.M.S</option>
     </select>
     <i class="fa fa-th" style="margin-left:22px;"></i> Graticule
-    <select id="node-input-showgrid" style="width:95px;">
+    <select id="node-input-showgrid" style="width:101px;">
         <option value="false">Not shown</option>
         <option value="true">Visible</option>
     </select>
@@ -114,8 +110,8 @@
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="name">
 </div>
-<div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>If <i>Path</i> is left empty,
-then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
+<div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>
+If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
 <script type="text/html" data-help-name="worldmap">
@@ -193,7 +189,19 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
         <option value="Hike Bike">Hike Bike OSM</option>
         <option value="Terrain">Terrain</option>
         <option value="Watercolor">Stamen Watercolor</option>
+        <option value="Custom">Custom Map Provider</option>
     </select>
+</div>
+<div class="form-row" id="customMap">
+    <label for="node-input-mapname">&nbsp;&nbsp;&nbsp;Map name</label>
+    <input type="text" id="node-input-mapname" placeholder="name for Layer Menu"><br/>
+    <label for="node-input-mapurl">&nbsp;&nbsp;&nbsp;Map URL</label>
+    <input type="text" id="node-input-mapurl" placeholder="URL"><br/>
+    <label for="node-input-mapopt">&nbsp;&nbsp;&nbsp;Map options</label>
+    <input type="text" id="node-input-mapopt" placeholder="options (Leaflet JSON string)"><br/>
+    <label for="node-input-mapwms">&nbsp;&nbsp;&nbsp;</label>
+    <input type="checkbox" id="node-input-mapwms" style="display:inline-block; width:20px; vertical-align:baseline;">
+    Map server uses WMS
 </div>
 <div class="form-row">
     <label for="node-input-cluster"><i class="fa fa-dot-circle-o"></i>Cluster when</label>
@@ -241,13 +249,13 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
 </div>
 <div class="form-row">
     <label for="node-input-coords"><i class="fa fa-compass"></i> Co-ordinates</label>
-    <select id="node-input-coords" style="width:95px;">
+    <select id="node-input-coords" style="width:101px;">
         <option value="none">Not shown</option>
         <option value="deg">Degrees</option>
         <option value="dms">D.M.S</option>
     </select>
     <i class="fa fa-th" style="margin-left:22px;"></i> Graticule
-    <select id="node-input-showgrid" style="width:95px;">
+    <select id="node-input-showgrid" style="width:101px;">
         <option value="false">Not shown</option>
         <option value="true">Visible</option>
     </select>
@@ -265,8 +273,8 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
     <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="name">
 </div>
-<div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>If <i>Path</i> is left empty,
-then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
+<div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>
+If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
 
 <script type="text/html" data-help-name="ui_worldmap">
@@ -336,7 +344,11 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             coords: {value:"false"},
             showgrid: {value:"false"},
             allowFileDrop: {value:"false"},
-            path: {value:"/worldmap"}
+            path: {value:"/worldmap"},
+            mapname: {value:""},
+            mapurl: {value:""},
+            mapopt: {value:"", validate:function(v) {try{ v.length===0 || JSON.parse(v); return true;} catch(e) {return false;}}},
+            mapwms: {value:false}
         },
         inputs:1,
         outputs:0,
@@ -366,6 +378,13 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
             }
             $("#node-input-zoom").spinner({min:0, max:18});
             $("#node-input-cluster").spinner({min:0, max:19});
+            $("#node-input-layer").on("change",function() {
+                if ($("#node-input-layer").val() === "Custom") {
+                    $("#customMap").show();
+                } else {
+                    $("#customMap").hide();
+                }
+            });
         }
     });
 
@@ -405,7 +424,11 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
                     coords: {value:"false"},
                     showgrid: {value:"false"},
                     allowFileDrop: {value:"false"},
-                    path: {value:"/worldmap"}
+                    path: {value:"/worldmap"},
+                    mapname: {value:""},
+                    mapurl: {value:""},
+                    mapopt: {value:""},
+                    mapwms: {value:false}
                 },
                 inputs:1,
                 outputs:0,
@@ -438,6 +461,13 @@ then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the m
                     }
                     $("#node-input-zoom").spinner({min:0, max:18});
                     $("#node-input-cluster").spinner({min:0, max:19});
+                    $("#node-input-layer").on("change",function() {
+                        if ($("#node-input-layer").val() === "Custom") {
+                            $("#customMap").show();
+                        } else {
+                            $("#customMap").hide();
+                        }
+                    });
                 }
             });
         }
