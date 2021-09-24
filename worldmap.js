@@ -16,12 +16,12 @@ module.exports = function(RED) {
 
     function worldMap(node, n) {
         RED.nodes.createNode(node,n);
-        node.lat = n.lat ?? "";
-        node.lon = n.lon ?? "";
-        node.zoom = n.zoom ?? "";
+        node.lat = n.lat || "";
+        node.lon = n.lon || "";
+        node.zoom = n.zoom || "";
         node.layer = n.layer || "";
         node.cluster = n.cluster || "";
-        node.maxage = n.maxage ?? "";
+        node.maxage = n.maxage || "";
         node.showmenu = n.usermenu || "show";
         node.layers = n.layers || "show";
         node.panlock = n.panlock || "false";
@@ -281,7 +281,7 @@ module.exports = function(RED) {
         var bezierSpline = require("@turf/bezier-spline").default;
 
         var doTrack = function(msg) {
-            if (msg?.payload.hasOwnProperty("name")) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
                     if (msg.payload.name.substr(-1) === '_') {
@@ -360,7 +360,7 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track
                 }
             }
-            if (msg?.payload?.command.hasOwnProperty("clear")) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("command") && msg.payload.command.hasOwnProperty("clear")) {
                 for (var p in node.pointsarray) {
                     if (node.pointsarray.hasOwnProperty(p)) {
                         if (node.pointsarray[p][0].layer === msg.payload.command.clear) {
@@ -428,7 +428,7 @@ module.exports = function(RED) {
         }
 
         var doHull = function(msg) {
-            if (msg?.payload.hasOwnProperty("name")) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
                 var newmsg = RED.util.cloneMessage(msg);
                 newmsg.payload = {};
                 newmsg.payload[node.prop] = msg.payload[node.prop] || "unknown";
