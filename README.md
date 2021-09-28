@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.16.2 - better handling of unpacked gpz objects.
 - v2.16.0 - Allow specifying custom base map server.
 - v2.15.8 - Adjust ui check timing for UI worldmap.
 - v2.15.7 - Tidy up geoJson handling a bit more.

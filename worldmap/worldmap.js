@@ -111,6 +111,10 @@ var handleData = function(data) {
                 setMarker(data[prop]);
                 // bnds.extend(markers[data[prop].name].getLatLng());
             }
+            else if (data[prop].hasOwnProperty("filename") && data[prop].filename === "doc.kml") {
+                data = {command:{map:{overlay:"KML", kml:data[prop].payload}}};
+                doCommand(data.command); return;
+            }
             else { console.log("SKIP A",data[prop]); }
         }
         // map.fitBounds(bnds.pad(0.25));
@@ -124,7 +128,6 @@ var handleData = function(data) {
                 data = {command:{map:{overlay:"KML", kml:data}}};
             }
             else if (data.indexOf("<gpx") != -1) {
-                console.log("GPX")
                 data = {command:{map:{overlay:"GPX", gpx:data}}};
             }
         }
@@ -203,11 +206,12 @@ var readFile = function(file) {
     if (file.type &&
         file.type.indexOf('text') === -1 &&
         file.type.indexOf('kml') === -1 &&
+        file.type.indexOf('kmz') === -1 &&
         file.type.indexOf('json') === -1 &&
         file.type.indexOf('image/jpeg') === -1 &&
         file.type.indexOf('image/png') === -1 &&
         file.type.indexOf('image/tiff') === -1) {
-        console.log('File is not text, kml, jpeg, png, or json', file.type, file);
+        console.log('File is not text, kml, kmz, jpeg, png, or json', file.type, file);
         return;
     }
 
@@ -228,6 +232,9 @@ var readFile = function(file) {
                     else if (data.indexOf("<nvg") !== -1) {
                         doCommand({map:{overlay:file.name, nvg:data}});
                     }
+                }
+                else if (data.indexOf('PK') === 0) {
+                    console.log("ZIP FILE");
                 }
                 else {
                     try {
