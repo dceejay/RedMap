@@ -428,8 +428,6 @@ function setMaxAge() {
     if (stale) { clearInterval(stale); }
     //if (maxage > 0) {
     stale = setInterval( function() { doTidyUp() }, 20000); // check every 20 secs
-    //} //every minute
-    //console.log("Stale time set :",maxage+"s");
 }
 setMaxAge();
 
@@ -1233,12 +1231,13 @@ var rangerings = function(latlng, options) {
 
 // the MAIN add something to map function
 function setMarker(data) {
+
     var rightmenu = function(m) {
         // customise right click context menu
         var rightcontext = "";
-        if (polygons[data.name] == undefined) {
-            rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
-        }
+        //if (polygons[data.name] == undefined) {
+        rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+        //}
         if (data.editable) {
             rightcontext = "<button onclick='editPoly(\""+data.name+"\",true);'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
