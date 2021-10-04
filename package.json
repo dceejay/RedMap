@@ -13,7 +13,8 @@
         "cgi",
         "compression",
         "express",
-        "sockjs"
+        "sockjs",
+        "@turf/bezier-spline"
     ],
     "repository": {
         "type": "git",
