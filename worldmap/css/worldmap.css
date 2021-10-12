@@ -23,6 +23,10 @@ a {
     text-decoration:none;
 }
 
+.leaflet-interactive:hover {
+    filter: opacity(0.5);
+}
+
 .topbar {
     font-size:16px;
     vertical-align:middle;

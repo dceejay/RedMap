@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.17.0 - More complete feedback on click, better popup image sizing.
 - v2.16.3 - Ensure polygons can be deleted.
 - v2.16.2 - better handling of unpacked gpz objects.
 - v2.16.0 - Allow specifying custom base map server.

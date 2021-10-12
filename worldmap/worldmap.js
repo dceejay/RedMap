@@ -697,8 +697,11 @@ var addThing = function() {
 var feedback = function(n,v,a,c) {
     if (v === "$form") { v = form; }
     if (markers[n]) {
-        var fp = markers[n]._latlng;
-        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
+        //var fp = markers[n]._latlng;
+        // ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
+        var fb = allData[n];
+        fb.action = a || "feedback";
+        ws.send(JSON.stringify(fb));
     }
     else {
         if (n === undefined) { n = "map"; }
@@ -1214,7 +1217,7 @@ var rangerings = function(latlng, options) {
         ranges: [250,500,750,1000],
         pan: 0,
         fov: 60,
-        color: '#910000'
+        color: '#aaaa00'
     }, options);
     var rings = L.featureGroup();
     if (typeof options.ranges === "number") { options.ranges = [ options.ranges ]; }
@@ -1702,7 +1705,7 @@ function setMarker(data) {
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
         // escape out any isocodes eg flag symbols
-        var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation"];
+        var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed"];
         optfields.forEach(function (item) {
             if (opts.hasOwnProperty(item)) { opts[item] = unescape(encodeURIComponent(opts[item])); }
         });
@@ -1784,11 +1787,11 @@ function setMarker(data) {
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
     if (data.hasOwnProperty("photourl")) {
-        words += "<img src=\"" + data.photourl + "\" style=\"width:100%; margin-top:10px;\">";
+        words += "<img src=\"" + data.photourl + "\" style=\"max-width:100%; max-height:250px; margin-top:10px;\"><br/>";
         delete data.photourl;
     }
     if (data.hasOwnProperty("photoUrl")) {
-        words += "<img src=\"" + data.photoUrl + "\" style=\"width:100%; margin-top:10px;\">";
+        words += "<img src=\"" + data.photoUrl + "\" style=\"max-width:100%; max-height:250px; margin-top:10px;\"><br/>";
         delete data.photoUrl;
     }
     if (data.hasOwnProperty("videoUrl")) {
