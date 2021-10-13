@@ -1706,8 +1706,11 @@ function setMarker(data) {
         opts.size = opts.size * (opts.scale || 1);
         // escape out any isocodes eg flag symbols
         var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed"];
+        const regex = /\p{Extended_Pictographic}/ug;
         optfields.forEach(function (item) {
-            if (opts.hasOwnProperty(item)) { opts[item] = unescape(encodeURIComponent(opts[item])); }
+            if (opts.hasOwnProperty(item) && regex.test(opts[item])) {
+                opts[item] = unescape(encodeURIComponent(opts[item]));
+            }
         });
         myMarker = myMarker.setOptions(opts);
         var myicon = L.icon({
