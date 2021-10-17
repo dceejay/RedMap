@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.17.2 - Add smallplane icon.
  - v2.17.1 - More complete feedback on click, better popup image sizing.
  - v2.16.3 - Ensure polygons can be deleted.
  - v2.16.2 - better handling of unpacked gpz objects.

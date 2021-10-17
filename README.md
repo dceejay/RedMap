@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.17.2 - Add smallplane icon.
 - v2.17.1 - More complete feedback on click, better popup image sizing.
 - v2.16.3 - Ensure polygons can be deleted.
 - v2.16.2 - better handling of unpacked gpz objects.
@@ -91,18 +92,19 @@ Or you can specify an image to load as an icon by setting the icon to http(s)://
 
 There are also several special icons...
 
- - **plane** : a plane icon that aligns with the heading of travel.
+ - **plane** : a jet plane icon that aligns with the heading of travel.
+ - **smallplane** : a light aircraft icon that aligns with the heading of travel.
  - **ship** : a ship icon that aligns with the heading of travel.
  - **car** : a car icon that aligns with the heading of travel.
  - **bus** : a bus/coach icon that aligns with the heading of travel.
- - **uav** : a small plane icon that aligns with the heading of travel.
+ - **uav** : a small uav like icon that aligns with the heading of travel.
  - **helicopter** : a small helicopter icon that aligns with the heading of travel.
  - **arrow** : a map GPS arrow type pointer that aligns with the heading of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **satellite** : a small satellite icon.
  - **iss** : a slightly larger icon for the ISS.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
- - **friend** : pseudo NATO style blue rectangle.
+ - **friend** : pseudo NATO style blue rectangle. (see NATO SIDC option below)
  - **hostile** : pseudo NATO style red circle.
  - **neutral** : pseudo NATO style green square.
  - **unknown** : pseudo NATO style yellow square.
@@ -111,7 +113,7 @@ There are also several special icons...
 #### NATO Symbology
 
 You can use NATO symbols from <a href="https://github.com/spatialillusions/milsymbol" target="mapinfo">milsymbol.js</a>.
-To do this you need to supply a `msg.payload.SIDC` instead of an icon, for example:
+To do this you need to supply a `msg.payload.SIDC` 2525 code instead of an icon, for example:
 
     msg.payload = {
         "name": "Emergency Medical Operation",
