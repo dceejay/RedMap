@@ -11,17 +11,18 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.17.3 - Yet more better feedback on clicks, moves.
 - v2.17.2 - Add smallplane icon.
 - v2.17.1 - More complete feedback on click, better popup image sizing.
 - v2.16.3 - Ensure polygons can be deleted.
-- v2.16.2 - better handling of unpacked gpz objects.
+- v2.16.2 - Better handling of unpacked kmz objects.
 - v2.16.0 - Allow specifying custom base map server.
 - v2.15.8 - Adjust ui check timing for UI worldmap.
 - v2.15.7 - Tidy up geoJson handling a bit more.
 - v2.15.5 - Fix SIDC icons to accept unicoded icons as labels.
 - v2.15.4 - Let clear heatmap command do what it says.
 - v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
-- v2.15.0 - let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
+- v2.15.0 - Let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
 - v2.14.0 - Let geojson features be clickable if added as overlay.
 - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
 - v2.13.3 - Fix unchanged layer propagation.

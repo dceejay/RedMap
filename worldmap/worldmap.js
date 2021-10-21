@@ -76,6 +76,7 @@ if (typeof Object.assign !== 'function') {
 
 // Create the socket
 var connect = function() {
+    // var transports = ["websocket", "xhr-streaming", "xhr-polling"],
     ws = new SockJS(location.pathname.split("index")[0] + 'socket');
     ws.onopen = function() {
         console.log("CONNECTED");
@@ -1764,19 +1765,13 @@ function setMarker(data) {
             var b = marker.getPopup().getContent().split("heading : ");
             if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             else { b = undefined; }
-            ws.send(JSON.stringify({
-                action:"move",
-                name:marker.name,
-                layer:marker.lay,
-                lat:parseFloat(marker.getLatLng().lat.toFixed(6)),
-                lon:parseFloat(marker.getLatLng().lng.toFixed(6)),
-                hdg:b,
-                icon:marker.icon,
-                iconColor:marker.iconColor,
-                SIDC:marker.SIDC,
-                draggable:true,
-                from:oldll
-            }));
+
+            var fb = allData[marker.name];
+            fb.action = "move";
+            fb.lat = parseFloat(marker.getLatLng().lat.toFixed(6));
+            fb.lon = parseFloat(marker.getLatLng().lng.toFixed(6));
+            fb.from = oldll;
+            ws.send(JSON.stringify(fb));
         });
     }
 
@@ -1910,7 +1905,10 @@ function setMarker(data) {
     marker.lay = lay;                       // and the layer it is on
 
     marker.on('click', function(e) {
-        ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+        //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+        var fb = allData[marker.name];
+        fb.action = "click";
+        ws.send(JSON.stringify(fb));
     });
     if ((data.addtoheatmap !== "false") || (!data.hasOwnProperty("addtoheatmap"))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
