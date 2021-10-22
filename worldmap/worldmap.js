@@ -1784,13 +1784,13 @@ function setMarker(data) {
         var reft = new RegExp('feet|ft','i');
         var refm = new RegExp('metres|m','i');
         if ( reft.test(""+data.alt) ) {
-            data.alt = (parseFloat(data.alt)).toFixed(2) + " ft";
+            data.alt = +(parseFloat(data.alt)).toFixed(2) + " ft";
         }
         else if ( refm.test(""+data.alt) ) {
-            data.alt = (parseFloat(data.alt)).toFixed(2) + " m";
+            data.alt = +(parseFloat(data.alt)).toFixed(2) + " m";
         }
         else {
-            data.alt = (parseFloat(data.alt)).toFixed(2);
+            data.alt = +(parseFloat(data.alt)).toFixed(2);
         }
     }
 
