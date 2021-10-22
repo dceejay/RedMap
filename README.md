@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.18.0 - Add bounds event onzoom or drag.
 - v2.17.3 - Yet more better feedback on clicks, moves.
 - v2.17.2 - Add smallplane icon.
 - v2.17.1 - More complete feedback on click, better popup image sizing.
@@ -334,6 +335,7 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "connected" }  // useful to trigger delivery or redraw of points
     { "action": "disconnect", "clients": 1 }  // when a client disconnects - reports number remaining
+    {"action":"bounds", "south":50.55, "west":-1.48, "north":50.72, "east":-0.98}  // reports the outer bounds of the hmap area when zoomed or moved
 
     { "action": "click", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.024985, "lon":-1.39698 }   // when a marker is clicked
     { "action": "move", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.044632, "lon":-1.359901 }    // when a marker is moved

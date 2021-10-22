@@ -655,9 +655,13 @@ function showMapCurrentZoom() {
 map.on('zoomend', function() {
     showMapCurrentZoom();
     window.localStorage.setItem("lastzoom", map.getZoom());
+    var b = map.getBounds();
+    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng }));
 });
 map.on('moveend', function() {
     window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
+    var b = map.getBounds();
+    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng }));
 });
 
 //map.on('contextmenu', function(e) {
