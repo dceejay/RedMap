@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.18.§ - Let fillOpacity be 0.
  - v2.18.0 - Add bounds event onzoom or drag.
  - v2.17.3 - Yet more better feedback on clicks, moves.
  - v2.17.2 - Add smallplane icon.

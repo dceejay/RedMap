@@ -46,34 +46,6 @@ var iconSz = {
     "Command": 44
 };
 
-// Polyfill assign for IE11 for now
-if (typeof Object.assign !== 'function') {
-    // Must be writable: true, enumerable: false, configurable: true
-    Object.defineProperty(Object, "assign", {
-        value: function assign(target, varArgs) { // .length of function is 2
-            'use strict';
-            if (target === null || target === undefined) {
-                throw new TypeError('Cannot convert undefined or null to object');
-            }
-            var to = Object(target);
-            for (var index = 1; index < arguments.length; index++) {
-                var nextSource = arguments[index];
-                if (nextSource !== null && nextSource !== undefined) {
-                    for (var nextKey in nextSource) {
-                    // Avoid bugs when hasOwnProperty is shadowed
-                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                            to[nextKey] = nextSource[nextKey];
-                        }
-                    }
-                }
-            }
-            return to;
-        },
-        writable: true,
-        configurable: true
-    });
-}
-
 // Create the socket
 var connect = function() {
     // var transports = ["websocket", "xhr-streaming", "xhr-polling"],
@@ -1287,10 +1259,11 @@ function setMarker(data) {
     opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
     opt.weight = data.weight || 2;
     opt.opacity = data.opacity || 1;
-    opt.fillOpacity = data.fillOpacity || 0.2;
+    opt.fillOpacity = data.fillOpacity;
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
+    if (opt.fillOpacity === undefined) { opt.fillOpacity = 0.2; }
 
     // Replace building
     if (data.hasOwnProperty("building")) {
