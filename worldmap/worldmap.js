@@ -1780,7 +1780,7 @@ function setMarker(data) {
         delete data.photoUrl;
     }
     if (data.hasOwnProperty("videoUrl")) {
-        words += '<video controls muted autoplay width="320" height="240"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video>';
+        words += '<video controls muted autoplay width="320" height="240"><source src="'+data.videoUrl+'" type="video/mp4">Your browser does not support the video tag.</video><br/>';
         delete data.videoUrl;
     }
     if (data.hasOwnProperty("ttl")) {  // save expiry time for this marker
