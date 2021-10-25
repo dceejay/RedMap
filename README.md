@@ -11,7 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.18.§ - Let fillOpacity be 0.
+- v2.19.0 - Bump leaflet to latest. v1.7
+- v2.18.1 - Let fillOpacity be 0.
 - v2.18.0 - Add bounds event onzoom or drag.
 - v2.17.3 - Yet more better feedback on clicks, moves.
 - v2.17.2 - Add smallplane icon.

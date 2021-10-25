@@ -66,7 +66,11 @@ var connect = function() {
         setTimeout(function() { connect(); }, 2500);
     };
     ws.onmessage = function(e) {
-        try { var data = JSON.parse(e.data); handleData(data); }
+        try {
+            var data = JSON.parse(e.data);
+            if (data.hasOwnProperty("type") && data.hasOwnProperty("data") && data.type === "Buffer") { data = data.data.toString(); }
+            handleData(data);
+        }
         catch (e) { if (data) { console.log("BAD DATA",data); } }
         // console.log("DATA",typeof data,data);
     };
