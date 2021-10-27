@@ -244,6 +244,9 @@ module.exports = function(RED) {
                     else if ((node.events === "connect") && (message.action === "connected")) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
+                    else if ((node.events === "bounds") && (message.action === "bounds")) {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                    }
                     else if (node.events === "all") {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
