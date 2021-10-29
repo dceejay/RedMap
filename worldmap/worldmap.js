@@ -2362,6 +2362,9 @@ function doCommand(cmd) {
                 overlays[cmd.map.overlay] = new L.imageOverlay(cmd.map.url, L.latLngBounds(cmd.map.bounds), cmd.map.opt);
             }
         }
+        else if (cmd.map.url.slice(-4).toLowerCase() === ".pbf") {
+            overlays[cmd.map.overlay] = VectorTileLayer(cmd.map.url, cmd.map.opt);
+        }
         else {
             overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);
         }
