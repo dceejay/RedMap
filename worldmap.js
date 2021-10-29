@@ -217,7 +217,7 @@ module.exports = function(RED) {
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         this.path = n.path || "/worldmap";
-        this.events = n.events || "all";
+        this.events = n.events || "connect,disconnect,point,bounds,files,draw,other";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
@@ -237,17 +237,25 @@ module.exports = function(RED) {
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
-                    if ((node.events === "files") && (message.action === "file"))  {
+                    console.log("EVE",node.events,message.action)
+
+                    if ((node.events.indexOf("connect")!==-1) && (message.action === "connected")) {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                    }
+                    if ((node.events.indexOf("bounds")!==-1) && (message.action === "bounds")) {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                    }
+                    if ((node.events.indexOf("point")!==-1) && ((message.action === "point")||(message.action === "move")||(message.action === "delete") ))  {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                    }
+                    if ((node.events.indexOf("files")!==-1) && (message.action === "file"))  {
                         message.content =  Buffer.from(message.content.split('base64,')[1], 'base64');
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    else if ((node.events === "connect") && (message.action === "connected")) {
+                    if ((node.events.indexOf("draw")!==-1) && (message.action === "draw"))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    else if ((node.events === "bounds") && (message.action === "bounds")) {
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
-                    }
-                    else if (node.events === "all") {
+                    if (node.events.indexOf("other")!==-1 && "connected,point,delete,move,draw,files,bounds".indexOf(message.action) === -1) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                 }
@@ -255,7 +263,7 @@ module.exports = function(RED) {
             client.on('close', function() {
                 delete clients[client.id];
                 node.status({fill:"green",shape:"ring",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
-                if (node.events !== "files") {
+                if (node.events.indexOf("disconnect")!==-1) {
                     node.send({payload:{action:"disconnect", clients:Object.keys(clients).length}, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip});
                 }
             });

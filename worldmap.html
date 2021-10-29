@@ -484,12 +484,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     </div>
     <div class="form-row">
         <label for="node-input-events"><i class="fa fa-sign-out"></i> Output</label>
-        <select id="node-input-events" style="width:70%;">
-            <option value="all">All action events</option>
-            <option value="connect">Connect events only</option>
-            <option value="files">File events only</option>
-            <option value="bounds">Map bounds events only</option>
-        </select>
+        <input type="text" id="node-input-events" style="width:60%;"> events
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
@@ -527,7 +522,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         defaults: {
             name: {value:""},
             path: {value:"/worldmap"},
-            events: {value:"all"}
+            events: {value:"connect,disconnect,point,bounds,files,draw,other"}
         },
         inputs:0,
         outputs:1,
@@ -540,6 +535,27 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         },
         info: function() {
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
+        },
+        oneditprepare: function() {
+            if ($("#node-input-events").val() === "all") {
+                $("#node-input-events").val("connect,disconnect,point,bounds,files,draw,other");
+            }
+            $("#node-input-events").typedInput({type:"event", types:[{
+                value: "event",
+                multiple: true,
+                options: [
+                    { value: "connect", label: "Connect"},
+                    { value: "disconnect", label: "Disconnect"},
+                    { value: "point", label: "Add, move, delete point"},
+                    { value: "bounds", label: "Boundary change"},
+                    { value: "files", label: "File drop"},
+                    { value: "draw", label: "Drawing"},
+                    { value: "other", label: "All other"}
+                ]
+            }]});
+            $("#node-input-events").on('change', function(event, type, value) {
+                this.events = value;
+            });
         }
     });
 </script>
