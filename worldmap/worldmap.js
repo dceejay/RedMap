@@ -2040,7 +2040,7 @@ function setMarker(data) {
 
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
-    //console.log("COMMAND",cmd);
+    // console.log("COMMAND",cmd);
     if (cmd.init && cmd.hasOwnProperty("maplist")) {
         addBaseMaps(cmd.maplist,cmd.layer);
     }

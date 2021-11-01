@@ -47,7 +47,7 @@ module.exports = function(RED) {
         if (!sockets[node.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, node.path, 'leaflet', 'sockjs.min.js');
             var sockPath = path.posix.join(RED.settings.httpNodeRoot,node.path,'socket');
-            sockets[node.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function() { return; }});
+            sockets[node.path] = sockjs.createServer({prefix:sockPath, sockjs_url:libPath, log:function(s,e) { return; }});
             sockets[node.path].installHandlers(RED.server);
             sockets[node.path].on('error', function(e) { node.error("Socket Connection Error: "+e.stack); });
         }
