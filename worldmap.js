@@ -32,10 +32,14 @@ module.exports = function(RED) {
         node.showgrid = n.showgrid || "false";
         node.allowFileDrop = n.allowFileDrop || "false";
         node.path = n.path || "/worldmap";
+        node.maplist = n.maplist;
+        node.overlist = n.overlist;
         node.mapname = n.mapname || "";
         node.mapurl = n.mapurl || "";
         node.mapopt = n.mapopt || "";
         node.mapwms = n.mapwms || false;
+        if (n.maplist === undefined) { node.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"; }
+        if (n.overlist === undefined) { node.overlist = "DR,CO,RA,DN,HM"; }
         try { node.mapopt2 = JSON.parse(node.mapopt); }
         catch(e) { node.mapopt2 = null; }
 
@@ -63,6 +67,8 @@ module.exports = function(RED) {
                 if (message.action === "connected") {
                     var m = {};
                     var c = {init:true};
+                    c.maplist = node.maplist;
+                    c.overlist = node.overlist;
                     if (node.layer && node.layer == "Custom") {
                         m.name = node.mapname;
                         m.url = node.mapurl;
@@ -88,7 +94,8 @@ module.exports = function(RED) {
                     c.hiderightclick = node.hiderightclick;
                     c.allowFileDrop = node.allowFileDrop;
                     c.coords = node.coords;
-                    c.toptitle = node.name;
+                    if (node.name) { c.toptitle = node.name; }
+                    //console.log("INIT",c)
                     client.write(JSON.stringify({command:c}));
                 }
             });
@@ -237,8 +244,6 @@ module.exports = function(RED) {
             client.on('data', function(message) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
-                    console.log("EVE",node.events,message.action)
-
                     if ((node.events.indexOf("connect")!==-1) && (message.action === "connected")) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
