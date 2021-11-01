@@ -898,6 +898,9 @@ var addBaseMaps = function(maplist,first) {
             if (layerlookup[first]) { basemaps[layerlookup[first]].addTo(map); }
             else { basemaps[first].addTo(map); }
         }
+        else {
+            basemaps[Object.keys(basemaps)[0]].addTo(map);
+        }
         if (showLayerMenu) {
             map.removeControl(layercontrol);
             layercontrol = L.control.layers(basemaps, overlays).addTo(map);
