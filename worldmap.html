@@ -11,23 +11,12 @@
     </table>
 </div>
 <div class="form-row">
+    <label for="node-input-maplist"><i class="fa fa-list"></i> Map list</label>
+    <input type="text" id="node-input-maplist" placeholder="List of Maps">
+</div>
+<div class="form-row">
     <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
-    <select id="node-input-layer" style="width:70%;">
-        <option value="OSM grey">OpenStreetMap Greyscale</option>
-        <option value="OSM">OpenStreetMap</option>
-        <option value="Esri">ESRI Streetmap</option>
-        <option value="Esri Satellite">ESRI Satellite</option>
-        <option value="Esri Topography">ESRI Topography</option>
-        <option value="Esri Ocean">ESRI Ocean</option>
-        <option value="Esri Dark Grey">ESRI Dark Grey</option>
-        <option value="Nat Geo">National Geographic</option>
-        <option value="UK OS Opendata">UK OS Opendata</option>
-        <option value="Open Topo Map">Open Topo Map</option>
-        <option value="Hike Bike">Hike Bike OSM</option>
-        <option value="Terrain">Terrain</option>
-        <option value="Watercolor">Stamen Watercolor</option>
-        <option value="Custom">Custom Map Provider</option>
-    </select>
+    <input type="text" id="node-input-layer" placeholder="Initial Map">
 </div>
 <div class="form-row" id="customMap">
     <label for="node-input-mapname">&nbsp;&nbsp;&nbsp;Map name</label>
@@ -39,6 +28,10 @@
     <label for="node-input-mapwms">&nbsp;&nbsp;&nbsp;</label>
     <input type="checkbox" id="node-input-mapwms" style="display:inline-block; width:20px; vertical-align:baseline;">
     Map server uses WMS
+</div>
+<div class="form-row">
+    <label for="node-input-overlist"><i class="fa fa-map-o"></i> Overlays</label>
+    <input type="text" id="node-input-overlist" placeholder="Initial Overlays">
 </div>
 <div class="form-row">
     <label for="node-input-cluster"><i class="fa fa-dot-circle-o"></i>Cluster when</label>
@@ -54,7 +47,7 @@
         <option value="show">Show</option>
         <option value="hide">Hide</option>
     </select>
-    <i class="fa fa-bars" style="margin-left:30px;"></i> Layer menu
+    <i class="fa fa-bars" style="margin-left:53px;"></i> Layer menu
     <select id="node-input-layers" style="width:70px;">
         <option value="show">Show</option>
         <option value="hide">Hide</option>
@@ -66,7 +59,7 @@
         <option value="false">False</option>
         <option value="true">True</option>
     </select>
-    <i class="fa fa-lock" style="margin-left:30px;"></i> Lock zoom
+    <i class="fa fa-lock" style="margin-left:54px;"></i> Lock zoom
     <select id="node-input-zoomlock" style="width:70px;">
         <option value="false">False</option>
         <option value="true">True</option>
@@ -78,7 +71,7 @@
         <option value="true">Enable</option>
         <option value="false">Disable</option>
     </select>
-    <i class="fa fa-hand-o-right" style="margin-left:22px;"></i> Right click
+    <i class="fa fa-hand-o-right" style="margin-left:43px;"></i> Right click
     <select id="node-input-hiderightclick" style="width:80px;">
         <option value="false">Enable</option>
         <option value="true">Disable</option>
@@ -174,23 +167,12 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     </table>
 </div>
 <div class="form-row">
+    <label for="node-input-maplist"><i class="fa fa-list"></i> Map list</label>
+    <input type="text" id="node-input-maplist" placeholder="List of Maps">
+</div>
+<div class="form-row">
     <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
-    <select id="node-input-layer">
-        <option value="OSM grey">OpenStreetMap Greyscale</option>
-        <option value="OSM">OpenStreetMap</option>
-        <option value="Esri">ESRI Streetmap</option>
-        <option value="Esri Satellite">ESRI Satellite</option>
-        <option value="Esri Topography">ESRI Topography</option>
-        <option value="Esri Ocean">ESRI Ocean</option>
-        <option value="Esri Dark Grey">ESRI Dark Grey</option>
-        <option value="Nat Geo">National Geographic</option>
-        <option value="UK OS Opendata">UK OS Opendata</option>
-        <option value="Open Topo Map">Open Topo Map</option>
-        <option value="Hike Bike">Hike Bike OSM</option>
-        <option value="Terrain">Terrain</option>
-        <option value="Watercolor">Stamen Watercolor</option>
-        <option value="Custom">Custom Map Provider</option>
-    </select>
+    <input type="text" id="node-input-layer" placeholder="Initial Map">
 </div>
 <div class="form-row" id="customMap">
     <label for="node-input-mapname">&nbsp;&nbsp;&nbsp;Map name</label>
@@ -202,6 +184,10 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     <label for="node-input-mapwms">&nbsp;&nbsp;&nbsp;</label>
     <input type="checkbox" id="node-input-mapwms" style="display:inline-block; width:20px; vertical-align:baseline;">
     Map server uses WMS
+</div>
+<div class="form-row">
+    <label for="node-input-overlist"><i class="fa fa-map-o"></i> Overlays</label>
+    <input type="text" id="node-input-overlist" placeholder="Initial Overlays">
 </div>
 <div class="form-row">
     <label for="node-input-cluster"><i class="fa fa-dot-circle-o"></i>Cluster when</label>
@@ -217,7 +203,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <option value="show">Show</option>
         <option value="hide">Hide</option>
     </select>
-    <i class="fa fa-bars" style="margin-left:30px;"></i> Layer menu
+    <i class="fa fa-bars" style="margin-left:53px;"></i> Layer menu
     <select id="node-input-layers" style="width:70px;">
         <option value="show">Show</option>
         <option value="hide">Hide</option>
@@ -229,7 +215,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <option value="false">False</option>
         <option value="true">True</option>
     </select>
-    <i class="fa fa-lock" style="margin-left:30px;"></i> Lock zoom
+    <i class="fa fa-lock" style="margin-left:54px;"></i> Lock zoom
     <select id="node-input-zoomlock" style="width:70px;">
         <option value="false">False</option>
         <option value="true">True</option>
@@ -241,7 +227,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <option value="true">Enable</option>
         <option value="false">Disable</option>
     </select>
-    <i class="fa fa-hand-o-right" style="margin-left:22px;"></i> Right click
+    <i class="fa fa-hand-o-right" style="margin-left:43px;"></i> Right click
     <select id="node-input-hiderightclick" style="width:80px;">
         <option value="false">Enable</option>
         <option value="true">Disable</option>
@@ -315,6 +301,37 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
 </script>
 
 <script type="text/javascript">
+    var mlist = [
+        { value: "OSMG", label: "OpenStreetMap Greyscale" },
+        { value: "OSMC", label: "OpenStreetMap" },
+        { value: "OSMH", label: "OpenStreetMap Humanitarian" },
+        { value: "EsriC", label: "ESRI Streetmap" },
+        { value: "EsriS", label: "ESRI Satellite" },
+        { value: "EsriT", label: "ESRI Topography" },
+        { value: "EsriO", label: "ESRI Ocean" },
+        { value: "EsriDG", label: "ESRI Dark Grey" },
+        { value: "NatGeo", label: "National Geographic" },
+        { value: "UKOS", label: "UK OS Opendata" },
+        { value: "OS45", label: "UK OS 1919-47" },
+        { value: "OS00", label: "UK OS 1900" },
+        { value: "OpTop", label: "Open Topo Map" },
+        { value: "HB", label: "Hike Bike OSM" },
+        { value: "AN", label: "Autonavi (Chinese)" },
+        { value: "ST", label: "Stamen Terrain" },
+        { value: "SW", label: "Stamen Watercolor" }
+    ]
+    var olist = [
+        { value: "DR", label: "Drawing" },
+        { value: "CO", label: "Countries" },
+        { value: "RA", label: "Rainfall" },
+        { value: "DN", label: "Day/Night" },
+        { value: "BU", label: "Buildings" },
+        { value: "RW", label: "Railways" },
+        { value: "SN", label: "Ship Navigation" },
+        { value: "AC", label: "Air Corridors" },
+        { value: "TL", label: "Place Labels" },
+        { value: "HM", label: "Heatmap" }
+    ]
     var lnk = document.location.host+RED.settings.httpNodeRoot+"/worldmap";
     lnk = lnk.replace(new RegExp('\/{1,}','g'),'/');
     if (!RED.hasOwnProperty("actions")) {
@@ -345,6 +362,8 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             showgrid: {value:"false"},
             allowFileDrop: {value:"false"},
             path: {value:"/worldmap"},
+            overlist: {value:"DR,CO,RA,DN,HM"},
+            maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"},
             mapname: {value:""},
             mapurl: {value:""},
             mapopt: {value:"", validate:function(v) {try{ v.length===0 || JSON.parse(v); return true;} catch(e) {return false;}}},
@@ -364,6 +383,36 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
         },
         oneditprepare: function() {
+            if (this.maplist === undefined) {
+                $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
+                this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
+            }
+            if (this.overlist === undefined) {
+                $("#node-input-overlist").val("DR,CO,RA,DN,HM");
+                this.overlist = "DR,CO,RA,DN,HM";
+            }
+            $("#node-input-maplist").typedInput({type:"mapitem", types:[{
+                value: "mapitem",
+                multiple: true,
+                options: mlist
+            }]});
+            $("#node-input-layer").typedInput({type:"laye", types:[{
+                value: "laye",
+                options: mlist
+            }]});
+            $("#node-input-overlist").typedInput({type:"overlay", types:[{
+                value: "overlay",
+                multiple: true,
+                options: olist
+            }]});
+            $("#node-input-maplist").on('change', function(event, type, value) {
+                var mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
+                mshort.push({ value:"Custom", label:"Custom Map Provider" });
+                $("#node-input-layer").typedInput("types", [{
+                    value: "laye",
+                    options: mshort
+                }]);
+            });
             if ($("#node-input-path").val() === undefined) {
                 $("#node-input-path").val("worldmap");
                 this.path = "worldmap";
@@ -425,6 +474,8 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     showgrid: {value:"false"},
                     allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"},
+                    overlist: {value:"DR,CO,RA,DN,HM"},
+                    maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"},
                     mapname: {value:""},
                     mapurl: {value:""},
                     mapopt: {value:""},
@@ -442,6 +493,36 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     return this.name?"node_label_italic":"";
                 },
                 oneditprepare: function() {
+                    if (this.maplist === undefined) {
+                        $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
+                        this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
+                    }
+                    if (this.overlist === undefined) {
+                        $("#node-input-overlist").val("DR,CO,RA,DN,HM");
+                        this.overlist = "DR,CO,RA,DN,HM";
+                    }
+                    $("#node-input-maplist").typedInput({type:"mapitem", types:[{
+                        value: "mapitem",
+                        multiple: true,
+                        options: mlist
+                    }]});
+                    $("#node-input-layer").typedInput({type:"laye", types:[{
+                        value: "laye",
+                        options: mlist
+                    }]});
+                    $("#node-input-overlist").typedInput({type:"overlay", types:[{
+                        value: "overlay",
+                        multiple: true,
+                        options: olist
+                    }]});
+                    $("#node-input-maplist").on('change', function(event, type, value) {
+                        var mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
+                        mshort.push({ value:"Custom", label:"Custom Map Provider" });
+                        $("#node-input-layer").typedInput("types", [{
+                            value: "laye",
+                            options: mshort
+                        }]);
+                    });
                     $("#node-input-size").elementSizer({
                         width: "#node-input-width",
                         height: "#node-input-height",
@@ -477,18 +558,15 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     });
 </script>
 
+
 <script type="text/html" data-template-name="worldmap in">
     <div class="form-row">
         <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
         <input type="text" id="node-input-path" placeholder="worldmap">
     </div>
     <div class="form-row">
-        <label for="node-input-events"><i class="fa fa-sign-out"></i> Output</label>
-        <select id="node-input-events" style="width:70%;">
-            <option value="all">All action events</option>
-            <option value="connect">Connect events only</option>
-            <option value="files">File events only</option>
-        </select>
+        <label for="node-input-events"><i class="fa fa-sign-out"></i> Events</label>
+        <input type="text" id="node-input-events" placeholder="select events">
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
@@ -526,7 +604,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         defaults: {
             name: {value:""},
             path: {value:"/worldmap"},
-            events: {value:"all"}
+            events: {value:"connect,disconnect,point,bounds,files,draw,other"}
         },
         inputs:0,
         outputs:1,
@@ -539,6 +617,27 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         },
         info: function() {
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
+        },
+        oneditprepare: function() {
+            if ($("#node-input-events").val() === "all") {
+                $("#node-input-events").val("connect,disconnect,point,bounds,files,draw,other");
+            }
+            $("#node-input-events").typedInput({type:"event", types:[{
+                value: "event",
+                multiple: true,
+                options: [
+                    { value: "connect", label: "Connect"},
+                    { value: "disconnect", label: "Disconnect"},
+                    { value: "point", label: "Add, move, delete point"},
+                    { value: "bounds", label: "Boundary change"},
+                    { value: "files", label: "File drop"},
+                    { value: "draw", label: "Drawing"},
+                    { value: "other", label: "All other"}
+                ]
+            }]});
+            $("#node-input-events").on('change', function(event, type, value) {
+                this.events = value;
+            });
         }
     });
 </script>
@@ -566,42 +665,42 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="name">
     </div>
-    </script>
+</script>
 
-    <script type="text/html" data-help-name="worldmap-tracks">
-        <p>Creates tracks lines based on a specified number of previous locations.</p>
-        <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
-        <p>You can also specify the msg.payload.color, weight, opacity and dashArray properties for the track if required.</p>
-        <p>Holds all the points in memory, so if you have a lot of points held for a
-        large depth then memory usage may become excessive.</p>
-        <p>To delete a track send a msg.payload containing both the name of the object and
-        set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code>.</p>
-        <p>This will also delete the point. If you just want to clear the track set the msg.payload to the
-        name+"_", for example <code>msg.payload = { "name":"Fred_", "deleted":true }</code></p>
-    </script>
+<script type="text/html" data-help-name="worldmap-tracks">
+    <p>Creates tracks lines based on a specified number of previous locations.</p>
+    <p>The number of tracked points can be set per marker by specifying <code>msg.payload.trackpoints</code> as part of the update for a marker.</p>
+    <p>You can also specify the msg.payload.color, weight, opacity and dashArray properties for the track if required.</p>
+    <p>Holds all the points in memory, so if you have a lot of points held for a
+    large depth then memory usage may become excessive.</p>
+    <p>To delete a track send a msg.payload containing both the name of the object and
+    set deleted to true - for example <code>msg.payload = { "name":"Fred", "deleted":true }</code>.</p>
+    <p>This will also delete the point. If you just want to clear the track set the msg.payload to the
+    name+"_", for example <code>msg.payload = { "name":"Fred_", "deleted":true }</code></p>
+</script>
 
-    <script type="text/javascript">
-        RED.nodes.registerType('worldmap-tracks',{
-            category: 'location',
-            color:"darksalmon",
-            defaults: {
-                name: {value:""},
-                depth: {value:20},
-                layer: {value:"combined"},
-                smooth: {value:false}
-            },
-            inputs:1,
-            outputs:1,
-            icon: "white-globe.png",
-            paletteLabel: "tracks",
-            label: function() {
-                return this.name||"tracks";
-            },
-            labelStyle: function() {
-                return this.name?"node_label_italic":"";
-            }
-        });
-    </script>
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap-tracks',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            name: {value:""},
+            depth: {value:20},
+            layer: {value:"combined"},
+            smooth: {value:false}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "white-globe.png",
+        paletteLabel: "tracks",
+        label: function() {
+            return this.name||"tracks";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
 
 
 <script type="text/html" data-template-name="worldmap-hull">
@@ -613,33 +712,33 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="name">
     </div>
-    </script>
+</script>
 
-    <script type="text/html" data-help-name="worldmap-hull">
-        <p>Creates a convex-hull polygon around a set of supplied points.</p>
-        <p>Points can be made part of the same shape if they have the same <code>msg.payload.layer</code>
-        by default - this can be configured to another msg.payload property if desired.</p>
-        <p><b>Note</b>: the outgoing msg only contains the polygon to draw, so this node should be wired
-        in parallel to other paths going to the worldmap node.</p>
-    </script>
+<script type="text/html" data-help-name="worldmap-hull">
+    <p>Creates a convex-hull polygon around a set of supplied points.</p>
+    <p>Points can be made part of the same shape if they have the same <code>msg.payload.layer</code>
+    by default - this can be configured to another msg.payload property if desired.</p>
+    <p><b>Note</b>: the outgoing msg only contains the polygon to draw, so this node should be wired
+    in parallel to other paths going to the worldmap node.</p>
+</script>
 
-    <script type="text/javascript">
-        RED.nodes.registerType('worldmap-hull',{
-            category: 'location',
-            color:"darksalmon",
-            defaults: {
-                name: {value:""},
-                prop: {value:"layer",required:true}
-            },
-            inputs:1,
-            outputs:1,
-            icon: "white-globe.png",
-            paletteLabel: "convex-hull",
-            label: function() {
-                return this.name||"convex-hull";
-            },
-            labelStyle: function() {
-                return this.name?"node_label_italic":"";
-            }
-        });
-    </script>
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap-hull',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            name: {value:""},
+            prop: {value:"layer",required:true}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "white-globe.png",
+        paletteLabel: "convex-hull",
+        label: function() {
+            return this.name||"convex-hull";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>

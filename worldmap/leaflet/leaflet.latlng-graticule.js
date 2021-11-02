@@ -5,11 +5,10 @@
  *  Author: lanwei@cloudybay.com.tw
  */
 
-(function (window, document, undefined) {
+ (function (window, document, undefined) {
 
     L.LatLngGraticule = L.Layer.extend({
-        includes: L.Mixin.Events,
-
+        includes: (L.Evented.prototype || L.Mixin.Events),
         options: {
             showLabel: true,
             opacity: 1,
@@ -25,7 +24,8 @@
                 {start: 4, end: 4, interval: 10},
                 {start: 5, end: 7, interval: 5},
                 {start: 8, end: 20, interval: 1}
-            ]
+            ],
+            sides: ['N', 'S', 'E', 'W']
         },
 
         initialize: function (options) {
@@ -190,10 +190,10 @@
 
             // todo: format type of float
             if (lat < 0) {
-                return '' + (lat*-1) + 'S';
+                return '' + (lat*-1) + this.options.sides[1];
             }
             else if (lat > 0) {
-                return '' + lat + 'N';
+                return '' + lat + this.options.sides[0];
             }
             return '' + lat;
         },
@@ -205,19 +205,19 @@
 
             // todo: format type of float
             if (lng > 180) {
-                return '' + (360 - lng) + 'W';
+                return '' + (360 - lng) + this.options.sides[3];
             }
             else if (lng > 0 && lng < 180) {
-                return '' + lng + 'E';
+                return '' + lng + this.options.sides[2];
             }
             else if (lng < 0 && lng > -180) {
-                return '' + (lng*-1) + 'W';
+                return '' + (lng*-1) + this.options.sides[3];
             }
             else if (lng == -180) {
                 return '' + (lng*-1);
             }
             else if (lng < -180) {
-                return '' + (360 + lng) + 'W';
+                return '' + (360 + lng) + this.options.sides[3];
             }
             return '' + lng;
         },
@@ -308,7 +308,7 @@
                 var txtWidth = ctx.measureText('0').width;
                 var txtHeight = 12;
                 try {
-                    var _font_size = ctx.font.split(' ')[0];
+                    var _font_size = ctx.font.trim().split(' ')[0];
                     txtHeight = _parse_px_to_int(_font_size);
                 }
                 catch(e) {}
@@ -358,6 +358,7 @@
                     ll = self._latLngToCanvasPoint(L.latLng(lat_tick, _lon_l));
                     latstr = self.__format_lat(lat_tick);
                     txtWidth = ctx.measureText(latstr).width;
+                    var spacer = self.options.showLabel && label ? txtWidth + 10 : 0;
 
                     if (curvedLat) {
                         if (typeof(curvedLat) == 'number') {
@@ -380,11 +381,11 @@
                         }
 
                         ctx.beginPath();
-                        ctx.moveTo(ll.x, ll.y);
+                        ctx.moveTo(ll.x + spacer, ll.y);
                         var _prev_p = null;
                         for (var j=__lon_left; j<=__lon_right; j+=_lon_delta) {
                             rr = self._latLngToCanvasPoint(L.latLng(lat_tick, j));
-                            ctx.lineTo(rr.x, rr.y);
+                            ctx.lineTo(rr.x - spacer, rr.y);
 
                             if (self.options.showLabel && label && _prev_p != null) {
                                 if (_prev_p.x < 0 && rr.x >= 0) {
@@ -417,8 +418,8 @@
                         }
 
                         ctx.beginPath();
-                        ctx.moveTo(ll.x+1, ll.y);
-                        ctx.lineTo(rr.x-1, rr.y);
+                        ctx.moveTo(1 + spacer, ll.y);
+                        ctx.lineTo(rr.x-1 - spacer, rr.y);
                         ctx.stroke();
                         if (self.options.showLabel && label) {
                             var _yy = ll.y + (txtHeight/2)-2;
@@ -445,6 +446,7 @@
                     lngstr = self.__format_lng(lon_tick);
                     txtWidth = ctx.measureText(lngstr).width;
                     var bb = self._latLngToCanvasPoint(L.latLng(_lat_b, lon_tick));
+                    var spacer = self.options.showLabel && label ? txtHeight + 5 : 0;
 
                     if (curvedLon) {
                         if (typeof(curvedLon) == 'number') {
@@ -452,15 +454,15 @@
                         }
 
                         ctx.beginPath();
-                        ctx.moveTo(bb.x, bb.y);
+                        ctx.moveTo(bb.x, 5 + spacer);
                         var _prev_p = null;
                         for (var j=_lat_b; j<_lat_t; j+=_lat_delta) {
                             var tt = self._latLngToCanvasPoint(L.latLng(j, lon_tick));
-                            ctx.lineTo(tt.x, tt.y);
+                            ctx.lineTo(tt.x, tt.y - spacer);
 
                             if (self.options.showLabel && label && _prev_p != null) {
                                 if (_prev_p.y > 8 && tt.y <= 8) {
-                                    ctx.fillText(lngstr, tt.x - (txtWidth/2), txtHeight);
+                                    ctx.fillText(lngstr, tt.x - (txtWidth/2), txtHeight + 5);
                                 }
                                 else if (_prev_p.y >= hh && tt.y < hh) {
                                     ctx.fillText(lngstr, tt.x - (txtWidth/2), hh-2);
@@ -487,12 +489,12 @@
                         }
 
                         ctx.beginPath();
-                        ctx.moveTo(tt.x, tt.y+1);
-                        ctx.lineTo(bb.x, bb.y-1);
+                        ctx.moveTo(tt.x, 5 + spacer);
+                        ctx.lineTo(bb.x, hh-1 - spacer);
                         ctx.stroke();
 
                         if (self.options.showLabel && label) {
-                            ctx.fillText(lngstr, tt.x - (txtWidth/2), txtHeight+1);
+                            ctx.fillText(lngstr, tt.x - (txtWidth/2), txtHeight+5);
                             ctx.fillText(lngstr, bb.x - (txtWidth/2), hh-3);
                         }
                     }

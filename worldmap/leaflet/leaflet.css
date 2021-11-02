@@ -167,7 +167,7 @@
 /* zoom and fade animations */
 
 .leaflet-fade-anim .leaflet-tile {
-	will-change: opacity;
+	/* will-change: opacity; */
 	}
 .leaflet-fade-anim .leaflet-popup {
 	opacity: 0;
@@ -184,7 +184,7 @@
 	        transform-origin: 0 0;
 	}
 .leaflet-zoom-anim .leaflet-zoom-animated {
-	will-change: transform;
+	/* will-change: transform; */
 	}
 .leaflet-zoom-anim .leaflet-zoom-animated {
 	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
