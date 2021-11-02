@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
  - v2.20.0 - Add support of .pbf map layers. Issue #123.
  - v2.19.0 - Bump leaflet to latest. v1.7
  - v2.18.1 - Let fillOpacity be 0.
