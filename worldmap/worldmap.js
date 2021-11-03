@@ -1144,7 +1144,7 @@ var addOverlays = function(overlist) {
 
     // Add the OpenSea markers layer
     if (overlist.indexOf("SN")!==-1) {
-        overlays["ship nav"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+        overlays["ship navigation"] = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
         });
