@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.21.1 - Fix ui check callback to not use .
 - v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
 - v2.20.0 - Add support of .pbf map layers. Issue 123.
 - v2.19.1 - Add filter for bounds events only.
