@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.21.2 - expand ship nav to ship navigation.
 - v2.21.1 - Fix ui check callback to not use .
 - v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
 - v2.20.0 - Add support of .pbf map layers. Issue 123.
@@ -31,12 +32,6 @@ map web page for plotting "things" on.
 - v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
 - v2.15.0 - Let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
 - v2.14.0 - Let geojson features be clickable if added as overlay.
-- v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
-- v2.13.3 - Fix unchanged layer propagation.
-- v2.13.2 - Add mayflower icon.
-- v2.13.0 - Tidy velocity layer. Feedback any url parameters.
-- v2.12.1 - Only show online layer options if we are online.
-- v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
