@@ -593,7 +593,7 @@ map.on('baselayerchange', function(e) {
 });
 
 function showMapCurrentZoom() {
-    //console.log("zoom:",map.getZoom());
+    //console.log("ZOOM:",map.getZoom());
     for (var l in layers) {
         if (layers[l].hasOwnProperty("_zoom")) {
             if (map.getZoom() >= clusterAt) {
@@ -635,12 +635,12 @@ map.on('zoomend', function() {
     showMapCurrentZoom();
     window.localStorage.setItem("lastzoom", map.getZoom());
     var b = map.getBounds();
-    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng }));
+    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
 });
 map.on('moveend', function() {
     window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
     var b = map.getBounds();
-    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng }));
+    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
 });
 
 //map.on('contextmenu', function(e) {
@@ -735,7 +735,7 @@ var addBaseMaps = function(maplist,first) {
     //console.log("MAPS",first,maplist)
     if (navigator.onLine) {
         var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
-        EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
+        EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
         UKOS:"UK OS OpenData", UKOS45:"UK OS 1919-1947", UKOS00:"UK OS 1900", OpTop:"Open Topo Map",
         HB:"Hike Bike OSM", ST:"Stamen Topography", SW: "Stamen Watercolor", AN:"AutoNavi (Chinese)" }
 
@@ -794,21 +794,24 @@ var addBaseMaps = function(maplist,first) {
         if (maplist.indexOf("EsriR")!==-1) {
             basemaps[layerlookup["EsriR"]] = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
                 attribution:'Tiles &copy; Esri',
-                maxNativeZoom:13
+                maxNativeZoom:13,
+                maxZoom:16
             });
         }
 
         if (maplist.indexOf("EsriO")!==-1) {
             basemaps[layerlookup["EsriO"]] = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
                 attribution:'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
-                maxNativeZoom:13
+                maxNativeZoom:10,
+                maxZoom:13
             });
         }
 
         if (maplist.indexOf("EsriDG")!==-1) {
             basemaps[layerlookup["EsriDG"]] = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
                 attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-                maxNativeZoom:13
+                maxNativeZoom:16,
+                maxZoom:18
             });
         }
 

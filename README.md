@@ -11,7 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.21.2 - expand ship nav to ship navigation.
+- v2.21.3 - Add zoom to bounds action. Adjust map layers max zoom levels.
+- v2.21.2 - Expand ship nav to ship navigation.
 - v2.21.1 - Fix ui check callback to not use .
 - v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
 - v2.20.0 - Add support of .pbf map layers. Issue 123.
