@@ -1983,7 +1983,7 @@ function setMarker(data) {
     else if (data.heading !== undefined) { track = data.heading; }
     else if (data.bearing !== undefined) { track = data.bearing; }
     if (track != undefined) {  // if there is a heading
-        if (data.speed != null && !data.length) {  // and a speed - lets convert to a leader length
+        if (data.speed != null && data.length === undefined) {  // and a speed - lets convert to a leader length
             data.length = parseFloat(data.speed || "0") * 60;
             var re1 = new RegExp('kn|knot|kt','i');
             var re2 = new RegExp('kph|kmh','i');
@@ -1992,7 +1992,7 @@ function setMarker(data) {
             else if ( re2.test(""+data.speed) ) { data.length = data.length * 0.44704; }
             else if ( re3.test(""+data.speed) ) { data.length = data.length * 0.277778; }
         }
-        if (data.length != null) {
+        if (data.length !== undefined) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
                 map.removeLayer(polygons[data.name]);
             }
@@ -2451,6 +2451,11 @@ function doCommand(cmd) {
         }
         else if (cmd.map.url.slice(-4).toLowerCase() === ".pbf") {
             overlays[cmd.map.overlay] = VectorTileLayer(cmd.map.url, cmd.map.opt);
+        }
+        else if (cmd.map.hasOwnProperty("transparentPixels")) {
+            cmd.map.opt.pixelCodes =  cmd.map.transparentPixels;
+            cmd.map.opt.matchRGBA = [ 0,0,0,0 ];
+            overlays[cmd.map.overlay] = L.tileLayerPixelFilter(cmd.map.url, cmd.map.opt);
         }
         else {
             overlays[cmd.map.overlay] = L.tileLayer(cmd.map.url, cmd.map.opt);

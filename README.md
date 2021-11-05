@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.21.4 - fix speed leader length. Add transparentPixels option..
 - v2.21.3 - Add zoom to bounds action. Adjust map layers max zoom levels.
 - v2.21.2 - Expand ship nav to ship navigation.
 - v2.21.1 - Fix ui check callback to not use .
