@@ -24,7 +24,7 @@ a {
 }
 
 .leaflet-interactive:hover {
-    filter: opacity(0.5);
+    filter: opacity(0.7);
 }
 
 .topbar {
