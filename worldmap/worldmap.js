@@ -110,7 +110,12 @@ var handleData = function(data) {
             }
         }
         if (data.command) { doCommand(data.command); delete data.command; }
-        if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) { doGeojson("geojson",data); }
+        if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
+            if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('title')) {
+                doGeojson(data.properties.title,data)
+            }
+            else { doGeojson("geojson",data); }
+        }
         else if (data.hasOwnProperty("name")) { setMarker(data); }
         else {
             if (JSON.stringify(data) !== '{}') {
@@ -2571,6 +2576,7 @@ function doCommand(cmd) {
 
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
+    //console.log("GEOJSON",n,g,l,o)
     var lay = l || g.name || "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
@@ -2602,12 +2608,29 @@ function doGeojson(n,g,l,o) {
         return st;
     }}
     opt.pointToLayer = function (feature, latlng) {
-        var myMarker = L.VectorMarkers.icon({
-            icon: feature.properties["marker-symbol"] || "circle",
-            markerColor: (feature.properties["marker-color"] || "#910000"),
-            prefix: 'fa',
-            iconColor: 'white'
-        });
+        var myMarker;
+        if (feature.properties.hasOwnProperty("SIDC")) {
+            myMarker = new ms.Symbol( feature.properties.SIDC.toUpperCase(), {
+                uniqueDesignation:unescape(encodeURIComponent(feature.properties.title)) ,
+                country:feature.properties.country,
+                direction:feature.properties.bearing,
+                additionalInformation:feature.properties.modifier,
+                size:24
+            });
+            myMarker = L.icon({
+                iconUrl: myMarker.toDataURL(),
+                iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+                className: "natoicon",
+            });
+        }
+        else {
+            myMarker = L.VectorMarkers.icon({
+                icon: feature.properties["marker-symbol"] || "circle",
+                markerColor: (feature.properties["marker-color"] || "#910000"),
+                prefix: 'fa',
+                iconColor: 'white'
+            });
+        }
         if (!feature.properties.hasOwnProperty("title")) {
             feature.properties.title = feature.properties["marker-symbol"];
         }
