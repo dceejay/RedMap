@@ -2513,6 +2513,8 @@ function doCommand(cmd) {
     // Turn on an existing overlay(s)
     if (cmd.hasOwnProperty("showlayer")) {
         if (typeof cmd.showlayer === "string") { cmd.showlayer = [ cmd.showlayer ]; }
+        var sn = cmd.showlayer.indexOf("ship nav");
+        if (sn !== -1) { cmd.showlayer[sn] = "ship navigation"; }
         for (var i=0; i < cmd.showlayer.length; i++) {
             if (overlays.hasOwnProperty(cmd.showlayer[i])) {
                 map.addLayer(overlays[cmd.showlayer[i]]);
@@ -2522,6 +2524,8 @@ function doCommand(cmd) {
     // Turn off an existing overlay(s)
     if (cmd.hasOwnProperty("hidelayer")) {
         if (typeof cmd.hidelayer === "string") { cmd.hidelayer = [ cmd.hidelayer ]; }
+        var sn = cmd.hidelayer.indexOf("ship nav");
+        if (sn !== -1) { cmd.hidelayer[sn] = "ship navigation"; }
         for (var i=0; i < cmd.hidelayer.length; i++) {
             if (overlays.hasOwnProperty(cmd.hidelayer[i])) {
                 map.removeLayer(overlays[cmd.hidelayer[i]]);
