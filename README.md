@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.21.5 - Fix handling of "old" sjip nav to ship navigation
+- v2.21.5 - Fix handling of "old" ship nav to ship navigation
 - v2.21.4 - Fix speed leader length. Add transparentPixels option..
 - v2.21.3 - Add zoom to bounds action. Adjust map layers max zoom levels.
 - v2.21.2 - Expand ship nav to ship navigation.
