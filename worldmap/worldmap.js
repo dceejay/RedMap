@@ -1783,8 +1783,9 @@ function setMarker(data) {
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
         // escape out any isocodes eg flag symbols
-        var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed"];
-        const regex = /\p{Extended_Pictographic}/ug;
+        var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed","country"];
+        //const regex = /\p{Extended_Pictographic}/ug;
+        const regex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;
         optfields.forEach(function (item) {
             if (opts.hasOwnProperty(item) && regex.test(opts[item])) {
                 opts[item] = unescape(encodeURIComponent(opts[item]));
