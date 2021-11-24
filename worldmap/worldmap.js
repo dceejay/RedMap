@@ -653,7 +653,8 @@ map.on('moveend', function() {
 //});
 
 // single right click to add a marker
-var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon, layer, colour, heading)'/>";
+var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
+if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
 var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
 
 var rclk = {};
