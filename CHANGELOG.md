@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.21.7 - Let SIDC/icon short code be only 4 chars long
  - v2.21.5 - Fix handling of "old" ship nav to ship navigation
  - v2.21.4 - Fix speed leader length. Add transparentPixels option.
  - v2.21.3 - Add zoom to bounds action. Adjust map layers max zoom levels.
