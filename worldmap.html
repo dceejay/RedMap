@@ -604,7 +604,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         defaults: {
             name: {value:""},
             path: {value:"/worldmap"},
-            events: {value:"connect,disconnect,point,bounds,files,draw,other"}
+            events: {value:"connect,disconnect,point,layer,bounds,files,draw,other"}
         },
         inputs:0,
         outputs:1,
@@ -620,7 +620,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         },
         oneditprepare: function() {
             if ($("#node-input-events").val() === "all") {
-                $("#node-input-events").val("connect,disconnect,point,bounds,files,draw,other");
+                $("#node-input-events").val("connect,disconnect,point,layer,bounds,files,draw,other");
             }
             $("#node-input-events").typedInput({type:"event", types:[{
                 value: "event",
@@ -629,6 +629,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     { value: "connect", label: "Connect"},
                     { value: "disconnect", label: "Disconnect"},
                     { value: "point", label: "Add, move, delete point"},
+                    { value: "layer", label: "Add, remove layers"},
                     { value: "bounds", label: "Boundary change"},
                     { value: "files", label: "File drop"},
                     { value: "draw", label: "Drawing"},

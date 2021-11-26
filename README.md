@@ -11,6 +11,8 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.22.0 - Separate out layer events in worldmap in
+- v2.21.9 - Unbreak Drawing layer that I must have broken recently
 - v2.21.8 - Let SIDC/icon short code be only 4 chars long
 - v2.21.5 - Fix handling of "old" ship nav to ship navigation
 - v2.21.4 - Fix speed leader length. Add transparentPixels option..
@@ -29,13 +31,6 @@ map web page for plotting "things" on.
 - v2.16.3 - Ensure polygons can be deleted.
 - v2.16.2 - Better handling of unpacked kmz objects.
 - v2.16.0 - Allow specifying custom base map server.
-- v2.15.8 - Adjust ui check timing for UI worldmap.
-- v2.15.7 - Tidy up geoJson handling a bit more.
-- v2.15.5 - Fix SIDC icons to accept unicoded icons as labels.
-- v2.15.4 - Let clear heatmap command do what it says.
-- v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
-- v2.15.0 - Let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
-- v2.14.0 - Let geojson features be clickable if added as overlay.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -463,6 +458,13 @@ Or with an input box
     msg.payload.command : {
         contextmenu: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value,"myEventName")\' >'
     }
+
+Example simple form
+
+```
+[{"id":"7351100bacb1f5fe","type":"function","z":"4aa2ed2fd1b11362","name":"","func":"msg.payload = { command: {\ncontextmenu: String.raw`\nText <input type=\"text\" id=\"sometext\" value=\"hello\"><br/>\nNumber <input type=\"number\" id=\"somenum\" value=\"5\"><br/>\n<input type=\"button\" value=\"Send\" onclick=\n'feedback(\"myform\",{\n    \"st\":document.getElementById(\"sometext\").value,\n    \"sn\":document.getElementById(\"somenum\").value,\n})'\n>\n`\n}}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":350,"y":360,"wires":[["a6a82f2e8efc44fc"]]},{"id":"7b595f0c8f6ac710","type":"worldmap in","z":"4aa2ed2fd1b11362","name":"","path":"/worldmap","events":"connect","x":195,"y":360,"wires":[["7351100bacb1f5fe"]]}]
+```
+
 
 See the section on **Utility Functions** for details of the feedback function.
 

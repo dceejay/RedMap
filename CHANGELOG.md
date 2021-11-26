@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.22.0 - Separate out layer events in worldmap in
+ - v2.21.9 - Unbreak Drawing layer that I must have broken recently
  - v2.21.8 - Let SIDC/icon short code be only 4 chars long
  - v2.21.5 - Fix handling of "old" ship nav to ship navigation
  - v2.21.4 - Fix speed leader length. Add transparentPixels option.

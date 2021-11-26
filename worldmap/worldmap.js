@@ -28,7 +28,10 @@ var heat;
 var minimap;
 var sidebyside;
 var layercontrol;
+var drawControl;
 var drawingColour = "#910000";
+var sendRoute;
+var sendDrawing;
 
 var iconSz = {
     "Team/Crew": 24,
@@ -930,7 +933,7 @@ var addOverlays = function(overlist) {
         overlays["drawing"] = layers["_drawing"];
         map.options.drawControlTooltips = false;
         var drawCount = 0;
-        var drawControl = new L.Control.Draw({
+        drawControl = new L.Control.Draw({
             draw: {
                 polyline: { shapeOptions: { clickable:true } },
                 marker: false,
@@ -996,7 +999,7 @@ var addOverlays = function(overlist) {
             setTimeout(function() {map.openPopup(rightmenuMarker)},25);
         });
 
-        var sendDrawing = function(n) {
+        sendDrawing = function(n) {
             var thing = document.getElementById('dinput').value;
             map.closePopup();
             shape.m.name = thing;
@@ -1079,7 +1082,7 @@ var addOverlays = function(overlist) {
             return numbers;
         }
 
-        var sendRoute = function(n) {
+        sendRoute = function(n) {
             var p = (polygons[n]._latlngs.map(function(x) {
                 return x.lng+","+x.lat;
             })).join(';');
