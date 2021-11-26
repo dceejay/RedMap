@@ -252,7 +252,7 @@ module.exports = function(RED) {
                     if ((node.events.indexOf("point")!==-1) && ((message.action === "point")||(message.action === "move")||(message.action === "delete") ))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    if ((node.events.indexOf("layer")!==-1) && ((message.action === "layer") ))  {
+                    if ((node.events.indexOf("layer")!==-1) && (message.action.indexOf("layer") !== -1) )  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                     if ((node.events.indexOf("files")!==-1) && (message.action === "file"))  {

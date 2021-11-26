@@ -1954,7 +1954,7 @@ function setMarker(data) {
     if (data.dashArray) { delete data.dashArray; }
     if (data.fill) { delete data.fill; }
     if (data.draggable) { delete data.draggable; }
-    if (!isNaN(data.speed)) { data.speed = data.speed.toFixed(2); }
+    //if (!isNaN(data.speed)) { data.speed = data.speed.toFixed(2); }
     if (data.hasOwnProperty("clickable")) { delete data.clickable; }
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
