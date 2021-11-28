@@ -1340,7 +1340,7 @@ function setMarker(data) {
     }
 
     // console.log("DATA", typeof data, data);
-    if (data.deleted) { // remove markers we are told to
+    if (data.deleted == true) { // remove markers we are told to
         delMarker(data.name);
         return;
     }
