@@ -1491,6 +1491,13 @@ function setMarker(data) {
         return;
     }
 
+    if (ll.lat === 0 && ll.lng === 0) {
+        // Add a little wobble so we can zoom into each if required.
+        console.log(data.name,"is at null island.");
+        ll.lat = Math.round(1000000 * ll.lat + Math.random() * 10000 - 5000) / 1000000;
+        ll.lng = Math.round(1000000 * ll.lng + Math.random() * 10000 - 5000) / 1000000;
+    }
+
     // Adding new L.LatLng object (lli) when optional intensity value is defined. Only for use in heatmap layer
     if (typeof data.coordinates == "object") { lli = new L.LatLng(data.coordinates[2],data.coordinates[1],data.coordinates[0]); }
     else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon") && data.hasOwnProperty("intensity")) { lli = new L.LatLng((data.lat*1), (data.lon*1), (data.intensity*1)); }
@@ -2271,7 +2278,8 @@ function doCommand(cmd) {
             return st;
         }};
         opt.onEachFeature = function (f,l) {
-            l.bindPopup('<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+            var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
+            if (pw.length > 11) { l.bindPopup(pw); }
             if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
                 l.on('click', function (e) {
                     ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
