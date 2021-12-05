@@ -2066,6 +2066,11 @@ function doCommand(cmd) {
             document.getElementById("topwords").innerText = cmd.toptitle;
         }
     }
+    if (cmd.hasOwnProperty("toplogo")) {
+        if (!inIframe ) {
+             document.getElementById("toplogo").src = cmd.toplogo;
+        }
+    }	    
     if (cmd.hasOwnProperty("clear")) {
         doTidyUp(cmd.clear);
     }
