@@ -2075,9 +2075,10 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("toplogo")) {
         if (!inIframe ) {
-             document.getElementById("toplogo").src = cmd.toplogo;
+            document.getElementById("toplogo").src = cmd.toplogo;
+            document.getElementById("toplink").setAttribute("style", "pointer-events:none");
         }
-    }	    
+    }
     if (cmd.hasOwnProperty("clear")) {
         doTidyUp(cmd.clear);
     }

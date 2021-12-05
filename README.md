@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.23.0 - Give logo and id so it can be overridden by toplogo command. PR #188.
 - v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
 - v2.22.2 - Be more tolerant of speed string types
 - v2.22.0 - Separate out layer events in worldmap in
@@ -413,6 +414,8 @@ Optional properties include
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default).
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
+ - **toptitle** - Words to replace title in title bar (if not in iframe)
+ - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
 
 #### To switch layer, move map and zoom
 
