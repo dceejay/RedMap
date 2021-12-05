@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
 - v2.22.2 - Be more tolerant of speed string types
 - v2.22.0 - Separate out layer events in worldmap in
 - v2.21.9 - Unbreak Drawing layer that I must have broken recently
