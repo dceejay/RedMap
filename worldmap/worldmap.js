@@ -673,7 +673,7 @@ var addThing = function() {
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
-    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, hdg:hdg};
+    var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, hdg:hdg, ttl:0 };
     if (regi.test(icon)) {
         d.SIDC = (icon.toUpperCase()+"------------").substr(0,12);
     }

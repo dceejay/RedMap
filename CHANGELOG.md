@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.23.1 - Fix saving of custom map layer
  - v2.23.0 - Give logo and id so it can be overridden by toplogo command. PR #188.
  - v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
  - v2.22.2 - Be more tolerant of speed string types

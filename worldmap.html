@@ -383,6 +383,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             return 'The map can be found [here]('+RED.settings.httpNodeRoot.slice(0,-1)+this.path+').';
         },
         oneditprepare: function() {
+            var mshort;
             if (this.maplist === undefined) {
                 $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
                 this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
@@ -398,7 +399,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             }]});
             $("#node-input-layer").typedInput({type:"laye", types:[{
                 value: "laye",
-                options: mlist
+                options: mshort
             }]});
             $("#node-input-overlist").typedInput({type:"overlay", types:[{
                 value: "overlay",
@@ -406,7 +407,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                 options: olist
             }]});
             $("#node-input-maplist").on('change', function(event, type, value) {
-                var mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
+                mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
                 mshort.push({ value:"Custom", label:"Custom Map Provider" });
                 $("#node-input-layer").typedInput("types", [{
                     value: "laye",
@@ -493,6 +494,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     return this.name?"node_label_italic":"";
                 },
                 oneditprepare: function() {
+                    var mshort;
                     if (this.maplist === undefined) {
                         $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
                         this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
@@ -508,7 +510,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     }]});
                     $("#node-input-layer").typedInput({type:"laye", types:[{
                         value: "laye",
-                        options: mlist
+                        options: mshort
                     }]});
                     $("#node-input-overlist").typedInput({type:"overlay", types:[{
                         value: "overlay",
@@ -516,7 +518,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                         options: olist
                     }]});
                     $("#node-input-maplist").on('change', function(event, type, value) {
-                        var mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
+                        mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
                         mshort.push({ value:"Custom", label:"Custom Map Provider" });
                         $("#node-input-layer").typedInput("types", [{
                             value: "laye",
