@@ -2062,9 +2062,11 @@ function setMarker(data) {
 function doCommand(cmd) {
     // console.log("COMMAND",cmd);
     if (cmd.init && cmd.hasOwnProperty("maplist")) {
+        basemaps = [];
         addBaseMaps(cmd.maplist,cmd.layer);
     }
     if (cmd.init && cmd.hasOwnProperty("overlist")) {
+        overlays = [];
         addOverlays(cmd.overlist);
     }
     if (cmd.hasOwnProperty("toptitle")) {
