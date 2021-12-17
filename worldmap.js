@@ -486,16 +486,16 @@ module.exports = function(RED) {
                     node.send(newmsg);
                 }
                 if (leafletHull.length === 2 && (oldl === 1 || oldl === 3)) {
-                    newmsg.payload.deleted = true;
-                    node.send(newmsg);
-                    delete newmsg.payload.deleted;
+                    var newmsg2 = RED.util.cloneMessage(newmsg);
+                    newmsg2.payload.deleted = true;
+                    node.send(newmsg2);
                     newmsg.payload.line = leafletHull;
                     node.send(newmsg);
                 }
                 if (leafletHull.length === 3 && oldl === 2) {
-                    newmsg.payload.deleted = true;
-                    node.send(newmsg);
-                    delete newmsg.payload.deleted;
+                    var newmsg3 = RED.util.cloneMessage(newmsg);
+                    newmsg3.payload.deleted = true;
+                    node.send(newmsg3);
                 }
                 if (leafletHull.length >= 3) {
                     newmsg.payload.area = leafletHull;
