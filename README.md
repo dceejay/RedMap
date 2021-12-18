@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.23.3 - Fix initial laod of maps
+- v2.23.3 - Fix initial load of maps
 - v2.23.2 - Add convex-hull example
 - v2.23.1 - Fix saving of custom map layer
 - v2.23.0 - Give logo and id so it can be overridden by toplogo command. PR #188.
