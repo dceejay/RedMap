@@ -1428,6 +1428,9 @@ function setMarker(data) {
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
         polygons[data.name] = rightmenu(polyln);
+        if (data.hasOwnProperty("fit") && data.fit === true) {
+            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        }
     }
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea;

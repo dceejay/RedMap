@@ -127,6 +127,7 @@ then rather than draw a point and icon it draws the polygon. If the "area" array
 elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
 Likewise if it contains a **line** property it will draw the polyline.
+If the payload also includes a property `fit:true` the map will zoom to fit the line or area.
 
 There are extra optional properties you can specify - see Options below.
 
@@ -230,14 +231,15 @@ Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional pr
 
  - **layer** : declares which layer you put it on.
  - **color** : can set the colour of the polygon or line.
+ - **opacity** : the opacity of the line or outline.
  - **fillColor** : can set the fill colour of the polygon.
  - **fillOpacity** : can set the opacity of the polygon fill colour.
  - **dashArray** : optional dash array for polyline.
  - **clickable** : boolean - set to true to allow click to show popup.
  - **popup** : html string to display in popup (as well as name).
- - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu
- - **contextmenu** : html string to display a more complex right click contextmenu
- - **weight** : the width of the line (or outline)
+ - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu.
+ - **contextmenu** : html string to display a more complex right click contextmenu.
+ - **weight** : the width of the line or outline.
 
 Other properties can be found in the leaflet documentation.
 
