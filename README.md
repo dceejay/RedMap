@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.23.5 - Fix addtoheatmap. Issue #192
 - v2.23.4 - Fix opacity of area borders
 - v2.23.3 - Fix initial load of maps
 - v2.23.2 - Add convex-hull example

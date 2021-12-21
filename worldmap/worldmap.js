@@ -1997,7 +1997,7 @@ function setMarker(data) {
         fb.action = "click";
         ws.send(JSON.stringify(fb));
     });
-    if (heat && ((data.addtoheatmap !== "false") || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
+    if (heat && ((data.addtoheatmap != false) || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
     }
     markers[data.name] = marker;
