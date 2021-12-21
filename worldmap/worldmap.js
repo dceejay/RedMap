@@ -1351,13 +1351,15 @@ function setMarker(data) {
     opt.color = data.color || data.lineColor || "#910000";
     opt.fillColor = data.fillColor || "#910000";
     opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
-    opt.weight = data.weight || 2;
-    opt.opacity = data.opacity || 1;
+    opt.weight = data.weight;
+    opt.opacity = data.opacity;
     opt.fillOpacity = data.fillOpacity;
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
     if (opt.fillOpacity === undefined) { opt.fillOpacity = 0.2; }
+    if (opt.opacity === undefined) { opt.opacity = 1; }
+    if (opt.weight === undefined) { opt.weight = 2; }
 
     // Replace building
     if (data.hasOwnProperty("building")) {
@@ -1432,6 +1434,9 @@ function setMarker(data) {
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
         polygons[data.name] = rightmenu(polyarea);
+        if (data.hasOwnProperty("fit") && data.fit === true) {
+            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        }
     }
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings

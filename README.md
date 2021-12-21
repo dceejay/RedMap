@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.23.4 - Fix opacity of area borders
 - v2.23.3 - Fix initial load of maps
 - v2.23.2 - Add convex-hull example
 - v2.23.1 - Fix saving of custom map layer
@@ -18,25 +19,6 @@ map web page for plotting "things" on.
 - v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
 - v2.22.2 - Be more tolerant of speed string types
 - v2.22.0 - Separate out layer events in worldmap in
-- v2.21.9 - Unbreak Drawing layer that I must have broken recently
-- v2.21.8 - Let SIDC/icon short code be only 4 chars long
-- v2.21.5 - Fix handling of "old" ship nav to ship navigation
-- v2.21.4 - Fix speed leader length. Add transparentPixels option..
-- v2.21.3 - Add zoom to bounds action. Adjust map layers max zoom levels.
-- v2.21.2 - Expand ship nav to ship navigation.
-- v2.21.1 - Fix ui check callback to not use .
-- v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
-- v2.20.0 - Add support of .pbf map layers. Issue 123.
-- v2.19.1 - Add filter for bounds events only.
-- v2.19.0 - Bump leaflet to latest. v1.7
-- v2.18.1 - Let fillOpacity be 0.
-- v2.18.0 - Add bounds event onzoom or drag.
-- v2.17.3 - Yet more better feedback on clicks, moves.
-- v2.17.2 - Add smallplane icon.
-- v2.17.1 - More complete feedback on click, better popup image sizing.
-- v2.16.3 - Ensure polygons can be deleted.
-- v2.16.2 - Better handling of unpacked kmz objects.
-- v2.16.0 - Allow specifying custom base map server.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 

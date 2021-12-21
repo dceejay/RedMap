@@ -1,12 +1,15 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.23.4 - Fix opacity of area borders
  - v2.23.3 - Fix initial load of maps
  - v2.23.2 - Add convex-hull example
  - v2.23.1 - Fix saving of custom map layer
  - v2.23.0 - Give logo and id so it can be overridden by toplogo command. PR #188.
+
  - v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
  - v2.22.2 - Be more tolerant of speed string types
  - v2.22.0 - Separate out layer events in worldmap in
+
  - v2.21.9 - Unbreak Drawing layer that I must have broken recently
  - v2.21.8 - Let SIDC/icon short code be only 4 chars long
  - v2.21.5 - Fix handling of "old" ship nav to ship navigation
@@ -15,34 +18,47 @@
  - v2.21.2 - Expand ship nav to ship navigation.
  - v2.21.1 - Fix ui check callback to not use .
  - v2.21.0 - Let config panel select maps to show, default map and choice of overlays.
+
  - v2.20.0 - Add support of .pbf map layers. Issue #123.
+
  - v2.19.0 - Bump leaflet to latest. v1.7
+
  - v2.18.1 - Let fillOpacity be 0.
  - v2.18.0 - Add bounds event onzoom or drag.
+
  - v2.17.3 - Yet more better feedback on clicks, moves.
  - v2.17.2 - Add smallplane icon.
  - v2.17.1 - More complete feedback on click, better popup image sizing.
+
  - v2.16.3 - Ensure polygons can be deleted.
  - v2.16.2 - Better handling of unpacked kmz objects.
  - v2.16.0 - Allow specifying custom base map server.
+
  - v2.15.8 - Adjust ui check timing for UI worldmap.
  - v2.15.7 - Tidy up geoJson handling a bit more.
  - v2.15.5 - Fix SIDC icons to accept unicoded icons as labels.
  - v2.15.4 - Let clear heatmap command do what it says.
  - v2.15.3 - Fix panit command to work, try to use alt units, popup alignments.
  - v2.15.0 - Let speed be text and specify units if required (kt,kn,knots,mph,kmh,kph) default m/s.
+
  - v2.14.0 - Let geojson features be clickable if added as overlay.
+
  - v2.13.4 - Fix list of map choices to be in sync. Fix popup auto sizing.
  - v2.13.3 - Fix unchanged layer propagation.
  - v2.13.2 - Add mayflower icon.
  - v2.13.0 - Tidy velocity layer. Feedback any url parameters.
+
  - v2.12.1 - Only show online layer options if we are online.
  - v2.12.0 - Add live rainfall radar data layer. Remove some non-loading overlays.
+
  - v2.11.2 - Allow thicknesss of arc to be specified by weight
  - v2.11.1 - Better handle KML point info - add popup.
  - v2.11.0 - Add option to smooth tracks using bezier curves.
+
  - v2.10.0 - Save latest position to browser for refresh if in iframe/dashboard. Allow fractional Zoom levels.
+
  - v2.9.0 - Let weblinks be an array of links. Add more info to readme about Mapservers.
+
  - v2.8.9 - Only load cgi module if we have a local mapserv file
  - v2.8.8 - Change length of speed leader to show where you will be in 1 min if speed in m/s
  - v2.8.7 - Delay start of ui widget.
@@ -52,10 +68,13 @@
  - v2.8.2 - Improve direction handling of 3d objects.
  - v2.8.1 - Fix old tracks re-appearing afer hide/show. Issue #135
  - v2.8.0 - Align vector with `track`, prioritise hdg and heading over bearing. Add old location to move action.
+
  - v2.7.1 - Also allow geojson files to be dropped, and better png handling
  - v2.7.0 - Allow track and image files to be dragged onto the map, if enabled
+
  - v2.6.1 - Better fit for worldmap when in ui_template
  - v2.6.0 - Add route capability to draw line when online
+
  - v2.5.9 - Fix handling of multiple hulls, tidy contextmenu handling
  - v2.5.8 - Let node name be the full page map title
  - v2.5.7 - Let fillColor set color of hulls
@@ -66,8 +85,10 @@
  - v2.5.2 - Add boolean parameter to feedback call to allow auto close of popup on click. Set Esc key to close all open popups. Issue #146
  - v2.5.1 - Add lat, lng and layer to feedback function.
  - v2.5.0 - Add minimap capability.
+
  - v2.4.2 - Fix editing injected shapes.
  - v2.4.1 - Add convex-hull node for grouping objects.
+
  - v2.3.16 - Add heading to default addMarker, allow custom http icon size.
  - v2.3.13 - Fix geoson feature properties fill color, and better marker handling
  - v2.3.11 - Better editing of drawing layer, add OpenTopoMap, and better Esri satellite
@@ -81,8 +102,10 @@
  - v2.3.2 - Add better geojson support - name plus geojson properties
  - v2.3.1 - Stop adding point when you add a circle
  - v2.3.0 - Add colour options for drawing layer
+
  - v2.2.1 - Better implementation of legend create/show/hide
  - v2.2.0 - Add range rings and arcs function
+
  - v2.1.6 - Add legend command to allow inserting an html legend
  - v2.1.5 - Fix squawk icon color handling
  - v2.1.4 - Fix alt and speed as strings
@@ -90,6 +113,7 @@
  - v2.1.2 - Fix layercontrol remove bug. Issue #116
  - v2.1.1 - Fix bug in repeated add with polygon
  - v2.1.0 - Add ui-worldmap node to make embedding in Dashboard easier. Let -in node specify connection actions only.
+
  - v2.0.22 - fix SIDC missing property
  - v2.0.21 - allow adding overlays without making them visible (visible:false). Issue #108
  - v2.0.20 - ensure `fit` option is boolean, Issue #109. Fix track layers, Issue #110.
@@ -108,6 +132,7 @@
  - v2.0.2-beta - Let lines and areas also have popups
  - v2.0.1-beta - Add optional graticule.
  - v2.0.0-beta - Move to leaflet 1.4.x plus all plugins updated
+
  - v1.5.40 - Only enable on.location function when not in an iframe. Issue #89. Tidy html.
  - v1.5.39 - Add weather-lite icons
  - v1.5.38 - Add Esri dark grey and ocean, re-add hikebike, layers
