@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
  - v2.23.5 - Fix addtoheatmap. Issue #192
  - v2.23.4 - Fix opacity of area borders
  - v2.23.3 - Fix initial load of maps

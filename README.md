@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
 - v2.23.5 - Fix addtoheatmap. Issue #192
 - v2.23.4 - Fix opacity of area borders
 - v2.23.3 - Fix initial load of maps
@@ -118,7 +119,7 @@ SIDC codes can be generated using the online tool - https://spatialillusions.com
 
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 
-### Areas, Lines and Rectangles
+### Areas, Rectangles, Lines, and GreatCircles
 
 If the msg.payload contains an **area** property - that is an array of co-ordinates, e.g.
 
@@ -129,6 +130,11 @@ elements, then it assumes this is a bounding box for a rectangle and draws a rec
 
 Likewise if it contains a **line** property it will draw the polyline.
 If the payload also includes a property `fit:true` the map will zoom to fit the line or area.
+
+Finally if a **greatcircle** property is set containing an array of two coordinates then an arc
+following the great circle between the two co-ordinates is plotted.
+
+    msg.payload = {name:"GC1", greatcircle:[ [51.464,0], [25.76,-80.18] ] }
 
 There are extra optional properties you can specify - see Options below.
 

@@ -30,8 +30,9 @@ var sidebyside;
 var layercontrol;
 var drawControl;
 var drawingColour = "#910000";
-var sendRoute;
 var sendDrawing;
+var colorControl;
+var sendRoute;
 
 var iconSz = {
     "Team/Crew": 24,
@@ -132,7 +133,7 @@ var handleData = function(data) {
 
 window.onunload = function() { if (ws) ws.close(); }
 
-var onoffline = function() { if (!navigator.onLine) map.addLayer(layers["_countries"]); }
+var onoffline = function() { if (!navigator.onLine) { map.addLayer(layers["_countries"]); } }
 
 document.addEventListener ("keydown", function (ev) {
     // Set Ctl-Alt-3 to switch to 3d view
@@ -252,16 +253,6 @@ var readFile = function(file) {
 var menuButton = L.easyButton({states:[{icon:'fa-bars fa-lg', onClick:function() { toggleMenu(); }, title:'Toggle menu'}], position:"topright"});
 var fullscreenButton = L.control.fullscreen();
 var rulerButton = L.control.ruler({position:"topleft"});
-
-//var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
-var redButton = L.easyButton('fa-square wm-red', function(btn) { changeDrawColour("#E7827F"); })
-var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#94CCE2"); })
-var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#ACD6A4"); })
-var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#F5F08B"); })
-var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#444444"); })
-var whiteButton = L.easyButton('fa-square wm-white', function(btn) { changeDrawColour("#EEEEEE"); })
-var colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton,whiteButton]);
-
 
 function onLocationFound(e) {
     var radius = e.accuracy;
@@ -658,7 +649,7 @@ map.on('moveend', function() {
 // single right click to add a marker
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
 if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
-var rightmenuMap = L.popup({keepInView:true, minWidth:250}).setContent(addmenu);
+var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
 
 var rclk = {};
 var hiderightclick = false;
@@ -744,9 +735,10 @@ var addBaseMaps = function(maplist,first) {
     //console.log("MAPS",first,maplist)
     if (navigator.onLine) {
         var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
-        EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
-        UKOS:"UK OS OpenData", UKOS45:"UK OS 1919-1947", UKOS00:"UK OS 1900", OpTop:"Open Topo Map",
-        HB:"Hike Bike OSM", ST:"Stamen Topography", SW: "Stamen Watercolor", AN:"AutoNavi (Chinese)" }
+            EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
+            UKOS:"UK OS OpenData", UKOS45:"UK OS 1919-1947", UKOS00:"UK OS 1900", OpTop:"Open Topo Map",
+            HB:"Hike Bike OSM", ST:"Stamen Topography", SW: "Stamen Watercolor", AN:"AutoNavi (Chinese)"
+        }
 
         // Use this for OSM online maps
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -874,7 +866,7 @@ var addBaseMaps = function(maplist,first) {
 
         if (maplist.indexOf("OS00")!==-1) {
             //var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
-                basemaps[layerlookup["OS00"]] = L.tileLayer('https://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
+            basemaps[layerlookup["OS00"]] = L.tileLayer('https://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
                 attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
                 bounds: [[49.6, -12], [61.7, 3]],
                 minZoom:1, maxNativeZoom:19, maxZoom:20,
@@ -929,6 +921,15 @@ var addOverlays = function(overlist) {
 
     // Add the drawing layer...
     if (overlist.indexOf("DR")!==-1) {
+        //var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
+        var redButton = L.easyButton('fa-square wm-red', function(btn) { changeDrawColour("#E7827F"); })
+        var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#94CCE2"); })
+        var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#ACD6A4"); })
+        var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#F5F08B"); })
+        var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#444444"); })
+        var whiteButton = L.easyButton('fa-square wm-white', function(btn) { changeDrawColour("#EEEEEE"); })
+        colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton,whiteButton]);
+
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
         map.options.drawControlTooltips = false;
@@ -951,11 +952,13 @@ var addOverlays = function(overlist) {
             // }
         });
         var changeDrawColour = function(col) {
+            drawingColour = col;
+            console.log("COL",col)
             drawControl.setDrawingOptions({
-                polyline: { shapeOptions: { color:col } },
-                circle: { shapeOptions: { color:col } },
-                rectangle: { shapeOptions: { color:col } },
-                polygon: { shapeOptions: { color:col } }
+                polyline: { shapeOptions: { color:drawingColour } },
+                circle: { shapeOptions: { color:drawingColour } },
+                rectangle: { shapeOptions: { color:drawingColour } },
+                polygon: { shapeOptions: { color:drawingColour } }
             });
         }
         var shape;
@@ -1188,7 +1191,7 @@ var addOverlays = function(overlist) {
 
 // Layer control based on select box rather than radio buttons.
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
-var layercontrol = L.control.layers(basemaps, overlays);
+layercontrol = L.control.layers(basemaps, overlays);
 
 // Add the layers control widget
 if (!inIframe) { layercontrol.addTo(map); }
@@ -1437,6 +1440,17 @@ function setMarker(data) {
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
         polygons[data.name] = rightmenu(polyarea);
+        if (data.hasOwnProperty("fit") && data.fit === true) {
+            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        }
+    }
+    if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
+        delete opt.fill;
+        opt.vertices = 500;
+        if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
+        if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
+        var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
+        polygons[data.name] = rightmenu(greatc);
         if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }

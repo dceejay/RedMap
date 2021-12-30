@@ -153,7 +153,7 @@ module.exports = function(RED) {
         var size = ui.getSizes();
         var frameWidth = (size.sx + size.cx) * width - size.cx;
         var frameHeight = (size.sy + size.cy) * height - size.cy;
-        var url = encodeURI(config.path);
+        var url = encodeURI(path.posix.join(RED.settings.httpNodeRoot||RED.settings.httpRoot,config.path));
         var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
 <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border:none;"></iframe></div>`;
         return html;
@@ -525,7 +525,7 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("worldmap-hull",WorldMapHull);
 
-    RED.httpNode.get("/-ui-worldmap", function(req, res) {
+    RED.httpAdmin.get("/-ui-worldmap",  RED.auth.needsPermission('rpi-ui-worldmap.read'), function(req, res) {
         res.send(ui ? "true": "false");
     });
 }
