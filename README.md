@@ -134,7 +134,7 @@ If the payload also includes a property `fit:true` the map will zoom to fit the 
 Finally if a **greatcircle** property is set containing an array of two coordinates then an arc
 following the great circle between the two co-ordinates is plotted.
 
-    msg.payload = {name:"GC1", greatcircle:[ [51.464,0], [25.76,-80.18] ] }
+    msg.payload = {name:"GC1", color:"#ff00ff", greatcircle:[ [51.464,0], [25.76,-80.18] ] }
 
 There are extra optional properties you can specify - see Options below.
 

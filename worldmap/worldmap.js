@@ -1446,7 +1446,7 @@ function setMarker(data) {
     }
     if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
         delete opt.fill;
-        opt.vertices = 500;
+        opt.vertices = opt.vertices || 100;
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
