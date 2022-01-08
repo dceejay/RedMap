@@ -1465,7 +1465,8 @@ function setMarker(data) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
             var polycirc;
             if (Array.isArray(data.radius)) {
-                polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0]*Math.cos(data.lat*Math.PI/180), data.radius[1]], data.tilt || 0, opt);
+                //polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0]*Math.cos(data.lat*Math.PI/180), data.radius[1]], data.tilt || 0, opt);
+                polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0], data.radius[1]], data.tilt || 0, opt);
             }
             else {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);

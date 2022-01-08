@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.24.1 - Fix ellipse accuracy
 - v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
 - v2.23.5 - Fix addtoheatmap. Issue #192
 - v2.23.4 - Fix opacity of area borders
