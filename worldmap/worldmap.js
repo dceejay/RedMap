@@ -565,8 +565,8 @@ map.on('overlayadd', function(e) {
     }
     if (e.name == "drawing") {
         overlays["drawing"].bringToFront();
-        map.addControl(drawControl);
         map.addControl(colorControl);
+        map.addControl(drawControl);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -579,8 +579,8 @@ map.on('overlayremove', function(e) {
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
-        map.removeControl(colorControl);
         map.removeControl(drawControl);
+        map.removeControl(colorControl);
     }
     ws.send(JSON.stringify({action:"dellayer", name:e.name}));
 });
@@ -922,13 +922,14 @@ var addOverlays = function(overlist) {
     // Add the drawing layer...
     if (overlist.indexOf("DR")!==-1) {
         //var colorPickButton = L.easyButton({states:[{icon:'fa-tint fa-lg', onClick:function() { console.log("PICK"); }, title:'Pick Colour'}]});
-        var redButton = L.easyButton('fa-square wm-red', function(btn) { changeDrawColour("#E7827F"); })
-        var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#94CCE2"); })
-        var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#ACD6A4"); })
-        var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#F5F08B"); })
-        var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#444444"); })
+        var redButton = L.easyButton('fa-square wm-red', function(btn) { changeDrawColour("#FF4040"); })
+        var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#4040F0"); })
+        var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#40D040"); })
+        var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#FFFF40"); })
+        var magentaButton = L.easyButton('fa-square wm-magenta', function(btn) { changeDrawColour("#F020F0"); })
+        var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#000000"); })
         var whiteButton = L.easyButton('fa-square wm-white', function(btn) { changeDrawColour("#EEEEEE"); })
-        colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,blackButton,whiteButton]);
+        colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,magentaButton,blackButton,whiteButton]);
 
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
@@ -953,7 +954,7 @@ var addOverlays = function(overlist) {
         });
         var changeDrawColour = function(col) {
             drawingColour = col;
-            console.log("COL",col)
+            console.log("COLOR",col)
             drawControl.setDrawingOptions({
                 polyline: { shapeOptions: { color:drawingColour } },
                 circle: { shapeOptions: { color:drawingColour } },
@@ -2085,7 +2086,7 @@ function setMarker(data) {
 function doCommand(cmd) {
     // console.log("COMMAND",cmd);
     if (cmd.init && cmd.hasOwnProperty("maplist")) {
-        basemaps = [];
+        //basemaps = {};
         addBaseMaps(cmd.maplist,cmd.layer);
     }
     if (cmd.init && cmd.hasOwnProperty("overlist")) {

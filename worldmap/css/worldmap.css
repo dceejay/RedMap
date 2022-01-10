@@ -207,12 +207,13 @@ a {
    transform-origin:0 100%;
 }
 
-.wm-red { color: #F56361; }
-.wm-blue { color: #96CCE1; }
-.wm-green { color: #ADD5A6; }
-.wm-yellow { color: #F5EF91; }
-.wm-black { color: #444444; }
+.wm-red { color: #FF4040; }
+.wm-blue { color: #4040F0; }
+.wm-green { color: #40D040; }
+.wm-yellow { color: #FFFF40; }
+.wm-black { color: #333333; }
 .wm-white { color: #EEEEEE; }
+.wm-magenta { color: #F020F0; }
 
 .legend {
     padding: 6px 8px;
