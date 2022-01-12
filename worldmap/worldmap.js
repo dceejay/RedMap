@@ -926,10 +926,11 @@ var addOverlays = function(overlist) {
         var blueButton = L.easyButton('fa-square wm-blue', function(btn) { changeDrawColour("#4040F0"); })
         var greenButton = L.easyButton('fa-square wm-green', function(btn) { changeDrawColour("#40D040"); })
         var yellowButton = L.easyButton('fa-square wm-yellow', function(btn) { changeDrawColour("#FFFF40"); })
-        var magentaButton = L.easyButton('fa-square wm-magenta', function(btn) { changeDrawColour("#F020F0"); })
+        var cyanButton = L.easyButton('fa-square wm-cyan', function(btn) { changeDrawColour("#40F0F0"); })
+        var magentaButton = L.easyButton('fa-square wm-magenta', function(btn) { changeDrawColour("#F040F0"); })
         var blackButton = L.easyButton('fa-square wm-black', function(btn) { changeDrawColour("#000000"); })
         var whiteButton = L.easyButton('fa-square wm-white', function(btn) { changeDrawColour("#EEEEEE"); })
-        colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,magentaButton,blackButton,whiteButton]);
+        colorControl = L.easyBar([redButton,blueButton,greenButton,yellowButton,cyanButton,magentaButton,blackButton,whiteButton]);
 
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
@@ -2651,7 +2652,7 @@ function doGeojson(n,g,l,o) {
             st.fillColor = feature.style["fill-color"] || feature.style["fill"] || st.fillColor;
             st.fillOpacity = feature.style["fill-opacity"] || st.fillOpacity;
         }
-        if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && feature.geometry.type === "LineString") {
+        if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && (feature.geometry.type === "LineString" || feature.geometry.type === "MultiLineString")  ) {
             st.fill = false;
         }
         return st;

@@ -213,7 +213,8 @@ a {
 .wm-yellow { color: #FFFF40; }
 .wm-black { color: #333333; }
 .wm-white { color: #EEEEEE; }
-.wm-magenta { color: #F020F0; }
+.wm-magenta { color: #F040F0; }
+.wm-cyan { color: #40F0F0; }
 
 .legend {
     padding: 6px 8px;

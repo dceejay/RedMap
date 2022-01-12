@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.24.3 - Fix geojson incorrect fill.
  - v2.24.2 - Changes to drawing colours to be more visible.
  - v2.24.1 - Fix ellipse accuracy.
  - v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
@@ -8,7 +9,7 @@
  - v2.23.3 - Fix initial load of maps
  - v2.23.2 - Add convex-hull example
  - v2.23.1 - Fix saving of custom map layer
- - v2.23.0 - Give logo and id so it can be overridden by toplogo command. PR #188.
+ - v2.23.0 - Give logo an id so it can be overridden by toplogo command. PR #188.
 
  - v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
  - v2.22.2 - Be more tolerant of speed string types
