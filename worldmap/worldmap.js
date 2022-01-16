@@ -2622,6 +2622,11 @@ function doCommand(cmd) {
             map.touchZoom.enable();
         }
     }
+    if (cmd.hasOwnProperty("bounds")) {            // Move/Zoom map to new bounds
+        if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
+            map.fitBounds(cmd.bounds);
+        }
+    }
 }
 
 // handle any incoming GEOJSON directly - may style badly

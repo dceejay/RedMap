@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.25.0 - Add bounds command to set overall map bounds.
 - v2.24.3 - Fix geojson incorrect fill.
 - v2.24.2 - Changes to drawing colours to be more visible.
 - v2.24.1 - Fix ellipse accuracy
@@ -388,6 +389,7 @@ Optional properties include
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
+ - **bounds** - if set to an array `[ [ lat(S), lon(W) ], [lat(N), lon(E)] ]` - sets the overall map bounds.
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
  - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{"command":{"search":"Winchester"}}`
  - **showlayer** - show the named overlay(s) - `{"command":{"showlayer":"foo"}}` or `{"command":{"showlayer":["foo","bar"]}}`

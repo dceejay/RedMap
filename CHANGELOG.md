@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.25.0 - Add bounds command to set overall map bounds.
  - v2.24.3 - Fix geojson incorrect fill.
  - v2.24.2 - Changes to drawing colours to be more visible.
  - v2.24.1 - Fix ellipse accuracy.
