@@ -54,6 +54,9 @@ module.exports = function(RED) {
         //node.log("Serving "+__dirname+" as "+node.path);
         node.log("started at "+node.path);
         var clients = {};
+        RED.httpNode.get("/-worldmap3d-key",  RED.auth.needsPermission('worldmap3d.read'), function(req, res) {
+            res.send({key:process.env.MAPBOXGL_TOKEN||""});
+        });
         RED.httpNode.use(compression());
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
         // RED.httpNode.use(node.path, express.static(__dirname + '/worldmap', {maxage:3600000}));
