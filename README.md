@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.26.0 - Add UTM and MGRS to coordinate display options.
 - v2.25.0 - Add bounds command to set overall map bounds.
 - v2.24.3 - Fix geojson incorrect fill.
 - v2.24.2 - Changes to drawing colours to be more visible.

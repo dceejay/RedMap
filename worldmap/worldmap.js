@@ -1199,16 +1199,7 @@ layercontrol = L.control.layers(basemaps, overlays);
 if (!inIframe) { layercontrol.addTo(map); }
 else { showLayerMenu = false;}
 
-var coords = L.control.coordinates({
-    position:"bottomleft", //optional default "bottomright"
-    decimals:4, //optional default 4
-    decimalSeperator:".", //optional default "."
-    labelTemplateLat:"&nbsp;Lat: {y}", //optional default "Lat: {y}"
-    labelTemplateLng:"&nbsp;Lon: {x}", //optional default "Lng: {x}"
-    enableUserInput:false, //optional default true
-    useDMS:true, //optional default false
-    useLatLngOrder: true, //ordering of labels, default false-> lng-lat
-});
+var coords = L.control.mouseCoordinate({position:"bottomleft"});
 
 // Add an optional legend
 var legend = L.control({ position: "bottomleft" });
@@ -2193,16 +2184,13 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("coords")) {
         try { coords.removeFrom(map); }
         catch(e) {}
-        if (cmd.coords == "dms") {
-            coords.options.useDMS = true;
-            showMouseCoords = "dms";
-            coords.addTo(map);
-        }
-        if (cmd.coords == "deg") {
-            coords.options.useDMS = false;
-            showMouseCoords = "deg";
-            coords.addTo(map);
-        }
+        var opts = {gps:false, gpsLong:false, utm:false, utmref:false, position:"bottomleft"}
+        if (cmd.coords == "deg") { opts.gps = true; }
+        if (cmd.coords == "dms") { opts.gpsLong = true; }
+        if (cmd.coords == "utm") { opts.utm = true; }
+        if (cmd.coords == "mgrs") { opts.utmref = true; }
+        coords.options = opts;
+        coords.addTo(map);
     }
     if (cmd.hasOwnProperty("legend")) {
         if (typeof cmd.legend === "string" && cmd.legend.length > 0) {
@@ -2213,7 +2201,7 @@ function doCommand(cmd) {
                     return div;
                 };
                 legend.addTo(map);
-            };
+            }
             legend.getContainer().style.visibility = 'visible'; // if already exist use visibility to show/hide
             legend.getContainer().innerHTML = cmd.legend;       //  set content of legend
         }
