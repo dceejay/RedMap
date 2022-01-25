@@ -1981,6 +1981,7 @@ function setMarker(data) {
     if (data.hasOwnProperty("clickable")) { delete data.clickable; }
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
+    if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
     for (var i in data) {
         if ((i != "name") && (i != "length")) {
             if (typeof data[i] === "object") {
