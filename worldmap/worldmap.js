@@ -170,6 +170,9 @@ if (inIframe === true) {
 
 // Create the Initial Map object.
 map = new L.map('map',{zoomSnap: 0.1}).setView(startpos, startzoom);
+map.whenReady(function() {
+    connect();
+});
 
 var droplatlng;
 var target = document.getElementById("map")
@@ -2190,6 +2193,7 @@ function doCommand(cmd) {
         if (cmd.coords == "dms") { opts.gpsLong = true; }
         if (cmd.coords == "utm") { opts.utm = true; }
         if (cmd.coords == "mgrs") { opts.utmref = true; }
+        if (cmd.coords == "qth") { opts.qth = true; }
         coords.options = opts;
         coords.addTo(map);
     }
@@ -2711,5 +2715,3 @@ function doGeojson(n,g,l,o) {
     layers[lay].addLayer(markers[n]);
     map.addLayer(layers[lay]);
 }
-
-connect();

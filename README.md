@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.26.1 - Add QTH/Maidenhead option also
 - v2.26.0 - Add UTM and MGRS to coordinate display options.
 - v2.25.0 - Add bounds command to set overall map bounds.
 - v2.24.3 - Fix geojson incorrect fill.
@@ -141,6 +142,8 @@ following the great circle between the two co-ordinates is plotted.
 
     msg.payload = {name:"GC1", color:"#ff00ff", greatcircle:[ [51.464,0], [25.76,-80.18] ] }
 
+Shapes can also have a **popup** property containing html, but you MUST also set a property `clickable:true` in order to allow it to be seen.
+
 There are extra optional properties you can specify - see Options below.
 
 
@@ -255,6 +258,7 @@ Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional pr
 
 Other properties can be found in the leaflet documentation.
 
+Shapes can also have a **popup** property containing html, but you MUST also set a property `clickable:true` in order to allow it to be seen.
 
 ### Drawing
 
