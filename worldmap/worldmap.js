@@ -915,7 +915,6 @@ var addBaseMaps = function(maplist,first) {
     }
 }
 
-
 // Now add the overlays
 var addOverlays = function(overlist) {
     //console.log("OVERLAYS",overlist)

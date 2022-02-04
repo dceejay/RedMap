@@ -15,6 +15,7 @@ module.exports = function(RED) {
     }
 
     function worldMap(node, n) {
+        var allPoints = {};
         RED.nodes.createNode(node,n);
         node.lat = n.lat || "";
         node.lon = n.lon || "";
@@ -100,6 +101,9 @@ module.exports = function(RED) {
                     if (node.name) { c.toptitle = node.name; }
                     //console.log("INIT",c)
                     client.write(JSON.stringify({command:c}));
+                    var o = Object.values(allPoints);
+                    o.map(v => delete v.tout);
+                    setTimeout(function() { client.write(JSON.stringify(o)) }, 250);
                 }
             });
             client.on('close', function() {
@@ -120,6 +124,12 @@ module.exports = function(RED) {
                         clients[c].write(JSON.stringify(msg.payload));
                     }
                 }
+            }
+            if (msg.payload.hasOwnProperty("name")) {
+                allPoints[msg.payload.name] = msg.payload;
+                var t = node.maxage || 3600;
+                if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
+                allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
             }
         });
         node.on("close", function() {
