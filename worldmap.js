@@ -126,7 +126,7 @@ module.exports = function(RED) {
                 }
             }
             if (msg.payload.hasOwnProperty("name")) {
-                allPoints[msg.payload.name] = msg.payload;
+                allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
                 var t = node.maxage || 3600;
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
                 allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );

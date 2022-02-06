@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.27.0 - Reload existing markers for late joiners
+- v2.27.1 - Reload existing markers for late joiners
 - v2.26.1 - Add QTH/Maidenhead option also
 - v2.26.0 - Add UTM and MGRS to coordinate display options.
 - v2.25.0 - Add bounds command to set overall map bounds.
