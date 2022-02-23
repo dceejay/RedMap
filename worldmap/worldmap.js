@@ -18,7 +18,7 @@ var menuOpen = false;
 var clusterAt = 0;
 var maxage = 900;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var ibmfoot = "&nbsp;&copy; IBM 2015,2021"
+var pagefoot = "&nbsp;&copy; DCJ 2022"
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -58,7 +58,7 @@ var connect = function() {
     ws.onopen = function() {
         console.log("CONNECTED");
         if (!inIframe) {
-            document.getElementById("footer").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+            document.getElementById("footer").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
         }
         ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams)}));
         onoffline();
@@ -66,7 +66,7 @@ var connect = function() {
     ws.onclose = function() {
         console.log("DISCONNECTED");
         if (!inIframe) {
-            document.getElementById("footer").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+            document.getElementById("footer").innerHTML = "<font color='#900'>"+pagefoot+"</font>";
         }
         setTimeout(function() { connect(); }, 2500);
     };
@@ -1445,7 +1445,11 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
-        polygons[data.name] = rightmenu(greatc);
+        //     // opt.smoothFactor=  1;
+        //     // opt.noWrap = true;
+        var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
+
+        polygons[data.name] = rightmenu(aml);
         if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }

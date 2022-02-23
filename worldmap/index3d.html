@@ -83,14 +83,14 @@ fetch('/-worldmap3d-key')
                 ws.onopen = function() {
                     console.log("CONNECTED");
                     // if (!inIframe) {
-                    //     document.getElementById("foot").innerHTML = "<font color='#494'>"+ibmfoot+"</font>";
+                    //     document.getElementById("foot").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
                     // }
                     ws.send(JSON.stringify({action:"connected"}));
                 };
                 ws.onclose = function() {
                     console.log("DISCONNECTED");
                     // if (!inIframe) {
-                    //     document.getElementById("foot").innerHTML = "<font color='#900'>"+ibmfoot+"</font>";
+                    //     document.getElementById("foot").innerHTML = "<font color='#900'>"+pagefoot+"</font>";
                     // }
                     setTimeout(function() { connect(); }, 2500);
                 };
