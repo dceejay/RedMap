@@ -1441,12 +1441,10 @@ function setMarker(data) {
     }
     if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
         delete opt.fill;
-        //opt.vertices = opt.vertices || 100;
+        opt.vertices = opt.vertices || 20;
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
-        //     // opt.smoothFactor=  1;
-        //     // opt.noWrap = true;
         var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
 
         polygons[data.name] = rightmenu(aml);
