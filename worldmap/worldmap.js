@@ -735,18 +735,21 @@ map.on('contextmenu', function(e) {
 
 // Add all the base layer maps if we are online.
 var addBaseMaps = function(maplist,first) {
-    //console.log("MAPS",first,maplist)
+    // console.log("MAPS",first,maplist)
     if (navigator.onLine) {
         var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
             EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
-            UKOS:"UK OS OpenData", UKOS45:"UK OS 1919-1947", UKOS00:"UK OS 1900", OpTop:"Open Topo Map",
-            HB:"Hike Bike OSM", ST:"Stamen Topography", SW: "Stamen Watercolor", AN:"AutoNavi (Chinese)"
+            UKOS:"UK OS OpenData", OS45:"UK OS 1919-1947", OS00:"UK OS 1900", OpTop:"Open Topo Map",
+            HB:"Hike Bike OSM", ST:"Stamen Topography", SW:"Stamen Watercolor", AN:"AutoNavi (Chinese)"
         }
 
         // Use this for OSM online maps
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © OpenStreetMap contributors';
 
+        if (maplist.indexOf("MB3d")!==-1) { // handle the case of 3d by redirecting to that page instead.
+            window.location.href("index3d.html");
+        }
         if (maplist.indexOf("OSMG")!==-1) {
             basemaps[layerlookup["OSMG"]] = new L.TileLayer.Grayscale(osmUrl, {
                 attribution:osmAttrib,

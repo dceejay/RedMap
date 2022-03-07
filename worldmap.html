@@ -173,7 +173,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     <label for="node-input-maplist"><i class="fa fa-list"></i> Map list</label>
     <input type="text" id="node-input-maplist" placeholder="List of Maps">
 </div>
-<div class="form-row">
+<div class="form-row" id="node-input-baselayer">
     <label for="node-input-layer"><i class="fa fa-map"></i> Base map</label>
     <input type="text" id="node-input-layer" placeholder="Initial Map">
 </div>
@@ -188,7 +188,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     <input type="checkbox" id="node-input-mapwms" style="display:inline-block; width:20px; vertical-align:baseline;">
     Map server uses WMS
 </div>
-<div class="form-row">
+<div class="form-row" id="node-input-overlaylist">
     <label for="node-input-overlist"><i class="fa fa-map-o"></i> Overlays</label>
     <input type="text" id="node-input-overlist" placeholder="Initial Overlays">
 </div>
@@ -369,7 +369,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             allowFileDrop: {value:"false"},
             path: {value:"/worldmap"},
             overlist: {value:"DR,CO,RA,DN,HM"},
-            maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"},
+            maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS"},
             mapname: {value:""},
             mapurl: {value:""},
             mapopt: {value:"", validate:function(v) {try{ v.length===0 || JSON.parse(v); return true;} catch(e) {return false;}}},
@@ -391,8 +391,8 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         oneditprepare: function() {
             var mshort;
             if (this.maplist === undefined) {
-                $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
-                this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
+                $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop");
+                this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop";
             }
             if (this.overlist === undefined) {
                 $("#node-input-overlist").val("DR,CO,RA,DN,HM");
@@ -482,7 +482,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"},
                     overlist: {value:"DR,CO,RA,DN,HM"},
-                    maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"},
+                    maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS"},
                     mapname: {value:""},
                     mapurl: {value:""},
                     mapopt: {value:""},
@@ -502,8 +502,8 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                 oneditprepare: function() {
                     var mshort;
                     if (this.maplist === undefined) {
-                        $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW");
-                        this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop,SW";
+                        $("#node-input-maplist").val("OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop");
+                        this.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop";
                     }
                     if (this.overlist === undefined) {
                         $("#node-input-overlist").val("DR,CO,RA,DN,HM");
@@ -512,7 +512,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     $("#node-input-maplist").typedInput({type:"mapitem", types:[{
                         value: "mapitem",
                         multiple: true,
-                        options: mlist
+                        options: mlist.concat([{ value:"MB3d", label:"Mapbox 3D" }])
                     }]});
                     $("#node-input-layer").typedInput({type:"laye", types:[{
                         value: "laye",
@@ -524,8 +524,20 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                         options: olist
                     }]});
                     $("#node-input-maplist").on('change', function(event, type, value) {
-                        mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
-                        mshort.push({ value:"Custom", label:"Custom Map Provider" });
+                        if (value.indexOf("MB3d") > -1) {
+                            mshort = [{ value:"MB3d", label:"Mapbox 3D" }];
+                            $('#node-input-maplist option').prop('selected', false);
+                            $("#node-input-maplist").val("MB3d");
+                            this.maplist = "MB3d";
+                            $("#node-input-baselayer").hide();
+                            $("#node-input-overlaylist").hide();
+                        }
+                        else {
+                            $("#node-input-baselayer").show();
+                            $("#node-input-overlaylist").show();
+                            mshort = mlist.filter(e => value.indexOf(e.value)!==-1);
+                            mshort.push({ value:"Custom", label:"Custom Map Provider" });
+                        }
                         $("#node-input-layer").typedInput("types", [{
                             value: "laye",
                             options: mshort

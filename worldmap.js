@@ -56,7 +56,13 @@ module.exports = function(RED) {
         node.log("started at "+node.path);
         var clients = {};
         RED.httpNode.get("/-worldmap3d-key",  RED.auth.needsPermission('worldmap3d.read'), function(req, res) {
-            res.send({key:process.env.MAPBOXGL_TOKEN||""});
+            if (process.env.MAPBOXGL_TOKEN) {
+                res.send({key:process.env.MAPBOXGL_TOKEN});
+            }
+            else {
+                node.error("No API key set");
+                res.send({key:''})
+            }
         });
         RED.httpNode.use(compression());
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
@@ -167,6 +173,7 @@ module.exports = function(RED) {
         var frameWidth = (size.sx + size.cx) * width - size.cx;
         var frameHeight = (size.sy + size.cy) * height - size.cy;
         var url = encodeURI(path.posix.join(RED.settings.httpNodeRoot||RED.settings.httpRoot,config.path));
+        if (config.layer === "MB3d") { url += "/index3d.html"; }
         var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
 <iframe src="${url}" width="${frameWidth}px" height="${frameHeight}px" style="border:none;"></iframe></div>`;
         return html;
