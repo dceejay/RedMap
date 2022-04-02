@@ -2661,14 +2661,25 @@ function doGeojson(n,g,l,o) {
     }}
     opt.pointToLayer = function (feature, latlng) {
         var myMarker;
+        if (feature.properties.hasOwnProperty("icon")) {
+            var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
+            if (regi.test(feature.properties.icon)) {
+                feature.properties.SIDC = (feature.properties.icon.toUpperCase()+"------------").substr(0,12);
+                delete feature.properties.icon;
+            }
+        }
         if (feature.properties.hasOwnProperty("SIDC")) {
             myMarker = new ms.Symbol( feature.properties.SIDC.toUpperCase(), {
-                uniqueDesignation:unescape(encodeURIComponent(feature.properties.title)) ,
+                uniqueDesignation:unescape(encodeURIComponent(feature.properties.title||feature.properties.unit)),
                 country:feature.properties.country,
                 direction:feature.properties.bearing,
                 additionalInformation:feature.properties.modifier,
-                size:24
+                size:25
             });
+            if (myMarker.hasOwnProperty("metadata") && myMarker.metadata.hasOwnProperty("echelon")) {
+                var sz = iconSz[myMarker.metadata.echelon];
+                myMarker.setOptions({size:sz});
+            }
             myMarker = L.icon({
                 iconUrl: myMarker.toDataURL(),
                 iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],

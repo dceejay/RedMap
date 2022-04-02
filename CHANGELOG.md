@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.27.4 - Better Handling of sidc icons in geojson
  - v2.27.3 - Try to handle greatcircles crossing antimeridian
  - v2.27.1 - Reload existing markers for late joiners
  - v2.26.1 - Add QTH/Maidenhead option also
