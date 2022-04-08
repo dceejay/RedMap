@@ -733,16 +733,21 @@ map.on('contextmenu', function(e) {
     }
 });
 
+
+// Layer control based on select box rather than radio buttons.
+//var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
+layercontrol = L.control.layers(basemaps, overlays);
+
 // Add all the base layer maps if we are online.
 var addBaseMaps = function(maplist,first) {
     // console.log("MAPS",first,maplist)
-    if (navigator.onLine) {
-        var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
-            EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
-            UKOS:"UK OS OpenData", OS45:"UK OS 1919-1947", OS00:"UK OS 1900", OpTop:"Open Topo Map",
-            HB:"Hike Bike OSM", ST:"Stamen Topography", SW:"Stamen Watercolor", AN:"AutoNavi (Chinese)"
-        }
+    var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
+        EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
+        UKOS:"UK OS OpenData", OS45:"UK OS 1919-1947", OS00:"UK OS 1900", OpTop:"Open Topo Map",
+        HB:"Hike Bike OSM", ST:"Stamen Topography", SW:"Stamen Watercolor", AN:"AutoNavi (Chinese)"
+    }
 
+    if (navigator.onLine) {
         // Use this for OSM online maps
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © OpenStreetMap contributors';
@@ -903,18 +908,19 @@ var addBaseMaps = function(maplist,first) {
                 attribution: 'Map tiles by <a href="https://stamen.com">Stamen Design</a>, under <a href="https://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="https://openstreetmap.org">OpenStreetMap</a>, under <a href="https://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
             });
         }
+    }
 
-        if (first) {
-            if (layerlookup[first]) { basemaps[layerlookup[first]].addTo(map); }
-            else { basemaps[first].addTo(map); }
-        }
-        else {
-            basemaps[Object.keys(basemaps)[0]].addTo(map);
-        }
-        if (showLayerMenu) {
-            map.removeControl(layercontrol);
-            layercontrol = L.control.layers(basemaps, overlays).addTo(map);
-        }
+    if (first) {
+        if (layerlookup[first]) { baselayername = layerlookup[first]; }
+        else { basenayername = first; }
+    }
+    else {
+        basenayername = Object.keys(basemaps)[0];
+    }
+    basemaps[baselayername].addTo(map);
+    if (showLayerMenu) {
+        map.removeControl(layercontrol);
+        layercontrol = L.control.layers(basemaps, overlays).addTo(map);
     }
 }
 
@@ -960,7 +966,7 @@ var addOverlays = function(overlist) {
         });
         var changeDrawColour = function(col) {
             drawingColour = col;
-            console.log("COLOR",col)
+            // console.log("COLOR",col)
             drawControl.setDrawingOptions({
                 polyline: { shapeOptions: { color:drawingColour } },
                 circle: { shapeOptions: { color:drawingColour } },
@@ -1111,7 +1117,7 @@ var addOverlays = function(overlist) {
     }
 
     // Add the countries (world-110m) for offline use
-    if (overlist.indexOf("CO")!==-1 || (!navigator.onLine)) {
+    if (overlist.indexOf("CO") !== -1 || !navigator.onLine) {
         var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
         layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
         overlays["countries"] = layers["_countries"];
@@ -1195,10 +1201,6 @@ var addOverlays = function(overlist) {
         layercontrol = L.control.layers(basemaps, overlays).addTo(map);
     }
 }
-
-// Layer control based on select box rather than radio buttons.
-//var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
-layercontrol = L.control.layers(basemaps, overlays);
 
 // Add the layers control widget
 if (!inIframe) { layercontrol.addTo(map); }
@@ -2224,7 +2226,7 @@ function doCommand(cmd) {
     var existsalready = false;
     // Add a new base map layer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.name.length>0 && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
-        console.log("BASE",cmd.map);
+        // console.log("BASE",cmd.map);
         if (basemaps.hasOwnProperty(cmd.map.name)) { existsalready = true; }
         if (cmd.map.hasOwnProperty("wms")) {   // special case for wms
             console.log("New WMS:",cmd.map.name);
@@ -2523,6 +2525,7 @@ function doCommand(cmd) {
         baselayername = cmd.layer;
         basemaps[baselayername].addTo(map);
     }
+    // If set to none then remove the baselayer...
     if (cmd.layer && (cmd.layer === "none")) {
         map.removeLayer(basemaps[baselayername]);
         baselayername = cmd.layer;

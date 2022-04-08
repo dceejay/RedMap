@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.28.1 - Fix layer command bug for non-core layers. Issue #195
 - v2.28.0 - Better Handling of sidc icons in geojson
 - v2.27.3 - Try to handle greatcircles crossing antimeridian
 - v2.27.1 - Reload existing markers for late joiners
