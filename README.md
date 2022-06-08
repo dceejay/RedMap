@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.28.2 - Let button declaration be an array
 - v2.28.1 - Fix layer command bug for non-core layers. Issue #195
 - v2.28.0 - Better Handling of sidc icons in geojson
 - v2.27.3 - Try to handle greatcircles crossing antimeridian
@@ -420,7 +421,7 @@ Optional properties include
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
- a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default).
+ a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default). button can also be an array of button objects.
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
  - **toptitle** - Words to replace title in title bar (if not in iframe)
  - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
@@ -444,6 +445,8 @@ When clicked the button will send an event to the `worldmap in` node containing 
 to remove
 
     msg.payload.command = { "button": { "name":"My Fancy Button" } };
+
+Multiple buttons can declared by using an array of button objects.
 
 #### To add a custom popup or contextmenu
 

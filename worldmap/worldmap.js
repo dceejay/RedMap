@@ -2166,19 +2166,22 @@ function doCommand(cmd) {
         }
     }
     if (cmd.hasOwnProperty("button")) {
-        if (cmd.button.icon) {
-            if (!buttons[cmd.button.name]) {
-                buttons[cmd.button.name] = L.easyButton( cmd.button.icon, function() {
-                    ws.send(JSON.stringify({action:"button",name:cmd.button.name}));
-                }, cmd.button.name, { position:cmd.button.position||'topright' }).addTo(map);
+        if (!isArray(cmd.button)) { cmd.button = [cmd.button]; }
+        cmd.button.forEach(function(b) {
+            if (b.icon) {
+                if (!buttons[b.name]) {
+                    buttons[b.name] = L.easyButton( b.icon, function() {
+                        ws.send(JSON.stringify({action:"button", name:b.name}));
+                    }, b.name, { position:b.position||'topright' }).addTo(map);
+                }
             }
-        }
-        else {
-            if (buttons[cmd.button.name]) {
-                buttons[cmd.button.name].removeFrom(map);
-                delete buttons[cmd.button.name];
+            else {
+                if (buttons[b.name]) {
+                    buttons[b.name].removeFrom(map);
+                    delete buttons[b.name];
+                }
             }
-        }
+        })
     }
     if (cmd.hasOwnProperty("contextmenu")) {
         if (typeof cmd.contextmenu === "string") {
