@@ -2166,7 +2166,7 @@ function doCommand(cmd) {
         }
     }
     if (cmd.hasOwnProperty("button")) {
-        if (!isArray(cmd.button)) { cmd.button = [cmd.button]; }
+        if (!Array.isArray(cmd.button)) { cmd.button = [cmd.button]; }
         cmd.button.forEach(function(b) {
             if (b.icon) {
                 if (!buttons[b.name]) {
