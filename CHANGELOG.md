@@ -1,7 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style
- 
+ - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
+
  - v2.28.3 - Let button declaration be an array
  - v2.28.1 - Fix layer command bug for non-core layers. Issue #195
  - v2.28.0 - Better Handling of sidc icons in geojson
