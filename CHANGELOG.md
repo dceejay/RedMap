@@ -1,17 +1,24 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style
+ 
  - v2.28.3 - Let button declaration be an array
  - v2.28.1 - Fix layer command bug for non-core layers. Issue #195
  - v2.28.0 - Better Handling of sidc icons in geojson
+
  - v2.27.3 - Try to handle greatcircles crossing antimeridian
  - v2.27.1 - Reload existing markers for late joiners
+
  - v2.26.1 - Add QTH/Maidenhead option also
  - v2.26.0 - Add UTM and MGRS to coordinate display options.
+
  - v2.25.0 - Add bounds command to set overall map bounds.
+
  - v2.24.3 - Fix geojson incorrect fill.
  - v2.24.2 - Changes to drawing colours to be more visible.
  - v2.24.1 - Fix ellipse accuracy.
  - v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
+
  - v2.23.5 - Fix addtoheatmap. Issue #192
  - v2.23.4 - Fix opacity of area borders
  - v2.23.3 - Fix initial load of maps

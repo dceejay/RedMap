@@ -257,16 +257,27 @@ var menuButton = L.easyButton({states:[{icon:'fa-bars fa-lg', onClick:function()
 var fullscreenButton = L.control.fullscreen();
 var rulerButton = L.control.ruler({position:"topleft"});
 
+var followMode = { accuracy:true };
+var followState = false;
+var trackMeButton;
+var errRing;
+
 function onLocationFound(e) {
-    var radius = e.accuracy;
-    //L.marker(e.latlng).addTo(map).bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(e.latlng, radius, {color:"cyan", weight:4, opacity:0.8, fill:false, clickable:false}).addTo(map);
-    if (e.hasOwnProperty("heading")) {
-        var lengthAsDegrees = e.speed * 60 / 110540;
-        var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
-        var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
-        var lla = new L.LatLng(ya,xa);
-        L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
+    if (followState === true) { map.panTo(e.latlng); }
+    if (followMode.icon) {
+        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 || undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor || "#910000" };
+        setMarker(self);
+    }
+    if (followMode.accuracy) {
+        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color || "cyan", weight:3, opacity:0.6, fill:false, clickable:false});
+        errRing.addTo(map);
+        // if (e.hasOwnProperty("heading")) {
+        //     var lengthAsDegrees = e.speed * 60 / 110540;
+        //     var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
+        //     var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
+        //     var lla = new L.LatLng(ya,xa);
+        //     L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
+        // }
     }
     ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 || undefined)}));
 }
@@ -295,13 +306,36 @@ else {
     // Add the fullscreen button
     fullscreenButton.addTo(map);
 
-    // Add the locate my position button
-    L.easyButton( 'fa-crosshairs fa-lg', function() {
-        map.locate({setView:true, maxZoom:16});
-    }, "Locate me").addTo(map);
+    trackMeButton = L.easyButton({
+        states: [{
+            stateName: 'track-on',
+            icon:      'fa-window-close-o fa-lg',
+            title:     'Disable tracking',
+            onClick: function(btn, map) {
+                btn.state('track-off');
+                followState = false;
+                if (errRing) { errRing.removeFrom(map); }
+                delMarker(followMode.name || "self")
+                map.stopLocate();
+            }
+        }, {
+            stateName: 'track-off',
+            icon:      'fa-crosshairs fa-lg',
+            title:     'Enable tracking',
+            onClick: function(btn, map) {
+                btn.state('track-on');
+                followState = true;
+                map.locate({setView:false, watch:followState, enableHighAccuracy:true});
+            }
+        }]
+    });
+    trackMeButton.state('track-off');
+    trackMeButton.addTo(map);
 
-    map.on('locationfound', onLocationFound);
-    map.on('locationerror', onLocationError);
+    // Add the locate my position button
+    // L.easyButton( 'fa-crosshairs fa-lg', function() {
+    //     map.locate({setView:true, maxZoom:16});
+    // }, "Locate me").addTo(map);
 
     // Add the measure/ruler button
     rulerButton.addTo(map);
@@ -644,6 +678,8 @@ map.on('moveend', function() {
     var b = map.getBounds();
     ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
 });
+map.on('locationfound', onLocationFound);
+map.on('locationerror', onLocationError);
 
 //map.on('contextmenu', function(e) {
 //    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
@@ -743,7 +779,7 @@ var addBaseMaps = function(maplist,first) {
     // console.log("MAPS",first,maplist)
     var layerlookup = { OSMG:"OSM grey", OSMC:"OSM", OSMH:"OSM Humanitarian", EsriC:"Esri", EsriS:"Esri Satellite",
         EsriR:"Esri Relief", EsriT:"Esri Topography", EsriO:"Esri Ocean", EsriDG:"Esri Dark Grey", NatGeo: "National Geographic",
-        UKOS:"UK OS OpenData", OS45:"UK OS 1919-1947", OS00:"UK OS 1900", OpTop:"Open Topo Map",
+        UKOS:"UK OS OpenData", OpTop:"Open Topo Map",
         HB:"Hike Bike OSM", ST:"Stamen Topography", SW:"Stamen Watercolor", AN:"AutoNavi (Chinese)"
     }
 
@@ -863,25 +899,6 @@ var addBaseMaps = function(maplist,first) {
                 attribution: 'Tiles &copy; 高德地图',
                 maxNativeZoom:14,
                 maxZoom: 19,
-            });
-        }
-
-        if (maplist.indexOf("OS45")!==-1) {
-            basemaps[layerlookup["OS45"]] = L.tileLayer( 'https://nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg', {
-                attribution: 'Historical Maps Layer, from <a href="https://maps.nls.uk/projects/api/">NLS Maps</a>',
-                bounds: [[49.6, -12], [61.7, 3]],
-                minZoom:1, maxZoom:18,
-                subdomains: '0123'
-            });
-        }
-
-        if (maplist.indexOf("OS00")!==-1) {
-            //var NLS_OS_1900 = L.tileLayer('https://nls-{s}.tileserver.com/NLS_API/{z}/{x}/{y}.jpg', {
-            basemaps[layerlookup["OS00"]] = L.tileLayer('https://nls-{s}.tileserver.com/fpsUZbzrfb5d/{z}/{x}/{y}.jpg', {
-                attribution: '<a href="https://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
-                bounds: [[49.6, -12], [61.7, 3]],
-                minZoom:1, maxNativeZoom:19, maxZoom:20,
-                subdomains: '0123'
             });
         }
 
@@ -2182,6 +2199,22 @@ function doCommand(cmd) {
                 }
             }
         })
+    }
+    if (cmd.hasOwnProperty("trackme")) {
+        if (cmd.trackme === false) {
+            followState = false;
+            map.stopLocate();
+            if (errRing) { errRing.removeFrom(map); }
+            delMarker(followMode.name || "self")
+            if (trackMeButton !== undefined) { trackMeButton.state('track-off'); }
+        }
+        else {
+            followState = true;
+            if (cmd.trackme === true) { followMode = { accuracy:true }; }
+            else { followMode = cmd.trackme; }
+            map.locate({setView:false, watch:followState, enableHighAccuracy:true});
+            if (trackMeButton !== undefined) { trackMeButton.state('track-on'); }
+        }
     }
     if (cmd.hasOwnProperty("contextmenu")) {
         if (typeof cmd.contextmenu === "string") {

@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
 - v2.28.3 - Let button declaration be an array
 - v2.28.1 - Fix layer command bug for non-core layers. Issue #195
 - v2.28.0 - Better Handling of sidc icons in geojson
@@ -29,9 +30,6 @@ map web page for plotting "things" on.
 - v2.23.2 - Add convex-hull example
 - v2.23.1 - Fix saving of custom map layer
 - v2.23.0 - Give logo an id so it can be overridden by toplogo command. PR #188.
-- v2.22.3 - Don't show empty popup for geojson object. Issue #186. Add wobble to null island.
-- v2.22.2 - Be more tolerant of speed string types
-- v2.22.0 - Separate out layer events in worldmap in
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -425,6 +423,7 @@ Optional properties include
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
  - **toptitle** - Words to replace title in title bar (if not in iframe)
  - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
+ - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
 
 #### To switch layer, move map and zoom
 
