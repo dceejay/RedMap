@@ -721,6 +721,76 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     });
 </script>
 
+<script type="text/html" data-template-name="worldmap-heat">
+    <div class="form-row">
+        <label for="node-input-staticThreshold"><i class="fa fa-map-marker"></i> Static threshold</label>
+        <input type="text" id="node-input-staticThreshold" placeholder="0 - 10kph, default 0.5">
+    </div>
+    <div class="form-row">
+        <label for="node-input-bleedIntensity"><i class="fa fa-tint"></i> Bleed intensity</label>
+        <input type="text" id="node-input-bleedIntensity" placeholder="0.0 - 1.0, default 0.1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minNormalize"><i class="fa fa-clock-o"></i> Normalize interval</label>
+        <input type="text" id="node-input-minNormalize" placeholder="time in seconds, default 60">
+    </div>
+    <div class="form-row">
+        <label for="node-input-radius"><i class="fa fa-circle-thin"></i> Drop radius</label>
+        <input type="text" id="node-input-radius" placeholder="Default 15">
+    </div>
+    <div class="form-row">
+        <label for="node-input-maxZoom"><i class="fa fa-search-plus"></i> Max Zoom</label>
+        <input type="text" id="node-input-maxZoom" placeholder="Zoom level for max effect, default 16">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="worldmap-heat">
+    <p>Generates heatmap based on recieved positions.</p>
+
+    <p>Heatmap is periodically "normalized" to account for stationary objects that seldom report positions</p>
+
+    <p>Options:</p>
+    <p><code>Static treshold</code>: Speed in kph below which objects are considered stationary</p>
+    <p><code>Bleed intensity</code>: Adjusts the intensity of each heatpoint</p>
+    <p><code>Normalize interval</code>: Frequency at which normalization occours</p>
+    <p><code>Drop radius</code>: Size of the heatpoints</p>
+    <p><code>Max Zoom</code>: The zoom level at which the heatmap is in "full bloom"</p>
+
+    <p>To manually trigger normalization</p>
+    <p><code>msg.payload = {"command": {"heatmap": {"normalize": true}}}</code></p>
+
+    <p>To clear</p>
+    <p><code>msg.payload = {"command": {"clear": true}}</code> </p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('worldmap-heat',{
+        category: 'location',
+        color:"darksalmon",
+        defaults: {
+            name: {value:""},
+            staticThreshold: {value:0.5},
+            bleedIntensity: {value:0.1},
+            minNormalize: {value:60},
+            radius: {value: 15},
+            maxZoom: {value: 16},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "white-globe.png",
+        paletteLabel: "heat",
+        label: function() {
+            return this.name||"heat";
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
 
 <script type="text/html" data-template-name="worldmap-hull">
     <div class="form-row">

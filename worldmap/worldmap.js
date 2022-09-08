@@ -2639,9 +2639,22 @@ function doCommand(cmd) {
         setMaxAge();
     }
     if (cmd.hasOwnProperty("heatmap")) {
-        heat.setOptions(cmd.heatmap);
-        document.getElementById("heatall").checked = !!cmd.heatmap;
-        heat.redraw();
+        if (cmd.heatmap.hasOwnProperty("options")) {
+            heat.setOptions(cmd.heatmap.options);
+            document.getElementById("heatall").checked = !!cmd.heatmap.options;
+            heat.redraw();
+        }
+        if (cmd.heatmap.hasOwnProperty("point")) {
+            if (Array.isArray(cmd.heatmap.point)) {
+                heat.addLatLng(cmd.heatmap.point);
+            }
+        }
+        else if (cmd.heatmap.hasOwnProperty("setpoints")) {
+            if (Array.isArray(cmd.heatmap.setpoints)) {
+                heat.setLatLngs(cmd.heatmap.setpoints);
+            }
+        }
+
     }
     if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
     if (cmd.hasOwnProperty("zoomlock")) {

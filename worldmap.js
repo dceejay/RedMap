@@ -7,6 +7,7 @@ module.exports = function(RED) {
     var express = require("express");
     var compression = require("compression");
     var sockjs = require('sockjs');
+    var cheapRuler = require('cheap-ruler');
     var sockets = {};
     RED.log.info("Worldmap version " + require('./package.json').version );
     // add the cgi module for serving local maps.... only if mapserv exists
@@ -430,6 +431,121 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("worldmap-tracks",WorldMapTracks);
 
+    var WorldMapHeat = function(n) {
+        RED.nodes.createNode(this,n);
+        this.pointsarray = {};
+        this.lastNormalize = Date.now();
+        this.minNormalize = Math.max(n.minNormalize * 1000, 1);
+        this.bleedIntensity = Math.min(Math.max(n.bleedIntensity, 0.0), 1.0);
+        this.longestStationary = 0;
+        this.staticThreshold = Math.min(Math.max(n.staticThreshold, 0), 10);
+        this.radius = Math.max(n.radius, 0);
+        this.maxZoom = Math.min(Math.max(n.maxZoom, 1), 20);
+
+        var node = this;
+
+        var doTrack = function(msg) {
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+                var newmsg = RED.util.cloneMessage(msg);
+
+                if (!msg.payload.hasOwnProperty("lat") || !msg.payload.hasOwnProperty("lon")) { return; }
+
+                let stationary = 0;
+                let interval = 0;
+                let timestamp = Date.now();
+                let intensity = node.bleedIntensity;
+
+                if (!node.pointsarray.hasOwnProperty(msg.payload.name)) {
+                    node.pointsarray[msg.payload.name] = [];
+                } else {
+                    /*
+                    Check if position is stationary. Update last entry, add to stationarytime
+                    Output single point with adjusted intensity value.
+                    */
+                    var ruler = new cheapRuler(msg.payload.lat, 'meters');
+                    let speed = (ruler.distance(
+                        [msg.payload.lon, msg.payload.lat],
+                        [node.pointsarray[msg.payload.name].slice(-1)[0].lon, node.pointsarray[msg.payload.name].slice(-1)[0].lat]
+                      ) / 1000) / ((timestamp - node.pointsarray[msg.payload.name].slice(-1)[0].time) / 3.6e6);
+
+                    if(speed < node.staticThreshold) {
+                        let interval = timestamp - node.pointsarray[msg.payload.name].slice(-1)[0].time;
+                        stationary = node.pointsarray[msg.payload.name].slice(-1)[0].stationary + interval;
+
+                        if (stationary > node.longestStationary) {
+                          node.longestStationary = stationary;
+                        }
+                        node.pointsarray[msg.payload.name].slice(-1)[0].stationary = stationary;
+                        node.pointsarray[msg.payload.name].slice(-1)[0].time = timestamp;
+                        intensity = (interval / node.longestStationary) * (1.0 - node.bleedIntensity);
+                    }
+
+
+                }
+                //Only add new point if not stationary
+                if (stationary == 0) {
+                    node.pointsarray[msg.payload.name].push({
+                      "lat": msg.payload.lat,
+                      "lon": msg.payload.lon,
+                      "time": Date.now(),
+                      "stationary": stationary,
+                    });
+                }
+
+                if(timestamp - node.lastNormalize > node.minNormalize) {
+                    normalize(node);
+                } else {
+                  node.send({"payload":{"command": {"heatmap": {
+                      "point": [msg.payload.lat, msg.payload.lon, intensity]
+                    }}}});
+                }
+            }
+            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("command")) {
+                if (msg.payload.command.hasOwnProperty("clear")) {
+                    node.pointsarray = {};
+                    normalize(node);
+                } else if (msg.payload.command.hasOwnProperty("heatmap") && msg.payload.command.heatmap.hasOwnProperty("normalize")) {
+                    normalize(node);
+                }
+            }
+        };
+
+        //Normalize heatmap based on longestStationary
+        let normalize = function(node) {
+            node.send({"payload": {"command": { "heatmap": { "options": {
+                "radius": node.radius,
+                "maxZoom": node.maxZoom
+            }}}}});
+            let normMsg = {"payload": {"command": {"heatmap": {"setpoints": []}}}};
+            Object.values(node.pointsarray).forEach((n) => {
+                n.forEach((point) => {
+                    normMsg.payload.command.heatmap.setpoints.push([point.lat, point.lon,
+                      ((point.stationary / node.longestStationary) * (1.0 - node.bleedIntensity)) + node.bleedIntensity
+                    ]);
+                });
+            });
+            node.send(normMsg);
+            node.lastNormalize = Date.now();
+        };
+
+        node.on("input", function(m) {
+            if (Array.isArray(m.payload)) {
+                m.payload.forEach(function (pay) {
+                    var n = RED.util.cloneMessage(m);
+                    n.payload = pay;
+                    doTrack(n);
+                });
+            }
+            else {
+                doTrack(m);
+            }
+        });
+
+        node.on("close", function() {
+            node.pointsarray = {};
+        });
+    };
+    RED.nodes.registerType("worldmap-heat",WorldMapHeat);
 
     var WorldMapHull = function(n) {
         RED.nodes.createNode(this,n);
