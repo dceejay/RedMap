@@ -337,10 +337,7 @@ else {
     //     map.locate({setView:true, maxZoom:16});
     // }, "Locate me").addTo(map);
 
-    // Add the measure/ruler button
-    rulerButton.addTo(map);
-
-    // Create the clear heatmap button
+     // Create the clear heatmap button
     var clrHeat = L.easyButton( 'fa-eraser', function() {
         console.log("Reset heatmap");
         heat.setLatLngs([]);
@@ -360,6 +357,7 @@ document.getElementById('menu').innerHTML = helpMenu;
 
 // Add graticule
 var showGrid = false;
+var showRuler = false;
 var Lgrid = L.latlngGraticule({
     font: "Verdana",
     fontColor: "#666",
@@ -2170,8 +2168,8 @@ function doCommand(cmd) {
             if ((cmd.grid.showgrid == "false" || cmd.grid.showgrid == false ) && showGrid) { changed = true; }
             if (changed) {
                 showGrid = !showGrid;
-                if (showGrid) { Lgrid.addTo(map); rulerButton.addTo(map); }
-                else { Lgrid.removeFrom(map); rulerButton.remove(); }
+                if (showGrid) { Lgrid.addTo(map);}
+                else { Lgrid.removeFrom(map);}
             }
         }
         if (cmd.grid.hasOwnProperty("opt")) {
@@ -2179,6 +2177,18 @@ function doCommand(cmd) {
             if (showGrid) {
                 Lgrid.removeFrom(map);
                 Lgrid.addTo(map);
+            }
+        }
+    }
+    if (cmd.hasOwnProperty("ruler")) {
+        if (cmd.ruler.hasOwnProperty("showruler")) {
+            var changed = false;
+            if ((cmd.ruler.showruler == "true" || cmd.ruler.showruler == true ) && !showRuler) { changed = true; }
+            if ((cmd.ruler.showruler == "false" || cmd.ruler.showruler == false ) && showRuler) { changed = true; }
+            if (changed) {
+                showRuler = !showRuler;
+                if (showRuler) { rulerButton.addTo(map); }
+                else { rulerButton.remove(); }
             }
         }
     }

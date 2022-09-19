@@ -94,6 +94,13 @@
     </select>
 </div>
 <div class="form-row">
+	<label for="node-input-showruler"><i class="fa fa-window-minimize"></i> Ruler</label>
+    <select id="node-input-showruler" style="width:101px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
+</div>
+<div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
     <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
     <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
@@ -253,6 +260,13 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     </select>
 </div>
 <div class="form-row">
+	<label for="node-input-showruler"><i class="fa fa-window-minimize"></i> Ruler</label>
+    <select id="node-input-showruler" style="width:101px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
+</div>
+<div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
     <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
     <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
@@ -364,6 +378,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             hiderightclick: {value:"false"},
             coords: {value:"false"},
             showgrid: {value:"false"},
+			showruler: {value:"false"},
             allowFileDrop: {value:"false"},
             path: {value:"/worldmap"},
             overlist: {value:"DR,CO,RA,DN,HM"},
@@ -477,6 +492,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     hiderightclick: {value:"true"},
                     coords: {value:"false"},
                     showgrid: {value:"false"},
+					showruler: {value:"false"},
                     allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"},
                     overlist: {value:"DR,CO,RA,DN,HM"},
