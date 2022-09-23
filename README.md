@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.30.0 - Add show/hide ruler option. PR #206
 - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
 - v2.28.3 - Let button declaration be an array
 - v2.28.1 - Fix layer command bug for non-core layers. Issue #195
@@ -418,6 +419,7 @@ Optional properties include
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
+ - **showruler** - turns on and off a display of the ruler control. Values can be "true" or "false". - `{"command":{"showruler":true}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default). button can also be an array of button objects.
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
