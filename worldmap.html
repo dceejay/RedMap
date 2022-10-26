@@ -538,7 +538,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                         options: olist
                     }]});
                     $("#node-input-maplist").on('change', function(event, type, value) {
-                        if (value.indexOf("MB3d") > -1) {
+                        if (value && value.indexOf("MB3d") > -1) {
                             mshort = [{ value:"MB3d", label:"Mapbox 3D" }];
                             $('#node-input-maplist option').prop('selected', false);
                             $("#node-input-maplist").val("MB3d");

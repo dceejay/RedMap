@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.30.2 - Fix for bad handling of mapbox id. Issue #208
 - v2.30.1 - Don't resend bounds if not changed. Issue #209
 - v2.30.0 - Add show/hide ruler option. PR #206
 - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
@@ -22,16 +23,6 @@ map web page for plotting "things" on.
 - v2.26.1 - Add QTH/Maidenhead option also
 - v2.26.0 - Add UTM and MGRS to coordinate display options.
 - v2.25.0 - Add bounds command to set overall map bounds.
-- v2.24.3 - Fix geojson incorrect fill.
-- v2.24.2 - Changes to drawing colours to be more visible.
-- v2.24.1 - Fix ellipse accuracy
-- v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
-- v2.23.5 - Fix addtoheatmap. Issue #192
-- v2.23.4 - Fix opacity of area borders
-- v2.23.3 - Fix initial load of maps
-- v2.23.2 - Add convex-hull example
-- v2.23.1 - Fix saving of custom map layer
-- v2.23.0 - Give logo an id so it can be overridden by toplogo command. PR #188.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
