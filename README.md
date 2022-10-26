@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.30.1 - Don't resend bounds if not changed. Issue #209
 - v2.30.0 - Add show/hide ruler option. PR #206
 - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
 - v2.28.3 - Let button declaration be an array

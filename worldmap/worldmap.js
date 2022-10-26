@@ -33,6 +33,7 @@ var drawingColour = "#910000";
 var sendDrawing;
 var colorControl;
 var sendRoute;
+var oldBounds = {ne:{lat:0,lng:0},sw:{lat:0,lng:0}};
 
 var iconSz = {
     "Team/Crew": 24,
@@ -669,12 +670,16 @@ map.on('zoomend', function() {
     showMapCurrentZoom();
     window.localStorage.setItem("lastzoom", map.getZoom());
     var b = map.getBounds();
+    oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
     ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
 });
 map.on('moveend', function() {
     window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
     var b = map.getBounds();
-    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+    if (b._southWest.lat !== oldBounds.sw.lat && b._southWest.lng !== oldBounds.sw.lng && b._northEast.lat !== oldBounds.ne.lat && b._northEast.lng !== oldBounds.ne.lng) {
+        ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+        oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
+    }
 });
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
