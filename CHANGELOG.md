@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.30.3 - Fix for iframe height. Issue #210
  - v2.30.2 - Fix for bad handling of mapbox id. Issue #208
  - v2.30.1 - Don't resend bounds if not changed. Issue #209
  - v2.30.0 - Add show/hide ruler option. PR #206

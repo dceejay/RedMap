@@ -173,7 +173,7 @@ module.exports = function(RED) {
         if (height == 0) { height = 10; }
         var size = ui.getSizes();
         var frameWidth = (size.sx + size.cx) * width - size.cx;
-        var frameHeight = (size.sy + size.cy) * height - size.cy;
+        var frameHeight = (size.sy + size.cy) * height - size.cy + 40;
         var url = encodeURI(path.posix.join(RED.settings.httpNodeRoot||RED.settings.httpRoot,config.path));
         if (config.layer === "MB3d") { url += "/index3d.html"; }
         var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
