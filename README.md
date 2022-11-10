@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.31.0 - Better handling of KML files. Issue #211
 - v2.30.3 - Fix for iframe height. Issue #210
 - v2.30.2 - Fix for bad handling of mapbox id. Issue #208
 - v2.30.1 - Don't resend bounds if not changed. Issue #209

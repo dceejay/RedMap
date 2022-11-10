@@ -2480,8 +2480,12 @@ function doCommand(cmd) {
             overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
-        //var opt = {async:true};
-        overlays[cmd.map.overlay] = omnivore.kml.parse(cmd.map.kml, null, custIco());
+        try {
+            const parser = new DOMParser();
+            const kml = parser.parseFromString(cmd.map.kml, 'text/xml');
+            const track = new L.KML(kml);
+            overlays[cmd.map.overlay] = track;
+        } catch(e) { console.log("Failed to parse KML") }
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
