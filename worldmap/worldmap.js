@@ -1015,7 +1015,7 @@ var addOverlays = function(overlist) {
             else {
                 cent = e.layer.getBounds().getCenter();
             }
-            var m = {action:"draw", name:name, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
+            var m = {action:"draw", name:name, type:e.layerType, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
             if (e.layer.hasOwnProperty("_latlngs")) {
                 if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
                 else { m.area = e.layer._latlngs[0]; }

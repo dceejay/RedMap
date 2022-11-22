@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.31.1 - Fix missing type property for drawings. Issue #213
  - v2.31.0 - Better handling of KML files. Issue #211
 
  - v2.30.3 - Fix for iframe height. Issue #210
