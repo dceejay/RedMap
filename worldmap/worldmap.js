@@ -727,6 +727,7 @@ var feedback = function(n,v,a,c) {
         // ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
         var fb = allData[n];
         fb.action = a || "feedback";
+        if (v !== undefined) { fb.value = v; }
         ws.send(JSON.stringify(fb));
     }
     else {

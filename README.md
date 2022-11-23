@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.31.1 - Fix missing type property for drawings. Issue #213
+- v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Issue #213, Issue #212
 - v2.31.0 - Better handling of KML files. Issue #211
 - v2.30.3 - Fix for iframe height. Issue #210
 - v2.30.2 - Fix for bad handling of mapbox id. Issue #208
@@ -25,7 +25,6 @@ map web page for plotting "things" on.
 - v2.27.1 - Reload existing markers for late joiners
 - v2.26.1 - Add QTH/Maidenhead option also
 - v2.26.0 - Add UTM and MGRS to coordinate display options.
-- v2.25.0 - Add bounds command to set overall map bounds.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
