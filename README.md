@@ -11,7 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
-- v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Issue #213, Issue #212
+- v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Add route distance. Issue #213, Issue #212, PR #215
 - v2.31.0 - Better handling of KML files. Issue #211
 - v2.30.3 - Fix for iframe height. Issue #210
 - v2.30.2 - Fix for bad handling of mapbox id. Issue #208

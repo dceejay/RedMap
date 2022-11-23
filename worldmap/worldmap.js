@@ -1131,7 +1131,10 @@ var addOverlays = function(overlist) {
                     var r = decode(data.routes[0].geometry).map( x => L.latLng(x[0],x[1]) );
                     polygons[n]._latlngs = r;
                     shape.m.line = r;
-                    shape.m.type = {label:"routing",distance : data.routes[0].distance,duration : data.routes[0].duration}
+                    // shape.m.type = {label:"routing", distance:data.routes[0].distance, duration:data.routes[0].duration}
+                    shape.m.type = "route";
+                    shape.m.distance = data.routes[0].distance;
+                    shape.m.duration = data.routes[0].duration;
                     sendDrawing(n);
                 });
         }
