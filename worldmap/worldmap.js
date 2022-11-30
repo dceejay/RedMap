@@ -1475,7 +1475,11 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
-        var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
+        var gcp = greatc._latlngs.map(function(x) {
+            if (x.lng > 180) { x.lng -= 360; }
+            return x;
+        });
+        var aml = new L.Wrapped.Polyline(gcp, opt);
 
         polygons[data.name] = rightmenu(aml);
         if (data.hasOwnProperty("fit") && data.fit === true) {

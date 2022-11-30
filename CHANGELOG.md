@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.31.2 = Fix more antimeridian crossing wrinkles. Issue #216
  - v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Add route distance. Issue #213, Issue #212, PR #215
  - v2.31.0 - Better handling of KML files. Issue #211
 
