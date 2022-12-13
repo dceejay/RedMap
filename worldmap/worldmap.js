@@ -266,11 +266,11 @@ var errRing;
 function onLocationFound(e) {
     if (followState === true) { map.panTo(e.latlng); }
     if (followMode.icon) {
-        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 || undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor || "#910000" };
+        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
         setMarker(self);
     }
     if (followMode.accuracy) {
-        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color || "cyan", weight:3, opacity:0.6, fill:false, clickable:false});
+        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color ?? "cyan", weight:3, opacity:0.6, fill:false, clickable:false});
         errRing.addTo(map);
         // if (e.hasOwnProperty("heading")) {
         //     var lengthAsDegrees = e.speed * 60 / 110540;
@@ -280,7 +280,7 @@ function onLocationFound(e) {
         //     L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
         // }
     }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 || undefined)}));
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 ?? undefined)}));
 }
 
 function onLocationError(e) { console.log(e.message); }
@@ -702,7 +702,7 @@ var addThing = function() {
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
-    var colo = (bits[3] || "#910000").trim();
+    var colo = (bits[3] ?? "#910000").trim();
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
@@ -1325,7 +1325,7 @@ var rangerings = function(latlng, options) {
             radius: options.ranges[i],
             fill: false,
             color: options.color,
-            weight: options.weight || 1
+            weight: options.weight ?? 1
         }).setDirection(options.pan, options.fov).addTo(rings);
     }
     return rings;
@@ -1376,8 +1376,8 @@ function setMarker(data) {
     var ll;
     var lli = null;
     var opt = {};
-    opt.color = data.color || data.lineColor || "#910000";
-    opt.fillColor = data.fillColor || "#910000";
+    opt.color = data.color ?? data.lineColor ?? "#910000";
+    opt.fillColor = data.fillColor ?? "#910000";
     opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
     opt.weight = data.weight;
     opt.opacity = data.opacity;
@@ -1407,7 +1407,7 @@ function setMarker(data) {
     if (markers.hasOwnProperty(data.name) && markers[data.name].hasOwnProperty("lay")) {
         lll = markers[data.name].lay;
     }
-    var lay = data.layer || lll;
+    var lay = data.layer ?? lll;
     if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
         if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
             if (clusterAt > 0) {
@@ -1564,11 +1564,11 @@ function setMarker(data) {
     if (data.draggable === true) { drag = true; }
 
     if (data.hasOwnProperty("icon")) {
-        var dir = parseFloat(data.hdg || data.heading || data.bearing || "0");
+        var dir = parseFloat(data.hdg ?? data.heading ?? data.bearing ?? "0");
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
-                color: (data.iconColor || "blue")
+                color: (data.iconColor ?? "blue")
             });
             marker.setHeading(dir);
             q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
@@ -1592,7 +1592,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "smallplane") {
-            data.iconColor = data.iconColor || "black";
+            data.iconColor = data.iconColor ?? "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="20" height="20">';
             icon += '<path d="M15.388 4.781c.068.068.061.154-.171.656-.028.06-.18.277-.18.277s.102.113.13.14c.054.055.078.175.056.27-.068.295-.89 1.47-1.35 1.93-.285.286-.432.481-.422.56.009.068.117.356.24.64.219.5.3.599 2.762 3.339 1.95 2.169 2.546 2.87 2.582 3.028.098.439-.282.847-1.264 1.356l-.507.263-7.389-5.29-4.43 3.365.102.18c.056.099.519.676 1.029 1.283.51.607.933 1.161.94 1.232.026.284-1.111 1.177-1.282 1.006-.27-.27-1.399-1.131-1.494-1.14-.068-.007-1.04-.747-1.37-1.077-.329-.33-1.07-1.301-1.076-1.37-.01-.094-.871-1.224-1.14-1.493-.171-.171.722-1.308 1.006-1.282.07.007.625.43 1.231.94.607.51 1.185.973 1.283 1.029l.18.101 3.365-4.43-5.29-7.388.263-.507c.51-.982.918-1.362 1.357-1.264.158.035.859.632 3.028 2.581 2.74 2.462 2.838 2.544 3.339 2.762.284.124.572.232.639.24.08.01.274-.136.56-.422.46-.46 1.635-1.282 1.93-1.35.095-.022.216.003.27.057.028.028.139.129.139.129s.217-.153.277-.18c.502-.233.59-.238.657-.17z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
@@ -1607,7 +1607,7 @@ function setMarker(data) {
             dir = dir - 90;
             var sc = 1;
             if (dir < -90 || dir >= 90) { sc = -1; }
-            data.iconColor = data.iconColor || "#910000";
+            data.iconColor = data.iconColor ?? "#910000";
             var p = "m595.5 97.332-30.898-68.199c-11.141-24.223-35.344-39.762-62.004-39.801h-443.3c-32.738 0.035157-59.266 26.562-59.301 59.305v148.2c0 17.949 14.551 32.5 32.5 32.5h48.5c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h242c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h53.203c12.348-0.003906 23.219-8.1484 26.699-20 0.72266-2.5391 1.0898-5.1602 1.0977-7.7969v-83.5c-0.003906-7.1445-1.5391-14.203-4.5-20.703zm-545.5 12c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm80 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm110-150c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm110 0c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm30 10c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm90 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm19.199-140c-5.1836-0.46094-9.168-4.793-9.1992-10v-80.086c0-5.4727 4.4375-9.9141 9.9141-9.9141h12.684c18.824 0.050781 35.914 11.012 43.805 28.102l30.898 68.199c1.6133 3.5547 2.5 7.3984 2.6016 11.297z";
             icon = '<svg width="640pt" height="640pt" viewBox="-20 -180 640 640" xmlns="http://www.w3.org/2000/svg">';
             icon += '<path d="'+p+'" fill="'+data.iconColor+'"/></svg>';
@@ -1620,7 +1620,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "helicopter") {
-            data.iconColor = data.iconColor || "black";
+            data.iconColor = data.iconColor ?? "black";
             if (data.hasOwnProperty("squawk")) {
                 if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
                     data.iconColor = "red";
@@ -1772,7 +1772,7 @@ function setMarker(data) {
         }
         else if (data.icon.match(/^:.*:$/g)) {
             var em = emojify(data.icon);
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             myMarker = L.divIcon({
                 className:"emicon",
                 html: '<center><span style="font-size:2em; color:'+col+'">'+em+'</span></center>',
@@ -1782,7 +1782,7 @@ function setMarker(data) {
             labelOffset = [12,-4];
         }
         else if (data.icon.match(/^https?:.*$/)) {
-            var sz = data.iconSize || 32;
+            var sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
                 iconSize: [sz, sz],
@@ -1794,7 +1794,7 @@ function setMarker(data) {
             delete data.iconSize;
         }
         else if (data.icon.substr(0,3) === "fa-") {
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
             myMarker = L.divIcon({
@@ -1808,7 +1808,7 @@ function setMarker(data) {
             labelOffset = [8,-8];
         }
         else if (data.icon.substr(0,3) === "wi-") {
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
             myMarker = L.divIcon({
@@ -1823,8 +1823,8 @@ function setMarker(data) {
         }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: data.icon || "circle",
-                markerColor: (data.iconColor || "#910000"),
+                icon: data.icon ?? "circle",
+                markerColor: (data.iconColor ?? "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'
             });
@@ -1863,7 +1863,7 @@ function setMarker(data) {
     else {
         myMarker = L.VectorMarkers.icon({
             icon: "circle",
-            markerColor: (data.iconColor || "#910000"),
+            markerColor: (data.iconColor ?? "#910000"),
             prefix: 'fa',
             iconColor: 'white'
         });
@@ -2451,7 +2451,7 @@ function doCommand(cmd) {
     }
 
     var custIco = function() {
-        var col = cmd.map.iconColor || "#910000";
+        var col = cmd.map.iconColor ?? "#910000";
         var myMarker = L.VectorMarkers.icon({
             icon: "circle",
             markerColor: col,
@@ -2692,17 +2692,17 @@ function doCommand(cmd) {
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
     //console.log("GEOJSON",n,g,l,o)
-    var lay = l || g.name || "unknown";
+    var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
         var st = { stroke:true, color:"#910000", weight:1, fill:true, fillColor:"#910000", fillOpacity:0.15 };
         st = Object.assign(st,o);
         if (feature.hasOwnProperty("properties")) {
             //console.log("GPROPS", feature.properties)
-            st.color = feature.properties["stroke"] || st.color;
-            st.weight = feature.properties["stroke-width"] || st.weight;
-            st.fillColor = feature.properties["fill-color"] || feature.properties["fill"] || st.fillColor;
-            st.fillOpacity = feature.properties["fill-opacity"] || st.fillOpacity;
+            st.color = feature.properties["stroke"] ?? st.color;
+            st.weight = feature.properties["stroke-width"] ?? st.weight;
+            st.fillColor = feature.properties["fill-color"] ?? feature.properties["fill"] ?? st.fillColor;
+            st.fillOpacity = feature.properties["fill-opacity"] ?? st.fillOpacity;
             delete feature.properties["stroke"];
             delete feature.properties["stroke-width"];
             delete feature.properties["fill-color"];
@@ -2712,10 +2712,10 @@ function doGeojson(n,g,l,o) {
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
-            st.color = feature.style["stroke"] || st.color;
-            st.weight = feature.style["stroke-width"] || st.weight;
-            st.fillColor = feature.style["fill-color"] || feature.style["fill"] || st.fillColor;
-            st.fillOpacity = feature.style["fill-opacity"] || st.fillOpacity;
+            st.color = feature.style["stroke"] ?? st.color;
+            st.weight = feature.style["stroke-width"] ?? st.weight;
+            st.fillColor = feature.style["fill-color"] ?? feature.style["fill"] ?? st.fillColor;
+            st.fillOpacity = feature.style["fill-opacity"] ?? st.fillOpacity;
         }
         if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && (feature.geometry.type === "LineString" || feature.geometry.type === "MultiLineString")  ) {
             st.fill = false;
@@ -2751,8 +2751,8 @@ function doGeojson(n,g,l,o) {
         }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: feature.properties["marker-symbol"] || "circle",
-                markerColor: (feature.properties["marker-color"] || "#910000"),
+                icon: feature.properties["marker-symbol"] ?? "circle",
+                markerColor: (feature.properties["marker-color"] ?? "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'
             });
@@ -2768,7 +2768,7 @@ function doGeojson(n,g,l,o) {
         delete feature.properties["marker-size"];
         var nf = {title:feature.properties.title, name:feature.properties.name};
         feature.properties = Object.assign(nf, feature.properties);
-        return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker});
+        return L.marker(latlng, {title:feature.properties.title ?? "", icon:myMarker});
     }
     opt.onEachFeature = function (f,l) {
         if (f.properties && Object.keys(f.properties).length > 0) {
