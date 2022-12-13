@@ -2584,7 +2584,6 @@ function doCommand(cmd) {
             overlays[cmd.map.overlay].addTo(map);
         }
     }
-
     // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
         map.removeLayer(basemaps[baselayername]);
@@ -2668,10 +2667,13 @@ function doCommand(cmd) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
     }
-    if (cmd.hasOwnProperty("heatmap")) {
-        heat.setOptions(cmd.heatmap);
-        document.getElementById("heatall").checked = !!cmd.heatmap;
-        heat.redraw();
+    // Replace heatmap layer with new array (and optionally options)
+    if (cmd.hasOwnProperty("heatmap") && heat) {
+        if (cmd.hasOwnProperty("options")) { heat.setOptions(cmd.options); }
+        heat.setLatLngs(cmd.heatmap);
+        // heat.setOptions(cmd.heatmap);
+        // document.getElementById("heatall").checked = !!cmd.heatmap;
+        // heat.redraw();
     }
     if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
     if (cmd.hasOwnProperty("zoomlock")) {

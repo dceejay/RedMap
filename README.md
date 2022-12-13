@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.32.1 - Let command.map.heatmap replace complete heatmap array.
 - v2.32.0 - Change || to nullish operator ?? to fix numerous dodgy assignments. Issue #219
             Delete marker now also removes from heatmap layer. Issue #218
 - v2.31.3 - Undo previous fix as while more technically correct - doesn't look so good. Issue #217
@@ -410,7 +411,8 @@ Optional properties include
    - **wms** - true/false/grey, specifies if the data is provided by a Web Map Service (if grey sets layer to greyscale)
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
- - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
+ - **heatmap** - set heatmap latlngs array object see https://github.com/Leaflet/Leaflet.heat#reference
+ - **options** - if heatmap set, then use this to set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **panit** - auto pan to the latest marker updated.  - `{"command":{"panit":true}}`
