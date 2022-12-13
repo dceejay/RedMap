@@ -1214,9 +1214,13 @@ var addOverlays = function(overlist) {
         });
     }
 
-    // Add the heatmap layer
+    // Add the heatmap layer (and add delete LatLng function)
     if (overlist.indexOf("HM")!==-1) {
         heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
+        heat.delLatLng = function(ll) {
+            heat._latlngs = heat._latlngs.filter(v => { return v != ll; } );
+            heat._redraw();
+        }
         layers["_heat"] = new L.LayerGroup().addLayer(heat);
         overlays["heatmap"] = layers["_heat"];
     }
@@ -1276,6 +1280,9 @@ var delMarker = function(dname,note) {
         delete polygons[dname+"_"];
     }
     if (typeof markers[dname] != "undefined") {
+        if (heat && markers[dname].hasOwnProperty("_latlng")) {
+            heat.delLatLng(markers[dname]._latlng);
+        }
         layers[markers[dname].lay].removeLayer(markers[dname]);
         map.removeLayer(markers[dname]);
         delete markers[dname];
@@ -1333,7 +1340,6 @@ var rangerings = function(latlng, options) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-
     var rightmenu = function(m) {
         // customise right click context menu
         var rightcontext = "";
