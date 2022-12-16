@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.32.2 - Fix map split in iframe position
  - v2.32.1 - Let command.heatmap replace complete heatmap array.
  - v2.32.0 - Change || to nullish operator ?? to fix numerous dodgy assignments. Issue #219
              Delete marker now also removes from heatmap layer. Issue #218
