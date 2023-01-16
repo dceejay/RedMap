@@ -1505,6 +1505,11 @@ function setMarker(data) {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
             }
             polygons[data.name] = rightmenu(polycirc);
+            polycirc.on('click', function(e) {
+                var fb = allData[data.name];
+                fb.action = "click";
+                ws.send(JSON.stringify(fb));
+            });
             if (!data.hasOwnProperty("icon")) {
                 delete (data.lat);
                 delete (data.lon);
