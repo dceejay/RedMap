@@ -1,5 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.33.0 - Let shapes create click event. (from PR #221)
+             Fix heatmap delete point bug. Issue #222
  - v2.32.2 - Fix map split in iframe position
  - v2.32.1 - Let command.heatmap replace complete heatmap array.
  - v2.32.0 - Change || to nullish operator ?? to fix numerous dodgy assignments. Issue #219

@@ -1215,7 +1215,7 @@ var addOverlays = function(overlist) {
     }
 
     // Add the heatmap layer (and add delete LatLng function)
-    if (overlist.indexOf("HM")!==-1) {
+    if (overlist.indexOf("HM") !== -1) {
         heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
         heat.delLatLng = function(ll) {
             heat._latlngs = heat._latlngs.filter(v => { return v != ll; } );
@@ -1281,7 +1281,8 @@ var delMarker = function(dname,note) {
     }
     if (typeof markers[dname] != "undefined") {
         if (heat && markers[dname].hasOwnProperty("_latlng")) {
-            heat.delLatLng(markers[dname]._latlng);
+            try { heat.delLatLng(markers[dname]._latlng); }
+            catch(e) { }
         }
         layers[markers[dname].lay].removeLayer(markers[dname]);
         map.removeLayer(markers[dname]);
@@ -1341,6 +1342,11 @@ var rangerings = function(latlng, options) {
 // the MAIN add something to map function
 function setMarker(data) {
     var rightmenu = function(m) {
+        m.on('click', function(e) {
+            var fb = allData[data.name];
+            fb.action = "click";
+            ws.send(JSON.stringify(fb));
+        });
         // customise right click context menu
         var rightcontext = "";
         //if (polygons[data.name] == undefined) {
@@ -2040,12 +2046,12 @@ function setMarker(data) {
     marker._popup.dname = data.name;
     marker.lay = lay;                       // and the layer it is on
 
-    marker.on('click', function(e) {
-        //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
-        var fb = allData[marker.name];
-        fb.action = "click";
-        ws.send(JSON.stringify(fb));
-    });
+    // marker.on('click', function(e) {
+    //     //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+    //     var fb = allData[marker.name];
+    //     fb.action = "click";
+    //     ws.send(JSON.stringify(fb));
+    // });
     if (heat && ((data.addtoheatmap != false) || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
     }
