@@ -1793,7 +1793,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
         }
-        else if (data.icon.match(/^https?:.*$/)) {
+        else if (data.icon.match(/^https?:.*$|^\//)) {
             var sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
