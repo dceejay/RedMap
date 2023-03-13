@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.34.0 - Let icon "url" be a local fixed path (PR #223)
  - v2.33.0 - Let shapes create click event. (from PR #221)
              Fix heatmap delete point bug. Issue #222
  - v2.32.3 - Fix map split in iframe position

@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.34.0 - Let icon "url" be a local fixed path (PR #223)
 - v2.33.0 - Let shapes create click event. (from PR #221)
             Fix heatmap delete point bug. Issue #222
 - v2.32.2 - Fix map split in iframe position
@@ -25,14 +26,6 @@ map web page for plotting "things" on.
 - v2.30.2 - Fix for bad handling of mapbox id. Issue #208
 - v2.30.1 - Don't resend bounds if not changed. Issue #209
 - v2.30.0 - Add show/hide ruler option. PR #206
-- v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
-- v2.28.3 - Let button declaration be an array
-- v2.28.1 - Fix layer command bug for non-core layers. Issue #195
-- v2.28.0 - Better Handling of sidc icons in geojson
-- v2.27.3 - Try to handle greatcircles crossing antimeridian
-- v2.27.1 - Reload existing markers for late joiners
-- v2.26.1 - Add QTH/Maidenhead option also
-- v2.26.0 - Add UTM and MGRS to coordinate display options.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
