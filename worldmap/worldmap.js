@@ -2024,12 +2024,11 @@ function setMarker(data) {
     if (data.fill) { delete data.fill; }
     if (data.draggable) { delete data.draggable; }
     //if (!isNaN(data.speed)) { data.speed = data.speed.toFixed(2); }
-    if (data.hasOwnProperty("clickable")) { delete data.clickable; }
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
     for (var i in data) {
-        if ((i != "name") && (i != "length")) {
+        if ((i != "name") && (i != "length") && (i != "clickable")) {
             if (typeof data[i] === "object") {
                 words += i +" : "+JSON.stringify(data[i])+"<br/>";
             } else {
@@ -2042,8 +2041,10 @@ function setMarker(data) {
     words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
-    marker.bindPopup(words, wopt);
-    marker._popup.dname = data.name;
+    if (!data.hasOwnProperty("clickable") && data.clickable != false) {
+        marker.bindPopup(words, wopt);
+        marker._popup.dname = data.name;
+    }
     marker.lay = lay;                       // and the layer it is on
 
     // marker.on('click', function(e) {

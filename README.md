@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.35.0 - Let clickable:false work for markers as well.
 - v2.34.0 - Let icon "url" be a local fixed path (PR #223)
 - v2.33.0 - Let shapes create click event. (from PR #221)
             Fix heatmap delete point bug. Issue #222
@@ -67,6 +68,7 @@ Optional properties include
  - **weblink** : adds a link to an external page. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"}`, or multiple links with an *array of objects* `[{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"},{"name":"node-red", "url":"https://nodered.org", "target":"_new"}]`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to the heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
+ - **clickable** : Default true. Setting to false disables showing any popup.
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **label** : displays the contents as a permanent label next to the marker, or
