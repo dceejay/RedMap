@@ -186,11 +186,12 @@ var edgeAware = function() {
                     iconAnchor.y = -5;
                 };
 
-                var eico = new ms.Symbol("S" + allData[id].SIDC.charAt(1) + "G-",{size:9});
+                var eico = new ms.Symbol(allData[id].SIDC.substr(0,5)+"-------",{size:9});
+                // var eico = new ms.Symbol("S" + allData[id].SIDC.charAt(1) + "G-",{size:9});
                 var myicon = L.icon({
                     iconUrl: eico.toDataURL(),
                     iconAnchor: new L.Point(iconAnchor.x, iconAnchor.y),
-                    className: "natoicon",
+                    className: "natoicon-s",
                 });
 
                 edgeLayer.addLayer(L.marker([lat,lng],{icon:myicon}))
