@@ -33,7 +33,9 @@ var drawingColour = "#910000";
 var sendDrawing;
 var colorControl;
 var sendRoute;
-var oldBounds = {ne:{lat:0,lng:0},sw:{lat:0,lng:0}};
+var oldBounds = {ne:{lat:0, lng:0}, sw:{lat:0, lng:0}};
+var edgeLayer = new L.layerGroup();
+var edgeEnabled = true;
 
 var iconSz = {
     "Team/Crew": 24,
@@ -51,9 +53,6 @@ var iconSz = {
     "Region/Theater": 44,
     "Command": 44
 };
-
-var edgeLayer = new L.layerGroup();
-var edgeEnabled = true;
 
 // Create the socket
 var connect = function() {
@@ -133,71 +132,6 @@ var handleData = function(data) {
             // else { console.log("SKIP",data); }
         }
     }
-}
-
-var edgeAware = function() {
-    if (!edgeEnabled) { return; }
-	map.removeLayer(edgeLayer)
-	edgeLayer = new L.layerGroup();
-	var mapBounds = map.getBounds();
-	var mapBoundsCenter = mapBounds.getCenter();
-
-	pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
-	pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
-	pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
-
-	var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
-	for (var id in markers) {
-        if (allData[id].hasOwnProperty("SIDC")) {
-            markerLatLng = markers[id].getLatLng();
-            if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
-                var k = (markerLatLng.lat - mapBoundsCenter.lat) / (markerLatLng.lng - mapBoundsCenter.lng);
-                if (markerLatLng.lng > mapBoundsCenter.lng) {
-                    x = mapBounds.getEast() - mapBoundsCenter.lng;
-                }
-                else {
-                    x = (mapBounds.getWest() - mapBoundsCenter.lng);
-                }
-                if (markerLatLng.lat < mapBoundsCenter.lat) {
-                    y = mapBounds.getSouth() - mapBoundsCenter.lat;
-                }
-                else {
-                    y = mapBounds.getNorth() - mapBoundsCenter.lat;
-                }
-
-                var lat = (mapBoundsCenter.lat + (k*x));
-                var lng = (mapBoundsCenter.lng + (y/k));
-                var iconAnchor = {x:5, y:5}
-
-                if (lng > mapBounds.getEast()) {
-                    lng = mapBounds.getEast();
-                    iconAnchor.x = 20;
-                }
-                if (lng < mapBounds.getWest()) {
-                    lng = mapBounds.getWest();
-                    iconAnchor.x = -5;
-                };
-                if (lat < mapBounds.getSouth()) {
-                    lat = mapBounds.getSouth();
-                    iconAnchor.y = 15;
-                }
-                if (lat > mapBounds.getNorth()) {
-                    lat = mapBounds.getNorth();
-                    iconAnchor.y = -5;
-                };
-
-                var eico = new ms.Symbol(allData[id].SIDC.substr(0,5)+"-------",{size:9});
-                var myicon = L.icon({
-                    iconUrl: eico.toDataURL(),
-                    iconAnchor: new L.Point(iconAnchor.x, iconAnchor.y),
-                    className: "natoicon-s",
-                });
-
-                edgeLayer.addLayer(L.marker([lat,lng],{icon:myicon}))
-            }
-        }
-	}
-	edgeLayer.addTo(map)
 }
 
 window.onunload = function() { if (ws) ws.close(); }
@@ -438,6 +372,69 @@ var Lgrid = L.latlngGraticule({
         {start:8, end:20, interval:1}
     ]
 });
+
+// Add small sidc icons around edge of map for things just outside of view
+// This function based heavily on Game Aware code from Måns Beckman
+// Copyright (c) 2013 Måns Beckman, All rights reserved.
+var edgeAware = function() {
+    if (!edgeEnabled) { return; }
+	map.removeLayer(edgeLayer)
+	edgeLayer = new L.layerGroup();
+	var mapBounds = map.getBounds();
+	var mapBoundsCenter = mapBounds.getCenter();
+
+	pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
+	pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
+	pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
+
+	var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
+	for (var id in markers) {
+        if (allData[id].hasOwnProperty("SIDC")) {
+            markerLatLng = markers[id].getLatLng();
+            if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
+                var k = (markerLatLng.lat - mapBoundsCenter.lat) / (markerLatLng.lng - mapBoundsCenter.lng);
+
+                if (markerLatLng.lng > mapBoundsCenter.lng) { x = mapBounds.getEast() - mapBoundsCenter.lng; }
+                else { x = (mapBounds.getWest() - mapBoundsCenter.lng); }
+
+                if (markerLatLng.lat < mapBoundsCenter.lat) { y = mapBounds.getSouth() - mapBoundsCenter.lat; }
+                else { y = mapBounds.getNorth() - mapBoundsCenter.lat; }
+
+                var lat = (mapBoundsCenter.lat + (k * x));
+                var lng = (mapBoundsCenter.lng + (y / k));
+                var iconAnchor = {x:5, y:5}
+
+                if (lng > mapBounds.getEast()) {
+                    lng = mapBounds.getEast();
+                    iconAnchor.x = 20;
+                }
+                if (lng < mapBounds.getWest()) {
+                    lng = mapBounds.getWest();
+                    iconAnchor.x = -5;
+                };
+                if (lat < mapBounds.getSouth()) {
+                    lat = mapBounds.getSouth();
+                    iconAnchor.y = 15;
+                }
+                if (lat > mapBounds.getNorth()) {
+                    lat = mapBounds.getNorth();
+                    iconAnchor.y = -5;
+                };
+
+                var eico = new ms.Symbol(allData[id].SIDC.substr(0,5)+"-------",{size:9});
+                var myicon = L.icon({
+                    iconUrl: eico.toDataURL(),
+                    iconAnchor: new L.Point(iconAnchor.x, iconAnchor.y),
+                    className: "natoicon-s",
+                });
+
+                edgeLayer.addLayer(L.marker([lat,lng],{icon:myicon}))
+            }
+        }
+	}
+	edgeLayer.addTo(map)
+}
+// end of edge function
 
 var panit = false;
 function doPanit(v) {
