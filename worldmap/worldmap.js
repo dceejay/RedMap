@@ -2699,7 +2699,11 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("bounds")) {            // Move/Zoom map to new bounds
         if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
-            map.fitBounds(cmd.bounds);
+            if (cmd.hasOwnProperty("fly") && cmd.fly) {
+              map.flyToBounds(cmd.bounds);
+            } else {
+              map.fitBounds(cmd.bounds);
+            }
         }
     }
 }
