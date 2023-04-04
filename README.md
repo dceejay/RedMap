@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.36.0 - Add edge icons for SIDC markers just off the map.
 - v2.35.0 - Let clickable:false work for markers as well.
 - v2.34.0 - Let icon "url" be a local fixed path (PR #223)
 - v2.33.0 - Let shapes create click event. (from PR #221)
