@@ -1468,7 +1468,9 @@ function setMarker(data) {
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
         polygons[data.name] = rightmenu(polyln);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -1477,7 +1479,9 @@ function setMarker(data) {
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
         polygons[data.name] = rightmenu(polyarea);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -1490,7 +1494,9 @@ function setMarker(data) {
         var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
 
         polygons[data.name] = rightmenu(aml);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -2389,7 +2395,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             map.addLayer(overlays[cmd.map.overlay]);
         }
-        if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && (cmd.map.fly === true)) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new NVG XML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("nvg") ) {
@@ -2460,7 +2467,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             map.addLayer(overlays[cmd.map.overlay]);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
 
     var custIco = function() {
@@ -2510,7 +2518,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new TOPOJSON overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {
@@ -2525,7 +2534,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new GPX overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("gpx") ) {
@@ -2540,7 +2550,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new velocity overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
@@ -2553,7 +2564,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
@@ -2699,10 +2711,10 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("bounds")) {            // Move/Zoom map to new bounds
         if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
-            if (cmd.hasOwnProperty("fly") && cmd.fly) {
-              map.flyToBounds(cmd.bounds);
+            if (cmd.hasOwnProperty("fly") && cmd.fly === true) {
+                map.flyToBounds(cmd.bounds);
             } else {
-              map.fitBounds(cmd.bounds);
+                map.fitBounds(cmd.bounds);
             }
         }
     }
