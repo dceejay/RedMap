@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
  - v2.36.0 - Add edge icons for SIDC markers just off the map.
  - v2.35.0 - Let clickable:false work for markers as well.
  - v2.34.0 - Let icon "url" be a local fixed path (PR #223)

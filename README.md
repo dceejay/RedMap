@@ -11,6 +11,7 @@ map web page for plotting "things" on.
 
 ### Updates
 
+- v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
 - v2.36.0 - Add edge icons for SIDC markers just off the map.
 - v2.35.0 - Let clickable:false work for markers as well.
 - v2.34.0 - Let icon "url" be a local fixed path (PR #223)
@@ -137,7 +138,7 @@ then rather than draw a point and icon it draws the polygon. If the "area" array
 elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
 Likewise if it contains a **line** property it will draw the polyline.
-If the payload also includes a property `fit:true` the map will zoom to fit the line or area.
+If the payload also includes a property `fit:true` the map will zoom to fit the line or area. You can also optionally use `fly:true` instead of fit if required for a more animated look.
 
 Finally if a **greatcircle** property is set containing an array of two coordinates then an arc
 following the great circle between the two co-ordinates is plotted.
@@ -564,7 +565,7 @@ The geojson features may contain a `properties` property. That may also include 
 
 The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
 
-The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
+The `fit` property is optional, and you can also use `fly` if you wish. If boolean true the map will automatically zoom to fit the area relevant to the geojson, or use the 'fly' to animation style. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
 
 see https://leafletjs.com/examples/geojson/ for more details about options for opt.
 
@@ -583,7 +584,7 @@ As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSO
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
-Again the boolean `fit` property can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
+Again the boolean `fit` or `fly` properties can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
 
 #### To add a Velocity Grid Overlay
 
