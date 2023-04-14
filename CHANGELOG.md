@@ -1,10 +1,11 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
  - v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
  - v2.36.0 - Add edge icons for SIDC markers just off the map.
  - v2.35.0 - Let clickable:false work for markers as well.
- - v2.34.0 - Let icon "url" be a local fixed path (PR #223)
- - v2.33.0 - Let shapes create click event. (from PR #221)
+ - v2.34.0 - Let icon "url" be a local fixed path. PR #223
+ - v2.33.0 - Let shapes create click event. from PR #221
              Fix heatmap delete point bug. Issue #222
  - v2.32.3 - Fix map split in iframe position
  - v2.32.1 - Let command.heatmap replace complete heatmap array.

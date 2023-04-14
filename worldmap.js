@@ -121,6 +121,7 @@ module.exports = function(RED) {
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
         }
         node.on('input', function(msg) {
+            if (!msg.hasOwnProperty("payload")) { node.warn("Missing payload"); return; }
             if (msg.hasOwnProperty("_sessionid")) {
                 if (clients.hasOwnProperty(msg._sessionid)) {
                     clients[msg._sessionid].write(JSON.stringify(msg.payload));
