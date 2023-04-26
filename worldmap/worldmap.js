@@ -2388,6 +2388,11 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
+        // if new layer is only layer then show it.
+        if (Object.keys(basemaps).length === 1) {
+            baselayername = cmd.map.name;
+            basemaps[baselayername].addTo(map);
+        }
     }
     // Add or swap new minimap layer
     if (cmd.map && cmd.map.hasOwnProperty("minimap")) {

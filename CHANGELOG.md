@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.37.2 - If custom layer is only layer then show it automatically. Issue #230
  - v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
  - v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
  - v2.36.0 - Add edge icons for SIDC markers just off the map.
