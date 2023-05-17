@@ -389,7 +389,7 @@ var edgeAware = function() {
 
 	var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
 	for (var id in markers) {
-        if (allData[id].hasOwnProperty("SIDC")) {
+        if (allData[id] && allData[id].hasOwnProperty("SIDC")) {
             markerLatLng = markers[id].getLatLng();
             if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
                 var k = (markerLatLng.lat - mapBoundsCenter.lat) / (markerLatLng.lng - mapBoundsCenter.lng);
