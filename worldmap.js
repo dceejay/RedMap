@@ -31,6 +31,7 @@ module.exports = function(RED) {
         node.hiderightclick = n.hiderightclick || "false";
         node.coords = n.coords || "none";
         node.showgrid = n.showgrid || "false";
+        node.point_retention = n.point_retention || "all";
         node.showruler = n.showruler || "false";
         node.allowFileDrop = n.allowFileDrop || "false";
         node.path = n.path || "/worldmap";
@@ -134,12 +135,23 @@ module.exports = function(RED) {
                     }
                 }
             }
-            if (msg.payload.hasOwnProperty("name")) {
+            if (node.point_retention === "all") {
+                if (msg.payload.hasOwnProperty("name")) {
                 allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
                 var t = node.maxage || 3600;
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
                 allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
+                }
             }
+            if (node.point_retention === "no_sessionid" && !msg.hasOwnProperty("_sessionid")) {
+                if (msg.payload.hasOwnProperty("name")) {
+                allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
+                var t = node.maxage || 3600;
+                if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
+                allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
+                }
+            }
+            
         });
         node.on("close", function() {
             for (var c in clients) {
