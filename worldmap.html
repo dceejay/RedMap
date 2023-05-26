@@ -98,6 +98,12 @@
         <option value="false">Not shown</option>
         <option value="true">Visible</option>
     </select>
+    <i class="fa fa-database" style="margin-left:22px;"></i> Point retention
+    <select id="node-input-point_retention" style="width:101px;">
+        <option value="all">all</option>
+        <option value="no_sessionid">no sessionid</option>
+        <option value="stateless">stateless</option>
+    </select>
 </div>
 <div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
@@ -257,6 +263,12 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <option value="false">Not shown</option>
         <option value="true">Visible</option>
     </select>
+    <i class="fa fa-database" style="margin-left:22px;"></i> Point retention
+    <select id="node-input-point_retention" style="width:101px;">
+        <option value="all">all</option>
+        <option value="no_sessionid">no sessionid</option>
+        <option value="stateless">stateless</option>
+    </select>
 </div>
 <div class="form-row">
 	<label for="node-input-showruler"><i class="fa fa-window-minimize"></i> Ruler</label>
@@ -377,6 +389,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             hiderightclick: {value:"false"},
             coords: {value:"false"},
             showgrid: {value:"false"},
+            point_retention: {value:"all"},
 			showruler: {value:"false"},
             allowFileDrop: {value:"false"},
             path: {value:"/worldmap"},
@@ -453,6 +466,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     $("#customMap").hide();
                 }
             });
+            this.point_retention = !this.point_retention ? "all" : this.point_retention;
         }
     });
 
@@ -491,6 +505,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     hiderightclick: {value:"true"},
                     coords: {value:"false"},
                     showgrid: {value:"false"},
+                    point_retention: {value:"all"},
 					showruler: {value:"false"},
                     allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"},
@@ -582,6 +597,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                             $("#customMap").hide();
                         }
                     });
+                    this.point_retention = !this.point_retention ? "all" : this.point_retention;
                 }
             });
         }
