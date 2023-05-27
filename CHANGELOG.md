@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh
  - v2.37.3 - Fix hang on layer change
  - v2.37.2 - If custom layer is only layer then show it automatically. Issue #230
  - v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229

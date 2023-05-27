@@ -120,6 +120,7 @@ module.exports = function(RED) {
             });
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
         }
+
         node.on('input', function(msg) {
             if (!msg.hasOwnProperty("payload")) { node.warn("Missing payload"); return; }
             if (msg.hasOwnProperty("_sessionid")) {
@@ -134,7 +135,7 @@ module.exports = function(RED) {
                     }
                 }
             }
-            if (msg.payload.hasOwnProperty("name")) {
+            if (msg.payload.hasOwnProperty("name") && !msg.hasOwnProperty("_sessionid")) {
                 allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
                 var t = node.maxage || 3600;
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
