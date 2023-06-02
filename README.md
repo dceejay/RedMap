@@ -430,8 +430,8 @@ Optional properties include
  - **toptitle** - Words to replace title in title bar (if not in iframe)
  - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
  - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
- - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu: "hide"}}`
- - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers: "hide"}}`
+ - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu": "hide"}}`
+ - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers": "hide"}}`
 
 #### To switch layer, move map and zoom
 
