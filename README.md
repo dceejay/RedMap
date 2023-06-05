@@ -7,6 +7,8 @@
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
 
+Feel free to <iframe src="https://github.com/sponsors/dceejay/button" title="Sponsor dceejay" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe> this project.
+
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
