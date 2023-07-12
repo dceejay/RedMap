@@ -268,7 +268,7 @@ module.exports = function(RED) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
                     if ((node.events.indexOf("connect")!==-1) && (message.action === "connected")) {
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip, _clientheaders:client.headers})});
                     }
                     if ((node.events.indexOf("bounds")!==-1) && (message.action === "bounds")) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
