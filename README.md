@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v2.38.0 - Return client headers as part of connect message.
 - v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh
 - v2.37.3 - Fix hang on layer change
 - v2.37.2 - If custom layer is only layer then show it automatically. Issue #230

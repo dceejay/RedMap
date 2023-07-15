@@ -751,10 +751,6 @@ map.on('moveend', function() {
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 
-//map.on('contextmenu', function(e) {
-//    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
-//});
-
 // single right click to add a marker
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
 if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
@@ -808,6 +804,10 @@ var form = {};
 var addToForm = function(n,v) {
     form[n] = v;
 }
+
+// map.on('click', function(e) {
+//    ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
+// });
 
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
