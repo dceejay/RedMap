@@ -372,7 +372,11 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
 If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The node-red-node-exif node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
 
-All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+All actions also include a:
+`msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+'msg._sessionip' property that shows the ip of the client that is connected to the session. 
+
+Only actions "connected" include a msg._clientheaders property that shows the headers sent by the client to make a connection to the session.
 
 
 ### Utility functions
