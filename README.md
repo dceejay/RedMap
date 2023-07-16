@@ -20,22 +20,6 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
 - v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
 - v2.36.0 - Add edge icons for SIDC markers just off the map.
-- v2.35.0 - Let clickable:false work for markers as well.
-- v2.34.0 - Let icon "url" be a local fixed path. PR #223
-- v2.33.0 - Let shapes create click event. from PR #221
-            Fix heatmap delete point bug. Issue #222
-- v2.32.2 - Fix map split in iframe position
-- v2.32.1 - Let command.map.heatmap replace complete heatmap array.
-- v2.32.0 - Change || to nullish operator ?? to fix numerous dodgy assignments. Issue #219
-            Delete marker now also removes from heatmap layer. Issue #218
-- v2.31.3 - Undo previous fix as while more technically correct - doesn't look so good. Issue #217
-- v2.31.2 = Fix more antimeridian crossing wrinkles. Issue #216
-- v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Add route distance. Issue #213, Issue #212, PR #215
-- v2.31.0 - Better handling of KML files. Issue #211
-- v2.30.3 - Fix for iframe height. Issue #210
-- v2.30.2 - Fix for bad handling of mapbox id. Issue #208
-- v2.30.1 - Don't resend bounds if not changed. Issue #209
-- v2.30.0 - Add show/hide ruler option. PR #206
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -48,7 +32,7 @@ Either use the Manage Palette option in the Node-RED Editor menu, or run the fol
 ## Usage
 
 Plots "things" on a map. By default the map will be served from `{httpRoot}/worldmap`, but this
-can be configured in the configuration panel.
+can be changed in the configuration panel.
 
 Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
@@ -61,13 +45,13 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, for
 Optional properties include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
- - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
+ - **draggable** : set to <i>true</i> to allow marker to be moved by the mouse. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to. (default <i>"unknown"</i>)
  - **track | hdg | heading | bearing** : when combined with speed, draws a vector. (only first will be used)
- - **speed** : when combined with heading, draws a vector.
- - **accuracy** : when combined with heading vector, draws a polygon of possible direction.
- - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https://
+ - **speed** : when combined with track, hdg, heading, or bearing, draws a leader line vector.
+ - **accuracy** : when combined with heading vector, draws an arc of possible direction.
+ - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// uri.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -96,7 +80,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to http(s)://... By default will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
+Or you can specify an image to load as an icon by setting the icon to http(s)://... By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
 
 There are also several special icons...
 
@@ -112,7 +96,7 @@ There are also several special icons...
  - **satellite** : a small satellite icon.
  - **iss** : a slightly larger icon for the ISS.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
- - **friend** : pseudo NATO style blue rectangle. (see NATO SIDC option below)
+ - **friend** : pseudo NATO style blue rectangle. (but see NATO SIDC option below)
  - **hostile** : pseudo NATO style red circle.
  - **neutral** : pseudo NATO style green square.
  - **unknown** : pseudo NATO style yellow square.
@@ -145,7 +129,8 @@ then rather than draw a point and icon it draws the polygon. If the "area" array
 elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
 Likewise if it contains a **line** property it will draw the polyline.
-If the payload also includes a property `fit:true` the map will zoom to fit the line or area. You can also optionally use `fly:true` instead of fit if required for a more animated look.
+
+If the payload also includes a property `fit:true` the map will zoom to fit the line or area. Alternatively you can use `fly:true` instead of fit for a more animated look.
 
 Finally if a **greatcircle** property is set containing an array of two coordinates then an arc
 following the great circle between the two co-ordinates is plotted.
@@ -339,7 +324,7 @@ in addition existing male, female, fa-male and fa-female icons are all represent
 
  **NOTES**
 
- - There is currently no way to add labels, popups, or make the icons clickable.
+ - There is currently no way to add labels, popups, or to make the icons clickable.
  - The 3D only really works at zoomed in scales 16+ due to the small size of the icons. They are not scale independent like icons on the normal map.
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
@@ -374,9 +359,9 @@ If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, j
 
 All actions also include a:
 `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
-'msg._sessionip' property that shows the ip of the client that is connected to the session. 
+`msg._sessionip` property that shows the ip of the client that is connected to the session.
 
-Only actions "connected" include a msg._clientheaders property that shows the headers sent by the client to make a connection to the session.
+The "connected" action also include a `msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
 
 
 ### Utility functions

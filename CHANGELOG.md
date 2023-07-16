@@ -17,7 +17,7 @@
              Delete marker now also removes from heatmap layer. Issue #218
 
  - v2.31.3 - Undo previous fix as while more technically correct - doesn't look so good. Issue #217
- - v2.31.2 = Fix more antimeridian crossing wrinkles. Issue #216
+ - v2.31.2 - Fix more antimeridian crossing wrinkles. Issue #216
  - v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Add route distance. Issue #213, Issue #212, PR #215
  - v2.31.0 - Better handling of KML files. Issue #211
 
