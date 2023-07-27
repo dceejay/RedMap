@@ -63,7 +63,7 @@ var connect = function() {
         if (!inIframe) {
             document.getElementById("footer").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
         }
-        ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams)}));
+        ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams),clientTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone || false}));
         onoffline();
     };
     ws.onclose = function() {
