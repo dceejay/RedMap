@@ -2795,7 +2795,7 @@ function doCommand(cmd) {
 
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
-    //console.log("GEOJSON",n,g,l,o)
+    // console.log("GEOJSON",n,g,l,o)
     var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
@@ -2867,9 +2867,11 @@ function doGeojson(n,g,l,o) {
         if (feature.properties.hasOwnProperty("url")) {
             feature.properties.url = "<a target='_new' href='"+feature.properties.url+"'>"+feature.properties.url+"</a>";
         }
-        delete feature.properties["marker-symbol"];
-        delete feature.properties["marker-color"];
-        delete feature.properties["marker-size"];
+        if (feature.geometry.hasOwnProperty("type") && feature.geometry.type !== "MultiPoint") {
+            delete feature.properties["marker-symbol"];
+            delete feature.properties["marker-color"];
+            delete feature.properties["marker-size"];
+        }
         var nf = {title:feature.properties.title, name:feature.properties.name};
         feature.properties = Object.assign(nf, feature.properties);
         return L.marker(latlng, {title:feature.properties.title ?? "", icon:myMarker});
