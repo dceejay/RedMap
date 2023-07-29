@@ -13,7 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
-- v2.38.2 - Better fix for geojson multipoint icons.
+- v2.38.3 - Better fix for geojson multipoint icons.
 - v2.38.1 - Fix for geojson multipoint icons.
 - v2.38.0 - Return client headers as part of connect message.
 - v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh

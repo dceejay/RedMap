@@ -2853,7 +2853,7 @@ function doGeojson(n,g,l,o) {
                 className: "natoicon",
             });
         }
-        else if (feature.properties["marker-symbol"].substr(0,3) === "fa-") {
+        else if (feature.properties.hasOwnProperty("marker-symbol") && feature.properties["marker-symbol"].substr(0,3) === "fa-") {
             try {
                 var col = feature.properties["marker-color"] ?? "#910000";
                 var imod = "";
