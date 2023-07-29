@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.38.2 - Better fix for geojson multipoint icons.
  - v2.38.1 - Fix for geojson multipoint icons.
  - v2.38.0 - Return client headers as part of connect message.
  - v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh

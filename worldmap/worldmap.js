@@ -2853,6 +2853,21 @@ function doGeojson(n,g,l,o) {
                 className: "natoicon",
             });
         }
+        else if (feature.properties["marker-symbol"].substr(0,3) === "fa-") {
+            try {
+                var col = feature.properties["marker-color"] ?? "#910000";
+                var imod = "";
+                if (feature.properties["marker-symbol"].indexOf(" ") === -1) { imod = "fa-2x "; }
+                myMarker = L.divIcon({
+                    className:"faicon",
+                    html: '<center><i class="fa fa-fw '+imod+feature.properties["marker-symbol"]+'" style="color:'+col+'"></i></center>',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 12],
+                    popupAnchor: [0, -16]
+                });
+            }
+            catch(e) { console.log(e); }
+        }
         else {
             myMarker = L.VectorMarkers.icon({
                 icon: feature.properties["marker-symbol"] ?? "circle",
@@ -2867,20 +2882,19 @@ function doGeojson(n,g,l,o) {
         if (feature.properties.hasOwnProperty("url")) {
             feature.properties.url = "<a target='_new' href='"+feature.properties.url+"'>"+feature.properties.url+"</a>";
         }
-        if (feature.geometry.hasOwnProperty("type") && feature.geometry.type !== "MultiPoint") {
-            delete feature.properties["marker-symbol"];
-            delete feature.properties["marker-color"];
-            delete feature.properties["marker-size"];
-        }
         var nf = {title:feature.properties.title, name:feature.properties.name};
         feature.properties = Object.assign(nf, feature.properties);
         return L.marker(latlng, {title:feature.properties.title ?? "", icon:myMarker});
     }
     opt.onEachFeature = function (f,l) {
         if (f.properties && Object.keys(f.properties).length > 0) {
-            var tx = JSON.stringify(f.properties,null,' ');
+            var tx = JSON.parse(JSON.stringify(f.properties,null,' '));
+            delete tx["marker-symbol"];
+            delete tx["marker-color"];
+            delete tx["marker-size"];
+            tx = JSON.stringify(tx,null,' ');
             if ( tx !== "{}") {
-                l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+                l.bindPopup('<pre style="overflow-x: scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
             }
         }
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
