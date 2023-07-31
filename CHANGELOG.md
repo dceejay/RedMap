@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.39.0 - Add client timezone to connect message. PR #245
  - v2.38.3 - Better fix for geojson multipoint icons.
  - v2.38.1 - Fix for geojson multipoint icons.
  - v2.38.0 - Return client headers as part of connect message.

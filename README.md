@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v2.39.0 - Add client timezone to connect message. PR #245
 - v2.38.3 - Better fix for geojson multipoint icons.
 - v2.38.1 - Fix for geojson multipoint icons.
 - v2.38.0 - Return client headers as part of connect message.
