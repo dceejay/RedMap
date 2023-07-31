@@ -363,7 +363,10 @@ All actions also include a:
 `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
 `msg._sessionip` property that shows the ip of the client that is connected to the session.
 
-The "connected" action also include a `msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
+The "connected" action additionally includes a:
+`msg.payload.parameters` property object that lists the parameters sent in the url.
+`msg.payload.clientTimezone` property string showing the clients local Timezone. Returns bool of `false` if unable to retrive clients local Timezone.
+`msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
 
 
 ### Utility functions
