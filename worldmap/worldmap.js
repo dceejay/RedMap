@@ -2854,19 +2854,16 @@ function doGeojson(n,g,l,o) {
             });
         }
         else if (feature.properties.hasOwnProperty("marker-symbol") && feature.properties["marker-symbol"].substr(0,3) === "fa-") {
-            try {
-                var col = feature.properties["marker-color"] ?? "#910000";
-                var imod = "";
-                if (feature.properties["marker-symbol"].indexOf(" ") === -1) { imod = "fa-2x "; }
-                myMarker = L.divIcon({
-                    className:"faicon",
-                    html: '<center><i class="fa fa-fw '+imod+feature.properties["marker-symbol"]+'" style="color:'+col+'"></i></center>',
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 12],
-                    popupAnchor: [0, -16]
-                });
-            }
-            catch(e) { console.log(e); }
+            var col = feature.properties["marker-color"] ?? "#910000";
+            var imod = "";
+            if (feature.properties["marker-symbol"].indexOf(" ") === -1) { imod = "fa-2x "; }
+            myMarker = L.divIcon({
+                className:"faicon",
+                html: '<center><i class="fa fa-fw '+imod+feature.properties["marker-symbol"]+'" style="color:'+col+'"></i></center>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 12],
+                popupAnchor: [0, -16]
+            });
         }
         else {
             myMarker = L.VectorMarkers.icon({
