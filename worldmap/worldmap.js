@@ -18,7 +18,7 @@ var menuOpen = false;
 var clusterAt = 0;
 var maxage = 900;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var pagefoot = "&nbsp;&copy; DCJ 2022"
+var pagefoot = "&nbsp;&copy; DCJ 2023"
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -117,12 +117,23 @@ var handleData = function(data) {
             }
         }
         if (data.command) { doCommand(data.command); delete data.command; }
+
+        // handle raw geojson type msg
         if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
             if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('title')) {
                 doGeojson(data.properties.title,data)
             }
             else { doGeojson("geojson",data); }
         }
+        // handle TAK json (from tak-ingest node or fastxml node)
+        else if (data.hasOwnProperty("event") && data.event.hasOwnProperty("point")) {
+            doTAKjson(data.event);
+        }
+        // handle TAK json (from multicast Protobuf)
+        else if (data.hasOwnProperty("cotEvent") && data.cotEvent.hasOwnProperty("lat") && data.cotEvent.hasOwnProperty("lon")) {
+            doTAKMCjson(data.cotEvent);
+        }
+        // handle default worldmap json msg
         else if (data.hasOwnProperty("name")) { setMarker(data); }
         else {
             if (JSON.stringify(data) !== '{}') {
@@ -2909,4 +2920,60 @@ function doGeojson(n,g,l,o) {
     }
     layers[lay].addLayer(markers[n]);
     map.addLayer(layers[lay]);
+}
+
+// handle TAK messages from TAK server tcp - XML->JSON
+function doTAKjson(p) {
+    // console.log("TAK event",p);
+    if (p.type.indexOf('a') === 0) {
+        var d = {};
+        d.lat = Number(p.point.lat);
+        d.lon = Number(p.point.lon);
+        d.group = p.detail?.__group?.name;
+        d.role = p.detail?.__group?.role;
+        d.type = p.type;
+        d.uid = p.uid;
+        d.name = p.detail?.contact?.callsign || p.uid;
+        d.hdg = p.detail?.track?.course;
+        d.speed = p.detail?.track?.speed;
+        var i = d.type.split('-').join('').toUpperCase();
+        if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
+        d.SIDC = (i + '------------').substr(0,12);
+        d.timestamp = Date.parse(p.time);
+        d.ttl = Date.parse(p.stale);
+        // d.now = Date.now();
+        d.alt = Number(p.point.hae) || 9999999;
+        setMarker(d);
+    }
+    else {
+        console.log("Skip TAK type",p.type);
+    }
+}
+
+// handle TAK messages from TAK Multicast - Protobuf->JSON
+function doTAKMCjson(p) {
+    // console.log("TAK Multicast event",p);
+    if (p.type.indexOf('a') === 0) {
+        var d = {};
+        d.lat = p.lat;
+        d.lon = p.lon;
+        d.group = p.detail?.group?.name;
+        d.role = p.detail?.group?.role;
+        d.type = p.type;
+        d.uid = p.uid;
+        d.name = p.detail?.contact?.callsign || p.uid;
+        d.hdg = p.detail?.track?.course;
+        d.speed = p.detail?.track?.speed;
+        var i = d.type.split('-').join('').toUpperCase();
+        if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
+        d.SIDC = (i + '------------').substr(0,12);
+        d.timestamp = Number(p.sendTime);
+        d.ttl = Number(p.staleTime);
+        // d.now = Date.now();
+        d.alt = p.hae || 9999999;
+        setMarker(d);
+    }
+    else {
+        console.log("Skip TAK type",p.type);
+    }
 }

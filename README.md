@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v2.40.0 - Add handling for TAK event points from TAK ingest node.
 - v2.39.0 - Add client timezone to connect message. PR #245
 - v2.38.3 - Better fix for geojson multipoint icons.
 - v2.38.1 - Fix for geojson multipoint icons.
@@ -118,9 +119,17 @@ To do this you need to supply a `msg.payload.SIDC` 2525 code instead of an icon,
         "options": { "fillOpacity":0.8, "additionalInformation":"Extra info" }
     }
 
-SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
+SIDC codes can be generated using the online tool - https://www.spatialillusions.com/unitgenerator-legacy/
 
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
+
+#### TAK Visualisation
+
+Users of [TAK](https://tak.gov) can use the [TAK ingest node](https://flows.nodered.org/node/node-red-contrib-tak-registration) to create a JSON formatted TAK event object, received from a TAK server. This can be fed directly into the worldmap node.
+
+![Tak Flow](https://github.com/dceejay/pages/blob/master/TAKflow.png?raw=true)
+![Tak Image](https://github.com/dceejay/pages/blob/master/TAKicons.png?raw=true)
+
 
 ### Areas, Rectangles, Lines, and GreatCircles
 
@@ -698,7 +707,7 @@ and use a url like `"url": "http://localhost:1882/?map=/maps/my-app.map",`
 
 To use a vector mbtiles server like **MapTiler** then you can download your mbtiles file into a directory and then from that directory run
 ```
-docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080
+docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
 ```
 and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
 
