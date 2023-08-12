@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v2.40.1 - Fix missing countries overlay when starting disconnected.
 - v2.40.0 - Add handling for TAK event points from TAK ingest node.
 - v2.39.0 - Add client timezone to connect message. PR #245
 - v2.38.3 - Better fix for geojson multipoint icons.

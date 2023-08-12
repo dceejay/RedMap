@@ -147,7 +147,13 @@ var handleData = function(data) {
 
 window.onunload = function() { if (ws) ws.close(); }
 
-var onoffline = function() { if (!navigator.onLine) { map.addLayer(layers["_countries"]); } }
+var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
+layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
+overlays["countries"] = layers["_countries"];
+
+var onoffline = function() { if (!navigator.onLine) {
+    map.addLayer(overlays["countries"]);
+} }
 
 document.addEventListener ("keydown", function (ev) {
     // Set Ctl-Alt-3 to switch to 3d view
@@ -1216,7 +1222,6 @@ var addOverlays = function(overlist) {
                     sendDrawing(n);
                 });
         }
-
     }
 
     // Add the countries (world-110m) for offline use
