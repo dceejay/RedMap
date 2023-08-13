@@ -2934,7 +2934,8 @@ function doTAKjson(p) {
         var d = {};
         d.lat = Number(p.point.lat);
         d.lon = Number(p.point.lon);
-        d.group = p.detail?.__group?.name;
+        d.team = p.detail?.__group?.name;
+        d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
         d.role = p.detail?.__group?.role;
         d.type = p.type;
         d.uid = p.uid;
@@ -2943,11 +2944,20 @@ function doTAKjson(p) {
         d.speed = p.detail?.track?.speed;
         var i = d.type.split('-').join('').toUpperCase();
         if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
+        if (d.role === 'HQ') { i = 'SFGPUH' };
+        if (d.role === "Medic") { i = 'SFGPUSM'; }
+        if (d.role === "RTO") { i = 'SFGPUUS'; }
+        if (d.role === 'K9') { i = 'SFGPUU'; }
         d.SIDC = (i + '------------').substr(0,12);
-        d.timestamp = Date.parse(p.time);
-        d.ttl = Date.parse(p.stale);
-        // d.now = Date.now();
+        try {
+            var st = (new Date(p.time)).getTime() / 1000;
+            var et = (new Date(p.stale)).getTime() / 1000;
+            d.timestamp = (new Date(p.time)).toISOString();
+            d.staletime = (new Date(p.stale)).toISOString();
+            d.ttl = parseInt(et-st);
+        } catch(e) { console.log(e); }
         d.alt = Number(p.point.hae) || 9999999;
+        if (d.alt === 9999999) { delete d.alt; }
         setMarker(d);
     }
     else {
@@ -2962,7 +2972,8 @@ function doTAKMCjson(p) {
         var d = {};
         d.lat = p.lat;
         d.lon = p.lon;
-        d.group = p.detail?.group?.name;
+        d.team = p.detail?.group?.name;
+        d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
         d.role = p.detail?.group?.role;
         d.type = p.type;
         d.uid = p.uid;
@@ -2971,11 +2982,20 @@ function doTAKMCjson(p) {
         d.speed = p.detail?.track?.speed;
         var i = d.type.split('-').join('').toUpperCase();
         if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
+        if (d.role === 'HQ') { i = 'SFGPUH' };
+        if (d.role === "Medic") { i = 'SFGPUSM'; }
+        if (d.role === "RTO") { i = 'SFGPUUS'; }
+        if (d.role === 'K9') { i = 'SFGPUU'; }
         d.SIDC = (i + '------------').substr(0,12);
         d.timestamp = Number(p.sendTime);
         d.ttl = Number(p.staleTime);
-        // d.now = Date.now();
+        try {
+            d.timestamp = (new Date(+p.sendTime)).toISOString();
+            d.staletime = (new Date(+p.staleTime)).toISOString();
+            d.ttl = parseInt((+p.staleTime / 1000) - (+p.sendTime / 1000));
+        } catch(e) { console.log(e); }
         d.alt = p.hae || 9999999;
+        if (d.alt === 9999999) { delete d.alt; }
         setMarker(d);
     }
     else {

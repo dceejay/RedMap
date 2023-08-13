@@ -511,7 +511,7 @@ To remove set the legend to an empty string `""`.
 
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
 style server by adding a property `wms: true`. You can also set `wms: "grey"` to set the layer to greyscale which
-may let you markers be more visible. (see overlay example below).
+may let your markers be more visible. (see overlay example below).
 
     msg.payload.command.map = {
         "name":"OSMhot",  // use "overlay":"MyOverlayName" for an overlay rather than a base layer.
