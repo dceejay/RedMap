@@ -773,6 +773,17 @@ var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onk
 if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
 var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
 
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
+const colorKeywordToRGB = (colorKeyword) => {
+    let el = document.createElement('div');
+    el.style.color = colorKeyword;
+    document.body.appendChild(el);
+    let rgbValue = window.getComputedStyle(el).color;
+    document.body.removeChild(el);
+    console.log(rgbValue);
+    return rgba2hex(rgbValue);
+}
+
 var rclk = {};
 var hiderightclick = false;
 var addThing = function() {
@@ -783,6 +794,7 @@ var addThing = function() {
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
     var colo = (bits[3] ?? "#910000").trim();
+    colo = colorKeywordToRGB(colo);
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
@@ -794,6 +806,7 @@ var addThing = function() {
         d.icon = icon;
         d.iconColor = colo;
     }
+    if (icon === "dot") { d.icon = 'fa-circle fa-fw'; }
     ws.send(JSON.stringify(d));
     delete d.action;
     setMarker(d);
@@ -2942,13 +2955,7 @@ function doTAKjson(p) {
         d.name = p.detail?.contact?.callsign || p.uid;
         d.hdg = p.detail?.track?.course;
         d.speed = p.detail?.track?.speed;
-        var i = d.type.split('-').join('').toUpperCase();
-        if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
-        if (d.role === 'HQ') { i = 'SFGPUH' };
-        if (d.role === "Medic") { i = 'SFGPUSM'; }
-        if (d.role === "RTO") { i = 'SFGPUUS'; }
-        if (d.role === 'K9') { i = 'SFGPUU'; }
-        d.SIDC = (i + '------------').substr(0,12);
+
         try {
             var st = (new Date(p.time)).getTime() / 1000;
             var et = (new Date(p.stale)).getTime() / 1000;
@@ -2958,6 +2965,7 @@ function doTAKjson(p) {
         } catch(e) { console.log(e); }
         d.alt = Number(p.point.hae) || 9999999;
         if (d.alt === 9999999) { delete d.alt; }
+        handleCoTtypes(d);
         setMarker(d);
     }
     else {
@@ -2980,15 +2988,6 @@ function doTAKMCjson(p) {
         d.name = p.detail?.contact?.callsign || p.uid;
         d.hdg = p.detail?.track?.course;
         d.speed = p.detail?.track?.speed;
-        var i = d.type.split('-').join('').toUpperCase();
-        if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
-        if (d.role === 'HQ') { i = 'SFGPUH' };
-        if (d.role === "Medic") { i = 'SFGPUSM'; }
-        if (d.role === "RTO") { i = 'SFGPUUS'; }
-        if (d.role === 'K9') { i = 'SFGPUU'; }
-        d.SIDC = (i + '------------').substr(0,12);
-        d.timestamp = Number(p.sendTime);
-        d.ttl = Number(p.staleTime);
         try {
             d.timestamp = (new Date(+p.sendTime)).toISOString();
             d.staletime = (new Date(+p.staleTime)).toISOString();
@@ -2996,9 +2995,40 @@ function doTAKMCjson(p) {
         } catch(e) { console.log(e); }
         d.alt = p.hae || 9999999;
         if (d.alt === 9999999) { delete d.alt; }
+        handleCoTtypes(d);
         setMarker(d);
     }
     else {
         console.log("Skip TAK type",p.type);
     }
+}
+
+function handleCoTtypes(d) {
+    var i = d.type.split('-').join('').toUpperCase();
+    if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
+    if (d.role === 'Team Lead') { i = i + '----B'; }
+    if (d.role === 'HQ') { i = 'SFGPUH' };
+    if (d.role === "Medic") { i = 'SFGPUSM----A'; }
+    if (d.role === "RTO") { i = 'SFGPUUS'; }
+    if (d.role === 'K9') { i = 'SFGPUU'; }
+    d.SIDC = (i + '-------').substr(0,12);
+    // Handle "special" types
+    if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
+    if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
+    if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+
+    // Other non-atom types - tbd
+    // b-a-o  (Alert) - "ESOPB-------"
+    // b-a-g  (Geofence alert) - "ESOPEC------"
+    // b-a-o-can (cancel Alert) - "ENOSB-------" short ttl
+    // b-m-p-s-m Marker point (dot with colour)
+    // b-m-p-s-p-loc Located object eg video
+    // b-m-p-s-p-i Location indicator
+    // b-i-x-i Camera image
+    // b-m-r Route
+    // b-m-p-c Waypoint
+    // b-r-f-h-c Medevac
+    // b-d Drawings -c-c circle -c-e ellipse -r rectangle -f freehand
+    // b-t-f Geochat (f = file)
+    return d;
 }
