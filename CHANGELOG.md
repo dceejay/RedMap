@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
  - v2.40.1 - Fix missing countries overlay when starting disconnected.
  - v2.40.0 - Add handling for TAK event points from TAK ingest node.
  - v2.39.0 - Add client timezone to connect message. PR #245
