@@ -289,14 +289,14 @@ function onLocationFound(e) {
         setMarker(self);
     }
     if (followMode.accuracy) {
-        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color ?? "cyan", weight:3, opacity:0.6, fill:false, clickable:false});
+        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color ?? "#00ffff", weight:3, opacity:0.6, fill:false, clickable:false});
         errRing.addTo(map);
         // if (e.hasOwnProperty("heading")) {
         //     var lengthAsDegrees = e.speed * 60 / 110540;
         //     var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
         //     var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
         //     var lla = new L.LatLng(ya,xa);
-        //     L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
+        //     L.polygon([ e.latlng, lla ], {color:"00ffff", weight:3, opacity:0.5, clickable:false}).addTo(map);
         // }
     }
     ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 ?? undefined)}));
@@ -770,7 +770,7 @@ map.on('locationerror', onLocationError);
 
 // single right click to add a marker
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
-if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
+if (navigator.onLine) { addmenu += '<br/><a href="https://www.spatialillusions.com/unitgenerator-legacy/" target="_new">MilSymbol SIDC generator</a>'; }
 var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
 
 const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
@@ -1337,8 +1337,8 @@ var coords = L.control.mouseCoordinate({position:"bottomleft"});
 var legend = L.control({ position: "bottomleft" });
 
 // Add the dialog box for messages
-var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
-dialogue.freeze();
+// var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
+// dialogue.freeze();
 
 var doDialog = function(d) {
     //console.log("DIALOGUE",d);
@@ -1849,7 +1849,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "locate") {
-            data.iconColor = data.iconColor || "cyan";
+            data.iconColor = data.iconColor || "#00ffff";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
             icon += '<polygon points="32 32 104 32 104 0 0 0 0 104 32 104" fill="'+data.iconColor+'"/>';
             icon += '<polygon points="468 0 364 0 364 32 436 32 436 104 468 104" fill="'+data.iconColor+'"/>';
@@ -2942,19 +2942,25 @@ function doGeojson(n,g,l,o) {
 
 // handle TAK messages from TAK server tcp - XML->JSON
 function doTAKjson(p) {
-    // console.log("TAK event",p);
-    if (p.type.indexOf('a') === 0) {
+    //console.log("TAK event",p);
+    if (p.type.indexOf('a-') === 0 || p.type.indexOf('b-m-p-') === 0 || p.type.indexOf('b-a-o-') === 0 || p.type.indexOf('b-a-g') === 0) {
         var d = {};
+        d.name = p.detail?.contact?.callsign || p.uid;
         d.lat = Number(p.point.lat);
         d.lon = Number(p.point.lon);
-        d.team = p.detail?.__group?.name;
-        d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
-        d.role = p.detail?.__group?.role;
+        if (p.type.indexOf('a') === 0) {
+            d.hdg = p.detail?.track?.course;
+            d.speed = p.detail?.track?.speed;
+            d.team = p.detail?.__group?.name;
+            d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+            d.role = p.detail?.__group?.role;
+        }
         d.type = p.type;
+        d.remarks = p.detail?.remarks
+        if (p.detail?.remarks && p.detail.remarks.hasOwnProperty["#text"]) {
+            d.remarks = p.detail.remarks["#text"];
+        }
         d.uid = p.uid;
-        d.name = p.detail?.contact?.callsign || p.uid;
-        d.hdg = p.detail?.track?.course;
-        d.speed = p.detail?.track?.speed;
 
         try {
             var st = (new Date(p.time)).getTime() / 1000;
@@ -2962,10 +2968,11 @@ function doTAKjson(p) {
             d.timestamp = (new Date(p.time)).toISOString();
             d.staletime = (new Date(p.stale)).toISOString();
             d.ttl = parseInt(et-st);
-        } catch(e) { console.log(e); }
+        }
+        catch(e) { console.log(e); }
         d.alt = Number(p.point.hae) || 9999999;
         if (d.alt === 9999999) { delete d.alt; }
-        handleCoTtypes(d);
+        handleCoTtypes(d,p);
         setMarker(d);
     }
     else {
@@ -2988,6 +2995,7 @@ function doTAKMCjson(p) {
         d.name = p.detail?.contact?.callsign || p.uid;
         d.hdg = p.detail?.track?.course;
         d.speed = p.detail?.track?.speed;
+
         try {
             d.timestamp = (new Date(+p.sendTime)).toISOString();
             d.staletime = (new Date(+p.staleTime)).toISOString();
@@ -2995,7 +3003,7 @@ function doTAKMCjson(p) {
         } catch(e) { console.log(e); }
         d.alt = p.hae || 9999999;
         if (d.alt === 9999999) { delete d.alt; }
-        handleCoTtypes(d);
+        handleCoTtypes(d,p);
         setMarker(d);
     }
     else {
@@ -3003,32 +3011,123 @@ function doTAKMCjson(p) {
     }
 }
 
-function handleCoTtypes(d) {
-    var i = d.type.split('-').join('').toUpperCase();
-    if (i[0] === 'A') { i = 'S' + i.substr(1,2) + 'P' + i.substr(3); }
-    if (d.role === 'Team Lead') { i = i + '----B'; }
-    if (d.role === 'HQ') { i = 'SFGPUH' };
-    if (d.role === "Medic") { i = 'SFGPUSM----A'; }
-    if (d.role === "RTO") { i = 'SFGPUUS'; }
-    if (d.role === 'K9') { i = 'SFGPUU'; }
-    d.SIDC = (i + '-------').substr(0,12);
-    // Handle "special" types
-    if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
-    if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
-    if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+function convertCOTtoCIFColour(color) {
+    const c = parseInt(color);
+    const arr = new ArrayBuffer(4);
+    const view = new DataView(arr);
+    view.setUint32(0, color, false);
+    const b2h = buf2hex(arr);
+    return "#" + b2h.substr(2);
+}
 
-    // Other non-atom types - tbd
-    // b-a-o  (Alert) - "ESOPB-------"
-    // b-a-g  (Geofence alert) - "ESOPEC------"
-    // b-a-o-can (cancel Alert) - "ENOSB-------" short ttl
-    // b-m-p-s-m Marker point (dot with colour)
-    // b-m-p-s-p-loc Located object eg video
-    // b-m-p-s-p-i Location indicator
-    // b-i-x-i Camera image
-    // b-m-r Route
-    // b-m-p-c Waypoint
-    // b-r-f-h-c Medevac
-    // b-d Drawings -c-c circle -c-e ellipse -r rectangle -f freehand
-    // b-t-f Geochat (f = file)
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+    return [...new Uint8Array(buffer)]
+        .map(x => x.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+function createRings(r) {
+    if (r <= 100) { return r; }
+    var rings = [];
+    var step = 100;
+    if (r > 1000) { step = 1000; }
+    if (r > 10000) { step = 10000; }
+    for (var i = step; i < r; i += step) {
+        rings.push(i);
+    }
+    rings.push(r);
+    return rings;
+}
+
+function handleCoTtypes(d,p) {
+    if (d.type.indexOf('a-') === 0) { // handle a- types
+        var i = d.type.split('-').join('').toUpperCase();
+        i = 'S' + i.substr(1,2) + 'P' + i.substr(3);
+        if (d.role === 'Team Lead') { i = i + '----B'; }
+        if (d.role === 'HQ') { i = 'SFGPUH' };
+        if (d.role === "Medic") { i = 'SFGPUSM----A'; }
+        if (d.role === "RTO") { i = 'SFGPUUS'; }
+        if (d.role === 'K9') { i = 'SFGPUU'; }
+        d.SIDC = (i + '-------').substr(0,12);
+        // Handle "special" types
+        if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
+        if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
+        if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+        return d;
+    }
+    else { // handle b- types
+        // console.log("TYPE",d.type);
+        try {
+            if (d.type === 'b-m-p-s-m') { // small spot marker
+                d.icon = "fa-circle fa-fw";
+                d.ttl = 0;
+                d.iconColor = convertCOTtoCIFColour(p.detail.color.argb);
+                delete d.SIDC;
+            }
+            if (d.type.indexOf('b-m-p-s-p') === 0) { // it's a position indicator
+                delete d.SIDC;
+                d.ttl = 0;
+                if (d.type.indexOf('b-m-p-s-p-loc') === 0) {
+                    if (p.detail?.sensor) {
+                        if (p.detail?.__video) {
+                            d.icon = "fa-video-camera";
+                            d.video_link = p.detail?.__video?.ConnectionEntry?.protocol+'://'+p.detail?.__video?.url
+                        }
+                        else {
+                            d.SIDC = "SFGPUUMRS---";
+                        }
+                        if (p.detail.sensor?.fov) {
+                            d.arc = {
+                                fov: +p.detail.sensor.fov,
+                                pan: +p.detail.sensor.azimuth,
+                                ranges: createRings(+p.detail.sensor.range),
+                                color: convertCOTtoCIFColour(p.detail.sensor.strokeColor)
+                            }
+                        }
+                    }
+                    else { d.icon = "locate"; }
+                }
+                if (d.type.indexOf('b-m-p-s-p-op') === 0) {
+                    d.icon = "fa-binoculars";
+                }
+            }
+            if (d.type === 'b-m-p-w-GOTO') {
+                d.SIDC = "GFGPGPRP----";
+            }
+            if (d.type === 'b-m-p-c') {
+                d.SIDC = "GFGPGPRW----";
+            }
+            if (d.type === 'b-a-o-tbl' || d.type === 'b-a-o-pan' || d.type === 'b-a-o-opn') {
+                d.remarks = p.detail.emergency["#text"] + " " + p.detail.emergency.type;
+                d.icon = 'fa-exclamation-circle';
+                if (d.type === 'b-a-o-tbl') { d.iconColor = 'gold'; }
+                if (d.type === 'b-a-o-pan') { d.iconColor = 'orange'; }
+                if (d.type === 'b-a-o-opn') { d.iconColor = 'red'; }
+                // d.SIDC = 'ESOPB-------';
+                d.ttl = 0;
+            }
+            if (d.type === 'b-a-g') { // geofence alert
+                d.remarks = p.detail.emergency["#text"] + " " + p.detail.emergency.type;
+                d.icon = 'fa-crosshairs';
+                d.iconColor = 'orange';
+                // d.SIDC = 'ESOPEC------';
+                d.ttl = 0;
+            }
+            if (d.type === 'b-a-o-can') { // cancelled alert
+                d.name = p.detail.emergency["#text"] + "-Alert";
+                d.deleted = true;
+            }
+        }
+        catch(e) {
+            console.log(e);
+        }
+        // console.log("D",d)
+        // Other non-atom types - tbd
+        // b-i-x-i Camera image ?
+        // b-m-r Route
+        // b-r-f-h-c Medevac "EFOPBD------"
+        // b-d Drawings -c-c circle -c-e ellipse -r rectangle -f freehand
+        // b-t-f Geochat (f = file)  just No
+    }
     return d;
 }
