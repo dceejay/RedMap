@@ -129,6 +129,20 @@ L.Util.extend(L.KML, {
 				anchorType:	{x: ioptions.xunits, y: ioptions.yunits}
 			});
 		}
+        el = xml.getElementsByTagName('Data');
+        if (el && el[0]) {
+            var appicon = el[0].getElementsByTagName('value')[0].innerHTML;
+            var sidc;
+            if (appicon.indexOf("APP-6D") === 0) {
+                sidc = appicon.split(':')[1];
+                var mysymbol = new ms.Symbol(sidc);
+                mysymbol = mysymbol.setOptions({ size:20 });
+                style.icon = L.icon({
+                    iconUrl: mysymbol.toDataURL(),
+                    iconAnchor: [mysymbol.getAnchor().x, mysymbol.getAnchor().y],
+                });
+            }
+        }
 
 		id = xml.getAttribute('id');
 		if (id && style) {

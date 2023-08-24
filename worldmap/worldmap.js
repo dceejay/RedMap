@@ -194,6 +194,7 @@ map.whenReady(function() {
     connect();
 });
 
+// Drag Drop of files to target map
 var droplatlng;
 var target = document.getElementById("map")
 target.ondragover = function (ev) {
@@ -245,8 +246,16 @@ var readFile = function(file) {
                         doCommand({map:{overlay:file.name, nvg:data}});
                     }
                 }
+                else if (data.indexOf("<kml") !== -1) {
+                    doCommand({map:{overlay:file.name, kml:data}});
+                }
                 else if (data.indexOf('PK') === 0) {
-                    console.log("ZIP FILE");
+                    if (file.name.indexOf('.kmz') !== -1) {
+                        doCommand({map:{overlay:file.name, kmz:data}});
+                    }
+                    else {
+                        console.log("ZIP FILE",file);
+                    }
                 }
                 else {
                     try {
@@ -807,6 +816,7 @@ var addThing = function() {
         d.iconColor = colo;
     }
     if (icon === "dot") { d.icon = 'fa-circle fa-fw'; }
+    if (icon === "spot") { d.icon = 'fa-circle fa-fw'; }
     ws.send(JSON.stringify(d));
     delete d.action;
     setMarker(d);
@@ -2603,22 +2613,63 @@ function doCommand(cmd) {
     }
 
     // Add a new KML overlay layer
-    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
+    // if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
+    //     if (overlays.hasOwnProperty(cmd.map.overlay)) {
+    //         overlays[cmd.map.overlay].removeFrom(map);
+    //         existsalready = true;
+    //     }
+    //     try {
+    //         const parser = new DOMParser();
+    //         if (typeof cmd.map.kml === "object") { cmd.map.kml = new TextDecoder().decode(new Uint8Array(cmd.map.kml.data).buffer); }
+    //         const kml = parser.parseFromString(cmd.map.kml, 'text/xml');
+    //         const track = new L.KML(kml);
+    //         overlays[cmd.map.overlay] = track;
+    //     } catch(e) { console.log("Failed to parse KML",e) }
+    //     if (!existsalready) {
+    //         layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+    //     }
+    //     if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+    //         overlays[cmd.map.overlay].addTo(map);
+    //     }
+    //     if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+    //     else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    // }
+    // Add a new KMZ overlay layer (or KML)
+    //if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kmz")) {
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && ( cmd.map.hasOwnProperty("kmz") || cmd.map.hasOwnProperty("kml")) ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
             overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
         try {
-            const parser = new DOMParser();
-            const kml = parser.parseFromString(cmd.map.kml, 'text/xml');
-            const track = new L.KML(kml);
-            overlays[cmd.map.overlay] = track;
-        } catch(e) { console.log("Failed to parse KML") }
+            var kmz = L.kmzLayer().addTo(map);
+            kmz.on('load', function(e) {
+                overlays[cmd.map.overlay] = kmz;
+                if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                    overlays[cmd.map.overlay].addTo(map);
+                }
+            });
+            let arr;
+            if (cmd.map.hasOwnProperty("kmz")) {
+                console.log("KMZ",typeof cmd.map.kmz)
+                if (typeof cmd.map.kmz === "string") {
+                    arr = new Uint8Array(cmd.map.kmz.length);
+                    for (let i=0; i<cmd.map.kmz.length; i++) {
+                        arr[i] = cmd.map.kmz.charCodeAt(i);
+                    }
+                    arr = arr.buffer;
+                }
+                else { arr = new Uint8Array(cmd.map.kmz.data).buffer; }
+            }
+            if (cmd.map.hasOwnProperty("kml")) {
+                if (typeof cmd.map.kml === "string") { arr = cmd.map.kml; }
+                else { arr = new Uint8Array(cmd.map.kml.data).buffer; }
+            }
+            kmz.parse(arr, { name:cmd.map.overlay, icons:{} });
+            overlays[cmd.map.overlay] = kmz;
+        } catch(e) { console.log("Failed to parse KML/KMZ",e) }
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-        }
-        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            overlays[cmd.map.overlay].addTo(map);
         }
         if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
         else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
