@@ -246,7 +246,6 @@
                         iconAnchor: [14, 14],
                     })
                     if (feature.properties && feature.properties.SymbolSpecification) {
-                        console.log("DING",feature.properties.SymbolSpecification)
                         var mysymbol = new ms.Symbol(feature.properties.SymbolSpecification.split(':')[1]);
                         mysymbol = mysymbol.setOptions({ size:20 });
                         kicon = L.icon({
@@ -254,7 +253,7 @@
                             iconAnchor: [mysymbol.getAnchor().x, mysymbol.getAnchor().y],
                         });
                     }
-                    if (kicon.iconUrl === undefined) { // No icon found so just use default marker.
+                    if (kicon.options.iconUrl === undefined) { // No icon found so just use default marker.
                         return L.marker(latlng);
                     }
                     else {

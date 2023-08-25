@@ -2651,7 +2651,6 @@ function doCommand(cmd) {
             });
             let arr;
             if (cmd.map.hasOwnProperty("kmz")) {
-                console.log("KMZ",typeof cmd.map.kmz)
                 if (typeof cmd.map.kmz === "string") {
                     arr = new Uint8Array(cmd.map.kmz.length);
                     for (let i=0; i<cmd.map.kmz.length; i++) {
