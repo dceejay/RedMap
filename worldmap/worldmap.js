@@ -257,6 +257,10 @@ var readFile = function(file) {
                         console.log("ZIP FILE",file);
                     }
                 }
+                else if (file.type.indexOf('geo+json') !== -1 ) {
+                    data = JSON.parse(data);
+                    doGeojson(file.name,data,"geojson");
+                }
                 else {
                     try {
                         data = JSON.parse(data);
@@ -2874,7 +2878,7 @@ function doCommand(cmd) {
 
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
-    // console.log("GEOJSON",n,g,l,o)
+    // console.log("GEOJSON",n,g,l,o) // name,geojson,layer,options
     var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {

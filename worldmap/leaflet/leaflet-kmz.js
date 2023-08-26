@@ -140,6 +140,9 @@
 				text = new TextDecoder(encoding[1]).decode(data);
 			}
 		}
+        else {
+            text = text.substr(text.indexOf('<'));
+        }
 		return text ? (new DOMParser()).parseFromString(text, 'text/xml') : document.implementation.createDocument(null, "kml");}
 
 	function unzip(folder) {
@@ -265,6 +268,7 @@
                     // TODO: handle L.svg renderer within the L.KMZMarker class?
 				},
 				style: (feature) => {
+                    // console.log("FEATSTYLE",feature)
 					var styles = {};
 					var prop = feature.properties;
 
@@ -289,16 +293,18 @@
 					return styles;
 				},
 				onEachFeature: (feature, layer) => {
-					if (!this.options.ballon) return;
+                    // console.log("POP",feature.properties)
+				    //if (!this.options.ballon) return;
 
 					var prop = feature.properties;
-					var name = prop.name || "";
-					var desc = prop.description || "";
+					var name = (prop.name || "").trim();
+					var desc = (prop.description || "").trim();
 
+                    var p = '<div>';
 					if (name || desc) {
-						if (this.options.bindPopup) {
-							layer.bindPopup('<div>' + '<b>' + name + '</b>' + '<br>' + desc + '</div>');
-						}
+						// if (this.options.bindPopup) {
+						// 	p += '<b>' + name + '</b>' + '<br>' + desc + '</div>';
+						// }
 						if (this.options.bindTooltip) {
 							layer.bindTooltip('<b>' + name + '</b>', {
 								direction: 'auto',
@@ -306,6 +312,22 @@
 							});
 						}
 					}
+
+                    var u = {};
+                    if (prop.FeaturePlatformId) { u.FeaturePlatformId = prop.FeaturePlatformId; }
+                    if (prop.FeatureAddress) { u.FeatureAddress = prop.FeatureAddress; }
+                    if (prop.SymbolSpecification) { u.Symbol = prop.SymbolSpecification; }
+                    if (prop.Speed) { u.Speed = prop.Speed; }
+                    if (prop.FeatureLastModified) { u.LastUpdate = prop.FeatureLastModified; }
+                    if (u.LastUpdate) { u.LastUpdate = (new Date(u.LastUpdate*1000)).toISOString(); }
+
+                    Object.entries(u).forEach(([key, value]) => {
+                        p += '<b>'+key+'</b> : '+value+'<br/>';
+                    });
+                    p += '</div>';
+                    if (p !== '<div></div>') {
+                        layer.bindPopup(p);
+                    }
 				},
 				interactive: this.options.interactive,
 			});
@@ -427,4 +449,3 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=leaflet-kmz-src.js.map

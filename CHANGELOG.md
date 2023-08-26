@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v2.42.2 - More KML and GEOJson drag drop fixes
  - v2.42.1 - Remove extraneous debug logging, fix KMZ icons
  - v2.42.0 - Add handling for TAK type spots, waypoints, alerts, sensors. Better KML/KMZ handling.
  - v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
