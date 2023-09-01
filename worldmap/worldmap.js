@@ -2144,17 +2144,23 @@ function setMarker(data) {
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
-    for (var i in data) {
-        if ((i != "name") && (i != "length") && (i != "clickable")) {
-            if (typeof data[i] === "object") {
-                words += i +" : "+JSON.stringify(data[i])+"<br/>";
-            } else {
-                words += i +" : "+data[i]+"<br/>";
+    if (data.popup) { words = data.popup; }
+    else {
+        words += '<table>';
+        for (var i in data) {
+            if ((i != "name") && (i != "length") && (i != "clickable")) {
+                if (typeof data[i] === "object") {
+                    //
+                    words += '<tr><td>'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
+                } else {
+                    // words += i +" : "+data[i]+"<br/>";
+                    words += '<tr><td>'+ i +'</td><td>' + data[i] + '</td></tr>';
+                }
             }
         }
+        words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
+        words += '</table>';
     }
-    if (data.popup) { words = data.popup; }
-    else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
     words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
@@ -2616,28 +2622,6 @@ function doCommand(cmd) {
         return customLayer;
     }
 
-    // Add a new KML overlay layer
-    // if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
-    //     if (overlays.hasOwnProperty(cmd.map.overlay)) {
-    //         overlays[cmd.map.overlay].removeFrom(map);
-    //         existsalready = true;
-    //     }
-    //     try {
-    //         const parser = new DOMParser();
-    //         if (typeof cmd.map.kml === "object") { cmd.map.kml = new TextDecoder().decode(new Uint8Array(cmd.map.kml.data).buffer); }
-    //         const kml = parser.parseFromString(cmd.map.kml, 'text/xml');
-    //         const track = new L.KML(kml);
-    //         overlays[cmd.map.overlay] = track;
-    //     } catch(e) { console.log("Failed to parse KML",e) }
-    //     if (!existsalready) {
-    //         layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-    //     }
-    //     if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-    //         overlays[cmd.map.overlay].addTo(map);
-    //     }
-    //     if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
-    //     else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
-    // }
     // Add a new KMZ overlay layer (or KML)
     //if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kmz")) {
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && ( cmd.map.hasOwnProperty("kmz") || cmd.map.hasOwnProperty("kml")) ) {
@@ -2699,6 +2683,10 @@ function doCommand(cmd) {
             overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
+        // var gp = new DOMParser().parseFromString(cmd.map.gpx, "text/xml");
+        // var json = window.toGeoJSON.gpx(gp);
+        // console.log("j",json)
+        // doGeojson(json.features[0].properties.name,json,json.features[0].properties.type) // DCJ name,geojson,layer,options
         overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco());
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
@@ -2972,6 +2960,8 @@ function doGeojson(n,g,l,o) {
             delete tx["marker-symbol"];
             delete tx["marker-color"];
             delete tx["marker-size"];
+            delete tx["coordinateProperties"];
+            delete tx["_gpxType"]
             tx = JSON.stringify(tx,null,' ');
             if ( tx !== "{}") {
                 l.bindPopup('<pre style="overflow-x: scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
@@ -3025,7 +3015,9 @@ function doTAKjson(p) {
         }
         catch(e) { console.log(e); }
         d.alt = Number(p.point.hae) || 9999999;
-        if (d.alt === 9999999) { delete d.alt; }
+        if (d.alt && d.alt == 9999999) { delete d.alt; }
+        if (d.speed && d.speed == 9999999) { delete d.speed; }
+        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
         handleCoTtypes(d,p);
         setMarker(d);
     }
@@ -3056,7 +3048,9 @@ function doTAKMCjson(p) {
             d.ttl = parseInt((+p.staleTime / 1000) - (+p.sendTime / 1000));
         } catch(e) { console.log(e); }
         d.alt = p.hae || 9999999;
-        if (d.alt === 9999999) { delete d.alt; }
+        if (d.alt && d.alt == 9999999) { delete d.alt; }
+        if (d.speed && d.speed == 9999999) { delete d.speed; }
+        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
         handleCoTtypes(d,p);
         setMarker(d);
     }

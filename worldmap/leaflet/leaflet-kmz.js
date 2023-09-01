@@ -232,9 +232,10 @@
 			var preferCanvas = this._map ? this._map.options.preferCanvas : this.options.preferCanvas;
 			// var emptyIcon    = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 			// parse GeoJSON
+            //console.log("DATA",data)
 			var layer = L.geoJson(data, {
 				pointToLayer: (feature, latlng) => {
-                    // console.log("FEAT",feature)
+                    //console.log("FEAT",feature)
 					if (preferCanvas) {
 						return L.kmzMarker(latlng, {
 							iconUrl: data.properties.icons[feature.properties.icon] || feature.properties.icon,
@@ -249,12 +250,25 @@
                         iconAnchor: [14, 14],
                     })
                     if (feature.properties && feature.properties.SymbolSpecification) {
-                        var mysymbol = new ms.Symbol(feature.properties.SymbolSpecification.split(':')[1]);
+                        var mysymbol;
+                        if (feature.properties.MilitaryEchelon && feature.properties.SymbolSpecification.split(':')[0] === "APP-6D") {
+                            var a = feature.properties.SymbolSpecification.split(':')[1].substr(0,8);
+                            var c = feature.properties.SymbolSpecification.split(':')[1].substr(10);
+                            var b = parseInt(feature.properties.MilitaryEchelon) + 10;
+                            mysymbol = new ms.Symbol("" + a + b + c);
+                        }
+                        else {
+                            mysymbol = new ms.Symbol(feature.properties.SymbolSpecification.split(':')[1]);
+                        }
+
                         mysymbol = mysymbol.setOptions({ size:20 });
+                        if (feature.properties.name) { mysymbol = mysymbol.setOptions({ uniqueDesignation:feature.properties.name }); }
+                        if (feature.properties.MilitaryParentId) { mysymbol = mysymbol.setOptions({ higherFormation:feature.properties.MilitaryParentId }); }
                         kicon = L.icon({
                             iconUrl: mysymbol.toDataURL(),
                             iconAnchor: [mysymbol.getAnchor().x, mysymbol.getAnchor().y],
                         });
+                        //console.log("META",mysymbol.getMetadata())
                     }
                     if (kicon.options.iconUrl === undefined) { // No icon found so just use default marker.
                         return L.marker(latlng);
@@ -268,7 +282,7 @@
                     // TODO: handle L.svg renderer within the L.KMZMarker class?
 				},
 				style: (feature) => {
-                    // console.log("FEATSTYLE",feature)
+                    //console.log("FEATSTYLE",feature)
 					var styles = {};
 					var prop = feature.properties;
 
@@ -293,17 +307,17 @@
 					return styles;
 				},
 				onEachFeature: (feature, layer) => {
-                    // console.log("POP",feature.properties)
+                    //console.log("POP",feature.properties)
 				    //if (!this.options.ballon) return;
-
 					var prop = feature.properties;
 					var name = (prop.name || "").trim();
-					var desc = (prop.description || "").trim();
+					// var desc = (prop.description || "").trim();
+                    var desc = prop.description || "";
 
                     var p = '<div>';
 					if (name || desc) {
 						// if (this.options.bindPopup) {
-						// 	p += '<b>' + name + '</b>' + '<br>' + desc + '</div>';
+							p += '<b>' + name + '</b>' + '<br>' + desc + '</div>';
 						// }
 						if (this.options.bindTooltip) {
 							layer.bindTooltip('<b>' + name + '</b>', {
@@ -314,18 +328,20 @@
 					}
 
                     var u = {};
-                    if (prop.FeaturePlatformId) { u.FeaturePlatformId = prop.FeaturePlatformId; }
-                    if (prop.FeatureAddress) { u.FeatureAddress = prop.FeatureAddress; }
-                    if (prop.SymbolSpecification) { u.Symbol = prop.SymbolSpecification; }
-                    if (prop.Speed) { u.Speed = prop.Speed; }
-                    if (prop.FeatureLastModified) { u.LastUpdate = prop.FeatureLastModified; }
-                    if (u.LastUpdate) { u.LastUpdate = (new Date(u.LastUpdate*1000)).toISOString(); }
+                    if (prop.MilitaryParentId) { u.group = prop.MilitaryParentId; }
+                    if (prop.FeaturePlatformId) { u["platform id"] = prop.FeaturePlatformId; }
+                    if (prop.FeatureAddress) { u.address = prop.FeatureAddress; }
+                    if (prop.SymbolSpecification) { u[prop.SymbolSpecification.split(':')[0]] = prop.SymbolSpecification.split(':')[1]; }
+                    if (prop.Speed && prop.Speed !== "0") { u.speed = prop.Speed; }
+                    if (prop.FeatureLastModified) { u["last update"] = prop.FeatureLastModified; }
+                    if (u["last update"]) { u["last update"] = (new Date(u["last update"]*1000)).toISOString(); }
 
+                    p += '<table border="0">';
                     Object.entries(u).forEach(([key, value]) => {
-                        p += '<b>'+key+'</b> : '+value+'<br/>';
+                        p += '<tr><td>'+key+'</td><td>'+value+'</td></tr>';
                     });
-                    p += '</div>';
-                    if (p !== '<div></div>') {
+                    p += '</table></div>';
+                    if (p !== '<div><table border="0"></table></div>') {
                         layer.bindPopup(p);
                     }
 				},
