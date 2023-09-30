@@ -1411,7 +1411,7 @@ var editPoly = function(pname) {
     polygons[pname].on("dblclick", function(e) {
         editHandler.disable();
         editFeatureGroup.removeLayer(polygons[pname]);
-        polygons[pname].off("dblclick");
+        // polygons[pname].off("dblclick");
         L.DomEvent.stopPropagation(e);
         var la, lo;
         if (e.target.hasOwnProperty("_latlng")) {

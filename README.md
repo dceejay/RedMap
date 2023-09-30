@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v2.43.1 - Tweak drawing layer double click
 - v2.43.0 - Revert leaflet update as it broke Draw
 - v2.42.3 - More KML and GEOJson drag drop fixes
 - v2.42.1 - Remove extraneous debug logging, fix KMZ icons
