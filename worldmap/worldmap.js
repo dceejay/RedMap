@@ -28,7 +28,7 @@ var heat;
 var minimap;
 var sidebyside;
 var layercontrol;
-var drawControl;
+// var drawControl;
 var drawingColour = "#910000";
 var sendDrawing;
 var colorControl;
@@ -53,6 +53,8 @@ var iconSz = {
     "Region/Theater": 44,
     "Command": 44
 };
+
+// L.PM.setOptIn(true);
 
 // Create the socket
 var connect = function() {
@@ -79,7 +81,7 @@ var connect = function() {
             if (data.hasOwnProperty("type") && data.hasOwnProperty("data") && data.type === "Buffer") { data = data.data.toString(); }
             handleData(data);
         }
-        catch (e) { if (data) { console.log("BAD DATA",data); } }
+        catch (e) { if (data) { console.log("BAD DATA",data); console.log(e) } }
         // console.log("DATA",typeof data,data);
     };
 }
@@ -189,7 +191,14 @@ if (inIframe === true) {
 // }
 
 // Create the Initial Map object.
-map = new L.map('map',{zoomSnap: 0.1}).setView(startpos, startzoom);
+map = new L.map('map',{
+    zoomSnap: 0.1,
+    rotate: true,
+    rotateControl: {
+        closeOnZeroBearing: true,
+        position: 'topleft'
+    },
+    bearing: 0}).setView(startpos, startzoom);
 map.whenReady(function() {
     connect();
 });
@@ -301,6 +310,7 @@ function onLocationFound(e) {
         var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
         setMarker(self);
     }
+    if (e.heading !== null) { map.setBearing(e.heading); }
     if (followMode.accuracy) {
         errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color ?? "#00ffff", weight:3, opacity:0.6, fill:false, clickable:false});
         errRing.addTo(map);
@@ -696,8 +706,8 @@ map.on('overlayadd', function(e) {
     }
     if (e.name == "drawing") {
         overlays["drawing"].bringToFront();
+        map.pm.toggleControls();
         map.addControl(colorControl);
-        map.addControl(drawControl);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -710,7 +720,7 @@ map.on('overlayremove', function(e) {
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
-        map.removeControl(drawControl);
+        map.pm.toggleControls()
         map.removeControl(colorControl);
     }
     ws.send(JSON.stringify({action:"dellayer", name:e.name}));
@@ -793,7 +803,6 @@ const colorKeywordToRGB = (colorKeyword) => {
     document.body.appendChild(el);
     let rgbValue = window.getComputedStyle(el).color;
     document.body.removeChild(el);
-    console.log(rgbValue);
     return rgba2hex(rgbValue);
 }
 
@@ -1077,46 +1086,37 @@ var addOverlays = function(overlist) {
 
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
-        map.options.drawControlTooltips = false;
         var drawCount = 0;
-        drawControl = new L.Control.Draw({
-            draw: {
-                polyline: { shapeOptions: { clickable:true } },
-                marker: false,
-                //circle: false,
-                circle: { shapeOptions: { clickable:true } },
-                circlemarker: false,
-                rectangle: { shapeOptions: { clickable:true } },
-                polygon: { shapeOptions: { clickable:true } }
-            }
-            //edit: none
-            // {
-            //     featureGroup: layers["_drawing"],
-            //     remove: true,
-            //     edit: true
-            // }
+        map.pm.addControls({
+            position: 'topleft',
+            drawMarker: false,
+            drawCircleMarker: false,
+            drawText: false,
+            editControls: false
         });
+        map.pm.toggleControls();
+
         var changeDrawColour = function(col) {
             drawingColour = col;
-            // console.log("COLOR",col)
-            drawControl.setDrawingOptions({
-                polyline: { shapeOptions: { color:drawingColour } },
-                circle: { shapeOptions: { color:drawingColour } },
-                rectangle: { shapeOptions: { color:drawingColour } },
-                polygon: { shapeOptions: { color:drawingColour } }
-            });
+            map.pm.setPathOptions({
+                color: drawingColour,
+                fillColor: drawingColour,
+                fillOpacity: 0.4
+              });
         }
+
         var shape;
-        map.on('draw:created', function (e) {
-            var name = e.layerType + drawCount;
+        map.on("pm:create", (e) => {
+            var name = e.shape + drawCount;
             drawCount = drawCount + 1;
 
             e.layer.on('contextmenu', function(e) {
                 L.DomEvent.stopPropagation(e);
                 var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
-                rmen.setContent("<input type='text' autofocus value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\",true);'>Edit points</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                rmen.setContent("<input type='text' value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\");'>Edit points</button><button onclick='editPoly(\""+e.target.name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+e.target.name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
                 map.openPopup(rmen);
             });
+            e.layer.bindPopup(name);
 
             var la, lo, cent;
             if (e.layer.hasOwnProperty("_latlng")) {
@@ -1127,7 +1127,7 @@ var addOverlays = function(overlist) {
             else {
                 cent = e.layer.getBounds().getCenter();
             }
-            var m = {action:"draw", name:name, type:e.layerType, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
+            var m = {action:"draw", name:name, type:e.shape, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
             if (e.layer.hasOwnProperty("_latlngs")) {
                 if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
                 else { m.area = e.layer._latlngs[0]; }
@@ -1139,9 +1139,9 @@ var addOverlays = function(overlist) {
             polygons[name].name = name;
             layers["_drawing"].addLayer(shape.layer);
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             if (e.layer.options.fill === false && navigator.onLine) {
-                rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+                rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
             setTimeout(function() {map.openPopup(rightmenuMarker)},25);
@@ -1151,6 +1151,7 @@ var addOverlays = function(overlist) {
             var thing = document.getElementById('dinput').value;
             map.closePopup();
             shape.m.name = thing;
+            shape.layer.bindPopup(thing);
             delMarker(n,true);
 
             polygons[thing] = shape.layer;
@@ -1378,7 +1379,7 @@ helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b
 helpText += 'all layers whether hidden or not will contribute to the heatmap.';
 helpText += 'The default is that only visible layers add to the heatmap.</p>';
 
-// Delete a marker (and notify websocket)
+// Delete a marker or shape (and notify websocket)
 var delMarker = function(dname,note) {
     if (note) { map.closePopup(); }
     if (typeof polygons[dname] != "undefined") {
@@ -1402,16 +1403,15 @@ var delMarker = function(dname,note) {
     if (note) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
 }
 
-var editPoly = function(pname) {
+var editPoly = function(pname,fun) {
     map.closePopup();
-    editFeatureGroup = L.featureGroup();
-    editToolbar = new L.EditToolbar({ featureGroup:editFeatureGroup });
-    editHandler = editToolbar.getModeHandlers()[0].handler;
-    editHandler._map = map;
+    if (fun === "rot") { polygons[pname].pm.enableRotate(); }
+    else if (fun === "drag") { polygons[pname].pm.enableLayerDrag(); }
+    else { polygons[pname].pm.enable(); }
     polygons[pname].on("dblclick", function(e) {
-        editHandler.disable();
-        editFeatureGroup.removeLayer(polygons[pname]);
-        // polygons[pname].off("dblclick");
+        if (fun === "rot") { polygons[pname].pm.disableRotate(); }
+        else if (fun === "drag") { polygons[pname].pm.disableLayerDrag(); }
+        else { polygons[pname].pm.disable(); }
         L.DomEvent.stopPropagation(e);
         var la, lo;
         if (e.target.hasOwnProperty("_latlng")) {
@@ -1425,9 +1425,8 @@ var editPoly = function(pname) {
         }
         ws.send(JSON.stringify(m));
     })
-    editFeatureGroup.addLayer(polygons[pname]);
-    editHandler.enable();
 }
+
 
 var rangerings = function(latlng, options) {
     options = L.extend({
@@ -1463,7 +1462,7 @@ function setMarker(data) {
         rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         //}
         if (data.editable) {
-            rightcontext = "<button onclick='editPoly(\""+data.name+"\",true);'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            rightcontext = "<button onclick='editPoly(\""+data.name+"\");'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
             rightcontext = data.contextmenu.replace(/\$name/g,'"'+data.name+'"');
@@ -2812,7 +2811,7 @@ function doCommand(cmd) {
         else { lockit = false; doLock(false); }
         document.getElementById("lockit").checked = lockit;
     }
-    // move to a new position
+    // Move to a new position
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;
     var czoom = map.getZoom();
@@ -2820,6 +2819,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
     map.setView([clat,clon],czoom);
+
+    // Set rotation of map
+    if (cmd.hasOwnProperty("rotation") && !isNaN(cmd.rotation)) { map.setBearing(-cmd.rotation); }
 
     if (cmd.hasOwnProperty("cluster")) {
         clusterAt = cmd.cluster;
@@ -2866,7 +2868,6 @@ function doCommand(cmd) {
 
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o) {
-    // console.log("GEOJSON",n,g,l,o) // name,geojson,layer,options
     var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
@@ -2961,16 +2962,28 @@ function doGeojson(n,g,l,o) {
             delete tx["marker-color"];
             delete tx["marker-size"];
             delete tx["coordinateProperties"];
-            delete tx["_gpxType"]
+            delete tx["_gpxType"];
+            var n = tx["name"];
+            delete tx["name"];
             tx = JSON.stringify(tx,null,' ');
             if ( tx !== "{}") {
-                l.bindPopup('<pre style="overflow-x: scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
+                l.bindPopup('<b>'+n+'</b><pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
             }
         }
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
             l.on('click', function (e) {
                 ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
             });
+        }
+        if (f.geometry.type === "MultiLineString") {
+            l.on('contextmenu', function(e) {
+                L.DomEvent.stopPropagation(e);
+                var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
+                rmen.setContent("<b>"+n+"</b><br/><button onclick='editPoly(\""+n+"\");'>Edit points</button><button onclick='delMarker(\""+n+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                map.openPopup(rmen);
+            });
+            polygons[n] = l;
+            polygons[n].lay = lay;
         }
     }
     markers[n] = L.geoJson(g,opt);
