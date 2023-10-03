@@ -1,5 +1,11 @@
 ### Change Log for Node-RED Worldmap
 
+ - v3.0.0 - Bump to Leaflet 1.9.4
+            Move to geoman for drawing shapes.
+            Allow command.rotation to set rotation of map.
+            Allow editing of multipoint geojson tracks.
+
+ - v2.43.1 - Tweak drawing layer double click
  - v2.43.0 - Revert leaflet update as it broke Draw
  - v2.42.3 - More KML and GEOJson drag drop fixes
  - v2.42.1 - Remove extraneous debug logging, fix KMZ icons

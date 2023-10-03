@@ -13,6 +13,11 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v3.0.0  - Bump to Leaflet 1.9.4
+            Move to geoman for drawing shapes.
+            Allow command.rotation to set rotation of map.
+            Allow editing of multipoint geojson tracks.
+- v2.43.1 - Tweak drawing layer double click
 - v2.43.0 - Revert leaflet update as it broke Draw
 - v2.42.3 - More KML and GEOJson drag drop fixes
 - v2.42.1 - Remove extraneous debug logging, fix KMZ icons
@@ -413,6 +418,7 @@ Optional properties include
 
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
+ - **rotation** - rotate the base map to the specified compass angle.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **bounds** - if set to an array `[ [ lat(S), lon(W) ], [lat(N), lon(E)] ]` - sets the overall map bounds.
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
