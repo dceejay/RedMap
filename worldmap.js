@@ -40,8 +40,8 @@ module.exports = function(RED) {
         node.mapurl = n.mapurl || "";
         node.mapopt = n.mapopt || "";
         node.mapwms = n.mapwms || false;
-        if (n.maplist === undefined) { node.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"; }
-        if (n.overlist === undefined) { node.overlist = "DR,CO,RA,DN,HM"; }
+        if (n.maplist === undefined) { node.maplist = "OSMG,OSMC,EsriC,EsriS,UKOS"; }
+        if (n.overlist === undefined) { node.overlist = "DR,CO,RA,DN"; }
         try { node.mapopt2 = JSON.parse(node.mapopt); }
         catch(e) { node.mapopt2 = null; }
 
