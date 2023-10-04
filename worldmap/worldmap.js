@@ -18,7 +18,7 @@ var menuOpen = false;
 var clusterAt = 0;
 var maxage = 900;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var pagefoot = "&nbsp;&copy; DCJ 2023"
+var pagefoot = "&nbsp;&copy; DCJ 2023";
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -81,10 +81,10 @@ var connect = function() {
             if (data.hasOwnProperty("type") && data.hasOwnProperty("data") && data.type === "Buffer") { data = data.data.toString(); }
             handleData(data);
         }
-        catch (e) { if (data) { console.log("BAD DATA",data); console.log(e) } }
+        catch (e) { if (data) { console.log("BAD DATA",data); console.log(e); } }
         // console.log("DATA",typeof data,data);
     };
-}
+};
 console.log("CONNECT TO",location.pathname + 'socket');
 
 var handleData = function(data) {
@@ -2659,6 +2659,35 @@ function doCommand(cmd) {
         }
         if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
         else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new ESRI feature layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("esri") ) {
+        try {
+        if (overlays.hasOwnProperty(cmd.map.overlay)) {
+            overlays[cmd.map.overlay].removeFrom(map);
+            existsalready = true;
+        }
+        var opt = {};
+        if (cmd.map.hasOwnProperty("options")) { opt = cmd.map.options; }
+        console.log("OPTS",opt)
+        opt.url = cmd.map.esri;
+        map.createPane("blockpoints");
+        opt.pointToLayer = function (geojson, latlng) { 
+            console.log("Point geo",latlng, geojson);             
+            return L.marker(latlng);
+        };
+        opt.onEachFeature = function (geojson, layer) { 
+            console.log("Feature",layer, geojson); 
+        };
+        overlays[cmd.map.overlay] = L.esri.featureLayer(opt);
+        if (!existsalready) {
+            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+        }
+        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+            overlays[cmd.map.overlay].addTo(map);
+        }
+        // NOTE can't fit or fly to bounds as they keep reloading
+    } catch(e) { console.log(e); }
     }
     // Add a new TOPOJSON overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {

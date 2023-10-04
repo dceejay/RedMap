@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v3.1.0  - Add esri overlay layers
 - v3.0.0  - Bump to Leaflet 1.9.4
             Move to geoman for drawing shapes.
             Allow command.rotation to set rotation of map.
@@ -610,6 +611,18 @@ As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSO
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
 Again the boolean `fit` or `fly` properties can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
+
+#### To add an ESRI FeatureLayer overlay
+
+As per the geojson overlay you can also inject an ESRI ArcGIS FeatureLayer layer. The syntax is the same but with an `esri` property containing the url of the desired feature layer.
+
+    msg.payload.command.map = {
+        "overlay": "myFeatureLayer",
+        "esri": "https://services3.arcgis.com/...../0",
+        "options": { object of options }
+    };
+
+NOTE: you can set various options as [specified here](https://developers.arcgis.com/esri-leaflet/api-reference/layers/feature-layer/#options) - but these don't currently indlude the style oo onEachFeature fnctions as they are non-serialisable across the websocket link.
 
 #### To add a Velocity Grid Overlay
 

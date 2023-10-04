@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v3.1.0 - Add esri overlay layers
  - v3.0.0 - Bump to Leaflet 1.9.4
             Move to geoman for drawing shapes.
             Allow command.rotation to set rotation of map.
