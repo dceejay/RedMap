@@ -2467,57 +2467,69 @@ function doCommand(cmd) {
         }
     }
     // Add a new geojson overlay layer
-    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson")) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
             map.removeLayer(overlays[cmd.map.overlay]);
             existsalready = true;
         }
-        var opt = cmd.map.opt || { style:function(feature) {
-            var st = { stroke:true, weight:2, fill:true };
-            if (feature.hasOwnProperty("properties")) {
-                st.color = feature.properties.color||feature.properties.roofColor||"black";
-                if (feature.properties.hasOwnProperty("color")) { delete feature.properties.color; }
-                if (feature.properties.hasOwnProperty("roofColor")) { delete feature.properties.roofColor; }
+        try {
+            var opt = cmd.map.opt || {};
+            if (opt.hasOwnProperty("style")) { opt.style = new Function('return ' + opt.style)(); }
+            else {
+                opt.style = function(feature) {
+                    var st = { stroke:true, weight:2, fill:true };
+                    if (feature.hasOwnProperty("properties")) {
+                        st.color = feature.properties.color||feature.properties.roofColor||"black";
+                        if (feature.properties.hasOwnProperty("color")) { delete feature.properties.color; }
+                        if (feature.properties.hasOwnProperty("roofColor")) { delete feature.properties.roofColor; }
+                    }
+                    if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
+                        if (feature.properties.style.hasOwnProperty('stroke')) {
+                            st.color = feature.properties.style.stroke;
+                        }
+                        if (feature.properties.style.hasOwnProperty('stroke-width')) {
+                            st.weight = feature.properties.style["stroke-width"];
+                        }
+                        if (feature.properties.style.hasOwnProperty('stroke-opacity')) {
+                            st.opacity = feature.properties.style["stroke-opacity"];
+                        }
+                        if (feature.properties.style.hasOwnProperty('fill')) {
+                            if (feature.properties.style.fill == "none") { st.fill = false; }
+                            else { st.fillColor = feature.properties.style.fill; }
+                        }
+                        if (feature.properties.style.hasOwnProperty('fill-opacity')) {
+                            st.fillOpacity = feature.properties.style["fill-opacity"];
+                        }
+                    }
+                    delete feature.properties.style;
+                    return st;
+                };
             }
-            if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
-                if (feature.properties.style.hasOwnProperty('stroke')) {
-                    st.color = feature.properties.style.stroke;
-                }
-                if (feature.properties.style.hasOwnProperty('stroke-width')) {
-                    st.weight = feature.properties.style["stroke-width"];
-                }
-                if (feature.properties.style.hasOwnProperty('stroke-opacity')) {
-                    st.opacity = feature.properties.style["stroke-opacity"];
-                }
-                if (feature.properties.style.hasOwnProperty('fill')) {
-                    if (feature.properties.style.fill == "none") { st.fill = false; }
-                    else { st.fillColor = feature.properties.style.fill; }
-                }
-                if (feature.properties.style.hasOwnProperty('fill-opacity')) {
-                    st.fillOpacity = feature.properties.style["fill-opacity"];
+            if (opt.hasOwnProperty("pointToLayer")) { opt.pointToLayer = new Function('return ' + opt.pointToLayer)(); }
+            if (opt.hasOwnProperty("filter")) { opt.filter = new Function('return ' + opt.filter)(); }
+            if (opt.hasOwnProperty("onEachFeature")) { opt.onEachFeature = new Function('return ' + opt.onEachFeature)(); }
+            else {
+                opt.onEachFeature = function (f,l) {
+                    var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
+                    if (pw.length > 11) { l.bindPopup(pw); }
+                    if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
+                        l.on('click', function (e) {
+                            ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
+                        });
+                    }
                 }
             }
-            delete feature.properties.style;
-            return st;
-        }};
-        opt.onEachFeature = function (f,l) {
-            var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
-            if (pw.length > 11) { l.bindPopup(pw); }
-            if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
-                l.on('click', function (e) {
-                    ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
-                });
+            overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
+            if (!existsalready) {
+                layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
             }
-        }
-        overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
-        if (!existsalready) {
-            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-        }
-        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
-        }
-        if (cmd.map.hasOwnProperty("fly") && (cmd.map.fly === true)) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
-        else if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+            if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                map.addLayer(overlays[cmd.map.overlay]);
+            }
+            if (cmd.map.hasOwnProperty("fly") && (cmd.map.fly === true)) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+            else if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        } 
+        catch(e) { console.log(e); }
     }
     // Add a new NVG XML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("nvg") ) {
@@ -2663,31 +2675,25 @@ function doCommand(cmd) {
     // Add a new ESRI feature layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("esri") ) {
         try {
-        if (overlays.hasOwnProperty(cmd.map.overlay)) {
-            overlays[cmd.map.overlay].removeFrom(map);
-            existsalready = true;
-        }
-        var opt = {};
-        if (cmd.map.hasOwnProperty("options")) { opt = cmd.map.options; }
-        console.log("OPTS",opt)
-        opt.url = cmd.map.esri;
-        map.createPane("blockpoints");
-        opt.pointToLayer = function (geojson, latlng) { 
-            console.log("Point geo",latlng, geojson);             
-            return L.marker(latlng);
-        };
-        opt.onEachFeature = function (geojson, layer) { 
-            console.log("Feature",layer, geojson); 
-        };
-        overlays[cmd.map.overlay] = L.esri.featureLayer(opt);
-        if (!existsalready) {
-            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-        }
-        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            overlays[cmd.map.overlay].addTo(map);
-        }
-        // NOTE can't fit or fly to bounds as they keep reloading
-    } catch(e) { console.log(e); }
+            if (overlays.hasOwnProperty(cmd.map.overlay)) {
+                overlays[cmd.map.overlay].removeFrom(map);
+                existsalready = true;
+            }
+            var opt = {};
+            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt; }
+            if (opt.hasOwnProperty("style")) { opt.style = new Function('return ' + opt.style)(); }
+            if (opt.hasOwnProperty("pointToLayer")) { opt.pointToLayer = new Function('return ' + opt.pointToLayer)(); }
+            if (opt.hasOwnProperty("onEachFeature")) { opt.onEachFeature = new Function('return ' + opt.onEachFeature)(); }
+            opt.url = cmd.map.esri;
+            overlays[cmd.map.overlay] = L.esri.featureLayer(opt);
+            if (!existsalready) {
+                layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+            }
+            if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                overlays[cmd.map.overlay].addTo(map);
+            }
+            // NOTE can't fit or fly to bounds as they keep reloading
+        } catch(e) { console.log(e); }
     }
     // Add a new TOPOJSON overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {
@@ -2896,7 +2902,7 @@ function doCommand(cmd) {
 }
 
 // handle any incoming GEOJSON directly - may style badly
-function doGeojson(n,g,l,o) {
+function doGeojson(n,g,l,o) {  // name, geojson, layer, options
     var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {

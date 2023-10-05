@@ -13,14 +13,14 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
-- v3.1.0  - Add esri overlay layers
+- v3.1.0  - Add esri overlay layers, and let geojson overlay rendering be customised
 - v3.0.0  - Bump to Leaflet 1.9.4
             Move to geoman for drawing shapes.
             Allow command.rotation to set rotation of map.
             Allow editing of multipoint geojson tracks.
 - v2.43.1 - Tweak drawing layer double click
 - v2.43.0 - Revert leaflet update as it broke Draw
-- v2.42.3 - More KML and GEOJson drag drop fixes
+- v2.42.3 - More KML and GeoJson drag drop fixes
 - v2.42.1 - Remove extraneous debug logging, fix KMZ icons
 - v2.42.0 - Add handling for TAK type spots, waypoints, alerts, sensors. Better KML/KMZ handling.
 - v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
@@ -58,7 +58,7 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, for
 
 `name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
 
-Optional properties include
+Optional properties for **msg.payload** include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved by the mouse. (default <i>false</i>)
@@ -220,7 +220,9 @@ Defaults are shown above.
 
 ### GeoJSON
 
-If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
+There are several ways to send GeoJSON to the map.
+
+1)  If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
 rather than draw a point it will render the geojson.
 
     msg.payload = {
@@ -255,8 +257,9 @@ Often geojson may not have a `properties` or `style` property in which case you 
         clickable: true
     }
 
-**Note**: you can just send a msg.payload containing the geojson itself - but obviously you then can't style
-it, set the name, layer, etc.
+2) You can just send a msg.payload containing the geojson itself - but obviously you then can't style it, set the name, layer, etc.
+
+3) You can also add the geojson as a specific overlay, in which case you can also have more control of styles, and per feature customisations. See the section on overlays [below](#to-add-a-new-geojson-overlay). This is the most complex but customisable.
 
 
 ### Options
@@ -415,7 +418,7 @@ msg.payload = { command: { "contextmenu":menu } }
 
 You can also control the map via the node, by sending in a msg.payload containing a **command** object. Multiple parameters can be specified in one command.
 
-Optional properties include
+Optional properties for **msg.payload.command** include
 
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
@@ -583,17 +586,24 @@ By default the overlay will be instantly visible. To load it hidden add a proper
         "overlay": "myGeoJSON",
         "geojson": { your geojson feature as an object },
         "opt": { optional geojson options, style, etc },
-        "fit": true
+        "fit": true,
         "clickable": false
     };
 
 The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
 
-The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
+The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. 
 
-The `fit` property is optional, and you can also use `fly` if you wish. If boolean true the map will automatically zoom to fit the area relevant to the geojson, or use the 'fly' to animation style. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
+NOTE: In order to pass over **style**, **pointToLayer**, **onEachFeature**, or **filter** functions they need to be serialised as follows... for example
 
-see https://leafletjs.com/examples/geojson/ for more details about options for opt.
+    const style = function () {
+        return { color: "#910000", weight: 2 };
+    };
+    msg.payload.command.map.opt.style = style.toString();
+
+This may cause the function node setting them to be in error, for example if it references L (the leaflet map), which is unknown on the server side. The flow should still deploy and run ok.
+
+The `fit` property is optional, and you can also use `fly` if you wish. If boolean true the map will automatically zoom to fit the area relevant to the geojson, or use 'fly' to set the animated style. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
 
 #### To add a new KML, GPX, or TOPOJSON overlay
 
@@ -619,10 +629,20 @@ As per the geojson overlay you can also inject an ESRI ArcGIS FeatureLayer layer
     msg.payload.command.map = {
         "overlay": "myFeatureLayer",
         "esri": "https://services3.arcgis.com/...../0",
-        "options": { object of options }
+        "opt": { object of options }
     };
 
-NOTE: you can set various options as [specified here](https://developers.arcgis.com/esri-leaflet/api-reference/layers/feature-layer/#options) - but these don't currently indlude the style oo onEachFeature fnctions as they are non-serialisable across the websocket link.
+NOTE: you can set various options as [specified here](https://developers.arcgis.com/esri-leaflet/api-reference/layers/feature-layer/#options).
+
+In order to pass over **style**, **pointToLayer**, or **onEachFeature** functions they need to be serialised as follows... for example
+
+    const style = function () {
+        return { color: "#910000", weight: 2 };
+    };
+    msg.payload.command.map.opt.style = style.toString();
+
+This may cause the function node setting them to be in error, for example if it references L.marker, which is unknown on the server side. The flow should still deploy and run ok.
+
 
 #### To add a Velocity Grid Overlay
 
