@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v3.2.0 - Sync up drawing sessions across browsers to same map
  - v3.1.0 - Add esri overlay layers, and let geojson overlay rendering be customised
  - v3.0.0 - Bump to Leaflet 1.9.4
             Move to geoman for drawing shapes.

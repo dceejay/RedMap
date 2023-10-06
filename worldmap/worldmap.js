@@ -28,7 +28,7 @@ var heat;
 var minimap;
 var sidebyside;
 var layercontrol;
-// var drawControl;
+var drawCount = 0;
 var drawingColour = "#910000";
 var sendDrawing;
 var colorControl;
@@ -418,17 +418,17 @@ var Lgrid = L.latlngGraticule({
 // Copyright (c) 2013 Måns Beckman, All rights reserved.
 var edgeAware = function() {
     if (!edgeEnabled) { return; }
-	map.removeLayer(edgeLayer)
-	edgeLayer = new L.layerGroup();
-	var mapBounds = map.getBounds();
-	var mapBoundsCenter = mapBounds.getCenter();
+    map.removeLayer(edgeLayer)
+    edgeLayer = new L.layerGroup();
+    var mapBounds = map.getBounds();
+    var mapBoundsCenter = mapBounds.getCenter();
 
-	pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
-	pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
-	pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
+    pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
+    pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
+    pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
 
-	var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
-	for (var id in markers) {
+    var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
+    for (var id in markers) {
         if (allData[id] && allData[id].hasOwnProperty("SIDC")) {
             markerLatLng = markers[id].getLatLng();
             if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
@@ -471,8 +471,8 @@ var edgeAware = function() {
                 edgeLayer.addLayer(L.marker([lat,lng],{icon:myicon}))
             }
         }
-	}
-	edgeLayer.addTo(map)
+    }
+    edgeLayer.addTo(map)
 }
 // end of edge function
 
@@ -814,7 +814,7 @@ var addThing = function() {
     //popped = false;
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
-    var lay = (bits[2] || "_drawing").trim();
+    var lay = (bits[2] || "unknown").trim(); // TODO: Do we want _drawing here or unknown ?
     var colo = (bits[3] ?? "#910000").trim();
     colo = colorKeywordToRGB(colo);
     var hdg = parseFloat(bits[4] || 0);
@@ -1086,7 +1086,6 @@ var addOverlays = function(overlist) {
 
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
-        var drawCount = 0;
         map.pm.addControls({
             position: 'topleft',
             drawMarker: false,
@@ -1102,18 +1101,19 @@ var addOverlays = function(overlist) {
                 color: drawingColour,
                 fillColor: drawingColour,
                 fillOpacity: 0.4
-              });
+            });
         }
 
         var shape;
         map.on("pm:create", (e) => {
-            var name = e.shape + drawCount;
             drawCount = drawCount + 1;
+            var name = e.shape + drawCount;
 
             e.layer.on('contextmenu', function(e) {
                 L.DomEvent.stopPropagation(e);
+                var name = e.target.name;
                 var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
-                rmen.setContent("<input type='text' value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\");'>Edit points</button><button onclick='editPoly(\""+e.target.name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+e.target.name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                rmen.setContent("<input type='text' value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
                 map.openPopup(rmen);
             });
             e.layer.bindPopup(name);
@@ -1127,7 +1127,7 @@ var addOverlays = function(overlist) {
             else {
                 cent = e.layer.getBounds().getCenter();
             }
-            var m = {action:"draw", name:name, type:e.shape, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
+            var m = {action:"draw", name:name, type:e.shape, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo, drawCount:drawCount};
             if (e.layer.hasOwnProperty("_latlngs")) {
                 if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
                 else { m.area = e.layer._latlngs[0]; }
@@ -1250,6 +1250,8 @@ var addOverlays = function(overlist) {
                     sendDrawing(n);
                 });
         }
+
+        changeDrawColour("#4040F0");  // Set default drawing color to blue on start
     }
 
     // Add the countries (world-110m) for offline use
@@ -1496,15 +1498,15 @@ function setMarker(data) {
 
     var ll;
     var lli = null;
-    var opt = {};
-    opt.color = data.color ?? data.lineColor ?? "#910000";
-    opt.fillColor = data.fillColor ?? "#910000";
-    opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
-    opt.weight = data.weight;
-    opt.opacity = data.opacity;
-    opt.fillOpacity = data.fillOpacity;
+    var opt = data.options || {};
+    opt.color = opt.color ?? data.color ?? data.lineColor ?? "#910000";
+    opt.fillColor = opt.fillColor ?? data.fillColor ?? "#910000";
+    opt.stroke = opt.stroke ?? (data.hasOwnProperty("stroke")) ? data.stroke : true;
+    opt.weight = opt.weight ?? data.weight;
+    opt.opacity = opt.opacity ?? data.opacity;
+    opt.fillOpacity = opt.fillOpacity ?? data.fillOpacity;
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
-    opt.fill = (data.hasOwnProperty("fill")) ? data.fill : true;
+    opt.fill = opt.fill ?? (data.hasOwnProperty("fill")) ? data.fill : true;
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
     if (opt.fillOpacity === undefined) { opt.fillOpacity = 0.2; }
     if (opt.opacity === undefined) { opt.opacity = 1; }
@@ -1594,6 +1596,7 @@ function setMarker(data) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
+    if (data.hasOwnProperty("drawCount")) { drawCount = data.drawCount; }
     if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
         delete opt.fill;
         opt.vertices = opt.vertices || 20;
@@ -2528,7 +2531,7 @@ function doCommand(cmd) {
             }
             if (cmd.map.hasOwnProperty("fly") && (cmd.map.fly === true)) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
             else if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
-        } 
+        }
         catch(e) { console.log(e); }
     }
     // Add a new NVG XML overlay layer

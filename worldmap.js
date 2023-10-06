@@ -69,12 +69,22 @@ module.exports = function(RED) {
         RED.httpNode.use(node.path, express.static(__dirname + '/worldmap'));
         // RED.httpNode.use(node.path, express.static(__dirname + '/worldmap', {maxage:3600000}));
 
+        var sendToRest = function(m,id) {
+            for (var c in clients) {
+                if (clients.hasOwnProperty(c) && c !== id) {
+                    // console.log("RESEND",m);
+                    clients[c].write(JSON.stringify(m));
+                }
+            }
+        }
+
         var callback = function(client) {
             if (!client.headers.hasOwnProperty("user-agent")) { client.close(); }
             //client.setMaxListeners(0);
             clients[client.id] = client;
             client.on('data', function(message) {
                 message = JSON.parse(message);
+                // console.log("ACTION",message.action,client.id,message)
                 if (message.action === "connected") {
                     var m = {};
                     var c = {init:true};
@@ -112,6 +122,26 @@ module.exports = function(RED) {
                     var o = Object.values(allPoints);
                     o.map(v => delete v.tout);
                     setTimeout(function() { client.write(JSON.stringify(o)) }, 250);
+                }
+                if (message.action === "draw") {
+                    delete message.action;
+                    delete message.type;
+                    delete message.options?.pane;
+                    allPoints[message.name] = RED.util.cloneMessage(message);
+                    sendToRest(message,client.id);
+                }
+                if (message.action === "point") {
+                    delete message.action;
+                    sendToRest(message,client.id);
+                }
+                if (message.action === "move") {
+                    delete message.action;
+                    delete message.from;
+                    sendToRest(message,client.id);
+                }
+                if (message.action === "delete") {
+                    delete allPoints[message.name];
+                    sendToRest(message,client.id);
                 }
             });
             client.on('close', function() {
