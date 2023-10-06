@@ -1384,9 +1384,11 @@ helpText += 'The default is that only visible layers add to the heatmap.</p>';
 // Delete a marker or shape (and notify websocket)
 var delMarker = function(dname,note) {
     if (note) { map.closePopup(); }
+    var pol = false;
     if (typeof polygons[dname] != "undefined") {
         layers[polygons[dname].lay].removeLayer(polygons[dname]);
         delete polygons[dname];
+        pol = true;
     }
     if (typeof polygons[dname+"_"] != "undefined") {
         layers[polygons[dname+"_"].lay].removeLayer(polygons[dname+"_"]);
@@ -1402,7 +1404,10 @@ var delMarker = function(dname,note) {
         delete markers[dname];
     }
     delete allData[dname];
-    if (note) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
+    if (note) {
+        if (pol === false) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
+        else { ws.send(JSON.stringify({action:"drawdelete", name:dname, deleted:true}))}
+    }
 }
 
 var editPoly = function(pname,fun) {

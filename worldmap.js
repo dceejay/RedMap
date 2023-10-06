@@ -139,7 +139,7 @@ module.exports = function(RED) {
                     delete message.from;
                     sendToRest(message,client.id);
                 }
-                if (message.action === "delete") {
+                if (message.action === "delete" || message.action === "drawdelete") {
                     delete allPoints[message.name];
                     sendToRest(message,client.id);
                 }
@@ -313,7 +313,7 @@ module.exports = function(RED) {
                         message.content =  Buffer.from(message.content.split('base64,')[1], 'base64');
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    if ((node.events.indexOf("draw")!==-1) && (message.action === "draw"))  {
+                    if ((node.events.indexOf("draw")!==-1) && ((message.action === "draw")||(message.action === "drawdelete")))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                     if (node.events.indexOf("other")!==-1 && "connected,point,delete,move,draw,files,bounds".indexOf(message.action) === -1) {

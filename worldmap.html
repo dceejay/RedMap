@@ -617,6 +617,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <li><b>delete</b> - when a point or shape is deleted</li>
         <li><b>point</b> - when a point is added manually using right-click</li>
         <li><b>draw</b> - when a shape is added manually to the drawing layer</li>
+        <li><b>drawdelete</b> - when a shape is deleted from the drawing layer</li>
         <li><b>layer</b> - when a base layer is changed</li>
         <li><b>addlayer</b> - when an overlay is added to the map</li>
         <li><b>dellayer</b> - when an overlay is removed from the map</li>
@@ -662,10 +663,10 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     { value: "connect", label: "Connect"},
                     { value: "disconnect", label: "Disconnect"},
                     { value: "point", label: "Add, move, delete point"},
+                    { value: "draw", label: "Add, edit or delete drawing"},
                     { value: "layer", label: "Add, remove layers"},
                     { value: "bounds", label: "Boundary change"},
                     { value: "files", label: "File drop"},
-                    { value: "draw", label: "Drawing"},
                     { value: "other", label: "All other"}
                 ]
             }]});
