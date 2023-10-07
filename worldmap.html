@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <script type="text/html" data-template-name="worldmap">
 <div class="form-row">
     <table border="0" width="96%">
@@ -94,6 +93,13 @@
     </select>
 </div>
 <div class="form-row">
+	<label for="node-input-showruler"><i class="fa fa-window-minimize"></i> Ruler</label>
+    <select id="node-input-showruler" style="width:101px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
+</div>
+<div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
     <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
     <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
@@ -140,7 +146,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     <p>Icons of type <i>plane</i>, <i>ship</i>, <i>car</i>, <i>uav</i> or <i>arrow</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
     <p>Font Awesome (<a href="https://fontawesome.com/v4.7.0/icons/" target="_new">fa-icons 4.7</a>) can also be used, as can
-    NATO symbology codes (<a href="https://spatialillusions.com/unitgenerator/">SIDC</a>), or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>,
+    NATO symbology codes (<a href="https://www.spatialillusions.com/unitgenerator-legacy/">SIDC</a>), or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>,
     or the url of a small icon image (32x32)</p>
     <p>See the <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">README</a> for further
     details and examples of icons and commands for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and
@@ -253,6 +259,13 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     </select>
 </div>
 <div class="form-row">
+	<label for="node-input-showruler"><i class="fa fa-window-minimize"></i> Ruler</label>
+    <select id="node-input-showruler" style="width:101px;">
+        <option value="false">Not shown</option>
+        <option value="true">Visible</option>
+    </select>
+</div>
+<div class="form-row">
     <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
     <input type="text" id="node-input-path" placeholder="worldmap" style="width:30%;">
     <i class="fa fa-hand-paper-o" style="margin-left:22px;"></i> File Drop
@@ -299,7 +312,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
     <p>Icons of type <i>plane</i>, <i>ship</i>, <i>car</i>, <i>uav</i> or <i>arrow</i> will use built in SVG icons that align to the
     <code>bearing</code> value.</p>
     <p>Font Awesome (<a href="https://fontawesome.com/v4.7.0/icons/" target="_new">fa-icons 4.7</a>) can also be used, as can
-    NATO symbology codes (<a href="https://spatialillusions.com/unitgenerator/">SIDC</a>), or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>,
+    NATO symbology codes (<a href="https://www.spatialillusions.com/unitgenerator-legacy/">SIDC</a>), or <a href="https://github.com/dceejay/RedMap/blob/master/emojilist.md" target="_new">:emoji name:</a>,
     or the url of a small icon image (32x32)</p>
     <p>See the <a href="https://www.npmjs.com/package/node-red-contrib-web-worldmap" target="_new">README</a> for further
     details and examples of icons and commands for drawing <b>lines</b> and <b>areas</b>, and to <b>add layers</b> and
@@ -364,10 +377,11 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
             hiderightclick: {value:"false"},
             coords: {value:"false"},
             showgrid: {value:"false"},
+			showruler: {value:"false"},
             allowFileDrop: {value:"false"},
             path: {value:"/worldmap"},
-            overlist: {value:"DR,CO,RA,DN,HM"},
-            maplist: {value:"OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS"},
+            overlist: {value:"DR,CO,RA,DN"},
+            maplist: {value:"OSMG,OSMC,EsriC,EsriS,UKOS"},
             mapname: {value:""},
             mapurl: {value:""},
             mapopt: {value:"", validate:function(v) {try{ v.length===0 || JSON.parse(v); return true;} catch(e) {return false;}}},
@@ -477,6 +491,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                     hiderightclick: {value:"true"},
                     coords: {value:"false"},
                     showgrid: {value:"false"},
+					showruler: {value:"false"},
                     allowFileDrop: {value:"false"},
                     path: {value:"/worldmap"},
                     overlist: {value:"DR,CO,RA,DN,HM"},
@@ -522,7 +537,7 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
                         options: olist
                     }]});
                     $("#node-input-maplist").on('change', function(event, type, value) {
-                        if (value.indexOf("MB3d") > -1) {
+                        if (value && value.indexOf("MB3d") > -1) {
                             mshort = [{ value:"MB3d", label:"Mapbox 3D" }];
                             $('#node-input-maplist option').prop('selected', false);
                             $("#node-input-maplist").val("MB3d");

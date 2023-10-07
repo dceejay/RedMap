@@ -18,7 +18,7 @@ var menuOpen = false;
 var clusterAt = 0;
 var maxage = 900;   // default max age of icons on map in seconds - cleared after 10 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var pagefoot = "&nbsp;&copy; DCJ 2022"
+var pagefoot = "&nbsp;&copy; DCJ 2023";
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -28,11 +28,14 @@ var heat;
 var minimap;
 var sidebyside;
 var layercontrol;
-var drawControl;
+// var drawControl;
 var drawingColour = "#910000";
 var sendDrawing;
 var colorControl;
 var sendRoute;
+var oldBounds = {ne:{lat:0, lng:0}, sw:{lat:0, lng:0}};
+var edgeLayer = new L.layerGroup();
+var edgeEnabled = true;
 
 var iconSz = {
     "Team/Crew": 24,
@@ -77,6 +80,8 @@ var loadStatic = function(fileName){
     } 
 }
 
+// L.PM.setOptIn(true);
+
 // Create the socket
 var connect = function() {
     // var transports = ["websocket", "xhr-streaming", "xhr-polling"],
@@ -86,7 +91,7 @@ var connect = function() {
         if (!inIframe) {
             document.getElementById("footer").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
         }
-        ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams)}));
+        ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams),clientTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone || false}));
         onoffline();
     };
     ws.onclose = function() {
@@ -102,10 +107,10 @@ var connect = function() {
             if (data.hasOwnProperty("type") && data.hasOwnProperty("data") && data.type === "Buffer") { data = data.data.toString(); }
             handleData(data);
         }
-        catch (e) { if (data) { console.log("BAD DATA",data); } }
+        catch (e) { if (data) { console.log("BAD DATA",data); console.log(e); } }
         // console.log("DATA",typeof data,data);
     };
-}
+};
 console.log("CONNECT TO",location.pathname + 'socket');
 
 var handleData = function(data) {
@@ -140,12 +145,23 @@ var handleData = function(data) {
             }
         }
         if (data.command) { doCommand(data.command); delete data.command; }
+
+        // handle raw geojson type msg
         if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
             if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('title')) {
                 doGeojson(data.properties.title,data)
             }
             else { doGeojson("geojson",data); }
         }
+        // handle TAK json (from tak-ingest node or fastxml node)
+        else if (data.hasOwnProperty("event") && data.event.hasOwnProperty("point")) {
+            doTAKjson(data.event);
+        }
+        // handle TAK json (from multicast Protobuf)
+        else if (data.hasOwnProperty("cotEvent") && data.cotEvent.hasOwnProperty("lat") && data.cotEvent.hasOwnProperty("lon")) {
+            doTAKMCjson(data.cotEvent);
+        }
+        // handle default worldmap json msg
         else if (data.hasOwnProperty("name")) { setMarker(data); }
         else {
             if (JSON.stringify(data) !== '{}') {
@@ -159,7 +175,13 @@ var handleData = function(data) {
 
 window.onunload = function() { if (ws) ws.close(); }
 
-var onoffline = function() { if (!navigator.onLine) { map.addLayer(layers["_countries"]); } }
+var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
+layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
+overlays["countries"] = layers["_countries"];
+
+var onoffline = function() { if (!navigator.onLine) {
+    map.addLayer(overlays["countries"]);
+} }
 
 document.addEventListener ("keydown", function (ev) {
     // Set Ctl-Alt-3 to switch to 3d view
@@ -195,11 +217,19 @@ if (inIframe === true) {
 // }
 
 // Create the Initial Map object.
-map = new L.map('map',{zoomSnap: 0.1}).setView(startpos, startzoom);
+map = new L.map('map',{
+    zoomSnap: 0.1,
+    rotate: true,
+    rotateControl: {
+        closeOnZeroBearing: true,
+        position: 'topleft'
+    },
+    bearing: 0}).setView(startpos, startzoom);
 map.whenReady(function() {
     connect();
 });
 
+// Drag Drop of files to target map
 var droplatlng;
 var target = document.getElementById("map")
 target.ondragover = function (ev) {
@@ -251,8 +281,20 @@ var readFile = function(file) {
                         doCommand({map:{overlay:file.name, nvg:data}});
                     }
                 }
+                else if (data.indexOf("<kml") !== -1) {
+                    doCommand({map:{overlay:file.name, kml:data}});
+                }
                 else if (data.indexOf('PK') === 0) {
-                    console.log("ZIP FILE");
+                    if (file.name.indexOf('.kmz') !== -1) {
+                        doCommand({map:{overlay:file.name, kmz:data}});
+                    }
+                    else {
+                        console.log("ZIP FILE",file);
+                    }
+                }
+                else if (file.type.indexOf('geo+json') !== -1 ) {
+                    data = JSON.parse(data);
+                    doGeojson(file.name,data,"geojson");
                 }
                 else {
                     try {
@@ -291,21 +333,22 @@ var errRing;
 function onLocationFound(e) {
     if (followState === true) { map.panTo(e.latlng); }
     if (followMode.icon) {
-        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 || undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor || "#910000" };
+        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
         setMarker(self);
     }
+    if (e.heading !== null) { map.setBearing(e.heading); }
     if (followMode.accuracy) {
-        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color || "cyan", weight:3, opacity:0.6, fill:false, clickable:false});
+        errRing = L.circle(e.latlng, e.accuracy, {color:followMode.color ?? "#00ffff", weight:3, opacity:0.6, fill:false, clickable:false});
         errRing.addTo(map);
         // if (e.hasOwnProperty("heading")) {
         //     var lengthAsDegrees = e.speed * 60 / 110540;
         //     var ya = e.latlng.lat + Math.sin((90-e.heading)/180*Math.PI)*lengthAsDegrees*Math.cos(e.latlng.lng/180*Math.PI);
         //     var xa = e.latlng.lng + Math.cos((90-e.heading)/180*Math.PI)*lengthAsDegrees;
         //     var lla = new L.LatLng(ya,xa);
-        //     L.polygon([ e.latlng, lla ], {color:"cyan", weight:3, opacity:0.5, clickable:false}).addTo(map);
+        //     L.polygon([ e.latlng, lla ], {color:"00ffff", weight:3, opacity:0.5, clickable:false}).addTo(map);
         // }
     }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 || undefined)}));
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 ?? undefined)}));
 }
 
 function onLocationError(e) { console.log(e.message); }
@@ -363,10 +406,7 @@ else {
     //     map.locate({setView:true, maxZoom:16});
     // }, "Locate me").addTo(map);
 
-    // Add the measure/ruler button
-    rulerButton.addTo(map);
-
-    // Create the clear heatmap button
+     // Create the clear heatmap button
     var clrHeat = L.easyButton( 'fa-eraser', function() {
         console.log("Reset heatmap");
         heat.setLatLngs([]);
@@ -386,6 +426,7 @@ document.getElementById('menu').innerHTML = helpMenu;
 
 // Add graticule
 var showGrid = false;
+var showRuler = false;
 var Lgrid = L.latlngGraticule({
     font: "Verdana",
     fontColor: "#666",
@@ -397,6 +438,69 @@ var Lgrid = L.latlngGraticule({
         {start:8, end:20, interval:1}
     ]
 });
+
+// Add small sidc icons around edge of map for things just outside of view
+// This function based heavily on Game Aware code from Måns Beckman
+// Copyright (c) 2013 Måns Beckman, All rights reserved.
+var edgeAware = function() {
+    if (!edgeEnabled) { return; }
+	map.removeLayer(edgeLayer)
+	edgeLayer = new L.layerGroup();
+	var mapBounds = map.getBounds();
+	var mapBoundsCenter = mapBounds.getCenter();
+
+	pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
+	pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
+	pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
+
+	var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
+	for (var id in markers) {
+        if (allData[id] && allData[id].hasOwnProperty("SIDC")) {
+            markerLatLng = markers[id].getLatLng();
+            if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
+                var k = (markerLatLng.lat - mapBoundsCenter.lat) / (markerLatLng.lng - mapBoundsCenter.lng);
+
+                if (markerLatLng.lng > mapBoundsCenter.lng) { x = mapBounds.getEast() - mapBoundsCenter.lng; }
+                else { x = (mapBounds.getWest() - mapBoundsCenter.lng); }
+
+                if (markerLatLng.lat < mapBoundsCenter.lat) { y = mapBounds.getSouth() - mapBoundsCenter.lat; }
+                else { y = mapBounds.getNorth() - mapBoundsCenter.lat; }
+
+                var lat = (mapBoundsCenter.lat + (k * x));
+                var lng = (mapBoundsCenter.lng + (y / k));
+                var iconAnchor = {x:5, y:5}
+
+                if (lng > mapBounds.getEast()) {
+                    lng = mapBounds.getEast();
+                    iconAnchor.x = 20;
+                }
+                if (lng < mapBounds.getWest()) {
+                    lng = mapBounds.getWest();
+                    iconAnchor.x = -5;
+                };
+                if (lat < mapBounds.getSouth()) {
+                    lat = mapBounds.getSouth();
+                    iconAnchor.y = 15;
+                }
+                if (lat > mapBounds.getNorth()) {
+                    lat = mapBounds.getNorth();
+                    iconAnchor.y = -5;
+                };
+
+                var eico = new ms.Symbol(allData[id].SIDC.substr(0,5)+"-------",{size:9});
+                var myicon = L.icon({
+                    iconUrl: eico.toDataURL(),
+                    iconAnchor: new L.Point(iconAnchor.x, iconAnchor.y),
+                    className: "natoicon-s",
+                });
+
+                edgeLayer.addLayer(L.marker([lat,lng],{icon:myicon}))
+            }
+        }
+	}
+	edgeLayer.addTo(map)
+}
+// end of edge function
 
 var panit = false;
 function doPanit(v) {
@@ -628,8 +732,8 @@ map.on('overlayadd', function(e) {
     }
     if (e.name == "drawing") {
         overlays["drawing"].bringToFront();
+        map.pm.toggleControls();
         map.addControl(colorControl);
-        map.addControl(drawControl);
     }
     ws.send(JSON.stringify({action:"addlayer", name:e.name}));
 });
@@ -642,7 +746,7 @@ map.on('overlayremove', function(e) {
         layers["_daynight"].clearLayers();
     }
     if (e.name == "drawing") {
-        map.removeControl(drawControl);
+        map.pm.toggleControls()
         map.removeControl(colorControl);
     }
     ws.send(JSON.stringify({action:"dellayer", name:e.name}));
@@ -697,24 +801,36 @@ map.on('zoomend', function() {
     showMapCurrentZoom();
     window.localStorage.setItem("lastzoom", map.getZoom());
     var b = map.getBounds();
+    oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
     ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+    edgeAware();
 });
 map.on('moveend', function() {
     window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
     var b = map.getBounds();
-    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+    if (b._southWest.lat !== oldBounds.sw.lat && b._southWest.lng !== oldBounds.sw.lng && b._northEast.lat !== oldBounds.ne.lat && b._northEast.lng !== oldBounds.ne.lng) {
+        ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+        oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
+    }
+    edgeAware();
 });
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 
-//map.on('contextmenu', function(e) {
-//    ws.send(JSON.stringify({action:"rightclick", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
-//});
-
 // single right click to add a marker
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
-if (navigator.onLine) { addmenu += '<br/><a href="https://spatialillusions.com/unitgenerator/" target="_new">MilSymbol SIDC generator</a>'; }
+if (navigator.onLine) { addmenu += '<br/><a href="https://www.spatialillusions.com/unitgenerator-legacy/" target="_new">MilSymbol SIDC generator</a>'; }
 var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
+
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
+const colorKeywordToRGB = (colorKeyword) => {
+    let el = document.createElement('div');
+    el.style.color = colorKeyword;
+    document.body.appendChild(el);
+    let rgbValue = window.getComputedStyle(el).color;
+    document.body.removeChild(el);
+    return rgba2hex(rgbValue);
+}
 
 var rclk = {};
 var hiderightclick = false;
@@ -725,7 +841,8 @@ var addThing = function() {
     var bits = thing.split(",");
     var icon = (bits[1] || "circle").trim();
     var lay = (bits[2] || "_drawing").trim();
-    var colo = (bits[3] || "#910000").trim();
+    var colo = (bits[3] ?? "#910000").trim();
+    colo = colorKeywordToRGB(colo);
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
     var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
@@ -737,6 +854,8 @@ var addThing = function() {
         d.icon = icon;
         d.iconColor = colo;
     }
+    if (icon === "dot") { d.icon = 'fa-circle fa-fw'; }
+    if (icon === "spot") { d.icon = 'fa-circle fa-fw'; }
     ws.send(JSON.stringify(d));
     delete d.action;
     setMarker(d);
@@ -750,6 +869,7 @@ var feedback = function(n,v,a,c) {
         // ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
         var fb = allData[n];
         fb.action = a || "feedback";
+        if (v !== undefined) { fb.value = v; }
         ws.send(JSON.stringify(fb));
     }
     else {
@@ -763,6 +883,10 @@ var form = {};
 var addToForm = function(n,v) {
     form[n] = v;
 }
+
+// map.on('click', function(e) {
+//    ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
+// });
 
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
@@ -988,46 +1112,37 @@ var addOverlays = function(overlist) {
 
         layers["_drawing"] = new L.FeatureGroup();
         overlays["drawing"] = layers["_drawing"];
-        map.options.drawControlTooltips = false;
         var drawCount = 0;
-        drawControl = new L.Control.Draw({
-            draw: {
-                polyline: { shapeOptions: { clickable:true } },
-                marker: false,
-                //circle: false,
-                circle: { shapeOptions: { clickable:true } },
-                circlemarker: false,
-                rectangle: { shapeOptions: { clickable:true } },
-                polygon: { shapeOptions: { clickable:true } }
-            }
-            //edit: none
-            // {
-            //     featureGroup: layers["_drawing"],
-            //     remove: true,
-            //     edit: true
-            // }
+        map.pm.addControls({
+            position: 'topleft',
+            drawMarker: false,
+            drawCircleMarker: false,
+            drawText: false,
+            editControls: false
         });
+        map.pm.toggleControls();
+
         var changeDrawColour = function(col) {
             drawingColour = col;
-            // console.log("COLOR",col)
-            drawControl.setDrawingOptions({
-                polyline: { shapeOptions: { color:drawingColour } },
-                circle: { shapeOptions: { color:drawingColour } },
-                rectangle: { shapeOptions: { color:drawingColour } },
-                polygon: { shapeOptions: { color:drawingColour } }
-            });
+            map.pm.setPathOptions({
+                color: drawingColour,
+                fillColor: drawingColour,
+                fillOpacity: 0.4
+              });
         }
+
         var shape;
-        map.on('draw:created', function (e) {
-            var name = e.layerType + drawCount;
+        map.on("pm:create", (e) => {
+            var name = e.shape + drawCount;
             drawCount = drawCount + 1;
 
             e.layer.on('contextmenu', function(e) {
                 L.DomEvent.stopPropagation(e);
                 var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
-                rmen.setContent("<input type='text' autofocus value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\",true);'>Edit points</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                rmen.setContent("<input type='text' value='"+e.target.name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+e.target.name+"\");'>Edit points</button><button onclick='editPoly(\""+e.target.name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+e.target.name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+e.target.name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
                 map.openPopup(rmen);
             });
+            e.layer.bindPopup(name);
 
             var la, lo, cent;
             if (e.layer.hasOwnProperty("_latlng")) {
@@ -1038,7 +1153,7 @@ var addOverlays = function(overlist) {
             else {
                 cent = e.layer.getBounds().getCenter();
             }
-            var m = {action:"draw", name:name, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
+            var m = {action:"draw", name:name, type:e.shape, layer:"_drawing", options:e.layer.options, radius:e.layer._mRadius, lat:la, lon:lo};
             if (e.layer.hasOwnProperty("_latlngs")) {
                 if (e.layer.options.fill === false) { m.line = e.layer._latlngs; }
                 else { m.area = e.layer._latlngs[0]; }
@@ -1050,9 +1165,9 @@ var addOverlays = function(overlist) {
             polygons[name].name = name;
             layers["_drawing"].addLayer(shape.layer);
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             if (e.layer.options.fill === false && navigator.onLine) {
-                rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\",true);'>Edit points</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+                rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
             setTimeout(function() {map.openPopup(rightmenuMarker)},25);
@@ -1062,6 +1177,7 @@ var addOverlays = function(overlist) {
             var thing = document.getElementById('dinput').value;
             map.closePopup();
             shape.m.name = thing;
+            shape.layer.bindPopup(thing);
             delMarker(n,true);
 
             polygons[thing] = shape.layer;
@@ -1153,10 +1269,13 @@ var addOverlays = function(overlist) {
                     var r = decode(data.routes[0].geometry).map( x => L.latLng(x[0],x[1]) );
                     polygons[n]._latlngs = r;
                     shape.m.line = r;
+                    // shape.m.type = {label:"routing", distance:data.routes[0].distance, duration:data.routes[0].duration}
+                    shape.m.type = "route";
+                    shape.m.distance = data.routes[0].distance;
+                    shape.m.duration = data.routes[0].duration;
                     sendDrawing(n);
                 });
         }
-
     }
 
     // Add the countries (world-110m) for offline use
@@ -1232,9 +1351,13 @@ var addOverlays = function(overlist) {
         });
     }
 
-    // Add the heatmap layer
-    if (overlist.indexOf("HM")!==-1) {
+    // Add the heatmap layer (and add delete LatLng function)
+    if (overlist.indexOf("HM") !== -1) {
         heat = L.heatLayer([], {radius:60, gradient:{0.2:'blue', 0.4:'lime', 0.6:'red', 0.8:'yellow', 1:'white'}});
+        heat.delLatLng = function(ll) {
+            heat._latlngs = heat._latlngs.filter(v => { return v != ll; } );
+            heat._redraw();
+        }
         layers["_heat"] = new L.LayerGroup().addLayer(heat);
         overlays["heatmap"] = layers["_heat"];
     }
@@ -1255,8 +1378,8 @@ var coords = L.control.mouseCoordinate({position:"bottomleft"});
 var legend = L.control({ position: "bottomleft" });
 
 // Add the dialog box for messages
-var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
-dialogue.freeze();
+// var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
+// dialogue.freeze();
 
 var doDialog = function(d) {
     //console.log("DIALOGUE",d);
@@ -1282,7 +1405,7 @@ helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b
 helpText += 'all layers whether hidden or not will contribute to the heatmap.';
 helpText += 'The default is that only visible layers add to the heatmap.</p>';
 
-// Delete a marker (and notify websocket)
+// Delete a marker or shape (and notify websocket)
 var delMarker = function(dname,note) {
     if (note) { map.closePopup(); }
     if (typeof polygons[dname] != "undefined") {
@@ -1294,6 +1417,10 @@ var delMarker = function(dname,note) {
         delete polygons[dname+"_"];
     }
     if (typeof markers[dname] != "undefined") {
+        if (heat && markers[dname].hasOwnProperty("_latlng")) {
+            try { heat.delLatLng(markers[dname]._latlng); }
+            catch(e) { }
+        }
         layers[markers[dname].lay].removeLayer(markers[dname]);
         map.removeLayer(markers[dname]);
         delete markers[dname];
@@ -1302,16 +1429,15 @@ var delMarker = function(dname,note) {
     if (note) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
 }
 
-var editPoly = function(pname) {
+var editPoly = function(pname,fun) {
     map.closePopup();
-    editFeatureGroup = L.featureGroup();
-    editToolbar = new L.EditToolbar({ featureGroup:editFeatureGroup });
-    editHandler = editToolbar.getModeHandlers()[0].handler;
-    editHandler._map = map;
+    if (fun === "rot") { polygons[pname].pm.enableRotate(); }
+    else if (fun === "drag") { polygons[pname].pm.enableLayerDrag(); }
+    else { polygons[pname].pm.enable(); }
     polygons[pname].on("dblclick", function(e) {
-        editHandler.disable();
-        editFeatureGroup.removeLayer(polygons[pname]);
-        polygons[pname].off("dblclick");
+        if (fun === "rot") { polygons[pname].pm.disableRotate(); }
+        else if (fun === "drag") { polygons[pname].pm.disableLayerDrag(); }
+        else { polygons[pname].pm.disable(); }
         L.DomEvent.stopPropagation(e);
         var la, lo;
         if (e.target.hasOwnProperty("_latlng")) {
@@ -1325,9 +1451,8 @@ var editPoly = function(pname) {
         }
         ws.send(JSON.stringify(m));
     })
-    editFeatureGroup.addLayer(polygons[pname]);
-    editHandler.enable();
 }
+
 
 var rangerings = function(latlng, options) {
     options = L.extend({
@@ -1343,7 +1468,7 @@ var rangerings = function(latlng, options) {
             radius: options.ranges[i],
             fill: false,
             color: options.color,
-            weight: options.weight || 1
+            weight: options.weight ?? 1
         }).setDirection(options.pan, options.fov).addTo(rings);
     }
     return rings;
@@ -1351,15 +1476,19 @@ var rangerings = function(latlng, options) {
 
 // the MAIN add something to map function
 function setMarker(data) {
-
     var rightmenu = function(m) {
+        m.on('click', function(e) {
+            var fb = allData[data.name];
+            fb.action = "click";
+            ws.send(JSON.stringify(fb));
+        });
         // customise right click context menu
         var rightcontext = "";
         //if (polygons[data.name] == undefined) {
         rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         //}
         if (data.editable) {
-            rightcontext = "<button onclick='editPoly(\""+data.name+"\",true);'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            rightcontext = "<button onclick='editPoly(\""+data.name+"\");'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
             rightcontext = data.contextmenu.replace(/\$name/g,'"'+data.name+'"');
@@ -1394,8 +1523,8 @@ function setMarker(data) {
     var ll;
     var lli = null;
     var opt = {};
-    opt.color = data.color || data.lineColor || "#910000";
-    opt.fillColor = data.fillColor || "#910000";
+    opt.color = data.color ?? data.lineColor ?? "#910000";
+    opt.fillColor = data.fillColor ?? "#910000";
     opt.stroke = (data.hasOwnProperty("stroke")) ? data.stroke : true;
     opt.weight = data.weight;
     opt.opacity = data.opacity;
@@ -1425,7 +1554,7 @@ function setMarker(data) {
     if (markers.hasOwnProperty(data.name) && markers[data.name].hasOwnProperty("lay")) {
         lll = markers[data.name].lay;
     }
-    var lay = data.layer || lll;
+    var lay = data.layer ?? lll;
     if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
         if (typeof layers[lay] == "undefined") {  // add layer if if doesn't exist
             if (clusterAt > 0) {
@@ -1474,7 +1603,9 @@ function setMarker(data) {
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
         polygons[data.name] = rightmenu(polyln);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -1483,7 +1614,9 @@ function setMarker(data) {
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
         polygons[data.name] = rightmenu(polyarea);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -1496,7 +1629,9 @@ function setMarker(data) {
         var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
 
         polygons[data.name] = rightmenu(aml);
-        if (data.hasOwnProperty("fit") && data.fit === true) {
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        } else if (data.hasOwnProperty("fit") && data.fit === true) {
             map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
         }
     }
@@ -1582,11 +1717,11 @@ function setMarker(data) {
     if (data.draggable === true) { drag = true; }
 
     if (data.hasOwnProperty("icon")) {
-        var dir = parseFloat(data.hdg || data.heading || data.bearing || "0");
+        var dir = parseFloat(data.hdg ?? data.heading ?? data.bearing ?? "0");
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
-                color: (data.iconColor || "blue")
+                color: (data.iconColor ?? "blue")
             });
             marker.setHeading(dir);
             q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
@@ -1610,7 +1745,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "smallplane") {
-            data.iconColor = data.iconColor || "black";
+            data.iconColor = data.iconColor ?? "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="20" height="20">';
             icon += '<path d="M15.388 4.781c.068.068.061.154-.171.656-.028.06-.18.277-.18.277s.102.113.13.14c.054.055.078.175.056.27-.068.295-.89 1.47-1.35 1.93-.285.286-.432.481-.422.56.009.068.117.356.24.64.219.5.3.599 2.762 3.339 1.95 2.169 2.546 2.87 2.582 3.028.098.439-.282.847-1.264 1.356l-.507.263-7.389-5.29-4.43 3.365.102.18c.056.099.519.676 1.029 1.283.51.607.933 1.161.94 1.232.026.284-1.111 1.177-1.282 1.006-.27-.27-1.399-1.131-1.494-1.14-.068-.007-1.04-.747-1.37-1.077-.329-.33-1.07-1.301-1.076-1.37-.01-.094-.871-1.224-1.14-1.493-.171-.171.722-1.308 1.006-1.282.07.007.625.43 1.231.94.607.51 1.185.973 1.283 1.029l.18.101 3.365-4.43-5.29-7.388.263-.507c.51-.982.918-1.362 1.357-1.264.158.035.859.632 3.028 2.581 2.74 2.462 2.838 2.544 3.339 2.762.284.124.572.232.639.24.08.01.274-.136.56-.422.46-.46 1.635-1.282 1.93-1.35.095-.022.216.003.27.057.028.028.139.129.139.129s.217-.153.277-.18c.502-.233.59-.238.657-.17z" fill="'+data.iconColor+'"/></svg>';
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
@@ -1625,7 +1760,7 @@ function setMarker(data) {
             dir = dir - 90;
             var sc = 1;
             if (dir < -90 || dir >= 90) { sc = -1; }
-            data.iconColor = data.iconColor || "#910000";
+            data.iconColor = data.iconColor ?? "#910000";
             var p = "m595.5 97.332-30.898-68.199c-11.141-24.223-35.344-39.762-62.004-39.801h-443.3c-32.738 0.035157-59.266 26.562-59.301 59.305v148.2c0 17.949 14.551 32.5 32.5 32.5h48.5c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h242c4.7344 23.309 25.219 40.051 49 40.051s44.266-16.742 49-40.051h53.203c12.348-0.003906 23.219-8.1484 26.699-20 0.72266-2.5391 1.0898-5.1602 1.0977-7.7969v-83.5c-0.003906-7.1445-1.5391-14.203-4.5-20.703zm-545.5 12c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm80 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm110-150c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm110 0c0 5.5234-4.4766 10-10 10h-70c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10zm30 10c-5.5234 0-10-4.4766-10-10v-80c0-5.5195 4.4766-10 10-10h70c5.5234 0 10 4.4805 10 10v80c0 5.5234-4.4766 10-10 10zm90 140c-16.566 0-30-13.43-30-30 0-16.566 13.434-30 30-30s30 13.434 30 30c-0.046875 16.551-13.453 29.953-30 30zm19.199-140c-5.1836-0.46094-9.168-4.793-9.1992-10v-80.086c0-5.4727 4.4375-9.9141 9.9141-9.9141h12.684c18.824 0.050781 35.914 11.012 43.805 28.102l30.898 68.199c1.6133 3.5547 2.5 7.3984 2.6016 11.297z";
             icon = '<svg width="640pt" height="640pt" viewBox="-20 -180 640 640" xmlns="http://www.w3.org/2000/svg">';
             icon += '<path d="'+p+'" fill="'+data.iconColor+'"/></svg>';
@@ -1638,7 +1773,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "helicopter") {
-            data.iconColor = data.iconColor || "black";
+            data.iconColor = data.iconColor ?? "black";
             if (data.hasOwnProperty("squawk")) {
                 if (data.squawk == 7500 || data.squawk == 7600 || data.squawk == 7700) {
                     data.iconColor = "red";
@@ -1753,7 +1888,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
         else if (data.icon === "locate") {
-            data.iconColor = data.iconColor || "cyan";
+            data.iconColor = data.iconColor || "#00ffff";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="468px" height="468px" viewBox="0 0 468 468">';
             icon += '<polygon points="32 32 104 32 104 0 0 0 0 104 32 104" fill="'+data.iconColor+'"/>';
             icon += '<polygon points="468 0 364 0 364 32 436 32 436 104 468 104" fill="'+data.iconColor+'"/>';
@@ -1790,7 +1925,7 @@ function setMarker(data) {
         }
         else if (data.icon.match(/^:.*:$/g)) {
             var em = emojify(data.icon);
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             myMarker = L.divIcon({
                 className:"emicon",
                 html: '<center><span style="font-size:2em; color:'+col+'">'+em+'</span></center>',
@@ -1799,8 +1934,8 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
         }
-        else if (data.icon.match(/^https?:.*$/)) {
-            var sz = data.iconSize || 32;
+        else if (data.icon.match(/^https?:.*$|^\//)) {
+            var sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
                 iconSize: [sz, sz],
@@ -1812,7 +1947,7 @@ function setMarker(data) {
             delete data.iconSize;
         }
         else if (data.icon.substr(0,3) === "fa-") {
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
             myMarker = L.divIcon({
@@ -1826,7 +1961,7 @@ function setMarker(data) {
             labelOffset = [8,-8];
         }
         else if (data.icon.substr(0,3) === "wi-") {
-            var col = data.iconColor || "#910000";
+            var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
             myMarker = L.divIcon({
@@ -1841,8 +1976,8 @@ function setMarker(data) {
         }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: data.icon || "circle",
-                markerColor: (data.iconColor || "#910000"),
+                icon: data.icon ?? "circle",
+                markerColor: (data.iconColor ?? "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'
             });
@@ -1877,11 +2012,12 @@ function setMarker(data) {
             className: "natoicon",
         });
         marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
+        edgeAware();
     }
     else {
         myMarker = L.VectorMarkers.icon({
             icon: "circle",
-            markerColor: (data.iconColor || "#910000"),
+            markerColor: (data.iconColor ?? "#910000"),
             prefix: 'fa',
             iconColor: 'white'
         });
@@ -2030,34 +2166,41 @@ function setMarker(data) {
     if (data.fill) { delete data.fill; }
     if (data.draggable) { delete data.draggable; }
     //if (!isNaN(data.speed)) { data.speed = data.speed.toFixed(2); }
-    if (data.hasOwnProperty("clickable")) { delete data.clickable; }
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
-    for (var i in data) {
-        if ((i != "name") && (i != "length")) {
-            if (typeof data[i] === "object") {
-                words += i +" : "+JSON.stringify(data[i])+"<br/>";
-            } else {
-                words += i +" : "+data[i]+"<br/>";
+    if (data.popup) { words = data.popup; }
+    else {
+        words += '<table>';
+        for (var i in data) {
+            if ((i != "name") && (i != "length") && (i != "clickable")) {
+                if (typeof data[i] === "object") {
+                    //
+                    words += '<tr><td>'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
+                } else {
+                    // words += i +" : "+data[i]+"<br/>";
+                    words += '<tr><td>'+ i +'</td><td>' + data[i] + '</td></tr>';
+                }
             }
         }
+        words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
+        words += '</table>';
     }
-    if (data.popup) { words = data.popup; }
-    else { words = words + marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')',''); }
     words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
-    marker.bindPopup(words, wopt);
-    marker._popup.dname = data.name;
+    if (!data.hasOwnProperty("clickable") && data.clickable != false) {
+        marker.bindPopup(words, wopt);
+        marker._popup.dname = data.name;
+    }
     marker.lay = lay;                       // and the layer it is on
 
-    marker.on('click', function(e) {
-        //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
-        var fb = allData[marker.name];
-        fb.action = "click";
-        ws.send(JSON.stringify(fb));
-    });
+    // marker.on('click', function(e) {
+    //     //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+    //     var fb = allData[marker.name];
+    //     fb.action = "click";
+    //     ws.send(JSON.stringify(fb));
+    // });
     if (heat && ((data.addtoheatmap != false) || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
     }
@@ -2196,8 +2339,8 @@ function doCommand(cmd) {
             if ((cmd.grid.showgrid == "false" || cmd.grid.showgrid == false ) && showGrid) { changed = true; }
             if (changed) {
                 showGrid = !showGrid;
-                if (showGrid) { Lgrid.addTo(map); rulerButton.addTo(map); }
-                else { Lgrid.removeFrom(map); rulerButton.remove(); }
+                if (showGrid) { Lgrid.addTo(map);}
+                else { Lgrid.removeFrom(map);}
             }
         }
         if (cmd.grid.hasOwnProperty("opt")) {
@@ -2205,6 +2348,18 @@ function doCommand(cmd) {
             if (showGrid) {
                 Lgrid.removeFrom(map);
                 Lgrid.addTo(map);
+            }
+        }
+    }
+    if (cmd.hasOwnProperty("ruler")) {
+        if (cmd.ruler.hasOwnProperty("showruler")) {
+            var changed = false;
+            if ((cmd.ruler.showruler == "true" || cmd.ruler.showruler == true ) && !showRuler) { changed = true; }
+            if ((cmd.ruler.showruler == "false" || cmd.ruler.showruler == false ) && showRuler) { changed = true; }
+            if (changed) {
+                showRuler = !showRuler;
+                if (showRuler) { rulerButton.addTo(map); }
+                else { rulerButton.remove(); }
             }
         }
     }
@@ -2307,6 +2462,11 @@ function doCommand(cmd) {
         if (!existsalready) {
             layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
         }
+        // if new layer is only layer then show it.
+        if (Object.keys(basemaps).length === 1) {
+            baselayername = cmd.map.name;
+            basemaps[baselayername].addTo(map);
+        }
     }
     // Add or swap new minimap layer
     if (cmd.map && cmd.map.hasOwnProperty("minimap")) {
@@ -2333,56 +2493,69 @@ function doCommand(cmd) {
         }
     }
     // Add a new geojson overlay layer
-    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson") ) {
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("geojson")) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
             map.removeLayer(overlays[cmd.map.overlay]);
             existsalready = true;
         }
-        var opt = cmd.map.opt || { style:function(feature) {
-            var st = { stroke:true, weight:2, fill:true };
-            if (feature.hasOwnProperty("properties")) {
-                st.color = feature.properties.color||feature.properties.roofColor||"black";
-                if (feature.properties.hasOwnProperty("color")) { delete feature.properties.color; }
-                if (feature.properties.hasOwnProperty("roofColor")) { delete feature.properties.roofColor; }
+        try {
+            var opt = cmd.map.opt || {};
+            if (opt.hasOwnProperty("style")) { opt.style = new Function('return ' + opt.style)(); }
+            else {
+                opt.style = function(feature) {
+                    var st = { stroke:true, weight:2, fill:true };
+                    if (feature.hasOwnProperty("properties")) {
+                        st.color = feature.properties.color||feature.properties.roofColor||"black";
+                        if (feature.properties.hasOwnProperty("color")) { delete feature.properties.color; }
+                        if (feature.properties.hasOwnProperty("roofColor")) { delete feature.properties.roofColor; }
+                    }
+                    if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
+                        if (feature.properties.style.hasOwnProperty('stroke')) {
+                            st.color = feature.properties.style.stroke;
+                        }
+                        if (feature.properties.style.hasOwnProperty('stroke-width')) {
+                            st.weight = feature.properties.style["stroke-width"];
+                        }
+                        if (feature.properties.style.hasOwnProperty('stroke-opacity')) {
+                            st.opacity = feature.properties.style["stroke-opacity"];
+                        }
+                        if (feature.properties.style.hasOwnProperty('fill')) {
+                            if (feature.properties.style.fill == "none") { st.fill = false; }
+                            else { st.fillColor = feature.properties.style.fill; }
+                        }
+                        if (feature.properties.style.hasOwnProperty('fill-opacity')) {
+                            st.fillOpacity = feature.properties.style["fill-opacity"];
+                        }
+                    }
+                    delete feature.properties.style;
+                    return st;
+                };
             }
-            if (feature.hasOwnProperty("properties") && feature.properties.hasOwnProperty('style')) {
-                if (feature.properties.style.hasOwnProperty('stroke')) {
-                    st.color = feature.properties.style.stroke;
-                }
-                if (feature.properties.style.hasOwnProperty('stroke-width')) {
-                    st.weight = feature.properties.style["stroke-width"];
-                }
-                if (feature.properties.style.hasOwnProperty('stroke-opacity')) {
-                    st.opacity = feature.properties.style["stroke-opacity"];
-                }
-                if (feature.properties.style.hasOwnProperty('fill')) {
-                    if (feature.properties.style.fill == "none") { st.fill = false; }
-                    else { st.fillColor = feature.properties.style.fill; }
-                }
-                if (feature.properties.style.hasOwnProperty('fill-opacity')) {
-                    st.fillOpacity = feature.properties.style["fill-opacity"];
+            if (opt.hasOwnProperty("pointToLayer")) { opt.pointToLayer = new Function('return ' + opt.pointToLayer)(); }
+            if (opt.hasOwnProperty("filter")) { opt.filter = new Function('return ' + opt.filter)(); }
+            if (opt.hasOwnProperty("onEachFeature")) { opt.onEachFeature = new Function('return ' + opt.onEachFeature)(); }
+            else {
+                opt.onEachFeature = function (f,l) {
+                    var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
+                    if (pw.length > 11) { l.bindPopup(pw); }
+                    if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
+                        l.on('click', function (e) {
+                            ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
+                        });
+                    }
                 }
             }
-            delete feature.properties.style;
-            return st;
-        }};
-        opt.onEachFeature = function (f,l) {
-            var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
-            if (pw.length > 11) { l.bindPopup(pw); }
-            if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
-                l.on('click', function (e) {
-                    ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
-                });
+            overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
+            if (!existsalready) {
+                layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
             }
-        }
-        overlays[cmd.map.overlay] = L.geoJson(cmd.map.geojson,opt);
-        if (!existsalready) {
-            layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
-        }
-        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            map.addLayer(overlays[cmd.map.overlay]);
-        }
-        if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+            if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                map.addLayer(overlays[cmd.map.overlay]);
+            }
+            if (cmd.map.hasOwnProperty("fly") && (cmd.map.fly === true)) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+            else if (cmd.map.hasOwnProperty("fit") && (cmd.map.fit === true)) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        } 
+        catch(e) { console.log(e); }
     }
     // Add a new NVG XML overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("nvg") ) {
@@ -2453,11 +2626,12 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             map.addLayer(overlays[cmd.map.overlay]);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
 
     var custIco = function() {
-        var col = cmd.map.iconColor || "#910000";
+        var col = cmd.map.iconColor ?? "#910000";
         var myMarker = L.VectorMarkers.icon({
             icon: "circle",
             markerColor: col,
@@ -2485,21 +2659,67 @@ function doCommand(cmd) {
         return customLayer;
     }
 
-    // Add a new KML overlay layer
-    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kml") ) {
+    // Add a new KMZ overlay layer (or KML)
+    //if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kmz")) {
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && ( cmd.map.hasOwnProperty("kmz") || cmd.map.hasOwnProperty("kml")) ) {
         if (overlays.hasOwnProperty(cmd.map.overlay)) {
             overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
-        //var opt = {async:true};
-        overlays[cmd.map.overlay] = omnivore.kml.parse(cmd.map.kml, null, custIco());
+        try {
+            var kmz = L.kmzLayer().addTo(map);
+            kmz.on('load', function(e) {
+                overlays[cmd.map.overlay] = kmz;
+                if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                    overlays[cmd.map.overlay].addTo(map);
+                }
+            });
+            let arr;
+            if (cmd.map.hasOwnProperty("kmz")) {
+                if (typeof cmd.map.kmz === "string") {
+                    arr = new Uint8Array(cmd.map.kmz.length);
+                    for (let i=0; i<cmd.map.kmz.length; i++) {
+                        arr[i] = cmd.map.kmz.charCodeAt(i);
+                    }
+                    arr = arr.buffer;
+                }
+                else { arr = new Uint8Array(cmd.map.kmz.data).buffer; }
+            }
+            if (cmd.map.hasOwnProperty("kml")) {
+                if (typeof cmd.map.kml === "string") { arr = cmd.map.kml; }
+                else { arr = new Uint8Array(cmd.map.kml.data).buffer; }
+            }
+            kmz.parse(arr, { name:cmd.map.overlay, icons:{} });
+            overlays[cmd.map.overlay] = kmz;
+        } catch(e) { console.log("Failed to parse KML/KMZ",e) }
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
-        if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
-            overlays[cmd.map.overlay].addTo(map);
-        }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+    }
+    // Add a new ESRI feature layer
+    if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("esri") ) {
+        try {
+            if (overlays.hasOwnProperty(cmd.map.overlay)) {
+                overlays[cmd.map.overlay].removeFrom(map);
+                existsalready = true;
+            }
+            var opt = {};
+            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt; }
+            if (opt.hasOwnProperty("style")) { opt.style = new Function('return ' + opt.style)(); }
+            if (opt.hasOwnProperty("pointToLayer")) { opt.pointToLayer = new Function('return ' + opt.pointToLayer)(); }
+            if (opt.hasOwnProperty("onEachFeature")) { opt.onEachFeature = new Function('return ' + opt.onEachFeature)(); }
+            opt.url = cmd.map.esri;
+            overlays[cmd.map.overlay] = L.esri.featureLayer(opt);
+            if (!existsalready) {
+                layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
+            }
+            if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
+                overlays[cmd.map.overlay].addTo(map);
+            }
+            // NOTE can't fit or fly to bounds as they keep reloading
+        } catch(e) { console.log(e); }
     }
     // Add a new TOPOJSON overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("topojson") ) {
@@ -2514,7 +2734,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new GPX overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("gpx") ) {
@@ -2522,6 +2743,10 @@ function doCommand(cmd) {
             overlays[cmd.map.overlay].removeFrom(map);
             existsalready = true;
         }
+        // var gp = new DOMParser().parseFromString(cmd.map.gpx, "text/xml");
+        // var json = window.toGeoJSON.gpx(gp);
+        // console.log("j",json)
+        // doGeojson(json.features[0].properties.name,json,json.features[0].properties.type) // DCJ name,geojson,layer,options
         overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco());
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
@@ -2529,7 +2754,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new velocity overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("velocity") ) {
@@ -2542,7 +2768,8 @@ function doCommand(cmd) {
         if (!cmd.map.hasOwnProperty("visible") || (cmd.map.visible != false)) {
             overlays[cmd.map.overlay].addTo(map);
         }
-        if (cmd.map.hasOwnProperty("fit")) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
+        if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
+        else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
     // Add a new overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
@@ -2580,7 +2807,6 @@ function doCommand(cmd) {
             overlays[cmd.map.overlay].addTo(map);
         }
     }
-
     // Swap a base layer
     if (cmd.layer && basemaps.hasOwnProperty(cmd.layer)) {
         map.removeLayer(basemaps[baselayername]);
@@ -2646,7 +2872,7 @@ function doCommand(cmd) {
         else { lockit = false; doLock(false); }
         document.getElementById("lockit").checked = lockit;
     }
-    // move to a new position
+    // Move to a new position
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;
     var czoom = map.getZoom();
@@ -2654,6 +2880,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("lon")) { clon = cmd.lon; }
     if (cmd.hasOwnProperty("zoom")) { czoom = cmd.zoom; }
     map.setView([clat,clon],czoom);
+
+    // Set rotation of map
+    if (cmd.hasOwnProperty("rotation") && !isNaN(cmd.rotation)) { map.setBearing(-cmd.rotation); }
 
     if (cmd.hasOwnProperty("cluster")) {
         clusterAt = cmd.cluster;
@@ -2664,10 +2893,13 @@ function doCommand(cmd) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
     }
-    if (cmd.hasOwnProperty("heatmap")) {
-        heat.setOptions(cmd.heatmap);
-        document.getElementById("heatall").checked = !!cmd.heatmap;
-        heat.redraw();
+    // Replace heatmap layer with new array (and optionally options)
+    if (cmd.hasOwnProperty("heatmap") && heat) {
+        if (cmd.hasOwnProperty("options")) { heat.setOptions(cmd.options); }
+        heat.setLatLngs(cmd.heatmap);
+        // heat.setOptions(cmd.heatmap);
+        // document.getElementById("heatall").checked = !!cmd.heatmap;
+        // heat.redraw();
     }
     if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
     if (cmd.hasOwnProperty("zoomlock")) {
@@ -2686,7 +2918,11 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("bounds")) {            // Move/Zoom map to new bounds
         if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
-            map.fitBounds(cmd.bounds);
+            if (cmd.hasOwnProperty("fly") && cmd.fly === true) {
+                map.flyToBounds(cmd.bounds);
+            } else {
+                map.fitBounds(cmd.bounds);
+            }
         }
     }
     if (cmd.hasOwnProperty("loadStatic")) {
@@ -2705,19 +2941,18 @@ function doCommand(cmd) {
 }
 
 // handle any incoming GEOJSON directly - may style badly
-function doGeojson(n,g,l,o) {
-    //console.log("GEOJSON",n,g,l,o)
-    var lay = l || g.name || "unknown";
+function doGeojson(n,g,l,o) {  // name, geojson, layer, options
+    var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
         var st = { stroke:true, color:"#910000", weight:1, fill:true, fillColor:"#910000", fillOpacity:0.15 };
         st = Object.assign(st,o);
         if (feature.hasOwnProperty("properties")) {
             //console.log("GPROPS", feature.properties)
-            st.color = feature.properties["stroke"] || st.color;
-            st.weight = feature.properties["stroke-width"] || st.weight;
-            st.fillColor = feature.properties["fill-color"] || feature.properties["fill"] || st.fillColor;
-            st.fillOpacity = feature.properties["fill-opacity"] || st.fillOpacity;
+            st.color = feature.properties["stroke"] ?? st.color;
+            st.weight = feature.properties["stroke-width"] ?? st.weight;
+            st.fillColor = feature.properties["fill-color"] ?? feature.properties["fill"] ?? st.fillColor;
+            st.fillOpacity = feature.properties["fill-opacity"] ?? st.fillOpacity;
             delete feature.properties["stroke"];
             delete feature.properties["stroke-width"];
             delete feature.properties["fill-color"];
@@ -2727,10 +2962,10 @@ function doGeojson(n,g,l,o) {
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
-            st.color = feature.style["stroke"] || st.color;
-            st.weight = feature.style["stroke-width"] || st.weight;
-            st.fillColor = feature.style["fill-color"] || feature.style["fill"] || st.fillColor;
-            st.fillOpacity = feature.style["fill-opacity"] || st.fillOpacity;
+            st.color = feature.style["stroke"] ?? st.color;
+            st.weight = feature.style["stroke-width"] ?? st.weight;
+            st.fillColor = feature.style["fill-color"] ?? feature.style["fill"] ?? st.fillColor;
+            st.fillOpacity = feature.style["fill-opacity"] ?? st.fillOpacity;
         }
         if (feature.hasOwnProperty("geometry") && feature.geometry.hasOwnProperty("type") && (feature.geometry.type === "LineString" || feature.geometry.type === "MultiLineString")  ) {
             st.fill = false;
@@ -2764,10 +2999,22 @@ function doGeojson(n,g,l,o) {
                 className: "natoicon",
             });
         }
+        else if (feature.properties.hasOwnProperty("marker-symbol") && feature.properties["marker-symbol"].substr(0,3) === "fa-") {
+            var col = feature.properties["marker-color"] ?? "#910000";
+            var imod = "";
+            if (feature.properties["marker-symbol"].indexOf(" ") === -1) { imod = "fa-2x "; }
+            myMarker = L.divIcon({
+                className:"faicon",
+                html: '<center><i class="fa fa-fw '+imod+feature.properties["marker-symbol"]+'" style="color:'+col+'"></i></center>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 12],
+                popupAnchor: [0, -16]
+            });
+        }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: feature.properties["marker-symbol"] || "circle",
-                markerColor: (feature.properties["marker-color"] || "#910000"),
+                icon: feature.properties["marker-symbol"] ?? "circle",
+                markerColor: (feature.properties["marker-color"] ?? "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'
             });
@@ -2778,24 +3025,39 @@ function doGeojson(n,g,l,o) {
         if (feature.properties.hasOwnProperty("url")) {
             feature.properties.url = "<a target='_new' href='"+feature.properties.url+"'>"+feature.properties.url+"</a>";
         }
-        delete feature.properties["marker-symbol"];
-        delete feature.properties["marker-color"];
-        delete feature.properties["marker-size"];
         var nf = {title:feature.properties.title, name:feature.properties.name};
         feature.properties = Object.assign(nf, feature.properties);
-        return L.marker(latlng, {title:feature.properties.title || "", icon:myMarker});
+        return L.marker(latlng, {title:feature.properties.title ?? "", icon:myMarker});
     }
     opt.onEachFeature = function (f,l) {
         if (f.properties && Object.keys(f.properties).length > 0) {
-            var tx = JSON.stringify(f.properties,null,' ');
+            var tx = JSON.parse(JSON.stringify(f.properties,null,' '));
+            delete tx["marker-symbol"];
+            delete tx["marker-color"];
+            delete tx["marker-size"];
+            delete tx["coordinateProperties"];
+            delete tx["_gpxType"];
+            var n = tx["name"];
+            delete tx["name"];
+            tx = JSON.stringify(tx,null,' ');
             if ( tx !== "{}") {
-                l.bindPopup('<pre style="overflow-x: scroll">'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>');
+                l.bindPopup('<b>'+n+'</b><pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
             }
         }
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
             l.on('click', function (e) {
                 ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
             });
+        }
+        if (f.geometry.type === "MultiLineString") {
+            l.on('contextmenu', function(e) {
+                L.DomEvent.stopPropagation(e);
+                var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
+                rmen.setContent("<b>"+n+"</b><br/><button onclick='editPoly(\""+n+"\");'>Edit points</button><button onclick='delMarker(\""+n+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                map.openPopup(rmen);
+            });
+            polygons[n] = l;
+            polygons[n].lay = lay;
         }
     }
     markers[n] = L.geoJson(g,opt);
@@ -2807,4 +3069,200 @@ function doGeojson(n,g,l,o) {
     }
     layers[lay].addLayer(markers[n]);
     map.addLayer(layers[lay]);
+}
+
+// handle TAK messages from TAK server tcp - XML->JSON
+function doTAKjson(p) {
+    //console.log("TAK event",p);
+    if (p.type.indexOf('a-') === 0 || p.type.indexOf('b-m-p-') === 0 || p.type.indexOf('b-a-o-') === 0 || p.type.indexOf('b-a-g') === 0) {
+        var d = {};
+        d.name = p.detail?.contact?.callsign || p.uid;
+        d.lat = Number(p.point.lat);
+        d.lon = Number(p.point.lon);
+        if (p.type.indexOf('a') === 0) {
+            d.hdg = p.detail?.track?.course;
+            d.speed = p.detail?.track?.speed;
+            d.team = p.detail?.__group?.name;
+            d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+            d.role = p.detail?.__group?.role;
+        }
+        d.type = p.type;
+        d.remarks = p.detail?.remarks
+        if (p.detail?.remarks && p.detail.remarks.hasOwnProperty["#text"]) {
+            d.remarks = p.detail.remarks["#text"];
+        }
+        d.uid = p.uid;
+
+        try {
+            var st = (new Date(p.time)).getTime() / 1000;
+            var et = (new Date(p.stale)).getTime() / 1000;
+            d.timestamp = (new Date(p.time)).toISOString();
+            d.staletime = (new Date(p.stale)).toISOString();
+            d.ttl = parseInt(et-st);
+        }
+        catch(e) { console.log(e); }
+        d.alt = Number(p.point.hae) || 9999999;
+        if (d.alt && d.alt == 9999999) { delete d.alt; }
+        if (d.speed && d.speed == 9999999) { delete d.speed; }
+        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
+        handleCoTtypes(d,p);
+        setMarker(d);
+    }
+    else {
+        console.log("Skip TAK type",p.type);
+    }
+}
+
+// handle TAK messages from TAK Multicast - Protobuf->JSON
+function doTAKMCjson(p) {
+    // console.log("TAK Multicast event",p);
+    if (p.type.indexOf('a') === 0) {
+        var d = {};
+        d.lat = p.lat;
+        d.lon = p.lon;
+        d.team = p.detail?.group?.name;
+        d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+        d.role = p.detail?.group?.role;
+        d.type = p.type;
+        d.uid = p.uid;
+        d.name = p.detail?.contact?.callsign || p.uid;
+        d.hdg = p.detail?.track?.course;
+        d.speed = p.detail?.track?.speed;
+
+        try {
+            d.timestamp = (new Date(+p.sendTime)).toISOString();
+            d.staletime = (new Date(+p.staleTime)).toISOString();
+            d.ttl = parseInt((+p.staleTime / 1000) - (+p.sendTime / 1000));
+        } catch(e) { console.log(e); }
+        d.alt = p.hae || 9999999;
+        if (d.alt && d.alt == 9999999) { delete d.alt; }
+        if (d.speed && d.speed == 9999999) { delete d.speed; }
+        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
+        handleCoTtypes(d,p);
+        setMarker(d);
+    }
+    else {
+        console.log("Skip TAK type",p.type);
+    }
+}
+
+function convertCOTtoCIFColour(color) {
+    const c = parseInt(color);
+    const arr = new ArrayBuffer(4);
+    const view = new DataView(arr);
+    view.setUint32(0, color, false);
+    const b2h = buf2hex(arr);
+    return "#" + b2h.substr(2);
+}
+
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+    return [...new Uint8Array(buffer)]
+        .map(x => x.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+function createRings(r) {
+    if (r <= 100) { return r; }
+    var rings = [];
+    var step = 100;
+    if (r > 1000) { step = 1000; }
+    if (r > 10000) { step = 10000; }
+    for (var i = step; i < r; i += step) {
+        rings.push(i);
+    }
+    rings.push(r);
+    return rings;
+}
+
+function handleCoTtypes(d,p) {
+    if (d.type.indexOf('a-') === 0) { // handle a- types
+        var i = d.type.split('-').join('').toUpperCase();
+        i = 'S' + i.substr(1,2) + 'P' + i.substr(3);
+        if (d.role === 'Team Lead') { i = i + '----B'; }
+        if (d.role === 'HQ') { i = 'SFGPUH' };
+        if (d.role === "Medic") { i = 'SFGPUSM----A'; }
+        if (d.role === "RTO") { i = 'SFGPUUS'; }
+        if (d.role === 'K9') { i = 'SFGPUU'; }
+        d.SIDC = (i + '-------').substr(0,12);
+        // Handle "special" types
+        if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
+        if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
+        if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+        return d;
+    }
+    else { // handle b- types
+        // console.log("TYPE",d.type);
+        try {
+            if (d.type === 'b-m-p-s-m') { // small spot marker
+                d.icon = "fa-circle fa-fw";
+                d.ttl = 0;
+                d.iconColor = convertCOTtoCIFColour(p.detail.color.argb);
+                delete d.SIDC;
+            }
+            if (d.type.indexOf('b-m-p-s-p') === 0) { // it's a position indicator
+                delete d.SIDC;
+                d.ttl = 0;
+                if (d.type.indexOf('b-m-p-s-p-loc') === 0) {
+                    if (p.detail?.sensor) {
+                        if (p.detail?.__video) {
+                            d.icon = "fa-video-camera";
+                            d.video_link = p.detail?.__video?.ConnectionEntry?.protocol+'://'+p.detail?.__video?.url
+                        }
+                        else {
+                            d.SIDC = "SFGPUUMRS---";
+                        }
+                        if (p.detail.sensor?.fov) {
+                            d.arc = {
+                                fov: +p.detail.sensor.fov,
+                                pan: +p.detail.sensor.azimuth,
+                                ranges: createRings(+p.detail.sensor.range),
+                                color: convertCOTtoCIFColour(p.detail.sensor.strokeColor)
+                            }
+                        }
+                    }
+                    else { d.icon = "locate"; }
+                }
+                if (d.type.indexOf('b-m-p-s-p-op') === 0) {
+                    d.icon = "fa-binoculars";
+                }
+            }
+            if (d.type === 'b-m-p-w-GOTO') {
+                d.SIDC = "GFGPGPRP----";
+            }
+            if (d.type === 'b-m-p-c') {
+                d.SIDC = "GFGPGPRW----";
+            }
+            if (d.type === 'b-a-o-tbl' || d.type === 'b-a-o-pan' || d.type === 'b-a-o-opn') {
+                d.remarks = p.detail.emergency["#text"] + " " + p.detail.emergency.type;
+                d.icon = 'fa-exclamation-circle';
+                if (d.type === 'b-a-o-tbl') { d.iconColor = 'gold'; }
+                if (d.type === 'b-a-o-pan') { d.iconColor = 'orange'; }
+                if (d.type === 'b-a-o-opn') { d.iconColor = 'red'; }
+                // d.SIDC = 'ESOPB-------';
+                d.ttl = 0;
+            }
+            if (d.type === 'b-a-g') { // geofence alert
+                d.remarks = p.detail.emergency["#text"] + " " + p.detail.emergency.type;
+                d.icon = 'fa-crosshairs';
+                d.iconColor = 'orange';
+                // d.SIDC = 'ESOPEC------';
+                d.ttl = 0;
+            }
+            if (d.type === 'b-a-o-can') { // cancelled alert
+                d.name = p.detail.emergency["#text"] + "-Alert";
+                d.deleted = true;
+            }
+        }
+        catch(e) {
+            console.log(e);
+        }
+        // console.log("D",d)
+        // Other non-atom types - tbd
+        // b-i-x-i Camera image ?
+        // b-m-r Route
+        // b-r-f-h-c Medevac "EFOPBD------"
+        // b-d Drawings -c-c circle -c-e ellipse -r rectangle -f freehand
+        // b-t-f Geochat (f = file)  just No
+    }
+    return d;
 }

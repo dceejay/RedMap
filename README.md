@@ -7,29 +7,35 @@
 A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
 map web page for plotting "things" on.
 
+Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/dceejay) this project.
+
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
 
-- v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
-- v2.28.3 - Let button declaration be an array
-- v2.28.1 - Fix layer command bug for non-core layers. Issue #195
-- v2.28.0 - Better Handling of sidc icons in geojson
-- v2.27.3 - Try to handle greatcircles crossing antimeridian
-- v2.27.1 - Reload existing markers for late joiners
-- v2.26.1 - Add QTH/Maidenhead option also
-- v2.26.0 - Add UTM and MGRS to coordinate display options.
-- v2.25.0 - Add bounds command to set overall map bounds.
-- v2.24.3 - Fix geojson incorrect fill.
-- v2.24.2 - Changes to drawing colours to be more visible.
-- v2.24.1 - Fix ellipse accuracy
-- v2.24.0 - Add greatcircle option, fix non default httpRoot. Issue #193
-- v2.23.5 - Fix addtoheatmap. Issue #192
-- v2.23.4 - Fix opacity of area borders
-- v2.23.3 - Fix initial load of maps
-- v2.23.2 - Add convex-hull example
-- v2.23.1 - Fix saving of custom map layer
-- v2.23.0 - Give logo an id so it can be overridden by toplogo command. PR #188.
+- v3.1.0  - Add esri overlay layers, and let geojson overlay rendering be customised
+- v3.0.0  - Bump to Leaflet 1.9.4
+            Move to geoman for drawing shapes.
+            Allow command.rotation to set rotation of map.
+            Allow editing of multipoint geojson tracks.
+- v2.43.1 - Tweak drawing layer double click
+- v2.43.0 - Revert leaflet update as it broke Draw
+- v2.42.3 - More KML and GeoJson drag drop fixes
+- v2.42.1 - Remove extraneous debug logging, fix KMZ icons
+- v2.42.0 - Add handling for TAK type spots, waypoints, alerts, sensors. Better KML/KMZ handling.
+- v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
+- v2.40.1 - Fix missing countries overlay when starting disconnected.
+- v2.40.0 - Add handling for TAK event points from TAK ingest node.
+- v2.39.0 - Add client timezone to connect message. PR #245
+- v2.38.3 - Better fix for geojson multipoint icons.
+- v2.38.1 - Fix for geojson multipoint icons.
+- v2.38.0 - Return client headers as part of connect message.
+- v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh
+- v2.37.3 - Fix hang on layer change
+- v2.37.2 - If custom layer is only layer then show it automatically. Issue #230
+- v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
+- v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
+- v2.36.0 - Add edge icons for SIDC markers just off the map.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -42,7 +48,7 @@ Either use the Manage Palette option in the Node-RED Editor menu, or run the fol
 ## Usage
 
 Plots "things" on a map. By default the map will be served from `{httpRoot}/worldmap`, but this
-can be configured in the configuration panel.
+can be changed in the configuration panel.
 
 Use keyboard shortcut `⌘⇧m`, `ctrl-shift-m` to jump to the map.
 
@@ -52,16 +58,16 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, for
 
 `name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
 
-Optional properties include
+Optional properties for **msg.payload** include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
- - **draggable** : set to <i>true</i> to allow marker to be moved. (default <i>false</i>)
+ - **draggable** : set to <i>true</i> to allow marker to be moved by the mouse. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to. (default <i>"unknown"</i>)
  - **track | hdg | heading | bearing** : when combined with speed, draws a vector. (only first will be used)
- - **speed** : when combined with heading, draws a vector.
- - **accuracy** : when combined with heading vector, draws a polygon of possible direction.
- - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https://
+ - **speed** : when combined with track, hdg, heading, or bearing, draws a leader line vector.
+ - **accuracy** : when combined with heading vector, draws an arc of possible direction.
+ - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// uri.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -71,6 +77,7 @@ Optional properties include
  - **weblink** : adds a link to an external page. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"}`, or multiple links with an *array of objects* `[{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"},{"name":"node-red", "url":"https://nodered.org", "target":"_new"}]`
  - **addtoheatmap** : set to <i>false</i> to exclude point from contributing to the heatmap layer. (default true)
  - **intensity** : set to a value of 0.1 - 1.0 to set the intensity of the point on the heatmap layer. (default 1.0)
+ - **clickable** : Default true. Setting to false disables showing any popup.
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **label** : displays the contents as a permanent label next to the marker, or
@@ -89,7 +96,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to http(s)://... By default will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
+Or you can specify an image to load as an icon by setting the icon to http(s)://... By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
 
 There are also several special icons...
 
@@ -105,7 +112,7 @@ There are also several special icons...
  - **satellite** : a small satellite icon.
  - **iss** : a slightly larger icon for the ISS.
  - **locate** : a 4 corner outline to locate a point without obscuring it.
- - **friend** : pseudo NATO style blue rectangle. (see NATO SIDC option below)
+ - **friend** : pseudo NATO style blue rectangle. (but see NATO SIDC option below)
  - **hostile** : pseudo NATO style red circle.
  - **neutral** : pseudo NATO style green square.
  - **unknown** : pseudo NATO style yellow square.
@@ -124,9 +131,17 @@ To do this you need to supply a `msg.payload.SIDC` 2525 code instead of an icon,
         "options": { "fillOpacity":0.8, "additionalInformation":"Extra info" }
     }
 
-SIDC codes can be generated using the online tool - https://spatialillusions.com/unitgenerator/
+SIDC codes can be generated using the online tool - https://www.spatialillusions.com/unitgenerator-legacy/
 
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
+
+#### TAK Visualisation
+
+Users of [TAK](https://tak.gov) can use the [TAK ingest node](https://flows.nodered.org/node/node-red-contrib-tak-registration) to create a JSON formatted TAK event object, received from a TAK server. This can be fed directly into the worldmap node.
+
+![Tak Flow](https://github.com/dceejay/pages/blob/master/TAKflow.png?raw=true)
+![Tak Image](https://github.com/dceejay/pages/blob/master/TAKicons.png?raw=true)
+
 
 ### Areas, Rectangles, Lines, and GreatCircles
 
@@ -138,7 +153,8 @@ then rather than draw a point and icon it draws the polygon. If the "area" array
 elements, then it assumes this is a bounding box for a rectangle and draws a rectangle.
 
 Likewise if it contains a **line** property it will draw the polyline.
-If the payload also includes a property `fit:true` the map will zoom to fit the line or area.
+
+If the payload also includes a property `fit:true` the map will zoom to fit the line or area. Alternatively you can use `fly:true` instead of fit for a more animated look.
 
 Finally if a **greatcircle** property is set containing an array of two coordinates then an arc
 following the great circle between the two co-ordinates is plotted.
@@ -204,7 +220,9 @@ Defaults are shown above.
 
 ### GeoJSON
 
-If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
+There are several ways to send GeoJSON to the map.
+
+1)  If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
 rather than draw a point it will render the geojson.
 
     msg.payload = {
@@ -239,8 +257,9 @@ Often geojson may not have a `properties` or `style` property in which case you 
         clickable: true
     }
 
-**Note**: you can just send a msg.payload containing the geojson itself - but obviously you then can't style
-it, set the name, layer, etc.
+2) You can just send a msg.payload containing the geojson itself - but obviously you then can't style it, set the name, layer, etc.
+
+3) You can also add the geojson as a specific overlay, in which case you can also have more control of styles, and per feature customisations. See the section on overlays [below](#to-add-a-new-geojson-overlay). This is the most complex but customisable.
 
 
 ### Options
@@ -332,7 +351,7 @@ in addition existing male, female, fa-male and fa-female icons are all represent
 
  **NOTES**
 
- - There is currently no way to add labels, popups, or make the icons clickable.
+ - There is currently no way to add labels, popups, or to make the icons clickable.
  - The 3D only really works at zoomed in scales 16+ due to the small size of the icons. They are not scale independent like icons on the normal map.
  - As this uses the mapbox api you may wish to edit the index3d.html code to include your api key to remove any usage restrictions.
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
@@ -365,7 +384,14 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
 If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The node-red-node-exif node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
 
-All actions also include a `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+All actions also include a:
+`msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+`msg._sessionip` property that shows the ip of the client that is connected to the session.
+
+The "connected" action additionally includes a:
+`msg.payload.parameters` property object that lists the parameters sent in the url.
+`msg.payload.clientTimezone` property string showing the clients local Timezone. Returns bool of `false` if unable to retrive clients local Timezone.
+`msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
 
 
 ### Utility functions
@@ -392,10 +418,11 @@ msg.payload = { command: { "contextmenu":menu } }
 
 You can also control the map via the node, by sending in a msg.payload containing a **command** object. Multiple parameters can be specified in one command.
 
-Optional properties include
+Optional properties for **msg.payload.command** include
 
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
+ - **rotation** - rotate the base map to the specified compass angle.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **bounds** - if set to an array `[ [ lat(S), lon(W) ], [lat(N), lon(E)] ]` - sets the overall map bounds.
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
@@ -411,19 +438,23 @@ Optional properties include
    - **wms** - true/false/grey, specifies if the data is provided by a Web Map Service (if grey sets layer to greyscale)
    - **bounds** - sets the bounds of an Overlay-Image. 2 Dimensional Array that defines the top-left and bottom-right Corners (lat/lon Points)
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
- - **heatmap** - set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
+ - **heatmap** - set heatmap latlngs array object see https://github.com/Leaflet/Leaflet.heat#reference
+ - **options** - if heatmap set, then use this to set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
  - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **panit** - auto pan to the latest marker updated.  - `{"command":{"panit":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
  - **hiderightclick** - disables the right click that allows adding or deleting points on the map - `{"command":{"hiderightclick":true}}`
  - **coords** - turns on and off a display of the current mouse co-ordinates. Values can be "deg", "dms", or "none" (default). - `{"command":{"coords":"deg"}}`
+ - **showruler** - turns on and off a display of the ruler control. Values can be "true" or "false". - `{"command": {"ruler": {"showruler": true}}}`
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default). button can also be an array of button objects.
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
  - **toptitle** - Words to replace title in title bar (if not in iframe)
  - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
  - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
+ - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu": "hide"}}`
+ - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers": "hide"}}`
 
 #### To switch layer, move map and zoom
 
@@ -495,7 +526,7 @@ To remove set the legend to an empty string `""`.
 
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
 style server by adding a property `wms: true`. You can also set `wms: "grey"` to set the layer to greyscale which
-may let you markers be more visible. (see overlay example below).
+may let your markers be more visible. (see overlay example below).
 
     msg.payload.command.map = {
         "name":"OSMhot",  // use "overlay":"MyOverlayName" for an overlay rather than a base layer.
@@ -555,17 +586,24 @@ By default the overlay will be instantly visible. To load it hidden add a proper
         "overlay": "myGeoJSON",
         "geojson": { your geojson feature as an object },
         "opt": { optional geojson options, style, etc },
-        "fit": true
+        "fit": true,
         "clickable": false
     };
 
 The geojson features may contain a `properties` property. That may also include a `style` with properties - stroke, stroke-width, stroke-opacity, fill, fill-opacity. Any other properties will be listed in the popup.
 
-The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. Note: only simple options are supported as functions cannot be serialised.
+The `opt` property is optional. See the <a href="https://leafletjs.com/examples/geojson/">Leaflet geojson docs</a> for more info on possible options. 
 
-The `fit` property is optional. If boolean true the map will automatically zoom to fit the area relevant to the geojson. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
+NOTE: In order to pass over **style**, **pointToLayer**, **onEachFeature**, or **filter** functions they need to be serialised as follows... for example
 
-see https://leafletjs.com/examples/geojson/ for more details about options for opt.
+    const style = function () {
+        return { color: "#910000", weight: 2 };
+    };
+    msg.payload.command.map.opt.style = style.toString();
+
+This may cause the function node setting them to be in error, for example if it references L (the leaflet map), which is unknown on the server side. The flow should still deploy and run ok.
+
+The `fit` property is optional, and you can also use `fly` if you wish. If boolean true the map will automatically zoom to fit the area relevant to the geojson, or use 'fly' to set the animated style. You can also set `clickable` true to return the properties of the clicked feature to the worldmap-in node.
 
 #### To add a new KML, GPX, or TOPOJSON overlay
 
@@ -582,7 +620,29 @@ As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSO
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
 
-Again the boolean `fit` property can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
+Again the boolean `fit` or `fly` properties can be added to make the map zoom to the relevant area, and the `visible` property can be set false to not immediately show the layer.
+
+#### To add an ESRI FeatureLayer overlay
+
+As per the geojson overlay you can also inject an ESRI ArcGIS FeatureLayer layer. The syntax is the same but with an `esri` property containing the url of the desired feature layer.
+
+    msg.payload.command.map = {
+        "overlay": "myFeatureLayer",
+        "esri": "https://services3.arcgis.com/...../0",
+        "opt": { object of options }
+    };
+
+NOTE: you can set various options as [specified here](https://developers.arcgis.com/esri-leaflet/api-reference/layers/feature-layer/#options).
+
+In order to pass over **style**, **pointToLayer**, or **onEachFeature** functions they need to be serialised as follows... for example
+
+    const style = function () {
+        return { color: "#910000", weight: 2 };
+    };
+    msg.payload.command.map.opt.style = style.toString();
+
+This may cause the function node setting them to be in error, for example if it references L.marker, which is unknown on the server side. The flow should still deploy and run ok.
+
 
 #### To add a Velocity Grid Overlay
 
@@ -692,7 +752,7 @@ and use a url like `"url": "http://localhost:1882/?map=/maps/my-app.map",`
 
 To use a vector mbtiles server like **MapTiler** then you can download your mbtiles file into a directory and then from that directory run
 ```
-docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080
+docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
 ```
 and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
 

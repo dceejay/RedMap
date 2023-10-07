@@ -31,6 +31,7 @@ module.exports = function(RED) {
         node.hiderightclick = n.hiderightclick || "false";
         node.coords = n.coords || "none";
         node.showgrid = n.showgrid || "false";
+        node.showruler = n.showruler || "false";
         node.allowFileDrop = n.allowFileDrop || "false";
         node.path = n.path || "/worldmap";
         node.maplist = n.maplist;
@@ -39,8 +40,8 @@ module.exports = function(RED) {
         node.mapurl = n.mapurl || "";
         node.mapopt = n.mapopt || "";
         node.mapwms = n.mapwms || false;
-        if (n.maplist === undefined) { node.maplist = "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS,SW"; }
-        if (n.overlist === undefined) { node.overlist = "DR,CO,RA,DN,HM"; }
+        if (n.maplist === undefined) { node.maplist = "OSMG,OSMC,EsriC,EsriS,UKOS"; }
+        if (n.overlist === undefined) { node.overlist = "DR,CO,RA,DN"; }
         try { node.mapopt2 = JSON.parse(node.mapopt); }
         catch(e) { node.mapopt2 = null; }
 
@@ -101,6 +102,7 @@ module.exports = function(RED) {
                     c.zoomlock = node.zoomlock;
                     c.showlayers = node.layers;
                     c.grid = {showgrid:node.showgrid};
+                    c.ruler = {showruler:node.showruler};
                     c.hiderightclick = node.hiderightclick;
                     c.allowFileDrop = node.allowFileDrop;
                     c.coords = node.coords;
@@ -118,7 +120,9 @@ module.exports = function(RED) {
             });
             node.status({fill:"green",shape:"dot",text:"connected "+Object.keys(clients).length,_sessionid:client.id});
         }
+
         node.on('input', function(msg) {
+            if (!msg.hasOwnProperty("payload")) { node.warn("Missing payload"); return; }
             if (msg.hasOwnProperty("_sessionid")) {
                 if (clients.hasOwnProperty(msg._sessionid)) {
                     clients[msg._sessionid].write(JSON.stringify(msg.payload));
@@ -131,7 +135,7 @@ module.exports = function(RED) {
                     }
                 }
             }
-            if (msg.payload.hasOwnProperty("name")) {
+            if (msg.payload.hasOwnProperty("name") && !msg.hasOwnProperty("_sessionid")) {
                 allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
                 var t = node.maxage || 3600;
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
@@ -171,7 +175,7 @@ module.exports = function(RED) {
         if (height == 0) { height = 10; }
         var size = ui.getSizes();
         var frameWidth = (size.sx + size.cx) * width - size.cx;
-        var frameHeight = (size.sy + size.cy) * height - size.cy;
+        var frameHeight = (size.sy + size.cy) * height - size.cy + 40;
         var url = encodeURI(path.posix.join(RED.settings.httpNodeRoot||RED.settings.httpRoot,config.path));
         if (config.layer === "MB3d") { url += "/index3d.html"; }
         var html = `<style>.nr-dashboard-ui_worldmap{padding:0;}</style><div style="overflow:hidden;">
@@ -264,7 +268,7 @@ module.exports = function(RED) {
                 message = JSON.parse(message);
                 if (message.hasOwnProperty("action")) {
                     if ((node.events.indexOf("connect")!==-1) && (message.action === "connected")) {
-                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip, _clientheaders:client.headers})});
                     }
                     if ((node.events.indexOf("bounds")!==-1) && (message.action === "bounds")) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});

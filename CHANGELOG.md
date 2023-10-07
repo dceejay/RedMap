@@ -1,5 +1,48 @@
 ### Change Log for Node-RED Worldmap
 
+ - v3.1.0 - Add esri overlay layers, and let geojson overlay rendering be customised
+ - v3.0.0 - Bump to Leaflet 1.9.4
+            Move to geoman for drawing shapes.
+            Allow command.rotation to set rotation of map.
+            Allow editing of multipoint geojson tracks.
+
+ - v2.43.1 - Tweak drawing layer double click
+ - v2.43.0 - Revert leaflet update as it broke Draw
+ - v2.42.3 - More KML and GeoJson drag drop fixes
+ - v2.42.1 - Remove extraneous debug logging, fix KMZ icons
+ - v2.42.0 - Add handling for TAK type spots, waypoints, alerts, sensors. Better KML/KMZ handling.
+ - v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
+ - v2.40.1 - Fix missing countries overlay when starting disconnected.
+ - v2.40.0 - Add handling for TAK event points from TAK ingest node.
+ - v2.39.0 - Add client timezone to connect message. PR #245
+ - v2.38.3 - Better fix for geojson multipoint icons.
+ - v2.38.1 - Fix for geojson multipoint icons.
+ - v2.38.0 - Return client headers as part of connect message.
+ - v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh
+ - v2.37.3 - Fix hang on layer change
+ - v2.37.2 - If custom layer is only layer then show it automatically. Issue #230
+ - v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
+ - v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
+ - v2.36.0 - Add edge icons for SIDC markers just off the map.
+ - v2.35.0 - Let clickable:false work for markers as well.
+ - v2.34.0 - Let icon "url" be a local fixed path. PR #223
+ - v2.33.0 - Let shapes create click event. from PR #221
+             Fix heatmap delete point bug. Issue #222
+ - v2.32.3 - Fix map split in iframe position
+ - v2.32.1 - Let command.heatmap replace complete heatmap array.
+ - v2.32.0 - Change || to nullish operator ?? to fix numerous dodgy assignments. Issue #219
+             Delete marker now also removes from heatmap layer. Issue #218
+
+ - v2.31.3 - Undo previous fix as while more technically correct - doesn't look so good. Issue #217
+ - v2.31.2 - Fix more antimeridian crossing wrinkles. Issue #216
+ - v2.31.1 - Fix missing type property for drawings, and pass back feedback value. Add route distance. Issue #213, Issue #212, PR #215
+ - v2.31.0 - Better handling of KML files. Issue #211
+
+ - v2.30.3 - Fix for iframe height. Issue #210
+ - v2.30.2 - Fix for bad handling of mapbox id. Issue #208
+ - v2.30.1 - Don't resend bounds if not changed. Issue #209
+ - v2.30.0 - Add show/hide ruler option. PR #206
+
  - v2.29.0 - Change locate to be a toggle and add command (trackme) to set style. Issue #202
 
  - v2.28.3 - Let button declaration be an array
