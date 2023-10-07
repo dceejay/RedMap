@@ -54,6 +54,32 @@ var iconSz = {
     "Command": 44
 };
 
+var filesAdded = ''; 
+  
+var loadStatic = function(fileName){ 
+    if(filesAdded.indexOf(fileName) !== -1)
+        return
+    var head = document.getElementsByTagName('head')[0]
+    if(fileName.indexOf('js') !== -1) {      
+        var script = document.createElement('script') 
+        script.src = fileName
+        script.type = 'text/javascript'
+        console.log("Loading: ",fileName)  
+        head.append(script) 
+        filesAdded += ' ' + fileName
+    } else if (fileName.indexOf('css') !== -1) {
+        var style = document.createElement('link') 
+        style.href = fileName
+        style.type = 'text/css'
+        style.rel = 'stylesheet'
+        console.log("Loading: ",fileName)  
+        head.append(style);
+        filesAdded += ' ' + fileName
+    } else {
+        console.log("Unsupported file type: ",fileName)  
+    } 
+}
+
 // L.PM.setOptIn(true);
 
 // Create the socket
@@ -2897,6 +2923,19 @@ function doCommand(cmd) {
             } else {
                 map.fitBounds(cmd.bounds);
             }
+        }
+    }
+    if (cmd.hasOwnProperty("loadStatic")) {
+      console.log("load Static files",JSON.stringify(cmd.loadStatic.fileNames));
+      cmd.loadStatic.fileNames.forEach(fileName => loadStatic(fileName));
+    }
+    if (cmd.hasOwnProperty("customCmd")) {
+        console.log("custom Command",JSON.stringify(cmd.customCmd));
+        try {
+            eval(cmd.customCmd);
+        }
+        catch (e) {
+          console.log("ERR - custom command: ", JSON.stringify(cmd.customCmd));
         }
     }
 }
