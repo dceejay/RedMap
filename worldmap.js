@@ -316,7 +316,7 @@ module.exports = function(RED) {
                     if ((node.events.indexOf("draw")!==-1) && ((message.action === "draw")||(message.action === "drawdelete")))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    if (node.events.indexOf("other")!==-1 && "connected,point,delete,move,draw,files,bounds".indexOf(message.action) === -1) {
+                    if (node.events.indexOf("other")!==-1 && "connected,point,delete,move,draw,drawdelete,files,bounds".indexOf(message.action) === -1) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                 }

@@ -27,16 +27,6 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
 - v2.40.1 - Fix missing countries overlay when starting disconnected.
 - v2.40.0 - Add handling for TAK event points from TAK ingest node.
-- v2.39.0 - Add client timezone to connect message. PR #245
-- v2.38.3 - Better fix for geojson multipoint icons.
-- v2.38.1 - Fix for geojson multipoint icons.
-- v2.38.0 - Return client headers as part of connect message.
-- v2.37.4 - Fix sessionid specific data not to be sent on reload/refresh
-- v2.37.3 - Fix hang on layer change
-- v2.37.2 - If custom layer is only layer then show it automatically. Issue #230
-- v2.37.1 - Warn (and drop) messages that are missing a payload. Issue #229
-- v2.37.0 - Allow fly instead of fit option when using command to move view window. (PR #225)
-- v2.36.0 - Add edge icons for SIDC markers just off the map.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 

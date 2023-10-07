@@ -30,6 +30,7 @@ var sidebyside;
 var layercontrol;
 var drawCount = 0;
 var drawingColour = "#910000";
+var drawcontextmenu = "";
 var sendDrawing;
 var colorControl;
 var sendRoute;
@@ -836,6 +837,8 @@ var addThing = function() {
     map.addLayer(layers[lay]);
 }
 
+var form = {};
+var addToForm = function(n,v) { form[n] = v; }
 var feedback = function(n,v,a,c) {
     if (v === "$form") { v = form; }
     if (markers[n]) {
@@ -846,16 +849,14 @@ var feedback = function(n,v,a,c) {
         if (v !== undefined) { fb.value = v; }
         ws.send(JSON.stringify(fb));
     }
+    else if (polygons[n]) {
+        sendDrawing(n,v,a)
+    }
     else {
         if (n === undefined) { n = "map"; }
         ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
     if (c === true) { map.closePopup(); }
-}
-
-var form = {};
-var addToForm = function(n,v) {
-    form[n] = v;
 }
 
 // map.on('click', function(e) {
@@ -1113,7 +1114,8 @@ var addOverlays = function(overlist) {
                 L.DomEvent.stopPropagation(e);
                 var name = e.target.name;
                 var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
-                rmen.setContent("<input type='text' value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>");
+                var d = drawcontextmenu || "<input type='text' value='$name' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\"$name\");'>Edit points</button><button onclick='editPoly(\"$name\",\"drag\");'>Drag</button><button onclick='editPoly(\"$name\",\"rot\");'>Rotate</button><button onclick='delMarker(\"$name\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>";
+                rmen.setContent(d.replace(/\$name/g,name));
                 map.openPopup(rmen);
             });
             e.layer.bindPopup(name);
@@ -1139,21 +1141,24 @@ var addOverlays = function(overlist) {
             polygons[name].name = name;
             layers["_drawing"].addLayer(shape.layer);
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\$name/g,name) || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             if (e.layer.options.fill === false && navigator.onLine) {
-                rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+                rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\$name/g,name) || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
             setTimeout(function() {map.openPopup(rightmenuMarker)},25);
         });
 
-        sendDrawing = function(n) {
-            var thing = document.getElementById('dinput').value;
+        sendDrawing = function(n,v,a) {
+            var thing = document.getElementById('dinput')?.value || n;
             map.closePopup();
             shape.m.name = thing;
             shape.layer.bindPopup(thing);
             delMarker(n,true);
-
+            if (v) {
+                shape.layer.form = v;
+                shape.m.form = v;
+            }
             polygons[thing] = shape.layer;
             polygons[thing].lay = "_drawing";
             polygons[thing].name = thing;
@@ -1405,8 +1410,8 @@ var delMarker = function(dname,note) {
     }
     delete allData[dname];
     if (note) {
-        if (pol === false) { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
-        else { ws.send(JSON.stringify({action:"drawdelete", name:dname, deleted:true}))}
+        if (pol === true) { ws.send(JSON.stringify({action:"drawdelete", name:dname, deleted:true})); }
+        else { ws.send(JSON.stringify({action:"delete", name:dname, deleted:true})); }
     }
 }
 
@@ -1426,6 +1431,7 @@ var editPoly = function(pname,fun) {
             lo = e.target._latlng.lng;
         }
         var m = {action:"draw", name:pname, layer:polygons[pname].lay, options:e.target.options, radius:e.target._mRadius, lat:la, lon:lo};
+        if (e.target.form) { m.form = e.target.form; }
         if (e.target.hasOwnProperty("_latlngs")) {
             if (e.target.options.fill === false) { m.line = e.target._latlngs; }
             else { m.area = e.target._latlngs[0]; }
@@ -2383,6 +2389,11 @@ function doCommand(cmd) {
         if (typeof cmd.contextmenu === "string") {
             addmenu = cmd.contextmenu;
             rightmenuMap.setContent(addmenu);
+        }
+    }
+    if (cmd.hasOwnProperty("drawcontextmenu")) {
+        if (typeof cmd.drawcontextmenu === "string") {
+            drawcontextmenu = cmd.drawcontextmenu;
         }
     }
     if (cmd.hasOwnProperty("allowFileDrop")) {
