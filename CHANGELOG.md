@@ -1,5 +1,8 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.0.0 - Breaking - Better context menu variable substitution and retention
+            Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
+            
  - v3.2.0 - Sync up drawing sessions across browsers to same map
  - v3.1.0 - Add esri overlay layers, and let geojson overlay rendering be customised
  - v3.0.0 - Bump to Leaflet 1.9.4

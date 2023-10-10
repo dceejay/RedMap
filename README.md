@@ -13,10 +13,12 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.0.0  - Breaking - Better context menu variable substitution and retention
+            Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
 - v3.2.0  - Sync up drawing sessions across browsers to same map
 - v3.1.0  - Add esri overlay layers, and let geojson overlay rendering be customised
 - v3.0.0  - Bump to Leaflet 1.9.4
-            Move to geoman for drawing shapes.
+            Breaking - Move to geoman for drawing shapes.
             Allow command.rotation to set rotation of map.
             Allow editing of multipoint geojson tracks.
 - v2.43.1 - Tweak drawing layer double click
@@ -73,12 +75,11 @@ Optional properties for **msg.payload** include
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
- - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `$name` to pass in the name of the marker. Set to `""` to disable just this instance.
+ - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `${name}` to substitute in the name of the marker. Set to `""` to disable just this instance.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be
 overridden by using the **popup** property to supply your own html content. If you use the
-popup property it will completely replace the contents so photourl, videourl and weblink are
-meaningless in this mode.
+popup property it will completely replace the contents so photourl, videourl and weblink are meaningless in this mode.
 
 ### Icons
 
@@ -273,6 +274,7 @@ Other properties can be found in the leaflet documentation.
 
 Shapes can also have a **popup** property containing html, but you MUST also set a property `clickable:true` in order to allow it to be seen.
 
+
 ### Drawing
 
 A single *right click* will allow you to add a point to the map - you must specify the `name` and optionally the `icon` and `layer`.
@@ -280,7 +282,9 @@ A single *right click* will allow you to add a point to the map - you must speci
 Right-clicking on an icon will allow you to delete it.
 
 If you select the **drawing** layer you can also add and edit polylines, polygons, rectangles and circles.
-Once an item is drawn you can right click to edit or delete it. Double click the object to exit edit mode.
+Once an item is drawn you can right click to edit or delete it. 
+
+Double click the object to exit edit mode.
 
 
 ### Buildings
@@ -389,20 +393,22 @@ The "connected" action additionally includes a:
 
 There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
 
- - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `$name` to let it be substituted automatically.
+ - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `${name}` to let it be substituted automatically.
 
- - **addToForm()** : takes a property name value pair to add to a variable called form. When used with contextmenu feedback (above) you can set the feedback value to `"$form"` to substitute this accumulated value. This allows you to do things like `onChange='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"$form")` to submit them all at once. For example a simple multiple line form could be:
+ - **addToForm()** : takes a property name value pair to add to a variable called `form`. When used with contextmenu feedback (above) you can set the feedback value to `"_form"` to substitute this accumulated value. This allows you to do things like `onBlur='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"_form")` to submit them all at once. For example a simple multiple line form could be as per the example below:
+
+ Also if you wish to retain the values between separate openings of this form you can assign property names to the value field in the form `value="${foo}`, etc. These will then appear as part of an **value** property on the worldmap-in node message.
 
 ```
-var menu = 'Add some data <input name="foo" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
-menu += 'Add more data <input name="bar" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
-menu += '<button name="my_form" onclick=\'feedback(this.name,"$form",null,true)\'>Submit</button>'
+var menu = 'Add some data <input name="foo" value="${foo}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
+menu += 'Add more data <input name="bar" value="${bar}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
+menu += '<button name="my_form" onclick=\'feedback(this.name,"_form",null,true)\'>Submit</button>'
 msg.payload = { command: { "contextmenu":menu } }
 ```
 
- - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+ - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
 
- - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `$name` for dynamic substitution.
+ - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
 
 
 ## Controlling the map
@@ -478,11 +484,11 @@ careful escaping quotes, and that they remain matched.
 
 For example a marker popup with a slider (note the \ escaping the internal ' )
 
-    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback($name,this.value,this.name)\' style="width:250px;">'
+    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(${name},this.value,this.name)\' style="width:250px;">'
 
 Or a marker contextmenu with an input box
 
-    contextmenu: '<input name="channel" type="text" value="5" onchange=\'feedback($name,{"name":this.name,"value":this.value},"myFeedback")\' />'
+    contextmenu: '<input name="channel" type="text" value="5" onchange=\'feedback(${name},{"name":this.name,"value":this.value},"myFeedback")\' />'
 
 Or you can add a contextmenu to the map. Simple contextmenu with a button
 

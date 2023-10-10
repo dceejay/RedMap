@@ -28,11 +28,12 @@ var heat;
 var minimap;
 var sidebyside;
 var layercontrol;
+var colorControl;
 var drawCount = 0;
 var drawingColour = "#910000";
 var drawcontextmenu = "";
 var sendDrawing;
-var colorControl;
+var rmenudata = {};
 var sendRoute;
 var oldBounds = {ne:{lat:0, lng:0}, sw:{lat:0, lng:0}};
 var edgeLayer = new L.layerGroup();
@@ -55,30 +56,30 @@ var iconSz = {
     "Command": 44
 };
 
-var filesAdded = ''; 
-  
-var loadStatic = function(fileName){ 
+var filesAdded = '';
+
+var loadStatic = function(fileName){
     if(filesAdded.indexOf(fileName) !== -1)
         return
     var head = document.getElementsByTagName('head')[0]
-    if(fileName.indexOf('js') !== -1) {      
-        var script = document.createElement('script') 
+    if(fileName.indexOf('js') !== -1) {
+        var script = document.createElement('script')
         script.src = fileName
         script.type = 'text/javascript'
-        console.log("Loading: ",fileName)  
-        head.append(script) 
+        console.log("Loading: ",fileName)
+        head.append(script)
         filesAdded += ' ' + fileName
     } else if (fileName.indexOf('css') !== -1) {
-        var style = document.createElement('link') 
+        var style = document.createElement('link')
         style.href = fileName
         style.type = 'text/css'
         style.rel = 'stylesheet'
-        console.log("Loading: ",fileName)  
+        console.log("Loading: ",fileName)
         head.append(style);
         filesAdded += ' ' + fileName
     } else {
-        console.log("Unsupported file type: ",fileName)  
-    } 
+        console.log("Unsupported file type: ",fileName)
+    }
 }
 
 // L.PM.setOptIn(true);
@@ -221,10 +222,11 @@ if (inIframe === true) {
 map = new L.map('map',{
     zoomSnap: 0.1,
     rotate: true,
-    rotateControl: {
-        closeOnZeroBearing: true,
-        position: 'topleft'
-    },
+    rotateControl: false,
+    // rotateControl: {
+    //     closeOnZeroBearing: true,
+    //     position: 'topleft'
+    // },
     bearing: 0}).setView(startpos, startzoom);
 map.whenReady(function() {
     connect();
@@ -866,20 +868,22 @@ var addThing = function() {
 var form = {};
 var addToForm = function(n,v) { form[n] = v; }
 var feedback = function(n,v,a,c) {
-    if (v === "$form") { v = form; }
+    if (v === "_form") { v = form; }
     if (markers[n]) {
-        //var fp = markers[n]._latlng;
-        // ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, layer:markers[n].lay, lat:fp.lat, lon:fp.lng}));
-        var fb = allData[n];
-        fb.action = a || "feedback";
-        if (v !== undefined) { fb.value = v; }
-        ws.send(JSON.stringify(fb));
+        console.log("FB1",n,v,a,c)
+        allData[n].action = a || "feedback";
+        if (v !== undefined) { allData[n][a||"value"] = v; }
+        ws.send(JSON.stringify(allData[n]));
+        setMarker(allData[n]);
     }
     else if (polygons[n]) {
+        console.log("FB2",n,v,a)
         sendDrawing(n,v,a)
     }
     else {
         if (n === undefined) { n = "map"; }
+        console.log("FB3",n,v,a,c)
+        rmenudata = v;
         ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
     if (c === true) { map.closePopup(); }
@@ -909,6 +913,12 @@ map.on('contextmenu', function(e) {
             if ((hiderightclick !== true) && (addmenu.length > 0)) {
                 rclk = e.latlng;
                 form = {};
+                var ramen = ""+addmenu;
+                for (const item in rmenudata) {
+                    ramen = ramen.replace(new RegExp("\\${"+item+"}","g"),rmenudata[item]);
+                }
+                ramen = ramen.replace(/\${.*?}/g,'')
+                rightmenuMap.setContent(ramen);
                 rightmenuMap.setLatLng(e.latlng);
                 map.openPopup(rightmenuMap);
                 setTimeout( function() {
@@ -1140,9 +1150,15 @@ var addOverlays = function(overlist) {
                 L.DomEvent.stopPropagation(e);
                 var name = e.target.name;
                 var rmen = L.popup({offset:[0,-12]}).setLatLng(e.latlng);
-                var d = drawcontextmenu || "<input type='text' value='$name' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\"$name\");'>Edit points</button><button onclick='editPoly(\"$name\",\"drag\");'>Drag</button><button onclick='editPoly(\"$name\",\"rot\");'>Rotate</button><button onclick='delMarker(\"$name\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>";
-                rmen.setContent(d.replace(/\$name/g,name));
-                map.openPopup(rmen);
+                var d = drawcontextmenu || "<input type='text' value='${name}' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\"${name}\");'>Edit points</button><button onclick='editPoly(\"${name}\",\"drag\");'>Drag</button><button onclick='editPoly(\"${name}\",\"rot\");'>Rotate</button><button onclick='delMarker(\"${name}\",true);'>Delete</button><button onclick='sendDrawing();'>OK</button>";
+                d = d.replace(/\${name}/g,name);
+                if (e.target.value) {
+                    for (const item in e.target.value) {
+                        d = d.replace(new RegExp("\\${"+item+"}","g"),e.target.value[item]);
+                    }
+                }
+                rmen.setContent(d);
+                setImmediate(function() { map.openPopup(rmen) });
             });
             e.layer.bindPopup(name);
 
@@ -1167,9 +1183,9 @@ var addOverlays = function(overlist) {
             polygons[name].name = name;
             layers["_drawing"].addLayer(shape.layer);
 
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\$name/g,name) || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\${name}/g,name).replace(/\${.*?}/g,'') || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             if (e.layer.options.fill === false && navigator.onLine) {
-                rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\$name/g,name) || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
+                rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\${name}/g,name).replace(/\${.*?}/g,'') || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
             setTimeout(function() {map.openPopup(rightmenuMarker)},25);
@@ -1182,8 +1198,8 @@ var addOverlays = function(overlist) {
             shape.layer.bindPopup(thing);
             delMarker(n,true);
             if (v) {
-                shape.layer.form = v;
-                shape.m.form = v;
+                shape.layer.value = v;
+                shape.m.value = v;
             }
             polygons[thing] = shape.layer;
             polygons[thing].lay = "_drawing";
@@ -1457,7 +1473,7 @@ var editPoly = function(pname,fun) {
             lo = e.target._latlng.lng;
         }
         var m = {action:"draw", name:pname, layer:polygons[pname].lay, options:e.target.options, radius:e.target._mRadius, lat:la, lon:lo};
-        if (e.target.form) { m.form = e.target.form; }
+        if (e.target.value) { m.value = e.target.value; }
         if (e.target.hasOwnProperty("_latlngs")) {
             if (e.target.options.fill === false) { m.line = e.target._latlngs; }
             else { m.area = e.target._latlngs[0]; }
@@ -1504,9 +1520,13 @@ function setMarker(data) {
             rightcontext = "<button onclick='editPoly(\""+data.name+"\");'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
-            rightcontext = data.contextmenu.replace(/\$name/g,'"'+data.name+'"');
+            rightcontext = data.contextmenu.replace(/\${name}/g,data.name);
             delete data.contextmenu;
         }
+        for (const item in allData[data.name].value) {
+            rightcontext = rightcontext.replace(new RegExp("\\${"+item+"}","g"),allData[data.name].value[item]);
+        }
+        rightcontext = rightcontext.replace(/\${.*?}/g,'')
         if (rightcontext.length > 0) {
             var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
             if (hiderightclick !== true) {
@@ -1731,7 +1751,7 @@ function setMarker(data) {
     if (data.draggable === true) { drag = true; }
 
     if (data.hasOwnProperty("icon")) {
-        var dir = parseFloat(data.hdg ?? data.heading ?? data.bearing ?? "0");
+        var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? "0") + map.getBearing();
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
@@ -2200,7 +2220,7 @@ function setMarker(data) {
         words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
         words += '</table>';
     }
-    words = "<b>"+data.name+"</b><br/>" + words; //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+    words = "<b>"+data.name+"</b><br/>" + words.replace(/\${name}/g,data.name); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
     if (!data.hasOwnProperty("clickable") && data.clickable != false) {
@@ -2286,7 +2306,7 @@ function setMarker(data) {
 
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
-    // console.log("COMMAND",cmd);
+    //console.log("COMMAND",cmd);
     if (cmd.init && cmd.hasOwnProperty("maplist")) {
         //basemaps = {};
         addBaseMaps(cmd.maplist,cmd.layer);
@@ -2414,7 +2434,6 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("contextmenu")) {
         if (typeof cmd.contextmenu === "string") {
             addmenu = cmd.contextmenu;
-            rightmenuMap.setContent(addmenu);
         }
     }
     if (cmd.hasOwnProperty("drawcontextmenu")) {
@@ -2901,7 +2920,14 @@ function doCommand(cmd) {
     map.setView([clat,clon],czoom);
 
     // Set rotation of map
-    if (cmd.hasOwnProperty("rotation") && !isNaN(cmd.rotation)) { map.setBearing(-cmd.rotation); }
+    if (cmd.hasOwnProperty("rotation") && !isNaN(cmd.rotation)) {
+        map.setBearing(-cmd.rotation);
+        for (const item in allData) {
+            if (allData[item].hasOwnProperty("hdg") || allData[item].hasOwnProperty("heading") || allData[item].hasOwnProperty("bearing") || allData[item].hasOwnProperty("track")) {
+                setMarker(allData[item]);
+            }
+        }
+    }
 
     if (cmd.hasOwnProperty("cluster")) {
         clusterAt = cmd.cluster;
