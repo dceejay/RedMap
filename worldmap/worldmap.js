@@ -1708,6 +1708,7 @@ function setMarker(data) {
             if (data.popup) { words = words + "<br/>" + data.popup; }
             polygons[data.name].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
         }
+        if (data.hasOwnProperty("tooltip")) { polygons[data.name].bindTooltip(data.tooltip); }
         //polygons[data.name] = rightmenu(polygons[data.name]); // DCJ Investigate
         layers[lay].addLayer(polygons[data.name]);
     }
