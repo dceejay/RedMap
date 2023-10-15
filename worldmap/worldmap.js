@@ -16,7 +16,7 @@ var buttons = {};
 var marksIndex = 0;
 var menuOpen = false;
 var clusterAt = 0;
-var maxage = 900;   // default max age of icons on map in seconds - cleared after 10 mins
+var maxage = 900;   // default max age of icons on map in seconds - cleared after 15 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
 var pagefoot = "&nbsp;&copy; DCJ 2023";
 var inIframe = false;
@@ -58,31 +58,30 @@ var iconSz = {
 
 var filesAdded = '';
 
-var loadStatic = function(fileName){
-    if(filesAdded.indexOf(fileName) !== -1)
-        return
+var loadStatic = function(fileName) {
+    if (filesAdded.indexOf(fileName) !== -1) { return; }
     var head = document.getElementsByTagName('head')[0]
-    if(fileName.indexOf('js') !== -1) {
-        var script = document.createElement('script')
-        script.src = fileName
-        script.type = 'text/javascript'
-        console.log("Loading: ",fileName)
-        head.append(script)
-        filesAdded += ' ' + fileName
-    } else if (fileName.indexOf('css') !== -1) {
-        var style = document.createElement('link')
-        style.href = fileName
-        style.type = 'text/css'
-        style.rel = 'stylesheet'
-        console.log("Loading: ",fileName)
-        head.append(style);
-        filesAdded += ' ' + fileName
-    } else {
-        console.log("Unsupported file type: ",fileName)
+    if (fileName.indexOf('js') !== -1) {
+        var script = document.createElement('script');
+        script.src = fileName;
+        script.type = 'text/javascript';
+        console.log("Loading: ",fileName);
+        head.append(script);
+        filesAdded += ' ' + fileName;
+    }
+    else if (fileName.indexOf('css') !== -1) {
+        var style = document.createElement('link');
+        style.href = fileName;
+        style.type = 'text/css';
+        style.rel = 'stylesheet';
+        console.log("Loading: ",fileName);
+        head.append(style);;
+        filesAdded += ' ' + fileName;
+    }
+    else {
+        console.log("Unsupported file type: ",fileName);
     }
 }
-
-// L.PM.setOptIn(true);
 
 // Create the socket
 var connect = function() {
@@ -118,8 +117,6 @@ console.log("CONNECT TO",location.pathname + 'socket');
 var handleData = function(data) {
     if (Array.isArray(data)) {
         //console.log("ARRAY");
-        // map.closePopup();
-        // var bnds= L.latLngBounds([0,0]);
         for (var prop in data) {
             if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
             if (data[prop].hasOwnProperty("name")) {
@@ -130,11 +127,11 @@ var handleData = function(data) {
                 data = {command:{map:{overlay:"KML", kml:data[prop].payload}}};
                 doCommand(data.command); return;
             }
-            else { console.log("SKIP A",data[prop]); }
+            else { console.log("SKIP array item",data[prop]); }
         }
-        // map.fitBounds(bnds.pad(0.25));
     }
     else {
+        // Handle some raw string data overlays
         if (typeof data === "string" && data.indexOf("<?xml") == 0) {
             if (data.indexOf("<nvg") != -1) {
                 data = {command:{map:{overlay:"NVG", nvg:data}}};
@@ -146,6 +143,8 @@ var handleData = function(data) {
                 data = {command:{map:{overlay:"GPX", gpx:data}}};
             }
         }
+
+        // handle any commands in the data
         if (data.command) { doCommand(data.command); delete data.command; }
 
         // handle raw geojson type msg
@@ -159,7 +158,7 @@ var handleData = function(data) {
         else if (data.hasOwnProperty("event") && data.event.hasOwnProperty("point")) {
             doTAKjson(data.event);
         }
-        // handle TAK json (from multicast Protobuf)
+        // handle TAK json (from multicast Protobuf via tak-ingest node)
         else if (data.hasOwnProperty("cotEvent") && data.cotEvent.hasOwnProperty("lat") && data.cotEvent.hasOwnProperty("lon")) {
             doTAKMCjson(data.cotEvent);
         }
@@ -175,7 +174,7 @@ var handleData = function(data) {
     }
 }
 
-window.onunload = function() { if (ws) ws.close(); }
+window.onunload = function() { if (ws) { ws.close(); } }
 
 var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
 layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
@@ -209,14 +208,6 @@ if (inIframe === true) {
         startzoom = window.localStorage.getItem("lastzoom");
     }
 }
-// if ( window.localStorage.hasOwnProperty("clusterat") ) {
-//     clusterAt = window.localStorage.getItem("clusterat");
-//     document.getElementById("setclus").value = clusterAt;
-// }
-// if ( window.localStorage.hasOwnProperty("maxage") ) {
-//     maxage = window.localStorage.getItem("maxage");
-//     document.getElementById("maxage").value = maxage;
-// }
 
 // Create the Initial Map object.
 map = new L.map('map',{
@@ -372,7 +363,7 @@ if (inIframe) {
     document.getElementById("menu").style.borderRadius="6px";
 }
 else {
-    console.log("NOT in an iframe");
+    //console.log("NOT in an iframe");
     if (!showUserMenu) { document.getElementById("bars").style.display="none"; }
 
     // Add the fullscreen button
@@ -503,12 +494,12 @@ var edgeAware = function() {
     }
     edgeLayer.addTo(map)
 }
-// end of edge function
+// end of edgeAware function
 
 var panit = false;
 function doPanit(v) {
     if (v !== undefined) { panit = v; }
-    console.log("Panit set :",panit);
+    // console.log("Panit set :",panit);
 }
 
 var heatAll = false;
@@ -518,24 +509,23 @@ function doHeatAll(v) {
 }
 
 var lockit = false;
-var mb = new L.LatLngBounds([[-120,-360],[120,360]]);
+var mbnds = new L.LatLngBounds([[-120,-360],[120,360]]);
 function doLock(v) {
     if (v !== undefined) { lockit = v; }
     if (lockit === false) {
-        mb = new L.LatLngBounds([[-120,-360],[120,360]]);
+        mbnds = new L.LatLngBounds([[-120,-360],[120,360]]);
         map.dragging.enable();
     }
     else {
-        mb = map.getBounds();
+        mbnds = map.getBounds();
         map.dragging.disable();
         window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
         window.localStorage.setItem("lastzoom", map.getZoom());
         window.localStorage.setItem("lastlayer", baselayername);
-        //window.localStorage.setItem("clusterat", clusterAt);
         window.localStorage.setItem("maxage", maxage);
         console.log("Saved :",JSON.stringify(map.getCenter()),map.getZoom(),baselayername);
     }
-    map.setMaxBounds(mb);
+    map.setMaxBounds(mbnds);
     //console.log("Map bounds lock :",lockit);
 }
 
@@ -610,7 +600,7 @@ function doSearch() {
     marks = [];
     marksIndex = 0;
     for (var key in markers) {
-        if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+        if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mbnds.contains(markers[key].getLatLng()))) {
             marks.push(markers[key]);
         }
         if (markers[key].icon === value) {
@@ -645,7 +635,8 @@ function doSearch() {
     else {
         if (lockit) {
             document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results within bounds.</font>";
-        } else {
+        }
+        else {
             document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Found "+marks.length+" results.</font>";
         }
     }
@@ -668,7 +659,7 @@ function clearSearch() {
     marks = [];
     marksIndex = 0;
     for (var key in markers) {
-        if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mb.contains(markers[key].getLatLng()))) {
+        if ( (~(key.toLowerCase()).indexOf(value.toLowerCase())) && (mbnds.contains(markers[key].getLatLng()))) {
             marks.push(markers[key]);
         }
     }
@@ -694,7 +685,8 @@ function toggleMenu() {
     menuOpen = !menuOpen;
     if (menuOpen) {
         document.getElementById("menu").style.display = 'block';
-    } else {
+    }
+    else {
         document.getElementById("menu").style.display = 'none';
         dialogue.close();
     }
@@ -929,7 +921,6 @@ map.on('contextmenu', function(e) {
         }, 300);
     }
 });
-
 
 // Layer control based on select box rather than radio buttons.
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
@@ -1271,7 +1262,8 @@ var addOverlays = function(overlist) {
                     numbers.push(current);
                     current = 0;
                     shift = 0;
-                } else {
+                }
+                else {
                     shift += 5;
                 }
             }
@@ -1395,10 +1387,11 @@ var addOverlays = function(overlist) {
 if (!inIframe) { layercontrol.addTo(map); }
 else { showLayerMenu = false;}
 
+// Add optional mouse co-ordinates display
 var coords = L.control.mouseCoordinate({position:"bottomleft"});
 
 // Add an optional legend
-var legend = L.control({ position: "bottomleft" });
+var legend = L.control({position:"bottomleft"});
 
 // Add the dialog box for messages
 // var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
@@ -1482,7 +1475,6 @@ var editPoly = function(pname,fun) {
     })
 }
 
-
 var rangerings = function(latlng, options) {
     options = L.extend({
         ranges: [250,500,750,1000],
@@ -1503,7 +1495,7 @@ var rangerings = function(latlng, options) {
     return rings;
 }
 
-// the MAIN add something to map function
+// the MAIN add marker or shape to map function
 function setMarker(data) {
     var rightmenu = function(m) {
         m.on('click', function(e) {
@@ -1630,30 +1622,23 @@ function setMarker(data) {
 
     if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
 
+    if (data.hasOwnProperty("drawCount")) { drawCount = data.drawCount; }
+    // Draw lines
     if (data.hasOwnProperty("line") && Array.isArray(data.line)) {
         delete opt.fill;
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
         polygons[data.name] = rightmenu(polyln);
-        if (data.hasOwnProperty("fly") && data.fly === true) {
-            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        } else if (data.hasOwnProperty("fit") && data.fit === true) {
-            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        }
     }
+    // Draw Areas
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea;
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
         polygons[data.name] = rightmenu(polyarea);
-        if (data.hasOwnProperty("fly") && data.fly === true) {
-            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        } else if (data.hasOwnProperty("fit") && data.fit === true) {
-            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        }
     }
-    if (data.hasOwnProperty("drawCount")) { drawCount = data.drawCount; }
+    // Draw Great circles
     if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
         delete opt.fill;
         opt.vertices = opt.vertices || 20;
@@ -1661,25 +1646,20 @@ function setMarker(data) {
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
         var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
-
         polygons[data.name] = rightmenu(aml);
-        if (data.hasOwnProperty("fly") && data.fly === true) {
-            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        } else if (data.hasOwnProperty("fit") && data.fit === true) {
-            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
-        }
     }
+    // Draw error ellipses
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings
         if (!data.hasOwnProperty("fillColor")) { opt.fillColor = "blue"; }
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
         polygons[data.name] = rightmenu(ellipse);
     }
+    // Draw circles and ellipses
     else if (data.hasOwnProperty("radius")) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
             var polycirc;
             if (Array.isArray(data.radius)) {
-                //polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0]*Math.cos(data.lat*Math.PI/180), data.radius[1]], data.tilt || 0, opt);
                 polycirc = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [data.radius[0], data.radius[1]], data.tilt || 0, opt);
             }
             else {
@@ -1692,27 +1672,41 @@ function setMarker(data) {
             }
         }
     }
+    // Draw arcs (and range rings)
     else if (data.hasOwnProperty("arc")) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
             polygons[data.name] = rangerings(new L.LatLng((data.lat*1), (data.lon*1)), data.arc);
         }
     }
+    // Draw a geojson "shape"
     else if (data.hasOwnProperty("geojson")) {
         doGeojson(data.name,data.geojson,(data.layer || "unknown"),opt);
     }
 
+    // If we created a shape then apply some generic things to it
     if (polygons[data.name] !== undefined) {
+        // Set the layer
         polygons[data.name].lay = lay;
+        // if clickable then add popup
         if (opt.clickable === true) {
             var words = "<b>"+data.name+"</b>";
             if (data.popup) { words = words + "<br/>" + data.popup; }
-            polygons[data.name].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200});
+            polygons[data.name].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
         }
+        // add a tooltip (if supplied)
         if (data.hasOwnProperty("tooltip")) { polygons[data.name].bindTooltip(data.tooltip); }
-        //polygons[data.name] = rightmenu(polygons[data.name]); // DCJ Investigate
+        // add to the layers
         layers[lay].addLayer(polygons[data.name]);
+        // fly or fit to the bounds if required
+        if (data.hasOwnProperty("fly") && data.fly === true) {
+            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        }
+        else if (data.hasOwnProperty("fit") && data.fit === true) {
+            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+        }
     }
 
+    // Now handle the markers
     if (typeof data.coordinates == "object") { ll = new L.LatLng(data.coordinates[1],data.coordinates[0]); }
     else if (data.hasOwnProperty("position") && data.position.hasOwnProperty("lat") && data.position.hasOwnProperty("lon")) {
         data.lat = data.position.lat*1;
@@ -1853,6 +1847,17 @@ function setMarker(data) {
             });
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
         }
+        else if (data.icon === "sensor") {
+            data.iconColor = data.iconColor || "#F39C12";
+            icon = '<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"><path fill="'+data.iconColor+'" d="M 478.281 5.437 L 367.741 118.227 L 367.741 84.075 C 367.741 38.352 344.315 1.298 315.417 1.298 L 53.768 1.298 C 24.87 1.298 1.434 38.352 1.434 84.075 L 1.434 415.183 C 1.434 460.893 24.87 497.959 53.768 497.959 L 315.417 497.959 C 344.315 497.959 367.741 460.893 367.741 415.183 L 367.741 381.031 L 478.281 493.808 C 490.714 504.155 498.566 486.571 498.566 476.224 L 498.566 21.993 C 498.566 11.646 491.37 -6.979 478.281 5.437 Z M 341.573 415.183 C 341.573 438.044 329.86 456.571 315.417 456.571 L 53.768 456.571 C 39.314 456.571 27.612 438.044 27.612 415.183 L 27.612 84.075 C 27.612 61.226 39.314 42.687 53.768 42.687 L 315.417 42.687 C 329.86 42.687 341.573 61.226 341.573 84.075 L 341.573 415.183 Z M 472.398 438.975 L 367.741 332.406 L 367.741 166.853 L 472.398 60.27 L 472.398 438.975 Z" style="transform-origin: 250.000025px 249.628505px;" transform="matrix(0, -1, 1, 0, -0.000013709068, 0.000009864569)"/></svg>';
+            var svgcam = "data:image/svg+xml;base64," + btoa(icon);
+            myMarker = L.divIcon({
+                className:"camicon",
+                iconAnchor: [12, 12],
+                html:'<img src="'+svgcam+'" style="width:24px; height:24px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+            });
+            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+        }
         else if (data.icon === "arrow") {
             data.iconColor = data.iconColor || "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
@@ -1958,7 +1963,7 @@ function setMarker(data) {
         else if (data.icon === "earthquake") {
             marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name, draggable:drag });
         }
-        else if (data.icon.match(/^:.*:$/g)) {
+        else if (data.icon.match(/^:.*:$/g)) { // emoji icon :smile:
             var em = emojify(data.icon);
             var col = data.iconColor ?? "#910000";
             myMarker = L.divIcon({
@@ -1969,7 +1974,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
         }
-        else if (data.icon.match(/^https?:.*$|^\//)) {
+        else if (data.icon.match(/^https?:.*$|^\//)) { // web url icon https://...
             var sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
@@ -1981,7 +1986,7 @@ function setMarker(data) {
             labelOffset = [sz/2-4,-4];
             delete data.iconSize;
         }
-        else if (data.icon.substr(0,3) === "fa-") {
+        else if (data.icon.substr(0,3) === "fa-") { // fa icon
             var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
@@ -1995,7 +2000,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
             labelOffset = [8,-8];
         }
-        else if (data.icon.substr(0,3) === "wi-") {
+        else if (data.icon.substr(0,3) === "wi-") { // weather icon
             var col = data.iconColor ?? "#910000";
             var imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
@@ -2010,7 +2015,7 @@ function setMarker(data) {
             labelOffset = [16,-16];
         }
         else {
-            myMarker = L.VectorMarkers.icon({
+            myMarker = L.VectorMarkers.icon({ // default - fa-icon in a marker shape
                 icon: data.icon ?? "circle",
                 markerColor: (data.iconColor ?? "#910000"),
                 prefix: 'fa',
@@ -2020,7 +2025,7 @@ function setMarker(data) {
             labelOffset = [6,-6];
         }
     }
-    else if (data.hasOwnProperty("SIDC")) {
+    else if (data.hasOwnProperty("SIDC")) {  // NATO mil2525 icons
         // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
         myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:unescape(encodeURIComponent(data.name)) });
         // Now that we have a symbol we can ask for the echelon and set the symbol size
@@ -2049,7 +2054,7 @@ function setMarker(data) {
         marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
         edgeAware();
     }
-    else {
+    else { // Otherwise just a generic map marker pin
         myMarker = L.VectorMarkers.icon({
             icon: "circle",
             markerColor: (data.iconColor ?? "#910000"),
@@ -2094,7 +2099,8 @@ function setMarker(data) {
     }
 
     // tidy up altitude
-    if (data.hasOwnProperty("alt")) {
+    if (data.hasOwnProperty("alt")||data.hasOwnProperty("altitude")) {
+        data.alt = data.alt ?? data.altitude;
         var reft = new RegExp('feet|ft','i');
         var refm = new RegExp('metres|m','i');
         if ( reft.test(""+data.alt) ) {
@@ -2108,8 +2114,8 @@ function setMarker(data) {
         }
     }
 
-    // remove icon from list of properties, then add all others to popup
-    if (data.hasOwnProperty("SIDC") && data.hasOwnProperty("options")) { delete data.options; }
+    // remove items from list of properties, then add all others to popup
+    if (data.hasOwnProperty("options")) { delete data.options; }
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
     if (data.hasOwnProperty("photourl")) {
@@ -2137,13 +2143,14 @@ function setMarker(data) {
         if (!Array.isArray(data.weblink) || !data.weblink.length) {
             if (typeof data.weblink === "string") {
                 words += "<b><a href='"+ data.weblink + "' target='_new'>more information...</a></b><br/>";
-            } else {
+            }
+            else {
                 var tgt = data.weblink.target || "_new";
                 words += "<b><a href='"+ data.weblink.url + "' target='"+ tgt + "'>" + data.weblink.name + "</a></b><br/>";
             }
         }
         else {
-            data.weblink.forEach(function(weblink){
+            data.weblink.forEach(function(weblink) {
                 if (typeof weblink === "string") {
                     words += "<b><a href='"+ weblink + "' target='_new'>more information...</a></b><br/>";
                 }
@@ -2185,10 +2192,11 @@ function setMarker(data) {
         }
     }
 
+    // Add right click contextmenu
     marker = rightmenu(marker);
 
-    // Add any remaining properties to the info box
-    var llc = data.lineColor || data.color;
+    // Delete more already handled properties
+    var llc = data.lineColor ?? data.color;
     delete data.lat;
     delete data.lon;
     if (data.arc) { delete data.arc; }
@@ -2204,15 +2212,17 @@ function setMarker(data) {
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
+
+    // then any remaining properties to the info box
     if (data.popup) { words = data.popup; }
     else {
         words += '<table>';
         for (var i in data) {
             if ((i != "name") && (i != "length") && (i != "clickable")) {
                 if (typeof data[i] === "object") {
-                    //
                     words += '<tr><td>'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
-                } else {
+                }
+                else {
                     // words += i +" : "+data[i]+"<br/>";
                     words += '<tr><td>'+ i +'</td><td>' + data[i] + '</td></tr>';
                 }
@@ -2223,7 +2233,7 @@ function setMarker(data) {
     }
     words = "<b>"+data.name+"</b><br/>" + words.replace(/\${name}/g,data.name); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
-    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; }
+    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
     if (!data.hasOwnProperty("clickable") && data.clickable != false) {
         marker.bindPopup(words, wopt);
         marker._popup.dname = data.name;
@@ -2241,11 +2251,15 @@ function setMarker(data) {
     }
     markers[data.name] = marker;
     layers[lay].addLayer(marker);
-    var track;
-    if (data.track !== undefined) { track = data.track; }
-    else if (data.hdg !== undefined) { track = data.hdg; }
-    else if (data.heading !== undefined) { track = data.heading; }
-    else if (data.bearing !== undefined) { track = data.bearing; }
+
+    // var track;
+    // if (data.track !== undefined) { track = data.track; }
+    // else if (data.hdg !== undefined) { track = data.hdg; }
+    // else if (data.heading !== undefined) { track = data.heading; }
+    // else if (data.bearing !== undefined) { track = data.bearing; }
+
+    // Now add any leader lines
+    var track = data.track ?? data.hdg ?? data.heading ?? data.bearing;
     if (track != undefined) {  // if there is a heading
         if (data.speed != null && data.length === undefined) {  // and a speed - lets convert to a leader length
             data.length = parseFloat(data.speed || "0") * 60;
@@ -2278,7 +2292,8 @@ function setMarker(data) {
                 var x3 = x + Math.cos((90-angle-data.accuracy)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var ll3 = new L.LatLng(y3,x3);
                 polygon = L.polygon([ ll1, ll2, ll3 ], {weight:2, color:llc||'#900', fillOpacity:0.06, clickable:false});
-            } else {
+            }
+            else {
                 var ya = y + Math.sin((90-angle)/180*Math.PI)*lengthAsDegrees;
                 var xa = x + Math.cos((90-angle)/180*Math.PI)*lengthAsDegrees/Math.cos(y/180*Math.PI);
                 var lla = new L.LatLng(ya,xa);
@@ -2335,10 +2350,6 @@ function doCommand(cmd) {
         if (cmd.panit == true || cmd.panit === "true") { panit = true; }
         else { panit = false; }
         document.getElementById("panit").checked = panit;
-    }
-    if (cmd.hasOwnProperty("hiderightclick")) {
-        if (cmd.hiderightclick == "true" || cmd.hiderightclick == true) { hiderightclick = true; }
-        else { hiderightclick = false; }
     }
     if (cmd.hasOwnProperty("showmenu")) {
         if ((cmd.showmenu === "hide") && (showUserMenu === true)) {
@@ -2431,6 +2442,10 @@ function doCommand(cmd) {
             map.locate({setView:false, watch:followState, enableHighAccuracy:true});
             if (trackMeButton !== undefined) { trackMeButton.state('track-on'); }
         }
+    }
+    if (cmd.hasOwnProperty("hiderightclick")) {
+        if (cmd.hiderightclick == "true" || cmd.hiderightclick == true) { hiderightclick = true; }
+        else { hiderightclick = false; }
     }
     if (cmd.hasOwnProperty("contextmenu")) {
         if (typeof cmd.contextmenu === "string") {
@@ -2905,7 +2920,7 @@ function doCommand(cmd) {
             }
         }
     }
-    // Lock the pan so map can be moved
+    // Lock the pan so map can't be moved
     if (cmd.hasOwnProperty("panlock")) {
         if (cmd.panlock == "true" || cmd.panlock == true) { lockit = true; }
         else { lockit = false; doLock(false); }
@@ -2929,7 +2944,6 @@ function doCommand(cmd) {
             }
         }
     }
-
     if (cmd.hasOwnProperty("cluster")) {
         clusterAt = cmd.cluster;
         document.getElementById("setclus").value = cmd.cluster;
@@ -2966,7 +2980,8 @@ function doCommand(cmd) {
         if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
             if (cmd.hasOwnProperty("fly") && cmd.fly === true) {
                 map.flyToBounds(cmd.bounds);
-            } else {
+            }
+            else {
                 map.fitBounds(cmd.bounds);
             }
         }

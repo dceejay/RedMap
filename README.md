@@ -99,6 +99,7 @@ There are also several special icons...
  - **bus** : a bus/coach icon that aligns with the heading of travel.
  - **uav** : a small uav like icon that aligns with the heading of travel.
  - **helicopter** : a small helicopter icon that aligns with the heading of travel.
+ - **sensor** : a camera icon that points to the heading angle.
  - **arrow** : a map GPS arrow type pointer that aligns with the heading of travel.
  - **wind** : a wind arrow that points in the direction the wind is coming FROM.
  - **satellite** : a small satellite icon.
@@ -153,7 +154,7 @@ following the great circle between the two co-ordinates is plotted.
 
     msg.payload = {name:"GC1", color:"#ff00ff", greatcircle:[ [51.464,0], [25.76,-80.18] ] }
 
-Shapes can also have a **popup** property containing html, but you MUST also set a property `clickable:true` in order to allow it to be seen.
+Shapes can also have a **popup** property containing html, but you MUST also set a property `clickable:true` in order to allow it to be seen. You can also set **tooltip** to create a label that appears when you hover the mouse over the shape.
 
 There are extra optional properties you can specify - see Options below.
 
@@ -192,7 +193,7 @@ You can add supplemental arc(s) to a marker by adding an **arc** property as bel
 Supplemental means that you can also specify a line using a **bearing** and **length** property.
 
 ```
-msg.payload = { name:"Camera01", icon:"fa-camera", lat:51.05, lon:-1.35,
+msg.payload = { name:"Camera01", icon:"sensor", lat:51.05, lon:-1.35,
     bearing: 235,
     length: 2200,
     arc: {
@@ -251,7 +252,7 @@ Often geojson may not have a `properties` or `style` property in which case you 
 
 2) You can just send a msg.payload containing the geojson itself - but obviously you then can't style it, set the name, layer, etc.
 
-3) You can also add the geojson as a specific overlay, in which case you can also have more control of styles, and per feature customisations. See the section on overlays [below](#to-add-a-new-geojson-overlay). This is the most complex but customisable.
+3) You can also add the geojson as a specific overlay, in which case you can also have more control of styles, and per feature customisations. See the section on overlays [below](#to-add-a-new-geojson-overlay). This is the most complex but also the most customisable.
 
 
 ### Options
@@ -267,6 +268,7 @@ Areas, Rectangles, Lines, Circles and Ellipses can also specify more optional pr
  - **clickable** : boolean - set to true to allow click to show popup.
  - **popup** : html string to display in popup (as well as name).
  - **editable** : boolean - set to true to allow simple edit/delete right click contextmenu.
+ - **tooltip** : Text string to display on mouse hover over the shape.
  - **contextmenu** : html string to display a more complex right click contextmenu.
  - **weight** : the width of the line or outline.
 
@@ -377,7 +379,7 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
 
-If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The node-red-node-exif node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
+If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The `node-red-node-exif` node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
 
 All actions also include a:
 `msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
@@ -419,15 +421,15 @@ Optional properties for **msg.payload.command** include
 
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
- - **rotation** - rotate the base map to the specified compass angle.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
  - **bounds** - if set to an array `[ [ lat(S), lon(W) ], [lat(N), lon(E)] ]` - sets the overall map bounds.
+ - **rotation** - rotate the base map to the specified compass angle.
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`
  - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{"command":{"search":"Winchester"}}`
  - **showlayer** - show the named overlay(s) - `{"command":{"showlayer":"foo"}}` or `{"command":{"showlayer":["foo","bar"]}}`
  - **hidelayer** - hide the named overlay(s) - `{"command":{"hidelayer":"bar"}}` or `{"command":{"hidelayer":["bar","another"]}}`
  - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{"command":{"side":"Esri Satellite"}}`
- - **split** - once you have split the screen - the split value is the % across the screen of the split line. - `{"command":{"split":50}}`
+ - **split** - once you have split the screen with the *side* command - the split value is then the % across the screen of the split line. - `{"command":{"split":50}}`
  - **map** - Object containing details of a new map layer:
    - **name** - name of the map base layer OR **overlay** - name of overlay layer
    - **url** - url of the map layer
@@ -448,7 +450,7 @@ Optional properties for **msg.payload.command** include
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default). button can also be an array of button objects.
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
  - **toptitle** - Words to replace title in title bar (if not in iframe)
- - **toplogo** - URL to logo image for top tile bar (if not in iframe) - ideally 60px by 24px.
+ - **toplogo** - URL to logo image for top title bar (if not in iframe) - ideally 60px by 24px.
  - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
  - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu": "hide"}}`
  - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers": "hide"}}`
@@ -507,7 +509,6 @@ Example simple form
 ```
 [{"id":"7351100bacb1f5fe","type":"function","z":"4aa2ed2fd1b11362","name":"","func":"msg.payload = { command: {\ncontextmenu: String.raw`\nText <input type=\"text\" id=\"sometext\" value=\"hello\"><br/>\nNumber <input type=\"number\" id=\"somenum\" value=\"5\"><br/>\n<input type=\"button\" value=\"Send\" onclick=\n'feedback(\"myform\",{\n    \"st\":document.getElementById(\"sometext\").value,\n    \"sn\":document.getElementById(\"somenum\").value,\n})'\n>\n`\n}}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":350,"y":360,"wires":[["a6a82f2e8efc44fc"]]},{"id":"7b595f0c8f6ac710","type":"worldmap in","z":"4aa2ed2fd1b11362","name":"","path":"/worldmap","events":"connect","x":195,"y":360,"wires":[["7351100bacb1f5fe"]]}]
 ```
-
 
 See the section on **Utility Functions** for details of the feedback function.
 
@@ -604,7 +605,7 @@ The `fit` property is optional, and you can also use `fly` if you wish. If boole
 
 #### To add a new KML, GPX, or TOPOJSON overlay
 
-As per the geojson overlay you can also inject a KML layer, GPX layer or TOPOJSON layer. The syntax is the same but with either a `kml` property containing the KML string - a `gpx` property containing a GPX string - or a `topojson` property containing the topojson.
+As with the geojson overlay, you can also inject a KML layer, GPX layer or TOPOJSON layer. The syntax is the same but with either a `kml` property containing the KML string - a `gpx` property containing a GPX string - or a `topojson` property containing the topojson.
 
     msg.payload.command.map = {
         "overlay": "myKML",
@@ -700,7 +701,7 @@ Feeding this into the tracks node will also remove the tracks stored for that la
 
 ### Using a local Map Server (WMS server)
 
-IMHO the easiest map server to make work is the <a href="http://www.mapserver.org/" target="mapinfo">mapserver</a> package in Ubuntu / Debian. Usually you will start with
+IMHO the easiest WMS map server to make work is the <a href="http://www.mapserver.org/" target="mapinfo">mapserver</a> package in Ubuntu / Debian. Usually you will start with
 
     sudo apt-get install mapserver-bin cgi-mapserver gdal-bin
 
@@ -729,7 +730,6 @@ You can then add a new WMS Base layer by injecting a message like
         },
         "wms": true                  // set to true for WMS type mapserver
     }}}
-
 
 #### Using a Docker Map Server
 
@@ -768,7 +768,7 @@ The following example gets recent earthquakes from USGS, parses the result,
 formats up the msg as per above and sends to the node to plot on the map.
 It also shows how to zoom and move the map or add a new layer.
 
-    [{"id":"86457344.50e6b","type":"inject","z":"745a133b.dd6dec","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":190,"y":2420,"wires":[["9a142026.fa47f"]]},{"id":"9a142026.fa47f","type":"function","z":"745a133b.dd6dec","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = { maxZoom: 19, attribution: '&copy; OpenStreetMap'};\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":2420,"wires":[["c643e022.1816c"]]},{"id":"c643e022.1816c","type":"worldmap","z":"745a133b.dd6dec","name":"","x":750,"y":2460,"wires":[]},{"id":"2998e233.4ba64e","type":"function","z":"745a133b.dd6dec","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"noerr":0,"x":540,"y":2560,"wires":[["c643e022.1816c"]]},{"id":"e72c5732.9fa198","type":"function","z":"745a133b.dd6dec","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:0,zoom:3} };\nreturn msg;","outputs":1,"noerr":0,"x":420,"y":2460,"wires":[["c643e022.1816c"]]},{"id":"12317723.589249","type":"csv","z":"745a133b.dd6dec","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":390,"y":2500,"wires":[["2998e233.4ba64e"]]},{"id":"10e5e5f0.8daeaa","type":"inject","z":"745a133b.dd6dec","name":"","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":190,"y":2460,"wires":[["e72c5732.9fa198"]]},{"id":"b6917d83.d1bac","type":"http request","z":"745a133b.dd6dec","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":270,"y":2560,"wires":[["12317723.589249"]]},{"id":"3842171.4d487e8","type":"inject","z":"745a133b.dd6dec","name":"Quakes","topic":"","payload":"","payloadType":"none","repeat":"900","crontab":"","once":false,"x":200,"y":2500,"wires":[["b6917d83.d1bac"]]}]
+    [{"id":"86457344.50e6b","type":"inject","z":"cb7b09e3354afd4c","name":"","repeat":"","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":170,"y":500,"wires":[["9a142026.fa47f"]]},{"id":"9a142026.fa47f","type":"function","z":"cb7b09e3354afd4c","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = { maxZoom: 19, attribution: '&copy; OpenStreetMap'};\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":400,"y":500,"wires":[["c643e022.1816c"]]},{"id":"c643e022.1816c","type":"worldmap","z":"cb7b09e3354afd4c","name":"","lat":"30","lon":"0","zoom":"3","layer":"OSMG","cluster":"","maxage":"","usermenu":"show","layers":"show","panit":"false","panlock":"false","zoomlock":"false","hiderightclick":"false","coords":"deg","showgrid":"false","showruler":"false","allowFileDrop":"false","path":"worldmap","overlist":"CO,RA,DN","maplist":"OSMG,OSMH,EsriS","mapname":"","mapurl":"","mapopt":"","mapwms":false,"x":640,"y":540,"wires":[]},{"id":"2998e233.4ba64e","type":"function","z":"cb7b09e3354afd4c","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":520,"y":640,"wires":[["c643e022.1816c"]]},{"id":"e72c5732.9fa198","type":"function","z":"cb7b09e3354afd4c","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:-90,zoom:2} };\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":400,"y":540,"wires":[["c643e022.1816c"]]},{"id":"12317723.589249","type":"csv","z":"cb7b09e3354afd4c","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":370,"y":580,"wires":[["2998e233.4ba64e"]]},{"id":"10e5e5f0.8daeaa","type":"inject","z":"cb7b09e3354afd4c","name":"","repeat":"","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":170,"y":540,"wires":[["e72c5732.9fa198"]]},{"id":"b6917d83.d1bac","type":"http request","z":"cb7b09e3354afd4c","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":250,"y":640,"wires":[["12317723.589249"]]},{"id":"3842171.4d487e8","type":"inject","z":"cb7b09e3354afd4c","name":"Quakes","repeat":"900","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":180,"y":580,"wires":[["b6917d83.d1bac"]]}]
 
 ---
 
