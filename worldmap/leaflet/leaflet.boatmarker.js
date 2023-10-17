@@ -7,7 +7,7 @@
 /* BOAT ICON */
 L.BoatIcon = L.Icon.extend({
     options: {
-        iconSize: new L.Point(50, 50),
+        iconSize: new L.Point(52, 52),
         className: "leaflet-boat-icon",
         course: 0,
         color: "#8ED6FF",

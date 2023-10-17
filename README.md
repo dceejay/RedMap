@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.1.0  - Add optional SOG, COG, altft, altm input properties.
 - v4.0.0  - Breaking - Better context menu variable substitution and retention
             Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
 - v3.2.0  - Sync up drawing sessions across browsers to same map
@@ -49,15 +50,17 @@ The minimum **msg.payload** must contain `name`, `lat` and `lon` properties, for
 
         msg.payload = { "name":"Jason", "lat":51.05, "lon":-1.35 }
 
-`name` must be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
+`name` **must** be a unique identifier across the whole map. Repeated location updates to the same `name` move the marker.
 
 Optional properties for **msg.payload** include
 
  - **deleted** : set to <i>true</i> to remove the named marker. (default <i>false</i>)
  - **draggable** : set to <i>true</i> to allow marker to be moved by the mouse. (default <i>false</i>)
  - **layer** : specify a layer on the map to add marker to. (default <i>"unknown"</i>)
- - **track | hdg | heading | bearing** : when combined with speed, draws a vector. (only first will be used)
- - **speed** : when combined with track, hdg, heading, or bearing, draws a leader line vector.
+ - **track | hdg | heading | COG | bearing** : when combined with speed, draws a vector. (only first will be used)
+ - **speed** : when combined with track, hdg, heading, or bearing, draws a leader line vector - should be in m/s. Can also be specified as "20 kph", or "20 mph", or "20 kt". i.e a string with units.
+ - **SOG** : speed over ground - speed in knots.
+ - **alt | altitude | altft | altm** : Altitude in meters, but can use *altft* to specify feet instead.
  - **accuracy** : when combined with heading vector, draws an arc of possible direction.
  - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon.
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// uri.

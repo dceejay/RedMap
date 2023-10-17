@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.1.0 - Add optional SOG, COG, altft, altm input properties.
  - v4.0.0 - Breaking - Better context menu variable substitution and retention
             Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
             

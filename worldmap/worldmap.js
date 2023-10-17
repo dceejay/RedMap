@@ -327,7 +327,7 @@ var errRing;
 function onLocationFound(e) {
     if (followState === true) { map.panTo(e.latlng); }
     if (followMode.icon) {
-        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*3.6 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
+        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*1 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
         setMarker(self);
     }
     if (e.heading !== null) { map.setBearing(e.heading); }
@@ -342,7 +342,7 @@ function onLocationFound(e) {
         //     L.polygon([ e.latlng, lla ], {color:"00ffff", weight:3, opacity:0.5, clickable:false}).addTo(map);
         // }
     }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*3.6 ?? undefined)}));
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*1 ?? undefined)}));
 }
 
 function onLocationError(e) { console.log(e.message); }
@@ -1750,7 +1750,7 @@ function setMarker(data) {
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data.name,
-                color: (data.iconColor ?? "blue")
+                color: (data.iconColor ?? "#5DADE2")
             });
             marker.setHeading(dir);
             q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
@@ -2113,6 +2113,16 @@ function setMarker(data) {
             data.alt = +(parseFloat(data.alt)).toFixed(2);
         }
     }
+    if (data.hasOwnProperty("altft")) {
+        data.alt = +(parseFloat(data.altft)).toFixed(2) + " ft";
+        delete data.altft;
+    }
+    if (data.hasOwnProperty("altm")) {
+        data.alt = +(parseFloat(data.altm)).toFixed(2) + " m";
+        delete data.altm;
+    }
+    if (data.sog) { data.speed = data.sog * 0.514444; data.sog = data.sog + " kt"; } // SOG is in knots
+    if (data.SOG) { data.speed = data.SOG * 0.514444; data.SOG = data.SOG + " kt"; } // SOG is in knots
 
     // remove items from list of properties, then add all others to popup
     if (data.hasOwnProperty("options")) { delete data.options; }
@@ -2198,7 +2208,9 @@ function setMarker(data) {
     // Delete more already handled properties
     var llc = data.lineColor ?? data.color;
     delete data.lat;
+    delete data.latitude;
     delete data.lon;
+    delete data.longitude;
     if (data.arc) { delete data.arc; }
     if (data.layer) { delete data.layer; }
     if (data.lineColor) { delete data.lineColor; }
@@ -2259,16 +2271,17 @@ function setMarker(data) {
     // else if (data.bearing !== undefined) { track = data.bearing; }
 
     // Now add any leader lines
-    var track = data.track ?? data.hdg ?? data.heading ?? data.bearing;
+    var track = data.track ?? data.COG ?? data.cog ?? data.hdg ?? data.heading ?? data.bearing;
     if (track != undefined) {  // if there is a heading
+        // Speed is in m/s
         if (data.speed != null && data.length === undefined) {  // and a speed - lets convert to a leader length
             data.length = parseFloat(data.speed || "0") * 60;
-            var re1 = new RegExp('kn|knot|kt','i');
+            var re1 = new RegExp('kn|knot|kt|kts','i');
             var re2 = new RegExp('kph|kmh','i');
             var re3 = new RegExp('mph','i');
             if ( re1.test(""+data.speed) ) { data.length = data.length * 0.514444; }
-            else if ( re2.test(""+data.speed) ) { data.length = data.length * 0.44704; }
-            else if ( re3.test(""+data.speed) ) { data.length = data.length * 0.277778; }
+            else if ( re2.test(""+data.speed) ) { data.length = data.length * 0.277778; }
+            else if ( re3.test(""+data.speed) ) { data.length = data.length * 0.44704; }
         }
         if (data.length !== undefined) {
             if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
@@ -2939,7 +2952,7 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("rotation") && !isNaN(cmd.rotation)) {
         map.setBearing(-cmd.rotation);
         for (const item in allData) {
-            if (allData[item].hasOwnProperty("hdg") || allData[item].hasOwnProperty("heading") || allData[item].hasOwnProperty("bearing") || allData[item].hasOwnProperty("track")) {
+            if (allData[item].hasOwnProperty("hdg") || allData[item].hasOwnProperty("heading") || allData[item].hasOwnProperty("bearing") || allData[item].hasOwnProperty("track") || allData[item].hasOwnProperty("cog") || allData[item].hasOwnProperty("COG")) {
                 setMarker(allData[item]);
             }
         }
