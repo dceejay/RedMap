@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.2.0  - Let icons also be inline images data:image... 
 - v4.1.0  - Add optional SOG, COG, altft, altm input properties.
 - v4.0.0  - Breaking - Better context menu variable substitution and retention
             Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
