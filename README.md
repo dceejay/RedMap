@@ -64,7 +64,7 @@ Optional properties for **msg.payload** include
  - **alt | altitude | altft | altm** : Altitude in meters, but can use *altft* to specify feet instead.
  - **accuracy** : when combined with heading vector, draws an arc of possible direction.
  - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon.
- - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// uri.
+ - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// or inline data:image/ uri.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
@@ -92,7 +92,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to http(s)://... By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`
+Or you can specify an image to load as an icon by setting the icon to http(s)://... By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form data:image/...  which uses a base64 encoded image.
 
 There are also several special icons...
 
