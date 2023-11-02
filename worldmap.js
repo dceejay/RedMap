@@ -126,7 +126,7 @@ module.exports = function(RED) {
                 if (message.action === "draw") {
                     delete message.action;
                     delete message.type;
-                    delete message.options?.pane;
+                    if (message.options) { delete message.options.pane; }
                     allPoints[message.name] = RED.util.cloneMessage(message);
                     sendToRest(message,client.id);
                 }

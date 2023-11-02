@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.2.1 - Revert use of optional chaining to extend life slightly. Issue #252
  - v4.2.0 - Let icons also be inline images data:image... 
  - v4.1.0 - Add optional SOG, COG, altft, altm input properties.
  - v4.0.0 - Breaking - Better context menu variable substitution and retention
