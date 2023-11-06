@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.3.0  - Add support for PMtiles files.
 - v4.2.1  - Revert use of optional chaining to extend life slightly. Issue #252
 - v4.2.0  - Let icons also be inline images data:image... 
 - v4.1.0  - Add optional SOG, COG, altft, altm input properties.
@@ -93,7 +94,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to http(s)://... By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form data:image/...  which uses a base64 encoded image.
+Or you can specify an image to load as an icon by setting the icon to `http(s)://...` By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form `data:image/...`  which uses a base64 encoded image.
 
 There are also several special icons...
 
@@ -220,7 +221,7 @@ Defaults are shown above.
 
 There are several ways to send GeoJSON to the map.
 
-1)  If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
+1) If the msg.payload contains a **geojson** property, and no **lat** and **lon**, then
 rather than draw a point it will render the geojson.
 
     msg.payload = {
@@ -359,65 +360,6 @@ in addition existing male, female, fa-male and fa-female icons are all represent
  - This view is a side project to the Node-RED Worldmap project so I'm happy to take PRs but it probably won't be actively developed.
 
 
-## Events from the map
-
-The **worldmap in** node can be used to receive various events from the map. Examples of messages coming FROM the map include:
-
-    { "action": "connected" }  // useful to trigger delivery or redraw of points
-    { "action": "disconnect", "clients": 1 }  // when a client disconnects - reports number remaining
-    {"action":"bounds", "south":50.55, "west":-1.48, "north":50.72, "east":-0.98}  // reports the outer bounds of the hmap area when zoomed or moved
-
-    { "action": "click", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.024985, "lon":-1.39698 }   // when a marker is clicked
-    { "action": "move", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.044632, "lon":-1.359901 }    // when a marker is moved
-    { "action": "delete", "name": "Jason" }  // when a point or shape is deleted
-
-    { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "Jason,male,gps" }
-    { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
-
-    { "action": "layer", "name": "myLayer" }      // when a map layer is changed
-    { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
-    { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
-
-    { "action": "file", "name": "myfilename", "type":"image/jpeg", "lat":51, "lon":-1, "content":"....."}   // when a file is dropped on the map - see below.
-
-    { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
-
-    { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
-
-If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The `node-red-node-exif` node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
-
-All actions also include a:
-`msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
-`msg._sessionip` property that shows the ip of the client that is connected to the session.
-
-The "connected" action additionally includes a:
-`msg.payload.parameters` property object that lists the parameters sent in the url.
-`msg.payload.clientTimezone` property string showing the clients local Timezone. Returns bool of `false` if unable to retrive clients local Timezone.
-`msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
-
-
-### Utility functions
-
-There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
-
- - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `${name}` to let it be substituted automatically.
-
- - **addToForm()** : takes a property name value pair to add to a variable called `form`. When used with contextmenu feedback (above) you can set the feedback value to `"_form"` to substitute this accumulated value. This allows you to do things like `onBlur='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"_form")` to submit them all at once. For example a simple multiple line form could be as per the example below:
-
- Also if you wish to retain the values between separate openings of this form you can assign property names to the value field in the form `value="${foo}`, etc. These will then appear as part of an **value** property on the worldmap-in node message.
-
-```
-var menu = 'Add some data <input name="foo" value="${foo}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
-menu += 'Add more data <input name="bar" value="${bar}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
-menu += '<button name="my_form" onclick=\'feedback(this.name,"_form",null,true)\'>Submit</button>'
-msg.payload = { command: { "contextmenu":menu } }
-```
-
- - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
-
- - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
-
-
 ## Controlling the map
 
 You can also control the map via the node, by sending in a msg.payload containing a **command** object. Multiple parameters can be specified in one command.
@@ -468,62 +410,11 @@ You can also use the name "none" to completely remove the base layer,
 
     msg.payload = { "command": { "layer":"none" }};
 
-#### To add and remove a user defined button
+#### To clear all markers from a layer, or an overlay from the map
 
-to add a button bottom right
+    msg.payload = { "command": { "clear: "name of the layer/overlay you wish to clear" }};
 
-    msg.payload.command = { "button": { "name":"My Fancy Button", "icon": "fa-star", "position":"bottomright" } };
-
-When clicked the button will send an event to the `worldmap in` node containing `{"action":"button", "name","My Fancy Button"}` - this can then be used to trigger other map commands or flows.
-
-to remove
-
-    msg.payload.command = { "button": { "name":"My Fancy Button" } };
-
-Multiple buttons can declared by using an array of button objects.
-
-#### To add a custom popup or contextmenu
-
-You can customise a marker's popup, or context menu (right click), by setting the
-appropriate property to an html string. Often you will need some embedded javascript
-in order to make it do something when you click a button for example. You need to be
-careful escaping quotes, and that they remain matched.
-
-For example a marker popup with a slider (note the \ escaping the internal ' )
-
-    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(${name},this.value,this.name)\' style="width:250px;">'
-
-Or a marker contextmenu with an input box
-
-    contextmenu: '<input name="channel" type="text" value="5" onchange=\'feedback(${name},{"name":this.name,"value":this.value},"myFeedback")\' />'
-
-Or you can add a contextmenu to the map. Simple contextmenu with a button
-
-    msg.payload.command = {
-        contextmenu: '<button name="Clicker" onclick=\'feedback(this.name,"ping!",null,true)\'>Click me</button>'
-    }
-
-Or with an input box
-
-    msg.payload.command : {
-        contextmenu: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value,"myEventName")\' >'
-    }
-
-Example simple form
-
-```
-[{"id":"7351100bacb1f5fe","type":"function","z":"4aa2ed2fd1b11362","name":"","func":"msg.payload = { command: {\ncontextmenu: String.raw`\nText <input type=\"text\" id=\"sometext\" value=\"hello\"><br/>\nNumber <input type=\"number\" id=\"somenum\" value=\"5\"><br/>\n<input type=\"button\" value=\"Send\" onclick=\n'feedback(\"myform\",{\n    \"st\":document.getElementById(\"sometext\").value,\n    \"sn\":document.getElementById(\"somenum\").value,\n})'\n>\n`\n}}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":350,"y":360,"wires":[["a6a82f2e8efc44fc"]]},{"id":"7b595f0c8f6ac710","type":"worldmap in","z":"4aa2ed2fd1b11362","name":"","path":"/worldmap","events":"connect","x":195,"y":360,"wires":[["7351100bacb1f5fe"]]}]
-```
-
-See the section on **Utility Functions** for details of the feedback function.
-
-#### To add and remove a legend
-
-If you want to add a small legend overlay
-
-    msg.payload.command = { "legend": "<b>Title</b></br><i style=\"background: #477AC2\"></i> Water<br><i style=\"background: #448D40\"></i> Forest<br>" };
-
-To remove set the legend to an empty string `""`.
+Feeding this into the tracks node will also remove the tracks stored for that layer.
 
 #### To add a new base layer
 
@@ -536,23 +427,6 @@ may let your markers be more visible. (see overlay example below).
         "url":"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         "opt":{ "maxZoom":19, "attribution":"&copy; OpenStreetMap" }
     };
-
-#### To add a minimap
-
-A minimap overview can be added by sending a suitable command. The "minimap" property
-must specify the name of an existing base layer to use. The "opt" property can contain
-valid options from the [minimap library options](https://github.com/Norkart/Leaflet-MiniMap#available-options).
-
-    msg.payload.command.map = {
-            minimap: "OSM",
-            opt: {
-    			centerFixed: [51.05, -1.35],
-    			toggleDisplay: true
-    		}
-        }
-    };
-
-Set `msg.payload.command.map.minimap = false;` to remove the minimap.
 
 #### To remove base or overlay layers
 
@@ -637,7 +511,7 @@ As per the geojson overlay you can also inject an ESRI ArcGIS FeatureLayer layer
 
 NOTE: you can set various options as [specified here](https://developers.arcgis.com/esri-leaflet/api-reference/layers/feature-layer/#options).
 
-In order to pass over **style**, **pointToLayer**, or **onEachFeature** functions they need to be serialised as follows... for example
+In order to pass over **style**, **pointToLayer**, or **onEachFeature** functions they need to be serialised as follows. For example
 
     const style = function () {
         return { color: "#910000", weight: 2 };
@@ -646,6 +520,18 @@ In order to pass over **style**, **pointToLayer**, or **onEachFeature** function
 
 This may cause the function node setting them to be in error, for example if it references L.marker, which is unknown on the server side. The flow should still deploy and run ok.
 
+#### To add an Image Overlay
+
+You can overlay an image as long as you can specify the lower-left and upper-right corners. For example in a function node:
+
+    var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
+    msg.payload = { command : { lat:40.74, lon:-74.175, zoom:13 } };
+    msg.payload.command.map = {
+        overlay: "New York Historical",
+        url: 'https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+        bounds: imageBounds,
+        opt: { opacity:0.8, attribution:"&copy; University of Texas" }
+    };
 
 #### To add a Velocity Grid Overlay
 
@@ -673,19 +559,6 @@ Or you can use try this docker image which uses the Canadian Meterological Servi
 
     docker run -d -p 7000:7000 --name windserver theceejay/windserver:latest
 
-#### To add an Image Overlay
-
-in a function node:
-
-    var imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
-    msg.payload = { command : { lat:40.74, lon:-74.175, zoom:13 } };
-    msg.payload.command.map = {
-        overlay: "New York Historical",
-        url: 'https://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
-        bounds: imageBounds,
-        opt: { opacity:0.8, attribution:"&copy; University of Texas" }
-    };
-
 #### To add a Lat/Lon Graticule overlay
 
 A graticule can be enabled via the node configuration, and can also be set dynamically,
@@ -698,11 +571,178 @@ for example in a function node:
 
 see https://github.com/cloudybay/leaflet.latlng-graticule for more details about options and demo.
 
-#### To clear all markers from a layer, or an overlay from the map
+#### To add and remove a user defined button
 
-    msg.payload.command.clear = "name of the layer/overlay you wish to clear";
+to add a button bottom right
 
-Feeding this into the tracks node will also remove the tracks stored for that layer.
+    msg.payload.command = { "button": { "name":"My Fancy Button", "icon": "fa-star", "position":"bottomright" } };
+
+When clicked the button will send an event to the `worldmap in` node containing `{"action":"button", "name","My Fancy Button"}` - this can then be used to trigger other map commands or flows.
+
+to remove
+
+    msg.payload.command = { "button": { "name":"My Fancy Button" } };
+
+Multiple buttons can declared by using an array of button objects.
+
+#### To add a custom popup or contextmenu
+
+You can customise a marker's popup, or context menu (right click), by setting the
+appropriate property to an html string. Often you will need some embedded javascript
+in order to make it do something when you click a button for example. You need to be
+careful escaping quotes, and that they remain matched.
+
+For example a marker popup with a slider (note the \ escaping the internal ' )
+
+    popup: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(${name},this.value,this.name)\' style="width:250px;">'
+
+Or a marker contextmenu with an input box
+
+    contextmenu: '<input name="channel" type="text" value="5" onchange=\'feedback(${name},{"name":this.name,"value":this.value},"myFeedback")\' />'
+
+Or you can add a contextmenu to the map. Simple contextmenu with a button
+
+    msg.payload.command = {
+        contextmenu: '<button name="Clicker" onclick=\'feedback(this.name,"ping!",null,true)\'>Click me</button>'
+    }
+
+Or with an input box
+
+    msg.payload.command : {
+        contextmenu: '<input name="slide1" type="range" min="1" max="100" value="50" onchange=\'feedback(this.name,this.value,"myEventName")\' >'
+    }
+
+Example simple form
+
+```
+[{"id":"7351100bacb1f5fe","type":"function","z":"4aa2ed2fd1b11362","name":"","func":"msg.payload = { command: {\ncontextmenu: String.raw`\nText <input type=\"text\" id=\"sometext\" value=\"hello\"><br/>\nNumber <input type=\"number\" id=\"somenum\" value=\"5\"><br/>\n<input type=\"button\" value=\"Send\" onclick=\n'feedback(\"myform\",{\n    \"st\":document.getElementById(\"sometext\").value,\n    \"sn\":document.getElementById(\"somenum\").value,\n})'\n>\n`\n}}\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":350,"y":360,"wires":[["a6a82f2e8efc44fc"]]},{"id":"7b595f0c8f6ac710","type":"worldmap in","z":"4aa2ed2fd1b11362","name":"","path":"/worldmap","events":"connect","x":195,"y":360,"wires":[["7351100bacb1f5fe"]]}]
+```
+
+See the section on **Utility Functions** for details of the feedback function.
+
+#### To add and remove a legend
+
+If you want to add a small legend overlay
+
+    msg.payload.command = { "legend": "<b>Title</b></br><i style=\"background: #477AC2\"></i> Water<br><i style=\"background: #448D40\"></i> Forest<br>" };
+
+To remove set the legend to an empty string `""`.
+
+#### To add a minimap
+
+A minimap overview can be added by sending a suitable command. The "minimap" property
+must specify the name of an existing base layer to use. The "opt" property can contain
+valid options from the [minimap library options](https://github.com/Norkart/Leaflet-MiniMap#available-options).
+
+    msg.payload.command.map = {
+            minimap: "OSM",
+            opt: {
+                centerFixed: [51.05, -1.35],
+                toggleDisplay: true
+            }
+        }
+    };
+
+Set `msg.payload.command.map.minimap = false;` to remove the minimap.
+
+
+## Events from the map
+
+The **worldmap in** node can be used to receive various events from the map. Examples of messages coming FROM the map include:
+
+    { "action": "connected" }  // useful to trigger delivery or redraw of points
+    { "action": "disconnect", "clients": 1 }  // when a client disconnects - reports number remaining
+    {"action":"bounds", "south":50.55, "west":-1.48, "north":50.72, "east":-0.98}  // reports the outer bounds of the hmap area when zoomed or moved
+
+    { "action": "click", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.024985, "lon":-1.39698 }   // when a marker is clicked
+    { "action": "move", "name":"Jason", "layer":"gps", "icon":"male", "iconColor":"blue", "lat":51.044632, "lon":-1.359901 }    // when a marker is moved
+    { "action": "delete", "name": "Jason" }  // when a point or shape is deleted
+
+    { "action": "point", "lat": "50.60634", "lon": "-1.66580", "point": "Jason,male,gps" }
+    { "action": "draw", "type": "rectangle", "points": [ { "lat": 50.61243889044519, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.5913009643554688 }, { "lat": 50.66665471366635, "lng": -1.4742279052734375 }, { "lat": 50.61243889044519, "lng": -1.4742279052734375 } ] }
+
+    { "action": "layer", "name": "myLayer" }      // when a map layer is changed
+    { "action": "addlayer", "name": "myLayer" }   // when a new map layer is added
+    { "action": "dellayer", "name": "myLayer" }   // when a new map layer is deleted
+
+    { "action": "file", "name": "myfilename", "type":"image/jpeg", "lat":51, "lon":-1, "content":"....."}   // when a file is dropped on the map - see below.
+
+    { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
+
+    { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
+
+If File Drop is enabled - then the map can accept files of type gpx, kml, nvg, jpeg, png and geojson. The file content property will always be a binary buffer. The lat, lon of the cursor drop point will be included. Tracks will be locally rendered on the map. The `node-red-node-exif` node can be used to extract location information from a jpeg image and then geolocate it back on the map. Png images will be located where they are dropped but can then be dragged if required.
+
+All actions also include a:
+`msg._sessionid` property that indicates which client session they came from. Any msg sent out that includes this property will ONLY be sent to that session - so you can target map updates to specific sessions if required.
+`msg._sessionip` property that shows the ip of the client that is connected to the session.
+
+The "connected" action additionally includes a:
+`msg.payload.parameters` property object that lists the parameters sent in the url.
+`msg.payload.clientTimezone` property string showing the clients local Timezone. Returns bool of `false` if unable to retrive clients local Timezone.
+`msg._clientheaders` property that shows the headers sent by the client to make a connection to the session.
+
+
+### Utility functions
+
+There are some internal functions available to make interacting with Node-RED easier (e.g. from inside a user defined popup., these include:
+
+ - **feedback()** : it takes 2, 3, or 4 parameters, name, value, and optionally an action name (defaults to "feedback"), and optional boolean to close the popup on calling this function, and can be used inside something like an input tag - `onchange='feedback(this.name,this.value,null,true)'`. Value can be a more complex object if required as long as it is serialisable. If used with a marker the name should be that of the marker - you can use `${name}` to let it be substituted automatically.
+
+ - **addToForm()** : takes a property name value pair to add to a variable called `form`. When used with contextmenu feedback (above) you can set the feedback value to `"_form"` to substitute this accumulated value. This allows you to do things like `onBlur='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"_form")` to submit them all at once. For example a simple multiple line form could be as per the example below:
+
+ Also if you wish to retain the values between separate openings of this form you can assign property names to the value field in the form `value="${foo}`, etc. These will then appear as part of an **value** property on the worldmap-in node message.
+
+```
+var menu = 'Add some data <input name="foo" value="${foo}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
+menu += 'Add more data <input name="bar" value="${bar}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
+menu += '<button name="my_form" onclick=\'feedback(this.name,"_form",null,true)\'>Submit</button>'
+msg.payload = { command: { "contextmenu":menu } }
+```
+
+ - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
+
+ - **editPoly()** : takes the name of the shape or line as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
+
+
+## Serving maps
+
+By default this node expects users to have access to the internet in order to access the map servers that provide all the built in mapping. As per above you are able to add your own sources of mapping and sometimes this includes the requirement for offline access, in which case maps must be served up locally. There are several ways to do this outlined below. My personal favourite is the Tileserver-gl docker option, but of course this does require Docker.
+
+### Using PMtiles files
+
+You can use a PMtiles format map archive file from [Protomaps](https://docs.protomaps.com/basemaps/downloads) as a base layer map.
+
+**Note**: the whole planet file is over 100GB so be warned both for local storage and your download speed. You can download or extract just a portion of it if you use the **pmtiles** command line with the extract option. Use `pmtiles extract --help` to see the options.
+
+Copy, or create an alias to, your .pmtiles file(s) into your `~/.node-red/node_modules/node-red-contrib-web-worldmap/worldmap/` directory. On re-starting Node-RED the node will detect the file(s) and add them to the base map layer menu, using the file name as the layer name.
+
+### Using a Docker Map Server
+
+I have found the easiest to use mapserver for decent generic map to be Tileserver-gl. It uses mbtiles format maps - for example from [MapTiler Data](https://data.maptiler.com/downloads/planet/). You can download your mbtiles file into a directory and then from that directory run
+```
+docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
+```
+and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
+
+Other more traditional map servers include containers like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+```
+docker run -d --name camptocamp -v $(pwd):/etc/mapserver/:ro -p 1881:80 camptocamp/mapserver
+```
+
+then the url should be of the form `"url": "http://localhost:1881/?map=/etc/mapserver/my-app.map"` where *my-app.map* is the name of your map file. A quick test of the server would be to browse to http://localhost:1881/?map=/etc/mapserver/my-app.map&mode=map
+
+Or you can use a docker container like https://hub.docker.com/r/geodata/mapserver/ then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+```
+docker run -d --name mapserver -v $(pwd):/maps:ro -p 1882:80 geodata/mapserver
+```
+and use a url like `"url": "http://localhost:1882/?map=/maps/my-app.map",`
+
+
+Other useful map servers include Geoserver, a somewhat larger image but fully featured.
+```
+docker run --name geoserver -d -v ${PWD}:/var/local/geoserver -p 1885:8080 oscarfonts/geoserver
+```
 
 ### Using a local Map Server (WMS server)
 
@@ -736,32 +776,6 @@ You can then add a new WMS Base layer by injecting a message like
         "wms": true                  // set to true for WMS type mapserver
     }}}
 
-#### Using a Docker Map Server
-
-You can use a docker container like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
-```
-docker run -d --name camptocamp -v $(pwd):/etc/mapserver/:ro -p 1881:80 camptocamp/mapserver
-```
-
-then the url should be of the form `"url": "http://localhost:1881/?map=/etc/mapserver/my-app.map"` where *my-app.map* is the name of your map file. A quick test of the server would be to browse to http://localhost:1881/?map=/etc/mapserver/my-app.map&mode=map
-
-Or you can use a docker container like https://hub.docker.com/r/geodata/mapserver/ then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
-```
-docker run -d --name mapserver -v $(pwd):/maps:ro -p 1882:80 geodata/mapserver
-```
-and use a url like `"url": "http://localhost:1882/?map=/maps/my-app.map",`
-
-
-To use a vector mbtiles server like **MapTiler** then you can download your mbtiles file into a directory and then from that directory run
-```
-docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
-```
-and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
-
-Other useful map servers include Geoserver, a somewhat larger image but fully featured.
-```
-docker run --name geoserver -d -v ${PWD}:/var/local/geoserver -p 1885:8080 oscarfonts/geoserver
-```
 
 ---
 

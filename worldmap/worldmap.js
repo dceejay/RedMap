@@ -38,6 +38,7 @@ var sendRoute;
 var oldBounds = {ne:{lat:0, lng:0}, sw:{lat:0, lng:0}};
 var edgeLayer = new L.layerGroup();
 var edgeEnabled = true;
+var pmtloaded = "";
 
 var iconSz = {
     "Team/Crew": 24,
@@ -93,7 +94,7 @@ var connect = function() {
             document.getElementById("footer").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
         }
         ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams),clientTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone || false}));
-        onoffline();
+        setTimeout(function() { onoffline(); }, 500);
     };
     ws.onclose = function() {
         console.log("DISCONNECTED");
@@ -181,7 +182,8 @@ layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,custo
 overlays["countries"] = layers["_countries"];
 
 var onoffline = function() { if (!navigator.onLine) {
-    map.addLayer(overlays["countries"]);
+    if (pmtloaded !== "") { basemaps[pmtloaded].addTo(map); layercontrol._update(); }
+    else { map.addLayer(overlays["countries"]); }
 } }
 
 document.addEventListener ("keydown", function (ev) {
@@ -581,7 +583,7 @@ setInterval( function() { moveTerminator() }, 60000 );
 
 // move the rainfall overlay (if enabled) every 10 minutes
 function moveRainfall() {
-    if (navigator.onLine && map.hasLayer(overlays["rainfall"])) {
+    if (navigator.onLine && overlays.hasOwnProperty("rainfall") && map.hasLayer(overlays["rainfall"])) {
         overlays["rainfall"]["_url"] = 'https://tilecache.rainviewer.com/v2/radar/' + parseInt(Date.now()/600000)*600 + '/256/{z}/{x}/{y}/2/1_1.png';
         overlays["rainfall"].redraw();
     }
@@ -1081,12 +1083,13 @@ var addBaseMaps = function(maplist,first) {
 
     if (first) {
         if (layerlookup[first]) { baselayername = layerlookup[first]; }
-        else { basenayername = first; }
+        else { baselayername = first; }
+        if (!basemaps[baselayername]) { baselayername = Object.keys(basemaps)[0]; }
     }
     else {
-        basenayername = Object.keys(basemaps)[0];
+        baselayername = Object.keys(basemaps)[0];
     }
-    basemaps[baselayername].addTo(map);
+    if (baselayername) { basemaps[baselayername].addTo(map); }
     if (showLayerMenu) {
         map.removeControl(layercontrol);
         layercontrol = L.control.layers(basemaps, overlays).addTo(map);
@@ -2333,9 +2336,38 @@ function setMarker(data) {
     if (p === true) { marker.openPopup(); }
 }
 
+var custIco = function() {
+    var col = cmd.map.iconColor ?? "#910000";
+    var myMarker = L.VectorMarkers.icon({
+        icon: "circle",
+        markerColor: col,
+        prefix: 'fa',
+        iconColor: 'white'
+    });
+    if (cmd.map.hasOwnProperty("icon")) {
+        myMarker = L.divIcon({
+            className:"faicon",
+            html: '<center><i class="fa fa-fw '+cmd.map.icon+'" style="color:'+col+'"></i></center>',
+            iconSize: [16, 16],
+        });
+    }
+    var customLayer = L.geoJson(null, {
+        pointToLayer: function(geoJsonPoint, latlng) {
+            //console.log("KML/GPX point",geoJsonPoint)
+            var d = (geoJsonPoint.properties.description || "").trim();
+            var mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0];
+            if (geoJsonPoint.geometry.coordinates[2]) {
+                mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon.alt : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0] + ', ' + geoJsonPoint.geometry.coordinates[2];
+            }
+            return L.marker(latlng, {icon:myMarker, title:geoJsonPoint.properties.name}).bindPopup(mypop);
+        }
+    });
+    return customLayer;
+}
+
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
-    //console.log("COMMAND",cmd);
+    // console.log("COMMAND",cmd);
     if (cmd.init && cmd.hasOwnProperty("maplist")) {
         //basemaps = {};
         addBaseMaps(cmd.maplist,cmd.layer);
@@ -2535,6 +2567,31 @@ function doCommand(cmd) {
             basemaps[baselayername].addTo(map);
         }
     }
+    // Add a new PMtiles/PBF feature layer
+    if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("pmtiles") ) {
+        try {
+            if (basemaps.hasOwnProperty(cmd.map.name)) {
+                basemaps[cmd.map.name].removeFrom(map);
+                existsalready = true;
+            }
+            var opt = {};
+            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt; }
+            opt.url = cmd.map.pmtiles;
+            opt.attribution = opt.attribution || '&copy; Protomaps';
+            opt.maxDataZoom = opt.maxDataZoom || 15;
+            opt.maxZoom = opt.maxZoom || 20;
+            console.log("New PMtiles:",cmd.map.name,opt);
+            basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
+            if (!existsalready) {
+                layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
+            }
+            if (Object.keys(basemaps).length === 1) {
+                baselayername = cmd.map.name;
+                basemaps[baselayername].addTo(map);
+            }
+            if (pmtloaded === "") { pmtloaded = cmd.map.name; }
+        } catch(e) { console.log(e); }
+    }
     // Add or swap new minimap layer
     if (cmd.map && cmd.map.hasOwnProperty("minimap")) {
         if (minimap) { map.removeControl(minimap); }
@@ -2696,36 +2753,6 @@ function doCommand(cmd) {
         if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
         else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
-
-    var custIco = function() {
-        var col = cmd.map.iconColor ?? "#910000";
-        var myMarker = L.VectorMarkers.icon({
-            icon: "circle",
-            markerColor: col,
-            prefix: 'fa',
-            iconColor: 'white'
-        });
-        if (cmd.map.hasOwnProperty("icon")) {
-            myMarker = L.divIcon({
-                className:"faicon",
-                html: '<center><i class="fa fa-fw '+cmd.map.icon+'" style="color:'+col+'"></i></center>',
-                iconSize: [16, 16],
-            });
-        }
-        var customLayer = L.geoJson(null, {
-            pointToLayer: function(geoJsonPoint, latlng) {
-                //console.log("KML/GPX point",geoJsonPoint)
-                var d = (geoJsonPoint.properties.description || "").trim();
-                var mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0];
-                if (geoJsonPoint.geometry.coordinates[2]) {
-                    mypop = '<b>'+geoJsonPoint.properties.name + '</b><br>'+d+'<br>lat,lon.alt : ' + geoJsonPoint.geometry.coordinates[1] + ', ' + geoJsonPoint.geometry.coordinates[0] + ', ' + geoJsonPoint.geometry.coordinates[2];
-                }
-                return L.marker(latlng, {icon:myMarker, title:geoJsonPoint.properties.name}).bindPopup(mypop);
-            }
-        });
-        return customLayer;
-    }
-
     // Add a new KMZ overlay layer (or KML)
     //if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("kmz")) {
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && ( cmd.map.hasOwnProperty("kmz") || cmd.map.hasOwnProperty("kml")) ) {
@@ -2813,7 +2840,7 @@ function doCommand(cmd) {
         // var gp = new DOMParser().parseFromString(cmd.map.gpx, "text/xml");
         // var json = window.toGeoJSON.gpx(gp);
         // console.log("j",json)
-        // doGeojson(json.features[0].properties.name,json,json.features[0].properties.type) // DCJ name,geojson,layer,options
+        // doGeojson(json.features[0].properties.name,json,json.features[0].properties.type) // name,geojson,layer,options
         overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco());
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
@@ -2939,6 +2966,7 @@ function doCommand(cmd) {
         else { lockit = false; doLock(false); }
         document.getElementById("lockit").checked = lockit;
     }
+    // if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
     // Move to a new position
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;
@@ -2962,6 +2990,7 @@ function doCommand(cmd) {
         document.getElementById("setclus").value = cmd.cluster;
         setCluster(clusterAt);
     }
+    // Set max age of markers
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
@@ -2974,7 +3003,7 @@ function doCommand(cmd) {
         // document.getElementById("heatall").checked = !!cmd.heatmap;
         // heat.redraw();
     }
-    if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
+    // Lock zoom controls
     if (cmd.hasOwnProperty("zoomlock")) {
         if (cmd.zoomlock == "true" || cmd.zoomlock == true) {
             if (map.doubleClickZoom.enabled()) { map.removeControl(map.zoomControl); }
@@ -2989,7 +3018,8 @@ function doCommand(cmd) {
             map.touchZoom.enable();
         }
     }
-    if (cmd.hasOwnProperty("bounds")) {            // Move/Zoom map to new bounds
+    // Move/Zoom map to new bounds
+    if (cmd.hasOwnProperty("bounds")) {
         if (cmd.bounds.length === 2 && cmd.bounds[0].length === 2 && cmd.bounds[1].length === 2) {
             if (cmd.hasOwnProperty("fly") && cmd.fly === true) {
                 map.flyToBounds(cmd.bounds);
