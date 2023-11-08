@@ -1278,7 +1278,7 @@ var addOverlays = function(overlist) {
                 return x.lng+","+x.lat;
             })).join(';');
 
-            fetch('https://router.project-osrm.org/route/v1/driving/'+p)
+            fetch('https://router.project-osrm.org/route/v1/driving/'+p+'?overview=full')
                 .then(response => response.json())
                 .then(data => {
                     if (data.code !== "Ok") { sendDrawing(n); }
@@ -1554,15 +1554,12 @@ function setMarker(data) {
     opt.color = opt.color ?? data.color ?? data.lineColor ?? "#910000";
     opt.fillColor = opt.fillColor ?? data.fillColor ?? "#910000";
     opt.stroke = opt.stroke ?? (data.hasOwnProperty("stroke")) ? data.stroke : true;
-    opt.weight = opt.weight ?? data.weight;
-    opt.opacity = opt.opacity ?? data.opacity;
-    opt.fillOpacity = opt.fillOpacity ?? data.fillOpacity;
+    opt.weight = opt.weight ?? data.weight ?? 2;
+    opt.opacity = opt.opacity ?? data.opacity ?? 1;
+    if (!data.SIDC) { opt.fillOpacity = opt.fillOpacity ?? data.fillOpacity ?? 0.2; }
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
     opt.fill = opt.fill ?? (data.hasOwnProperty("fill")) ? data.fill : true;
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
-    if (opt.fillOpacity === undefined) { opt.fillOpacity = 0.2; }
-    if (opt.opacity === undefined) { opt.opacity = 1; }
-    if (opt.weight === undefined) { opt.weight = 2; }
 
     // Replace building
     if (data.hasOwnProperty("building")) {
@@ -2056,6 +2053,7 @@ function setMarker(data) {
         });
         marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
         edgeAware();
+        delete data.options;
     }
     else { // Otherwise just a generic map marker pin
         myMarker = L.VectorMarkers.icon({
@@ -2567,7 +2565,7 @@ function doCommand(cmd) {
             basemaps[baselayername].addTo(map);
         }
     }
-    // Add a new PMtiles/PBF feature layer
+    // Add a new PMtiles/PBF feature baselayer
     if (cmd.map && cmd.map.hasOwnProperty("name") && cmd.map.hasOwnProperty("pmtiles") ) {
         try {
             if (basemaps.hasOwnProperty(cmd.map.name)) {
@@ -2865,7 +2863,7 @@ function doCommand(cmd) {
         if (cmd.map.hasOwnProperty("fly") && cmd.map.fly === true) { map.flyToBounds(overlays[cmd.map.overlay].getBounds()); }
         else if (cmd.map.hasOwnProperty("fit") && cmd.map.fit === true) { map.fitBounds(overlays[cmd.map.overlay].getBounds()); }
     }
-    // Add a new overlay layer
+    // Add a new leaflet (or WMS) overlay layer
     if (cmd.map && cmd.map.hasOwnProperty("overlay") && cmd.map.hasOwnProperty("url") && cmd.map.hasOwnProperty("opt")) {
         console.log("New overlay:",cmd.map.overlay);
         if (overlays.hasOwnProperty(cmd.map.overlay)) { existsalready = true; }

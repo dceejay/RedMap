@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.3.1  - Small fix to icon transparency, and routing detail.
 - v4.3.0  - Add support for PMtiles files.
 - v4.2.1  - Revert use of optional chaining to extend life slightly. Issue #252
 - v4.2.0  - Let icons also be inline images data:image... 
