@@ -3143,7 +3143,9 @@ function doGeojson(n,g,l,o) {  // name, geojson, layer, options
             delete tx["name"];
             tx = JSON.stringify(tx,null,' ');
             if ( tx !== "{}") {
-                l.bindPopup('<b>'+n+'</b><pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>');
+                var gp = '<pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>'
+                if (n) { gp = '<b>'+n+'</b>' + gp; }
+                l.bindPopup(gp);
             }
         }
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
