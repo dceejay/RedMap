@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.3.3  - Fix for objects changing layers.
 - v4.3.2  - Fix geojson popup missing label name.
 - v4.3.1  - Small fix to icon transparency, and routing detail.
 - v4.3.0  - Add support for PMtiles files.

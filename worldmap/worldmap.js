@@ -1502,28 +1502,30 @@ var rangerings = function(latlng, options) {
 function setMarker(data) {
     var rightmenu = function(m) {
         m.on('click', function(e) {
-            var fb = allData[data.name];
+            var fb = allData[data["name"]];
             fb.action = "click";
             ws.send(JSON.stringify(fb));
         });
         // customise right click context menu
         var rightcontext = "";
-        //if (polygons[data.name] == undefined) {
-        rightcontext = "<button id='delbutton' onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+        //if (polygons[data["name"]] == undefined) {
+        rightcontext = "<button id='delbutton' onclick='delMarker(\""+data["name"]+"\",true);'>Delete</button>";
         //}
         if (data.editable) {
-            rightcontext = "<button onclick='editPoly(\""+data.name+"\");'>Edit</button><button onclick='delMarker(\""+data.name+"\",true);'>Delete</button>";
+            rightcontext = "<button onclick='editPoly(\""+data["name"]+"\");'>Edit</button><button onclick='delMarker(\""+data["name"]+"\",true);'>Delete</button>";
         }
         if ((data.contextmenu !== undefined) && (typeof data.contextmenu === "string")) {
-            rightcontext = data.contextmenu.replace(/\${name}/g,data.name);
+            rightcontext = data.contextmenu.replace(/\${name}/g,data["name"]);
             delete data.contextmenu;
         }
-        for (const item in allData[data.name].value) {
-            rightcontext = rightcontext.replace(new RegExp("\\${"+item+"}","g"),allData[data.name].value[item]);
+        if (allData.hasOwnProperty(data["name"]) && allData[data["name"]].hasOwnProperty("value")) {
+            for (const item in allData[data["name"]].value) {
+                rightcontext = rightcontext.replace(new RegExp("\\${"+item+"}","g"),allData[data["name"]].value[item]);
+            }
         }
         rightcontext = rightcontext.replace(/\${.*?}/g,'')
         if (rightcontext.length > 0) {
-            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data.name+"</b><br/>"+rightcontext);
+            var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data["name"]+"</b><br/>"+rightcontext);
             if (hiderightclick !== true) {
                 m.on('contextmenu', function(e) {
                     L.DomEvent.stopPropagation(e);
@@ -1544,7 +1546,7 @@ function setMarker(data) {
 
     // console.log("DATA", typeof data, data);
     if (data.deleted == true) { // remove markers we are told to
-        delMarker(data.name);
+        delMarker(data["name"]);
         return;
     }
 
@@ -1576,8 +1578,8 @@ function setMarker(data) {
     }
 
     var lll = "unknown";
-    if (markers.hasOwnProperty(data.name) && markers[data.name].hasOwnProperty("lay")) {
-        lll = markers[data.name].lay;
+    if (markers.hasOwnProperty(data["name"]) && markers[data["name"]].hasOwnProperty("lay")) {
+        lll = markers[data["name"]].lay;
     }
     var lay = data.layer ?? lll;
     if (!data.hasOwnProperty("action") || data.action.indexOf("layer") === -1) {
@@ -1600,27 +1602,27 @@ function setMarker(data) {
             map.addLayer(overlays[lay]);
             //console.log("ADDED LAYER",lay,layers);
         }
-        if (!allData.hasOwnProperty(data.name)) { allData[data.name] = {}; }
+        if (!allData.hasOwnProperty(data["name"])) { allData[data["name"]] = {}; }
         delete data.action;
         Object.keys(data).forEach(function(key) {
-            if (data[key] == null) { delete allData[data.name][key]; }
-            else { allData[data.name][key] = data[key]; }
+            if (data[key] == null) { delete allData[data["name"]][key]; }
+            else { allData[data["name"]][key] = data[key]; }
         });
-        data = Object.assign({},allData[data.name]);
+        data = Object.assign({},allData[data["name"]]);
     }
     delete data.action;
 
-    if (typeof markers[data.name] != "undefined") {
-        if (markers[data.name].lay !== lay) {
-            delMarker(data.name);
+    if (typeof markers[data["name"]] != "undefined") {
+        if (markers[data["name"]].lay !== lay) {
+            delMarker(data["name"]);
         }
         else {
-            try {layers[lay].removeLayer(markers[data.name]); }
+            try {layers[lay].removeLayer(markers[data["name"]]); }
             catch(e) { console.log("OOPS"); }
         }
     }
 
-    if (typeof polygons[data.name] != "undefined") { layers[lay].removeLayer(polygons[data.name]); }
+    if (typeof polygons[data["name"]] != "undefined") { layers[lay].removeLayer(polygons[data["name"]]); }
 
     if (data.hasOwnProperty("drawCount")) { drawCount = data.drawCount; }
     // Draw lines
@@ -1629,14 +1631,14 @@ function setMarker(data) {
         if (!data.hasOwnProperty("weight")) { opt.weight = 3; }    //Standard settings different for lines
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var polyln = L.polyline(data.line, opt);
-        polygons[data.name] = rightmenu(polyln);
+        polygons[data["name"]] = rightmenu(polyln);
     }
     // Draw Areas
     else if (data.hasOwnProperty("area") && Array.isArray(data.area)) {
         var polyarea;
         if (data.area.length === 2) { polyarea = L.rectangle(data.area, opt); }
         else { polyarea = L.polygon(data.area, opt); }
-        polygons[data.name] = rightmenu(polyarea);
+        polygons[data["name"]] = rightmenu(polyarea);
     }
     // Draw Great circles
     if (data.hasOwnProperty("greatcircle") && Array.isArray(data.greatcircle) && data.greatcircle.length === 2) {
@@ -1646,14 +1648,14 @@ function setMarker(data) {
         if (!data.hasOwnProperty("opacity")) { opt.opacity = 0.8; }
         var greatc = L.Polyline.Arc(data.greatcircle[0], data.greatcircle[1], opt);
         var aml = new L.Wrapped.Polyline(greatc._latlngs, opt);
-        polygons[data.name] = rightmenu(aml);
+        polygons[data["name"]] = rightmenu(aml);
     }
     // Draw error ellipses
     else if (data.hasOwnProperty("sdlat") && data.hasOwnProperty("sdlon")) {
         if (!data.hasOwnProperty("iconColor")) { opt.color = "blue"; }     //different standard Color Settings
         if (!data.hasOwnProperty("fillColor")) { opt.fillColor = "blue"; }
         var ellipse = L.ellipse(new L.LatLng((data.lat*1), (data.lon*1)), [200000*data.sdlon*Math.cos(data.lat*Math.PI/180), 200000*data.sdlat], 0, opt);
-        polygons[data.name] = rightmenu(ellipse);
+        polygons[data["name"]] = rightmenu(ellipse);
     }
     // Draw circles and ellipses
     else if (data.hasOwnProperty("radius")) {
@@ -1665,7 +1667,7 @@ function setMarker(data) {
             else {
                 polycirc = L.circle(new L.LatLng((data.lat*1), (data.lon*1)), data.radius*1, opt);
             }
-            polygons[data.name] = rightmenu(polycirc);
+            polygons[data["name"]] = rightmenu(polycirc);
             if (!data.hasOwnProperty("icon")) {
                 delete (data.lat);
                 delete (data.lon);
@@ -1675,34 +1677,34 @@ function setMarker(data) {
     // Draw arcs (and range rings)
     else if (data.hasOwnProperty("arc")) {
         if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
-            polygons[data.name] = rangerings(new L.LatLng((data.lat*1), (data.lon*1)), data.arc);
+            polygons[data["name"]] = rangerings(new L.LatLng((data.lat*1), (data.lon*1)), data.arc);
         }
     }
     // Draw a geojson "shape"
     else if (data.hasOwnProperty("geojson")) {
-        doGeojson(data.name,data.geojson,(data.layer || "unknown"),opt);
+        doGeojson(data["name"],data.geojson,(data.layer || "unknown"),opt);
     }
 
     // If we created a shape then apply some generic things to it
-    if (polygons[data.name] !== undefined) {
+    if (polygons[data["name"]] !== undefined) {
         // Set the layer
-        polygons[data.name].lay = lay;
+        polygons[data["name"]].lay = lay;
         // if clickable then add popup
         if (opt.clickable === true) {
-            var words = "<b>"+data.name+"</b>";
+            var words = "<b>"+data["name"]+"</b>";
             if (data.popup) { words = words + "<br/>" + data.popup; }
-            polygons[data.name].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
+            polygons[data["name"]].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
         }
         // add a tooltip (if supplied)
-        if (data.hasOwnProperty("tooltip")) { polygons[data.name].bindTooltip(data.tooltip); }
+        if (data.hasOwnProperty("tooltip")) { polygons[data["name"]].bindTooltip(data.tooltip); }
         // add to the layers
-        layers[lay].addLayer(polygons[data.name]);
+        layers[lay].addLayer(polygons[data["name"]]);
         // fly or fit to the bounds if required
         if (data.hasOwnProperty("fly") && data.fly === true) {
-            map.flyToBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+            map.flyToBounds(polygons[data["name"]].getBounds(),{padding:[50,50]})
         }
         else if (data.hasOwnProperty("fit") && data.fit === true) {
-            map.fitBounds(polygons[data.name].getBounds(),{padding:[50,50]})
+            map.fitBounds(polygons[data["name"]].getBounds(),{padding:[50,50]})
         }
     }
 
@@ -1733,7 +1735,7 @@ function setMarker(data) {
 
     if (ll.lat === 0 && ll.lng === 0) {
         // Add a little wobble so we can zoom into each if required.
-        console.log(data.name,"is at null island.");
+        console.log(data["name"],"is at null island.");
         ll.lat = Math.round(1000000 * ll.lat + Math.random() * 10000 - 5000) / 1000000;
         ll.lng = Math.round(1000000 * ll.lng + Math.random() * 10000 - 5000) / 1000000;
     }
@@ -1757,11 +1759,11 @@ function setMarker(data) {
         var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? "0") + map.getBearing();
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
-                title: data.name,
+                title: data["name"],
                 color: (data.iconColor ?? "#5DADE2")
             });
             marker.setHeading(dir);
-            q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data.name)+'"';
+            q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data["name"])+'"';
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "plane") {
@@ -1779,7 +1781,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "smallplane") {
             data.iconColor = data.iconColor ?? "black";
@@ -1791,7 +1793,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+(dir - 45)+'deg); -moz-transform:rotate('+(dir - 45)+'deg);"/>'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "bus") {
             dir = dir - 90;
@@ -1807,7 +1809,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgbus+'" style="width:32px; height:32px; -webkit-transform:scaleY('+sc+') rotate('+dir*sc+'deg); -moz-transform:scaleY('+sc+') rotate('+dir*sc+'deg);"/>'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "helicopter") {
             data.iconColor = data.iconColor ?? "black";
@@ -1824,7 +1826,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgheli+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "uav") {
             data.iconColor = data.iconColor || "black";
@@ -1841,7 +1843,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svguav+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "car") {
             data.iconColor = data.iconColor || "black";
@@ -1853,7 +1855,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgcar+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "sensor") {
             data.iconColor = data.iconColor || "#F39C12";
@@ -1864,7 +1866,7 @@ function setMarker(data) {
                 iconAnchor: [12, 12],
                 html:'<img src="'+svgcam+'" style="width:24px; height:24px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "arrow") {
             data.iconColor = data.iconColor || "black";
@@ -1876,7 +1878,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:"'<img src='"+svgarrow+"' style='width:32px; height:32px; -webkit-transform:translate(0px,-16px) rotate("+dir+"deg); -moz-transform:translate(0px,-16px) rotate("+dir+"deg);'/>",
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "wind") {
             data.iconColor = data.iconColor || "black";
@@ -1888,7 +1890,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgwind+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "satellite") {
             data.iconColor = data.iconColor || "black";
@@ -1905,7 +1907,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svgsat+'" style="width:32px; height:32px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if ((data.icon === "iss") || (data.icon === "ISS")) {
             data.iconColor = data.iconColor || "black";
@@ -1921,7 +1923,7 @@ function setMarker(data) {
                 iconAnchor: [25, 25],
                 html:'<img src="'+svgiss+'" style="width:50px; height:50px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "mayflower") {
             data.iconColor = data.iconColor || "#910000";
@@ -1933,7 +1935,7 @@ function setMarker(data) {
                 iconAnchor: [12, 24],
                 html:'<img src="'+svgmay+'" style="width:24px; height:48px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "locate") {
             data.iconColor = data.iconColor || "#00ffff";
@@ -1950,26 +1952,26 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
         }
         else if (data.icon === "friend") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle f', iconSize: [20, 12] }), title: data["name"], draggable:drag });
         }
         else if (data.icon === "hostile") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle h', iconSize: [16, 16] }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle h', iconSize: [16, 16] }), title: data["name"], draggable:drag });
         }
         else if (data.icon === "neutral") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle n', iconSize: [16, 16] }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle n', iconSize: [16, 16] }), title: data["name"], draggable:drag });
         }
         else if (data.icon === "unknown") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle', iconSize: [16, 16] }), title: data["name"], draggable:drag });
         }
         else if (data.icon === "danger") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'up-triangle' }), title: data["name"], draggable:drag });
         }
         else if (data.icon === "earthquake") {
-            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data.name, draggable:drag });
+            marker = L.marker(ll, { icon: L.divIcon({ className: 'circle e', iconSize: [data.mag*5, data.mag*5] }), title: data["name"], draggable:drag });
         }
         else if (data.icon.match(/^:.*:$/g)) { // emoji icon :smile:
             var em = emojify(data.icon);
@@ -1979,7 +1981,7 @@ function setMarker(data) {
                 html: '<center><span style="font-size:2em; color:'+col+'">'+em+'</span></center>',
                 iconSize: [32, 32]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
         }
         else if (data.icon.match(/^https?:.*$|^\/|^data:image\//)) { // web url icon https://...
@@ -1990,7 +1992,7 @@ function setMarker(data) {
                 iconAnchor: [sz/2, sz/2],
                 popupAnchor: [0, -sz/2]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
             labelOffset = [sz/2-4,-4];
             delete data.iconSize;
         }
@@ -2005,7 +2007,7 @@ function setMarker(data) {
                 iconAnchor: [16, 12],
                 popupAnchor: [0, -16]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [8,-8];
         }
         else if (data.icon.substr(0,3) === "wi-") { // weather icon
@@ -2019,7 +2021,7 @@ function setMarker(data) {
                 iconAnchor: [16, 16],
                 popupAnchor: [0, -16]
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [16,-16];
         }
         else {
@@ -2029,13 +2031,13 @@ function setMarker(data) {
                 prefix: 'fa',
                 iconColor: 'white'
             });
-            marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+            marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [6,-6];
         }
     }
     else if (data.hasOwnProperty("SIDC")) {  // NATO mil2525 icons
         // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
-        myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:unescape(encodeURIComponent(data.name)) });
+        myMarker = new ms.Symbol( data.SIDC.toUpperCase(), { uniqueDesignation:unescape(encodeURIComponent(data["name"])) });
         // Now that we have a symbol we can ask for the echelon and set the symbol size
         var opts = data.options || {};
         var sz = 25;
@@ -2059,7 +2061,7 @@ function setMarker(data) {
             iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
             className: "natoicon",
         });
-        marker =  L.marker(ll, { title:data.name, icon:myicon, draggable:drag });
+        marker =  L.marker(ll, { title:data["name"], icon:myicon, draggable:drag });
         edgeAware();
         delete data.options;
     }
@@ -2070,10 +2072,10 @@ function setMarker(data) {
             prefix: 'fa',
             iconColor: 'white'
         });
-        marker = L.marker(ll, {title:data.name, icon:myMarker, draggable:drag});
+        marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         labelOffset = [6,-6];
     }
-    marker.name = data.name;
+    marker.name = data["name"];
 
     // var createLabelIcon = function(labelText) {
     //     return L.marker(new L.LatLng(51.05, -1.35), {icon:L.divIcon({ html:labelText })});
@@ -2195,7 +2197,7 @@ function setMarker(data) {
     // If .label then use that rather than name tooltip
     if (data.label) {
         if (typeof data.label === "boolean" && data.label === true) {
-            marker.bindTooltip(data.name, { permanent:true, direction:"right", offset:labelOffset });
+            marker.bindTooltip(data["name"], { permanent:true, direction:"right", offset:labelOffset });
         }
         else if (typeof data.label === "string" && data.label.length > 0) {
             marker.bindTooltip(data.label, { permanent:true, direction:"right", offset:labelOffset });
@@ -2253,12 +2255,12 @@ function setMarker(data) {
         words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
         words += '</table>';
     }
-    words = "<b>"+data.name+"</b><br/>" + words.replace(/\${name}/g,data.name); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+    words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
     if (!data.hasOwnProperty("clickable") && data.clickable != false) {
         marker.bindPopup(words, wopt);
-        marker._popup.dname = data.name;
+        marker._popup.dname = data["name"];
     }
     marker.lay = lay;                       // and the layer it is on
 
@@ -2271,7 +2273,7 @@ function setMarker(data) {
     if (heat && ((data.addtoheatmap != false) || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
     }
-    markers[data.name] = marker;
+    markers[data["name"]] = marker;
     layers[lay].addLayer(marker);
 
     // var track;
@@ -2294,11 +2296,11 @@ function setMarker(data) {
             else if ( re3.test(""+data.speed) ) { data.length = data.length * 0.44704; }
         }
         if (data.length !== undefined) {
-            if (polygons[data.name] != null && !polygons[data.name].hasOwnProperty("_layers")) {
-                map.removeLayer(polygons[data.name]);
+            if (polygons[data["name"]] != null && !polygons[data["name"]].hasOwnProperty("_layers")) {
+                map.removeLayer(polygons[data["name"]]);
             }
-            if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("name") ) {
-                delete(layers[lay]._layers[polygons[data.name]._leaflet_id]);
+            if (polygons[data["name"]] != null && polygons[data["name"]].hasOwnProperty("name") ) {
+                delete(layers[lay]._layers[polygons[data["name"]]._leaflet_id]);
             }
             var x = ll.lng * 1; // X coordinate
             var y = ll.lat * 1; // Y coordinate
@@ -2328,14 +2330,14 @@ function setMarker(data) {
                     polygon.setStyle({opacity:0});
                 }
             }
-            polygon.name = data.name;
-            if (polygons[data.name] != null && polygons[data.name].hasOwnProperty("_layers")) {
-                polygons[data.name].addLayer(polygon);
+            polygon.name = data["name"];
+            if (polygons[data["name"]] != null && polygons[data["name"]].hasOwnProperty("_layers")) {
+                polygons[data["name"]].addLayer(polygon);
             }
             else {
-                polygons[data.name] = polygon;
+                polygons[data["name"]] = polygon;
             }
-            polygons[data.name].lay = lay;
+            polygons[data["name"]].lay = lay;
             layers[lay].addLayer(polygon);
         }
     }
