@@ -2136,6 +2136,7 @@ function setMarker(data) {
     // remove items from list of properties, then add all others to popup
     if (data.hasOwnProperty("options")) { delete data.options; }
     if (data.hasOwnProperty("icon")) { delete data.icon; }
+    if (data.hasOwnProperty("iconSize")) { delete data.iconSize; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
     if (data.hasOwnProperty("photourl")) {
         words += "<img src=\"" + data.photourl + "\" style=\"max-width:100%; max-height:250px; margin-top:10px;\"><br/>";
