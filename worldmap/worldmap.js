@@ -117,7 +117,7 @@ console.log("CONNECT TO",location.pathname + 'socket');
 
 var handleData = function(data) {
     if (Array.isArray(data)) {
-        //console.log("ARRAY");
+        //console.log("ARRAY:",data.length);
         for (var prop in data) {
             if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
             if (data[prop].hasOwnProperty("name")) {
@@ -1716,8 +1716,16 @@ function setMarker(data) {
         delete data.position;
         ll = new L.LatLng((data.lat*1), (data.lon*1));
     }
-    else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) { ll = new L.LatLng((data.lat*1), (data.lon*1)); }
-    else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude")) { ll = new L.LatLng((data.latitude*1), (data.longitude*1)); }
+    else if (data.hasOwnProperty("lat") && data.hasOwnProperty("lon")) {
+        if (isNaN(data.lat*1)) { console.log("Invalid lat: lat:",data.lat, " - lon:",data.lon); return; }
+        if (isNaN(data.lon*1)) { console.log("Invalid lon: lat:",data.lat, " - lon:",data.lon); return; }
+        ll = new L.LatLng((data.lat*1), (data.lon*1));
+    }
+    else if (data.hasOwnProperty("latitude") && data.hasOwnProperty("longitude")) {
+        if (isNaN(data.latitude*1)) { console.log("Invalid latitude: lat:",data.latitude, " - lon:",data.longitude); return; }
+        if (isNaN(data.longitude*1)) { console.log("Invalid longitude: lat:",data.latitude, " - lon:",data.longitude); return; }
+        ll = new L.LatLng((data.latitude*1), (data.longitude*1));
+    }
     else {
         // console.log("No location:",data);
         return;
