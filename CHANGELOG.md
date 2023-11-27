@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.4.0 - Add quad(copter) drone icon.
  - v4.3.3 - Fix for objects changing layers.
  - v4.3.2 - Fix geojson popup missing label name.
  - v4.3.1 - Small fix to icon transparency, and routing detail.

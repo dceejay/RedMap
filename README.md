@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.4.0  - Add quad(copter) drone icon.
 - v4.3.3  - Fix for objects changing layers.
 - v4.3.2  - Fix geojson popup missing label name.
 - v4.3.1  - Small fix to icon transparency, and routing detail.
@@ -106,7 +107,8 @@ There are also several special icons...
  - **ship** : a ship icon that aligns with the heading of travel.
  - **car** : a car icon that aligns with the heading of travel.
  - **bus** : a bus/coach icon that aligns with the heading of travel.
- - **uav** : a small uav like icon that aligns with the heading of travel.
+ - **uav** : a small drone uav like icon that aligns with the heading of travel.
+ - **quad** : a small quadcopter uav like icon that aligns with the heading of travel.
  - **helicopter** : a small helicopter icon that aligns with the heading of travel.
  - **sensor** : a camera icon that points to the heading angle.
  - **arrow** : a map GPS arrow type pointer that aligns with the heading of travel.
