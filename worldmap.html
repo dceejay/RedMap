@@ -1,5 +1,9 @@
 <script type="text/html" data-template-name="worldmap">
 <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+</div>
+<div class="form-row">
     <table border="0" width="96%">
     <tr><td width="100px"><i class="fa fa-globe"></i> Start<td>Latitude</td><td>Longitude</td><td width="60px">Zoom</td></tr>
     <tr><td>&nbsp;</td>
@@ -108,10 +112,6 @@
         <option value="true">Enable</option>
     </select>
 </div>
-<div class="form-row">
-    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="name">
-</div>
 <div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>
 If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
 </script>
@@ -155,6 +155,10 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
 
 
 <script type="text/html" data-template-name="ui_worldmap">
+<div class="form-row">
+    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+</div>
 <div class="form-row" id="template-row-group">
     <label for="node-input-group"><i class="fa fa-table"></i> Group</span></label>
     <input type="text" id="node-input-group">
@@ -273,10 +277,6 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <option value="false">Disable</option>
         <option value="true">Enable</option>
     </select>
-</div>
-<div class="form-row">
-    <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="name">
 </div>
 <div class="form-tips">Set <i>Cluster when</i> to 0 to disable clustering of points.<br/>
 If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>ctrl-shift-m</code> will load the map in a new tab.</div>
@@ -594,16 +594,16 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
 
 <script type="text/html" data-template-name="worldmap in">
     <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row">
         <label for="node-input-path"><i class="fa fa-globe"></i> Web Path</label>
         <input type="text" id="node-input-path" placeholder="worldmap">
     </div>
     <div class="form-row">
         <label for="node-input-events"><i class="fa fa-sign-out"></i> Events</label>
         <input type="text" id="node-input-events" placeholder="select events">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="name">
     </div>
 </script>
 
@@ -680,6 +680,10 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
 
 <script type="text/html" data-template-name="worldmap-tracks">
     <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row">
         <label for="node-input-depth"><i class="fa fa-map-marker"></i> Number of</label>
         points in track <input type="text" id="node-input-depth" style="width:50%" placeholder="number - default 20">
     </div>
@@ -695,10 +699,6 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
         <label>&nbsp;</label>
         <input type="checkbox" id="node-input-smooth" style="display:inline-block; width:auto; vertical-align:top;">
         <label for="node-input-smooth" style="width:70%;">Smooth tracks using bezier curves.</label>
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="name">
     </div>
 </script>
 
@@ -740,12 +740,12 @@ If <i>Web Path</i> is left empty, then by default <code>⌘⇧m</code> - <code>c
 
 <script type="text/html" data-template-name="worldmap-hull">
     <div class="form-row">
-        <label for="node-input-prop"><i class="fa fa-ellipsis-h"></i> Property</label>
-        <input type="text" id="node-input-prop" placeholder="payload property to group">
-    </div>
-    <div class="form-row">
         <label for="node-input-name"><i class="fa fa-file"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-prop"><i class="fa fa-ellipsis-h"></i> Property</label>
+        <input type="text" id="node-input-prop" placeholder="payload property to group">
     </div>
 </script>
 

@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.5.0  - Fix pmtiles to look for maps in userdir rather than modules
 - v4.4.0  - Add quad(copter) drone icon.
 - v4.3.3  - Fix for objects changing layers.
 - v4.3.2  - Fix geojson popup missing label name.
@@ -720,7 +721,7 @@ You can use a PMtiles format map archive file from [Protomaps](https://docs.prot
 
 **Note**: the whole planet file is over 100GB so be warned both for local storage and your download speed. You can download or extract just a portion of it if you use the **pmtiles** command line with the extract option. Use `pmtiles extract --help` to see the options.
 
-Copy, or create an alias to, your .pmtiles file(s) into your `~/.node-red/node_modules/node-red-contrib-web-worldmap/worldmap/` directory. On re-starting Node-RED the node will detect the file(s) and add them to the base map layer menu, using the file name as the layer name.
+Copy your .pmtiles file(s) into your `~/.node-red` user directory. On re-starting Node-RED the node will detect the file(s) and add them to the base map layer menu, using the file name as the layer name.
 
 ### Using a Docker Map Server
 

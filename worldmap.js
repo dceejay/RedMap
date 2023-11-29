@@ -13,7 +13,8 @@ module.exports = function(RED) {
     if (fs.existsSync((__dirname + '/mapserv'))) {
         RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
     }
-    var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
+    //var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
+    var pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
 
     function worldMap(node, n) {
         var allPoints = {};
@@ -121,7 +122,14 @@ module.exports = function(RED) {
                     //console.log("INIT",c)
                     client.write(JSON.stringify({command:c}));
                     for (var p=0; p<pmtiles.length; p++) {
-                        client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p] }}}));
+                        fs.symlink(RED.settings.userDir+'/'+pmtiles[p], __dirname+'/worldmap/'+pmtiles[p], 'file', (err) => {
+                            if (err) {
+                                if (err.code !== "EEXIST") { console.log(err); }
+                            }
+                            else {
+                                client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p] }}}));
+                            }
+                        })
                     }
                     var o = Object.values(allPoints);
                     o.map(v => delete v.tout);
