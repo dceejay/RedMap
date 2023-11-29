@@ -169,7 +169,7 @@ module.exports = function(RED) {
                 if (msg.payload.command.map.pmtiles.indexOf("http") !== 0) {
                     fs.symlink(msg.payload.command.map.pmtiles, __dirname+'/worldmap/'+msg.payload.command.map.name+'.pmtiles', 'file', (err) => {
                         if (err) {
-                            if (err.code !== "EEXIST") { console.log(err); }
+                            if (err.code !== "EEXIST") { node.log("PMTiles "+err.code,msg); }
                         }
                     });
                     msg.payload.command.map.pmtiles = msg.payload.command.map.name+'.pmtiles';
