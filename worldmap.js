@@ -126,10 +126,8 @@ module.exports = function(RED) {
                             if (err) {
                                 if (err.code !== "EEXIST") { console.log(err); }
                             }
-                            else {
-                                client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p] }}}));
-                            }
                         })
+                        client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p] }}}));
                     }
                     var o = Object.values(allPoints);
                     o.map(v => delete v.tout);
