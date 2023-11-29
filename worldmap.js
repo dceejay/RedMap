@@ -13,8 +13,9 @@ module.exports = function(RED) {
     if (fs.existsSync((__dirname + '/mapserv'))) {
         RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
     }
-    //var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
-    var pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
+    var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
+    pmtiles.forEach(file => { fs.unlinkSync(__dirname + '/worldmap/'+file); })
+    pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
 
     function worldMap(node, n) {
         var allPoints = {};
@@ -163,6 +164,17 @@ module.exports = function(RED) {
 
         node.on('input', function(msg) {
             if (!msg.hasOwnProperty("payload")) { node.warn("Missing payload"); return; }
+
+            if (msg.payload.hasOwnProperty("command") && msg.payload.command.hasOwnProperty("map") && msg.payload.command.map.hasOwnProperty("pmtiles")) {
+                if (msg.payload.command.map.pmtiles.indexOf("http") !== 0) {
+                    fs.symlink(msg.payload.command.map.pmtiles, __dirname+'/worldmap/'+msg.payload.command.map.name+'.pmtiles', 'file', (err) => {
+                        if (err) {
+                            if (err.code !== "EEXIST") { console.log(err); }
+                        }
+                    });
+                    msg.payload.command.map.pmtiles = msg.payload.command.map.name+'.pmtiles';
+                }
+            }
             if (msg.hasOwnProperty("_sessionid")) {
                 if (clients.hasOwnProperty(msg._sessionid)) {
                     clients[msg._sessionid].write(JSON.stringify(msg.payload));

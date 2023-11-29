@@ -1,6 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
- - v4.5.0 - Fix pmtiles to look for maps in userdir rather than modules
+ - v4.5.2 - Tidy up when pmtiles removed.
+ - v4.5.0 - Fix pmtiles to look for maps in userdir rather than modules.
  - v4.4.0 - Add quad(copter) drone icon.
  - v4.3.3 - Fix for objects changing layers.
  - v4.3.2 - Fix geojson popup missing label name.
