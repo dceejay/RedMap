@@ -1296,7 +1296,7 @@ var addOverlays = function(overlist) {
         changeDrawColour("#4040F0");  // Set default drawing color to blue on start
     }
 
-    // Add the countries (world-110m) for offline use
+    // Add the countries (world-50m geojson) outline for offline use
     if (overlist.indexOf("CO") !== -1 || !navigator.onLine) {
         var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
         layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
@@ -2605,11 +2605,14 @@ function doCommand(cmd) {
                 existsalready = true;
             }
             var opt = {};
-            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt; }
+            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt || {}; }
             opt.url = cmd.map.pmtiles;
-            opt.attribution = opt.attribution || '&copy; Protomaps';
+            opt.attribution = opt.attribution || '&copy; Protomaps & OSM';
             opt.maxDataZoom = opt.maxDataZoom || 15;
             opt.maxZoom = opt.maxZoom || 20;
+            // opt.shade = "grey";
+            // opt.dark = false;
+            // opt.xray = true;
             console.log("New PMtiles:",cmd.map.name,opt);
             basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
             if (!existsalready) {

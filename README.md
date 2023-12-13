@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.6.0  - let default pmtiles be light/dark or monocolored.
 - v4.5.2  - Tidy up when pmtiles removed.
 - v4.5.0  - Fix pmtiles to look for maps in userdir rather than modules
 - v4.4.0  - Add quad(copter) drone icon.
@@ -724,9 +725,23 @@ You can use a PMtiles format map archive file from [Protomaps](https://docs.prot
 
 Copy your .pmtiles file(s) into your `~/.node-red` user directory. On re-starting Node-RED the node will detect the file(s) and add them to the base map layer menu, using the file name as the layer name.
 
+You can set some default options for the pmtiles by creating a file called **pmtiles.opts** in your user directory. For example to create a nightvision style
+
+    {
+        "attribution": "Protomaps and OSM",
+        "maxDataZoom": 15,
+        "maxZoom": 20,
+        "shade": "red",
+        "dark": true
+    }
+
+The `maxDataZoom` should match the maximum zoom level in you pmtiles file(s) - whereas the `maxZoom` is the leaflet maximum zoom level you want to support. `shade` can be any valid html colour or #rrggbb string, and `dark` is a boolean (default false).
+
 You can also load them dynamically with a command like
 
-    msg.payload = {"command":{"map":{"name":"MyMap","pmtiles":"/path/to/mymap.pmtiles"}}}
+    msg.payload = {"command":{"map":{"name":"MyMap", "pmtiles":"/path/to/mymap.pmtiles", "opt":"myOptionsObject"}}}
+
+Where `opt` can be as per the options file mentioned above - or omitted completely.
 
 ### Using a Docker Map Server
 

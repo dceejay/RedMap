@@ -16,6 +16,12 @@ module.exports = function(RED) {
     var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
     pmtiles.forEach(file => { fs.unlinkSync(__dirname + '/worldmap/'+file); })
     pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
+    var pmtilesopts;
+    try {
+        pmtilesopts = fs.readFileSync(RED.settings.userDir+'/pmtiles.opts');
+        pmtilesopts = JSON.parse(pmtilesopts);
+    }
+    catch(e) {};
 
     function worldMap(node, n) {
         var allPoints = {};
@@ -128,7 +134,7 @@ module.exports = function(RED) {
                                 if (err.code !== "EEXIST") { console.log(err); }
                             }
                         })
-                        client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p] }}}));
+                        client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p], opt:pmtilesopts }}}));
                     }
                     var o = Object.values(allPoints);
                     o.map(v => delete v.tout);
