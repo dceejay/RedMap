@@ -13,11 +13,12 @@ module.exports = function(RED) {
     if (fs.existsSync((__dirname + '/mapserv'))) {
         RED.httpNode.use("/cgi-bin/mapserv", require('cgi')(__dirname + '/mapserv'));
     }
-    var pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
-    pmtiles.forEach(file => { fs.unlinkSync(__dirname + '/worldmap/'+file); })
-    pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
+    var pmtiles;
     var pmtilesopts;
     try {
+        pmtiles = fs.readdirSync(__dirname + '/worldmap').filter(fn => fn.endsWith('.pmtiles'));
+        pmtiles.forEach(file => { fs.unlinkSync(__dirname + '/worldmap/'+file); })
+        pmtiles = fs.readdirSync(RED.settings.userDir).filter(fn => fn.endsWith('.pmtiles'));
         pmtilesopts = fs.readFileSync(RED.settings.userDir+'/pmtiles.opts');
         pmtilesopts = JSON.parse(pmtilesopts);
     }
