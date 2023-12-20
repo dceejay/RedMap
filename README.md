@@ -739,13 +739,13 @@ The `maxDataZoom` should match the maximum zoom level in you pmtiles file(s) - w
 
 You can also load them dynamically with a command like
 
-    msg.payload = {"command":{"map":{"name":"MyMap", "pmtiles":"/path/to/mymap.pmtiles", "opt":"myOptionsObject"}}}
+    msg.payload = {"command":{"map":{"name":"MyMap", "pmtiles":"/path/to/mymap.pmtiles", "opt":myOptionsObject}}}
 
 Where `opt` can be as per the options file mentioned above - or omitted completely.
 
 ### Using a Docker Map Server
 
-I have found the easiest to use mapserver for decent generic map to be Tileserver-gl. It uses mbtiles format maps - for example from [MapTiler Data](https://data.maptiler.com/downloads/planet/). You can download your mbtiles file into a directory and then from that directory run
+I have found the easiest to use mapserver for a decent generic map to be Tileserver-gl. It uses mbtiles format maps - for example from [MapTiler Data](https://data.maptiler.com/downloads/planet/). You can download your mbtiles file into a directory and then from that directory run
 ```
 docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
 ```
