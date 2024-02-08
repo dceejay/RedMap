@@ -908,8 +908,10 @@ map.on('contextmenu', function(e) {
                 rclk = e.latlng;
                 form = {};
                 var ramen = ""+addmenu;
-                for (const item in rmenudata) {
-                    ramen = ramen.replace(new RegExp("\\${"+item+"}","g"),rmenudata[item]);
+                if (typeof rmenudata !== "string") {
+                    for (const item in rmenudata) {
+                        ramen = ramen.replace(new RegExp("\\${"+item+"}","g"),rmenudata[item]);
+                    }
                 }
                 ramen = ramen.replace(/\${.*?}/g,'')
                 rightmenuMap.setContent(ramen);

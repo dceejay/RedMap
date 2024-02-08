@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.6.2 - Fix multiple use of contextmenu feedback. Issue #259
  - v4.6.1 - let default pmtiles be light/dark or monocolored.
  - v4.5.2 - Tidy up when pmtiles removed.
  - v4.5.0 - Fix pmtiles to look for maps in userdir rather than modules.
