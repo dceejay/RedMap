@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.6.3  - Fix sending of layer events when not wanted. Issue #262
 - v4.6.2  - Fix multiple use of contextmenu feedback. Issue #259
 - v4.6.1  - Let default pmtiles be light/dark or monocolored.
 - v4.5.2  - Tidy up when pmtiles removed.
@@ -430,6 +431,7 @@ Feeding this into the tracks node will also remove the tracks stored for that la
 The layer will be called `name`. By default it expects a leaflet Tilelayer style url. You can also use a WMS
 style server by adding a property `wms: true`. You can also set `wms: "grey"` to set the layer to greyscale which
 may let your markers be more visible. (see overlay example below).
+Also useful is the Leaflet option `maxNativeZoom` which can allow scaling of maps beyond their natural maximum zoom level.
 
     msg.payload.command.map = {
         "name":"OSMhot",  // use "overlay":"MyOverlayName" for an overlay rather than a base layer.
