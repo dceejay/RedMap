@@ -200,6 +200,21 @@ module.exports = function(RED) {
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
                 allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
             }
+
+            if (msg?.payload?.command?.map?.delete) {
+                var ddd = msg.payload.command.map.delete;
+                if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
+                for (let a=0; a < ddd.length; a++) {
+                    for (let p in allPoints) {
+                        if (allPoints.hasOwnProperty(p)) {
+                            if (allPoints[p].layer === ddd[a]) {
+                                delete allPoints[p];
+                            }
+                        }
+                    }
+                }
+            }
+
         });
         node.on("close", function() {
             for (var c in clients) {
@@ -463,8 +478,21 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track
                 }
             }
-            if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("command") && msg.payload.command.hasOwnProperty("clear")) {
-                for (var p in node.pointsarray) {
+            if (msg?.payload?.command?.map?.delete) {
+                var ddd = msg.payload.command.map.delete;
+                if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
+                for (let a=0; a < ddd.length; a++) {
+                    for (let p in node.pointsarray) {
+                        if (node.pointsarray.hasOwnProperty(p)) {
+                            if (node.pointsarray[p][0].layer === ddd[a]) {
+                                delete node.pointsarray[p];
+                            }
+                        }
+                    }
+                }
+            }
+            if (msg?.payload?.command?.clear) {
+                for (let p in node.pointsarray) {
                     if (node.pointsarray.hasOwnProperty(p)) {
                         if (node.pointsarray[p][0].layer === msg.payload.command.clear) {
                             delete node.pointsarray[p];

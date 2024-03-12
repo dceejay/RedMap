@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.6.4  - Fix deletion of layers logic to actually fully remove points.
 - v4.6.3  - Fix sending of layer events when not wanted. Issue #262
 - v4.6.2  - Fix multiple use of contextmenu feedback. Issue #259
 - v4.6.1  - Let default pmtiles be light/dark or monocolored.
@@ -34,14 +35,6 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
             Breaking - Move to geoman for drawing shapes.
             Allow command.rotation to set rotation of map.
             Allow editing of multipoint geojson tracks.
-- v2.43.1 - Tweak drawing layer double click
-- v2.43.0 - Revert leaflet update as it broke Draw
-- v2.42.3 - More KML and GeoJson drag drop fixes
-- v2.42.1 - Remove extraneous debug logging, fix KMZ icons
-- v2.42.0 - Add handling for TAK type spots, waypoints, alerts, sensors. Better KML/KMZ handling.
-- v2.41.0 - Bump leaflet libs to latest stable (1.9.4)
-- v2.40.1 - Fix missing countries overlay when starting disconnected.
-- v2.40.0 - Add handling for TAK event points from TAK ingest node.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 

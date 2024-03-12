@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.6.4 - Fix deletion of layers logic to actually fully remove points.
  - v4.6.3 - Fix sending of layer events when not wanted. Issue #262
  - v4.6.2 - Fix multiple use of contextmenu feedback. Issue #259
  - v4.6.1 - let default pmtiles be light/dark or monocolored.

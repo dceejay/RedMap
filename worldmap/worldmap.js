@@ -545,13 +545,16 @@ function doTidyUp(l) {
                     if (typeof polygons[m+"_"] != "undefined") {
                         layers[polygons[m+"_"].lay].removeLayer(polygons[m+"_"]);
                         delete polygons[m+"_"];
+                        delete allData[m+"_"];
                     }
                     if (typeof polygons[m] != "undefined") {
                         layers[markers[m].lay].removeLayer(polygons[m]);
                         delete polygons[m];
+                        delete allData[m];
                     }
                     layers[markers[m].lay].removeLayer(markers[m]);
                     delete markers[m];
+                    delete allData[m];
                 }
             }
         }
@@ -2645,6 +2648,7 @@ function doCommand(cmd) {
         for (var a=0; a < cmd.map.delete.length; a++) {
             if (basemaps.hasOwnProperty(cmd.map.delete[a])) { delete basemaps[cmd.map.delete[a]]; }
             if (overlays.hasOwnProperty(cmd.map.delete[a])) { delete overlays[cmd.map.delete[a]]; }
+            doTidyUp(cmd.map.delete[a]);
         }
         if (showLayerMenu) {
             map.removeControl(layercontrol);
