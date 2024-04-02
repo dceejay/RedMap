@@ -129,7 +129,7 @@ module.exports = function(RED) {
                     if (node.name) { c.toptitle = node.name; }
                     //console.log("INIT",c)
                     client.write(JSON.stringify({command:c}));
-                    for (var p=0; p<pmtiles.length; p++) {
+                    for (var p=0; p < pmtiles.length; p++) {
                         fs.symlink(RED.settings.userDir+'/'+pmtiles[p], __dirname+'/worldmap/'+pmtiles[p], 'file', (err) => {
                             if (err) {
                                 if (err.code !== "EEXIST") { console.log(err); }
@@ -200,7 +200,6 @@ module.exports = function(RED) {
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
                 allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
             }
-
             if (msg?.payload?.command?.map?.delete) {
                 var ddd = msg.payload.command.map.delete;
                 if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
@@ -214,8 +213,8 @@ module.exports = function(RED) {
                     }
                 }
             }
-
         });
+
         node.on("close", function() {
             for (var c in clients) {
                 if (clients.hasOwnProperty(c)) {
@@ -232,6 +231,7 @@ module.exports = function(RED) {
             }
             node.status({});
         });
+
         sockets[node.path].on('connection', callback);
     }
     var WorldMap = function(n) {

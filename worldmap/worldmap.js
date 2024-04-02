@@ -150,10 +150,10 @@ var handleData = function(data) {
 
         // handle raw geojson type msg
         if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
-            if (data.hasOwnProperty('properties') && data.properties.hasOwnProperty('title')) {
-                doGeojson(data.properties.title,data)
+            if (data?.properties?.title) {
+                doGeojson(data.properties.title,data,data?.layer,data?.options,data?.icon) // name, geojson, layer, options, icon
             }
-            else { doGeojson("geojson",data); }
+            else { doGeojson("geojson",data,data?.layer,data?.options,data?.icon); }
         }
         // handle TAK json (from tak-ingest node or fastxml node)
         else if (data.hasOwnProperty("event") && data.event.hasOwnProperty("point")) {
@@ -3084,7 +3084,7 @@ function doCommand(cmd) {
 }
 
 // handle any incoming GEOJSON directly - may style badly
-function doGeojson(n,g,l,o) {  // name, geojson, layer, options
+function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
     var lay = l ?? g.name ?? "unknown";
     // if (!basemaps[lay]) {
     var opt = { style: function(feature) {
@@ -3132,13 +3132,14 @@ function doGeojson(n,g,l,o) {  // name, geojson, layer, options
                 additionalInformation:feature.properties.modifier,
                 size:25
             });
+            var anc = myMarker.getAnchor();
             if (myMarker.hasOwnProperty("metadata") && myMarker.metadata.hasOwnProperty("echelon")) {
                 var sz = iconSz[myMarker.metadata.echelon];
                 myMarker.setOptions({size:sz});
             }
             myMarker = L.icon({
                 iconUrl: myMarker.toDataURL(),
-                iconAnchor: [myMarker.getAnchor().x, myMarker.getAnchor().y],
+                iconAnchor: [anc.x, anc.y],
                 className: "natoicon",
             });
         }
@@ -3156,7 +3157,7 @@ function doGeojson(n,g,l,o) {  // name, geojson, layer, options
         }
         else {
             myMarker = L.VectorMarkers.icon({
-                icon: feature.properties["marker-symbol"] ?? "circle",
+                icon: feature.properties["marker-symbol"] ?? i ?? "circle",
                 markerColor: (feature.properties["marker-color"] ?? "#910000"),
                 prefix: 'fa',
                 iconColor: 'white'
