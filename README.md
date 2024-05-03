@@ -400,6 +400,7 @@ Optional properties for **msg.payload.command** include
  - **button** - if supplied with a `name` and `icon` property - adds a button to provide user input - sends
  a msg `{"action":"button", "name":"the_button_name"}` to the worldmap in node. If supplied with a `name` property only, it will remove the button. Optional `position` property can be 'bottomright', 'bottomleft', 'topleft' or 'topright' (default). button can also be an array of button objects.
  - **contextmenu** - html string to define the right click menu when not on a marker. Defaults to the simple add marker input. Empty string `""` disables this right click.
+ - **drawcontextmenu** : an html fragment to display on right click or when creating new shapes (enable Drawing overlay in the worldmap node Overlays selection dropdown) - defaults to "Name" Input "Edit Points|Drag|Rotate|Delete|Ok" buttons.
  - **toptitle** - Words to replace title in title bar (if not in iframe)
  - **toplogo** - URL to logo image for top title bar (if not in iframe) - ideally 60px by 24px.
  - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
@@ -624,6 +625,11 @@ Example simple form
 ```
 
 See the section on **Utility Functions** for details of the feedback function.
+
+For the drawcontextmenu you can use the following snippet as a template:
+```
+msg.payload  = {"command" :{"drawcontextmenu" :"<input type='text' value='${name}' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\"${name}\");'>My Edit points</button><button onclick='editPoly(\"${name}\",\"drag\");'>My Drag</button><button onclick='editPoly(\"${name}\",\"rot\");'>My Rotate</button><button onclick='delMarker(\"${name}\",true);'>My Delete</button><button onclick='sendDrawing();'>My OK</button>"}};
+```
 
 #### To add and remove a legend
 
