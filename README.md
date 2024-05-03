@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v4.7.0  - Update pmtiles library, fix feedback function inconsistency. Issue #270
 - v4.6.5  - Let geojson allow for generic overrides with .icon and .layer.
 - v4.6.4  - Fix deletion of layers logic to actually fully remove points.
 - v4.6.3  - Fix sending of layer events when not wanted. Issue #262
