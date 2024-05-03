@@ -869,7 +869,8 @@ var feedback = function(n,v,a,c) {
     if (markers[n]) {
         console.log("FB1",n,v,a,c)
         allData[n].action = a || "feedback";
-        if (v !== undefined) { allData[n][a||"value"] = v; }
+        //if (v !== undefined) { allData[n][a||"value"] = v; }
+        if (v !== undefined) { allData[n]["value"] = v; }
         ws.send(JSON.stringify(allData[n]));
         setMarker(allData[n]);
     }
