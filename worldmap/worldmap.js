@@ -117,7 +117,7 @@ console.log("CONNECT TO",location.pathname + 'socket');
 
 var handleData = function(data) {
     if (Array.isArray(data)) {
-        //console.log("ARRAY:",data.length);
+        // console.log("ARRAY:",data.length);
         for (var prop in data) {
             if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
             if (data[prop].hasOwnProperty("name")) {
@@ -2611,13 +2611,16 @@ function doCommand(cmd) {
             }
             var opt = {};
             if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt || {}; }
+
+            if (!opt.paintRules && !opt.labelRules && !opt.backgroundColor && !opt.theme) {
+                opt.theme = "light"; // light, dark, white, black, grayscale
+            };
+
             opt.url = cmd.map.pmtiles;
             opt.attribution = opt.attribution || '&copy; Protomaps & OSM';
             opt.maxDataZoom = opt.maxDataZoom || 15;
             opt.maxZoom = opt.maxZoom || 20;
-            // opt.shade = "grey";
-            // opt.dark = false;
-            // opt.xray = true;
+
             console.log("New PMtiles:",cmd.map.name,opt);
             basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
             if (!existsalready) {

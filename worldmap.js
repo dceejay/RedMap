@@ -136,6 +136,7 @@ module.exports = function(RED) {
                             }
                         })
                         client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p], opt:pmtilesopts }}}));
+                        node.log("Added pmtiles file: "+pmtiles[p]);
                     }
                     var o = Object.values(allPoints);
                     o.map(v => delete v.tout);

@@ -722,15 +722,16 @@ You can use a PMtiles format map archive file from [Protomaps](https://docs.prot
 
 Copy your .pmtiles file(s) into your `~/.node-red` user directory. On re-starting Node-RED the node will detect the file(s) and add them to the base map layer menu, using the file name as the layer name.
 
-You can set some default options for the pmtiles by creating a file called **pmtiles.opts** in your user directory. For example to create a nightvision style
+You can set some default options for the pmtiles by creating a file called **pmtiles.opts** in your user directory. For example to use a dark theme
 
     {
         "attribution": "Protomaps and OSM",
         "maxDataZoom": 15,
         "maxZoom": 20,
-        "shade": "red",
-        "dark": true
+        "theme": "dark"
     }
+
+theme can be light, dark, white, black, or grayscale. 
 
 The `maxDataZoom` should match the maximum zoom level in you pmtiles file(s) - whereas the `maxZoom` is the leaflet maximum zoom level you want to support. `shade` can be any valid html colour or #rrggbb string, and `dark` is a boolean (default false).
 
