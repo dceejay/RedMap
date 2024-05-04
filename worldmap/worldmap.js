@@ -865,6 +865,10 @@ var addThing = function() {
 var form = {};
 var addToForm = function(n,v) { form[n] = v; }
 var feedback = function(n,v,a,c) {
+/*
+//  suggest to reove all the special handling for simplification, no reason to send information
+//  about entities that the backend generaed, the need is only to get recognizable actions from the frontend
+//   
     if (v === "_form") { v = form; }
     if (markers[n]) {
         console.log("FB1",n,v,a,c)
@@ -875,8 +879,10 @@ var feedback = function(n,v,a,c) {
         setMarker(allData[n]);
     }
     else if (polygons[n]) {
-        console.log("FB2",n,v,a)
-        sendDrawing(n,v,a)
+        console.log("FB2", n, v, a);
+        const polyData = { "name": n, "action": a || "feedback", "value": v || null };
+        //sendDrawing(n,v,a)
+        ws.send(JSON.stringify(polyData));
     }
     else {
         if (n === undefined) { n = "map"; }
@@ -884,6 +890,10 @@ var feedback = function(n,v,a,c) {
         rmenudata = v;
         ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
+*/
+	
+	const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
+	ws.send(JSON.stringify(dataToSend));
     if (c === true) { map.closePopup(); }
 }
 
@@ -1188,7 +1198,7 @@ var addOverlays = function(overlist) {
                 rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\${name}/g,name).replace(/\${.*?}/g,'') || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
-            setTimeout(function() {map.openPopup(rightmenuMarker)},25);
+            setTimeout(function() {map.openPopup(rightmenuMarker).replace(/\${name}/g,name)},25);
         });
 
         sendDrawing = function(n,v,a) {
@@ -1529,7 +1539,7 @@ function setMarker(data) {
                 rightcontext = rightcontext.replace(new RegExp("\\${"+item+"}","g"),allData[data["name"]].value[item]);
             }
         }
-        rightcontext = rightcontext.replace(/\${.*?}/g,'')
+        rightcontext = rightcontext.replace(/\${.*?}/g,'').replace(/\${name}/g,data["name"])
         if (rightcontext.length > 0) {
             var rightmenuMarker = L.popup({offset:[0,-12]}).setContent("<b>"+data["name"]+"</b><br/>"+rightcontext);
             if (hiderightclick !== true) {
@@ -1698,7 +1708,7 @@ function setMarker(data) {
         // if clickable then add popup
         if (opt.clickable === true) {
             var words = "<b>"+data["name"]+"</b>";
-            if (data.popup) { words = words + "<br/>" + data.popup; }
+            if (data.popup) { words = words + "<br/>" + data.popup.replace(/\${name}/g,data["name"]); }
             polygons[data["name"]].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
         }
         // add a tooltip (if supplied)

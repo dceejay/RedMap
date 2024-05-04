@@ -1,0 +1,129 @@
+[
+    {
+        "id": "46f4b9ae1c66c1ba",
+        "type": "tab",
+        "label": "Flow 4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c643e022.1816c",
+        "type": "worldmap",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "",
+        "lat": "30",
+        "lon": "0",
+        "zoom": "3",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "deg",
+        "showgrid": "false",
+        "showruler": "false",
+        "allowFileDrop": "false",
+        "path": "worldmap",
+        "overlist": "DR,CO,RA,DN",
+        "maplist": "OSMG,OSMH,EsriS",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1000,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "4966f5218c3fe1df",
+        "type": "inject",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "none",
+        "x": 530,
+        "y": 480,
+        "wires": [
+            [
+                "87dff974113c8c54"
+            ]
+        ]
+    },
+    {
+        "id": "87dff974113c8c54",
+        "type": "function",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "add new rectangle",
+        "func": "\nmsg.payload = {\"command\":{\"bounds\":[[49.83682820280039,-4.019763692204326],[51.4723362586149,1.1741268015945219]]}};\nnode.send(msg);\nmsg.payload = {\"command\":{\"zoom\":9.7}};\nnode.send(msg);\n\n\nvar popup = \"<button name=\\\"B1name\\\" onclick='feedback(\\\"${name}\\\",\\\"${name} sends {x} Hellow\\\",\\\"myAction\\\",true);'>Hellow1 from ${name}</button>\";\npopup += \"<button name=\\\"B2name\\\" onclick='feedback(this.name,\\\"${name} sends {x} Hellow\\\",\\\"myAction\\\",true);'>Hellow2 from ${name}</button>\";\n\nvar points =  [ { \"lat\": 50.66, \"lng\": -1.59 }, { \"lat\": 50.60, \"lng\": -1.47 } ] ;\nmsg.payload =  {\n    popup: popup.replace(/\\{x\\}/,\"popup\"),\n    contextmenu: popup.replace(/\\{x\\}/, \"context\"),\n    name: \"myShape\",\n    area: points,\n    clickable:true,\n };\nnode.send(msg);\n\nmsg.payload = {\n    popup: popup,\n    contextmenu: popup,\n    name: \"myMarker\",\n    lat: 50.40,\n    lon: -1.0,\n    weight: 1,\n};\nnode.send(msg);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 480,
+        "wires": [
+            [
+                "c643e022.1816c",
+                "34ad8daae96efd3e"
+            ]
+        ]
+    },
+    {
+        "id": "32d7cc4d4db67f66",
+        "type": "worldmap in",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "",
+        "path": "/worldmap",
+        "events": "connect,disconnect,point,layer,bounds,files,draw,other",
+        "x": 500,
+        "y": 540,
+        "wires": [
+            [
+                "32a2b83008623990"
+            ]
+        ]
+    },
+    {
+        "id": "32a2b83008623990",
+        "type": "debug",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "34ad8daae96efd3e",
+        "type": "debug",
+        "z": "46f4b9ae1c66c1ba",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 400,
+        "wires": []
+    }
+]
