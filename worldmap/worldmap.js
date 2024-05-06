@@ -1510,7 +1510,8 @@ function setMarker(data) {
         m.on('click', function(e) {
             var fb = allData[data["name"]];
             fb.action = "click";
-            ws.send(JSON.stringify(fb));
+            if (fb.sendOnClick ?? true)
+                ws.send(JSON.stringify(fb));
         });
         // customise right click context menu
         var rightcontext = "";
