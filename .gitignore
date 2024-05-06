@@ -1,1 +1,7 @@
 node_modules/
+*.DS_Store
+shrink
+mapbox.token
+*.bak
+worldmap/ml3d.html
+worldmap/unitgenerator.html

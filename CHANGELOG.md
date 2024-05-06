@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v4.8.0 - Merged PR for feedback functioanlity cleanup and example. PR #271 and #272
  - v4.7.0 - Update pmtiles library, fix feedback function inconsistency. Issue #270
  - v4.6.5 - Let geojson allow for generic overrides with .icon and .layer.
  - v4.6.4 - Fix deletion of layers logic to actually fully remove points.
