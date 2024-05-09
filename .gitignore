@@ -5,3 +5,4 @@ mapbox.token
 *.bak
 worldmap/ml3d.html
 worldmap/unitgenerator.html
+*.pmtiles
