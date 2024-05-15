@@ -2547,11 +2547,11 @@ function doCommand(cmd) {
         try { coords.removeFrom(map); }
         catch(e) {}
         var opts = {gps:false, gpsLong:false, utm:false, utmref:false, position:"bottomleft"}
-        if (cmd.coords == "deg") { opts.gps = true; }
-        if (cmd.coords == "dms") { opts.gpsLong = true; }
-        if (cmd.coords == "utm") { opts.utm = true; }
-        if (cmd.coords == "mgrs") { opts.utmref = true; }
-        if (cmd.coords == "qth") { opts.qth = true; }
+        if (cmd.coords.includes("deg")) { opts.gps = true; }
+        if (cmd.coords.includes("dms")) { opts.gpsLong = true; }
+        if (cmd.coords.includes("utm")) { opts.utm = true; }
+        if (cmd.coords.includes("mgrs")) { opts.utmref = true; }
+        if (cmd.coords.includes("qth")) { opts.qth = true; }
         coords.options = opts;
         coords.addTo(map);
     }
