@@ -13,31 +13,31 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
-- v4.8.0 - Merged PR for feedback functioanlity cleanup and example. PR #271 and #272
-- v4.7.0 - Update pmtiles library, fix feedback function inconsistency. Issue #270
-- v4.6.5 - Let geojson allow for generic overrides with .icon and .layer.
-- v4.6.4 - Fix deletion of layers logic to actually fully remove points.
-- v4.6.3 - Fix sending of layer events when not wanted. Issue #262
-- v4.6.2 - Fix multiple use of contextmenu feedback. Issue #259
-- v4.6.1 - Let default pmtiles be light/dark or monocolored.
-- v4.5.2 - Tidy up when pmtiles removed.
-- v4.5.0 - Fix pmtiles to look for maps in userdir rather than modules
-- v4.4.0 - Add quad(copter) drone icon.
-- v4.3.3 - Fix for objects changing layers.
-- v4.3.2 - Fix geojson popup missing label name.
-- v4.3.1 - Small fix to icon transparency, and routing detail.
-- v4.3.0 - Add support for PMtiles files.
-- v4.2.1 - Revert use of optional chaining to extend life slightly. Issue #252
-- v4.2.0 - Let icons also be inline images data:image...
-- v4.1.0 - Add optional SOG, COG, altft, altm input properties.
-- v4.0.0 - Breaking - Better context menu variable substitution and retention
-  Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
-- v3.2.0 - Sync up drawing sessions across browsers to same map
-- v3.1.0 - Add esri overlay layers, and let geojson overlay rendering be customised
-- v3.0.0 - Bump to Leaflet 1.9.4
-  Breaking - Move to geoman for drawing shapes.
-  Allow command.rotation to set rotation of map.
-  Allow editing of multipoint geojson tracks.
+- v4.8.0  - Merged PR for feedback functionality cleanup and example. PR #271 and #272
+- v4.7.0  - Update pmtiles library, fix feedback function inconsistency. Issue #270
+- v4.6.5  - Let geojson allow for generic overrides with .icon and .layer.
+- v4.6.4  - Fix deletion of layers logic to actually fully remove points.
+- v4.6.3  - Fix sending of layer events when not wanted. Issue #262
+- v4.6.2  - Fix multiple use of contextmenu feedback. Issue #259
+- v4.6.1  - Let default pmtiles be light/dark or monocolored.
+- v4.5.2  - Tidy up when pmtiles removed.
+- v4.5.0  - Fix pmtiles to look for maps in userdir rather than modules
+- v4.4.0  - Add quad(copter) drone icon.
+- v4.3.3  - Fix for objects changing layers.
+- v4.3.2  - Fix geojson popup missing label name.
+- v4.3.1  - Small fix to icon transparency, and routing detail.
+- v4.3.0  - Add support for PMtiles files.
+- v4.2.1  - Revert use of optional chaining to extend life slightly. Issue #252
+- v4.2.0  - Let icons also be inline images data:image... 
+- v4.1.0  - Add optional SOG, COG, altft, altm input properties.
+- v4.0.0  - Breaking - Better context menu variable substitution and retention
+            Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
+- v3.2.0  - Sync up drawing sessions across browsers to same map
+- v3.1.0  - Add esri overlay layers, and let geojson overlay rendering be customised
+- v3.0.0  - Bump to Leaflet 1.9.4
+            Breaking - Move to geoman for drawing shapes.
+            Allow command.rotation to set rotation of map.
+            Allow editing of multipoint geojson tracks.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
