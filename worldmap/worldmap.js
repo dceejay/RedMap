@@ -868,7 +868,7 @@ var feedback = function(n,v,a,c) {
 /*
 //  suggest to reove all the special handling for simplification, no reason to send information
 //  about entities that the backend generaed, the need is only to get recognizable actions from the frontend
-//   
+//
     if (v === "_form") { v = form; }
     if (markers[n]) {
         console.log("FB1",n,v,a,c)
@@ -891,7 +891,7 @@ var feedback = function(n,v,a,c) {
         ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
 */
-	
+
 	const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
 	ws.send(JSON.stringify(dataToSend));
     if (c === true) { map.closePopup(); }
@@ -3111,12 +3111,16 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             st.weight = feature.properties["stroke-width"] ?? st.weight;
             st.fillColor = feature.properties["fill-color"] ?? feature.properties["fill"] ?? st.fillColor;
             st.fillOpacity = feature.properties["fill-opacity"] ?? st.fillOpacity;
+            st.fontColor = feature.properties["font-color"] ?? st.fontColor ?? "#000000";
+            st.fontOpacity = feature.properties["font-opacity"] ?? st.fontOpacity;
             delete feature.properties["stroke"];
             delete feature.properties["stroke-width"];
-            delete feature.properties["fill-color"];
-            delete feature.properties["fill"];
-            delete feature.properties["fill-opacity"];
             delete feature.properties["stroke-opacity"];
+            delete feature.properties["fill"];
+            delete feature.properties["fill-color"];
+            delete feature.properties["fill-opacity"];
+            delete feature.properties["font-color"];
+            delete feature.properties["font-opacity"];
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
@@ -3141,17 +3145,17 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
         }
         if (feature.properties.hasOwnProperty("SIDC")) {
             myMarker = new ms.Symbol( feature.properties.SIDC.toUpperCase(), {
-                uniqueDesignation:unescape(encodeURIComponent(feature.properties.title||feature.properties.unit)),
+                uniqueDesignation:unescape(encodeURIComponent(feature.properties.title||feature.properties.unit||'')),
                 country:feature.properties.country,
                 direction:feature.properties.bearing,
                 additionalInformation:feature.properties.modifier,
-                size:25
+                size:20
             });
             var anc = myMarker.getAnchor();
-            if (myMarker.hasOwnProperty("metadata") && myMarker.metadata.hasOwnProperty("echelon")) {
-                var sz = iconSz[myMarker.metadata.echelon];
-                myMarker.setOptions({size:sz});
-            }
+            // if (myMarker.hasOwnProperty("metadata") && myMarker.metadata.hasOwnProperty("echelon")) {
+            //     var sz = iconSz[myMarker.metadata.echelon];
+            //     myMarker.setOptions({size:sz});
+            // }
             myMarker = L.icon({
                 iconUrl: myMarker.toDataURL(),
                 iconAnchor: [anc.x, anc.y],
@@ -3178,8 +3182,10 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
                 iconColor: 'white'
             });
         }
-        if (!feature.properties.hasOwnProperty("title")) {
-            feature.properties.title = feature.properties["marker-symbol"];
+        if (!feature.properties.hasOwnProperty("title") && feature.properties.hasOwnProperty("marker-symbol")) {
+            if (!feature.properties["marker-symbol"].indexOf('fa-') === 0) {
+                feature.properties.title = feature.properties["marker-symbol"];
+            }
         }
         if (feature.properties.hasOwnProperty("url")) {
             feature.properties.url = "<a target='_new' href='"+feature.properties.url+"'>"+feature.properties.url+"</a>";
