@@ -865,13 +865,9 @@ var addThing = function() {
 var form = {};
 var addToForm = function(n,v) { form[n] = v; }
 var feedback = function(n,v,a,c) {
-/*
-//  suggest to reove all the special handling for simplification, no reason to send information
-//  about entities that the backend generaed, the need is only to get recognizable actions from the frontend
-//
     if (v === "_form") { v = form; }
     if (markers[n]) {
-        console.log("FB1",n,v,a,c)
+        // console.log("FB1",n,v,a,c)
         allData[n].action = a || "feedback";
         //if (v !== undefined) { allData[n][a||"value"] = v; }
         if (v !== undefined) { allData[n]["value"] = v; }
@@ -879,19 +875,17 @@ var feedback = function(n,v,a,c) {
         setMarker(allData[n]);
     }
     else if (polygons[n]) {
-        console.log("FB2", n, v, a);
+        // console.log("FB2", n, v, a);
         const polyData = { "name": n, "action": a || "feedback", "value": v || null };
         //sendDrawing(n,v,a)
         ws.send(JSON.stringify(polyData));
     }
     else {
         if (n === undefined) { n = "map"; }
-        console.log("FB3",n,v,a,c)
+        // console.log("FB3",n,v,a,c)
         rmenudata = v;
         ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
     }
-*/
-
 	const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
 	ws.send(JSON.stringify(dataToSend));
     if (c === true) { map.closePopup(); }
@@ -1514,6 +1508,15 @@ var rangerings = function(latlng, options) {
     return rings;
 }
 
+// var mmsiList = {"M201":"AL","M202":"AD","M203":"AT","M204":"PT","M205":"BE","M206":"BY","M207":"BG","M208":"VA","M209":"CY","M210":"CY","M211":"DE","M212":"CY","M213":"GE","M214":"MD","M215":"MT","M216":"AM","M218":"DE","M219":"DK","M220":"DK","M224":"ES","M225":"ES","M226":"FR","M227":"FR","M228":"FR","M229":"MT","M230":"FI","M231":"FO","M232":"GB","M233":"GB","M234":"GB","M235":"GB","M236":"GI","M237":"GR","M238":"HR","M239":"GR","M240":"GR","M241":"GR","M242":"MA","M243":"HU","M244":"NL","M245":"NL","M246":"NL","M247":"IT","M248":"MT","M249":"MT","M250":"IE","M251":"IS","M252":"LI","M253":"LU","M254":"MC","M255":"PT","M256":"MT","M257":"NO","M258":"NO","M259":"NO","M261":"PL","M262":"ME","M263":"PT","M264":"RO","M265":"SE","M266":"SE","M267":"SK","M268":"SM","M269":"CH","M270":"CZ","M271":"TR","M272":"UA","M273":"RU","M274":"MK","M275":"LV","M276":"EE","M277":"LT","M278":"SI","M279":"RS","M301":"AI","M303":"US","M304":"AG","M305":"AG","M306":"CW","M307":"AW","M308":"BS","M309":"BS","M310":"BM","M311":"BS","M312":"BZ","M314":"BB","M316":"CA","M319":"KY","M321":"CR","M323":"CU","M325":"DM","M327":"DO","M329":"GP","M330":"GD","M331":"GL","M332":"GT","M334":"HN","M336":"HT","M338":"US","M339":"JM","M341":"KN","M343":"LC","M345":"MX","M347":"MQ","M348":"MS","M350":"NI","M351":"PA","M352":"PA","M353":"PA","M354":"PA","M355":"PA","M356":"PA","M357":"PA","M358":"PR","M359":"SV","M361":"PM","M362":"TT","M364":"TC","M366":"US","M367":"US","M368":"US","M369":"US","M370":"PA","M371":"PA","M372":"PA","M373":"PA","M374":"PA","M375":"VC","M376":"VC","M377":"VC","M378":"VG","M379":"VI","M401":"AF","M403":"SA","M405":"BD","M408":"BH","M410":"BT","M412":"CN","M413":"CN","M414":"CN","M416":"TW","M417":"LK","M419":"IN","M422":"IR","M423":"AZ","M425":"IQ","M428":"IL","M431":"JP","M432":"JP","M434":"TM","M436":"KZ","M437":"UZ","M438":"JO","M440":"KR","M441":"KR","M443":"PS","M445":"KP","M447":"KW","M450":"LB","M451":"KG","M453":"MO","M455":"MV","M457":"MN","M459":"NP","M461":"OM","M463":"PK","M466":"QA","M468":"SY","M470":"AE","M471":"AE","M472":"TJ","M473":"YE","M475":"YE","M477":"HK","M478":"BA","M501":"AQ","M503":"AU","M506":"MM","M508":"BN","M510":"FM","M511":"PW","M512":"NZ","M514":"KH","M515":"KH","M516":"CX","M518":"CK","M520":"FJ","M523":"CC","M525":"ID","M529":"KI","M531":"LA","M533":"MY","M536":"MP","M538":"MH","M540":"NC","M542":"NU","M544":"NR","M546":"PF","M548":"PH","M553":"PG","M555":"PN","M557":"SB","M559":"AS","M561":"WS","M563":"SG","M564":"SG","M565":"SG","M566":"SG","M567":"TH","M570":"TO","M572":"TV","M574":"VN","M576":"VU","M577":"VU","M578":"WF","M601":"ZA","M603":"AO","M605":"DZ","M607":"TF","M608":"IO","M609":"BI","M610":"BJ","M611":"BW","M612":"CF","M613":"CM","M615":"CG","M616":"KM","M617":"CV","M618":"AQ","M619":"CI","M620":"KM","M621":"DJ","M622":"EG","M624":"ET","M625":"ER","M626":"GA","M627":"GH","M629":"GM","M630":"GW","M631":"GQ","M632":"GN","M633":"BF","M634":"KE","M635":"AQ","M636":"LR","M637":"LR","M642":"LY","M644":"LS","M645":"MU","M647":"MG","M649":"ML","M650":"MZ","M654":"MR","M655":"MW","M656":"NE","M657":"NG","M659":"NA","M660":"RE","M661":"RW","M662":"SD","M663":"SN","M664":"SC","M665":"SH","M666":"SO","M667":"SL","M668":"ST","M669":"SZ","M670":"TD","M671":"TG","M672":"TN","M674":"TZ","M675":"UG","M676":"CD","M677":"TZ","M678":"ZM","M679":"ZW","M701":"AR","M710":"BR","M720":"BO","M725":"CL","M730":"CO","M735":"EC","M740":"UK","M745":"GF","M750":"GY","M755":"PY","M760":"PE","M765":"SR","M770":"UY","M775":"VE"}
+
+// var mmsiToCountry = function(str) {
+//     if (!str) { return ''; }
+//     var co = mmsiList[("M"+str).substr(0,4)];
+//     if (co.length === 2) { return co; }
+//     else { return str; }
+// };
+
 // the MAIN add marker or shape to map function
 function setMarker(data) {
     var rightmenu = function(m) {
@@ -2075,6 +2078,12 @@ function setMarker(data) {
         }
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
+        if (data.SIDC.length > 12) {
+            var cc = data.SIDC.substr(12,2).toLowerCase();
+            opts.country = cc.toUpperCase();
+            opts.staffComments = emojify(":flag-"+cc+":") + " " + (opts?.staffComments || "");
+            data.flag = emojify(":flag-"+cc+":");
+        }
         // escape out any isocodes eg flag symbols
         var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed","country"];
         //const regex = /\p{Extended_Pictographic}/ug;
@@ -2169,6 +2178,14 @@ function setMarker(data) {
     if (data.hasOwnProperty("icon")) { delete data.icon; }
     if (data.hasOwnProperty("iconSize")) { delete data.iconSize; }
     if (data.hasOwnProperty("iconColor")) { delete data.iconColor; }
+
+    // if (data?.MMSI && !data?.flag) {
+    //     data.flag = mmsiToCountry(data.MMSI)
+    // }
+    if (data?.flag && data.flag.length == 2) {
+        const tflg = emojify(":flag-"+data.flag.toLowerCase()+":");
+        if (!tflg.includes("flag-")) { data.flag = tflg; }
+    }
     if (data.hasOwnProperty("photourl")) {
         words += "<img src=\"" + data.photourl + "\" style=\"max-width:100%; max-height:250px; margin-top:10px;\"><br/>";
         delete data.photourl;
