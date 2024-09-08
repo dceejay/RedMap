@@ -1,0 +1,159 @@
+[
+    {
+        "id": "c643e022.1816c",
+        "type": "worldmap",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "lat": "30",
+        "lon": "0",
+        "zoom": "3",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "deg",
+        "showgrid": "false",
+        "showruler": "false",
+        "allowFileDrop": "false",
+        "path": "worldmap",
+        "overlist": "DR,CO,RA,DN",
+        "maplist": "OSMG,OSMH,EsriS",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1480,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "32d7cc4d4db67f66",
+        "type": "worldmap in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "path": "/worldmap",
+        "events": "connect,disconnect,point,layer,bounds,files,draw,other",
+        "x": 900,
+        "y": 700,
+        "wires": [
+            [
+                "32a2b83008623990"
+            ]
+        ]
+    },
+    {
+        "id": "32a2b83008623990",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "34ad8daae96efd3e",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1480,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "4cf111b68098072d",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Deg + DMS + UTM",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": " {\"command\": {\"coords\" : \"deg,dms,utm\"}}",
+        "payloadType": "json",
+        "x": 1270,
+        "y": 700,
+        "wires": [
+            [
+                "c643e022.1816c",
+                "34ad8daae96efd3e"
+            ]
+        ]
+    },
+    {
+        "id": "610e6795facbc3b7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Deg + UTM",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": " {\"command\": {\"coords\" : \"deg,utm\"}}",
+        "payloadType": "json",
+        "x": 1250,
+        "y": 760,
+        "wires": [
+            [
+                "c643e022.1816c",
+                "34ad8daae96efd3e"
+            ]
+        ]
+    },
+    {
+        "id": "9a238dc42949cb17",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "None",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": " {\"command\": {\"coords\" : \"\"}}",
+        "payloadType": "json",
+        "x": 1230,
+        "y": 820,
+        "wires": [
+            [
+                "c643e022.1816c",
+                "34ad8daae96efd3e"
+            ]
+        ]
+    }
+]
