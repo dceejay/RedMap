@@ -438,9 +438,9 @@ var Lgrid = L.latlngGraticule({
 // Add small sidc icons around edge of map for things just outside of view
 // This function based heavily on Game Aware code from Måns Beckman
 // Copyright (c) 2013 Måns Beckman, All rights reserved.
-var edgeAware = function() {
+var edgeAware = function () {
+    map.removeLayer(edgeLayer);
     if (!edgeEnabled) { return; }
-    map.removeLayer(edgeLayer)
     edgeLayer = new L.layerGroup();
     var mapBounds = map.getBounds();
     var mapBoundsCenter = mapBounds.getCenter();
@@ -3086,6 +3086,13 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
+    }
+    if (cmd.hasOwnProperty("sidcEdgeIcon")) {
+        if (typeof cmd.sidcEdgeIcon === 'boolean') {
+            edgeEnabled = cmd.sidcEdgeIcon;
+        } else {
+            console.log("ERR - invalid sidcEdgeIcon command: ", cmd.sidcEdgeIcon);
+        }
     }
     // Replace heatmap layer with new array (and optionally options)
     if (cmd.hasOwnProperty("heatmap") && heat) {
