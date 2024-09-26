@@ -3087,8 +3087,12 @@ function doCommand(cmd) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
     }
-    if (cmd.hasOwnProperty("edgeenabled")) {
-        edgeEnabled = cmd.edgeenabled;
+    if (cmd.hasOwnProperty("sidcEdgeIcon")) {
+        if (typeof cmd.sidcEdgeIcon === 'boolean') {
+            edgeEnabled = cmd.sidcEdgeIcon;
+        } else {
+            console.log("ERR - invalid sidcEdgeIcon command: ", cmd.sidcEdgeIcon);
+        }
     }
     // Replace heatmap layer with new array (and optionally options)
     if (cmd.hasOwnProperty("heatmap") && heat) {

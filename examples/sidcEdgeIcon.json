@@ -1,0 +1,158 @@
+[
+    {
+        "id": "3e0aaa7abbebfb76",
+        "type": "inject",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 630,
+        "y": 440,
+        "wires": [
+            [
+                "1b0f9c61acc853d8"
+            ]
+        ]
+    },
+    {
+        "id": "1b0f9c61acc853d8",
+        "type": "function",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "Add SIDC object to map",
+        "func": "msg.payload = {\n    \"name\": \"Emergency Medical Operation\",\n    \"lat\": 51.05,\n    \"lon\": -1.35,\n    \"SIDC\": \"ENOPA-------\",\n    \"options\": { \"fillOpacity\": 0.8, \"additionalInformation\": \"Extra info\" }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 440,
+        "wires": [
+            [
+                "e12fb3cdb87416ed"
+            ]
+        ]
+    },
+    {
+        "id": "cbeb8daf52cb3088",
+        "type": "comment",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "Simple map - click inject to send point to map.",
+        "info": "Adds a map at http://(your-server-ip):1880/worldmap. \n\nThe `function` node creates a SIDC object with some basic properties required to add to a map.",
+        "x": 830,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "e12fb3cdb87416ed",
+        "type": "worldmap",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showgrid": "false",
+        "showruler": "true",
+        "allowFileDrop": "false",
+        "path": "/worldmap",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1060,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "c5da3e3241f2bfcc",
+        "type": "inject",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "Disable Edge Icon",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\" : {\"sidcEdgeIcon\" : false}}",
+        "payloadType": "json",
+        "x": 850,
+        "y": 480,
+        "wires": [
+            [
+                "e12fb3cdb87416ed"
+            ]
+        ]
+    },
+    {
+        "id": "017d2569f2c8a046",
+        "type": "inject",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "Enable Edge Icon",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\" : {\"sidcEdgeIcon\" : true}}",
+        "payloadType": "json",
+        "x": 850,
+        "y": 520,
+        "wires": [
+            [
+                "e12fb3cdb87416ed"
+            ]
+        ]
+    },
+    {
+        "id": "a6cfecb5747ff649",
+        "type": "inject",
+        "z": "5ffb0f06dfc7e99e",
+        "name": "Error Edge Icon (=1)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\" : {\"sidcEdgeIcon\" :  1 }}",
+        "payloadType": "json",
+        "x": 850,
+        "y": 560,
+        "wires": [
+            [
+                "e12fb3cdb87416ed"
+            ]
+        ]
+    }
+]
