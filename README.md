@@ -13,7 +13,8 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
-- v4.9.0 - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
+- v5.0.0  - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
+- v4.9.0  - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
 - v4.8.1  - Slight tidy of some of the geojson handling
 - v4.8.0  - Merged PR for feedback functionality cleanup and example. PR #271 and #272
 - v4.7.0  - Update pmtiles library, fix feedback function inconsistency. Issue #270
@@ -394,7 +395,7 @@ Optional properties for **msg.payload.command** include
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap latlngs array object see https://github.com/Leaflet/Leaflet.heat#reference
  - **options** - if heatmap set, then use this to set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
- - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}`
+ - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}` or `{"command":{"clear":["oldLayer1","oldLayer2","etc,etc"]}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **panit** - auto pan to the latest marker updated.  - `{"command":{"panit":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`

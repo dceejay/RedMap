@@ -599,6 +599,30 @@ function setCluster(v) {
     showMapCurrentZoom();
 }
 
+var typingTimer;
+document.getElementById('search').addEventListener('keyup', () => {
+    clearTimeout(typingTimer);
+    if (document.getElementById('search').value.length >= 4) {
+        typingTimer = setTimeout(doneTyping, 700);
+    }
+});
+
+function doneTyping () { doSearch(); }
+
+async function readPhoton(url) {
+    const response = await fetch(url);
+    const reader = response.body.getReader();
+    let v = "";
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+            if (value !== undefined) { v += new TextDecoder().decode(value); }
+            return v;
+        }
+        v += new TextDecoder().decode(value)
+    }
+}
+
 // Search for markers with names of ... or icons of ...
 function doSearch() {
     var value = document.getElementById('search').value;
@@ -615,17 +639,21 @@ function doSearch() {
     moveToMarks();
     if (marks.length === 0) {
         // If no markers found let's try a geolookup...
+
         var protocol = location.protocol;
         if (protocol == "file:") { protocol = "https:"; }
-        var searchUrl = protocol + "//nominatim.openstreetmap.org/search?format=json&limit=1&q=";
+        var searchUrl = protocol + "//nominatim.openstreetmap.org/search?format=json&limit=5&q=";
 
         fetch(searchUrl + value) // Call the fetch function passing the url of the API as a parameter
             .then(function(resp) { return resp.json(); })
             .then(function(data) {
                 if (data.length > 0) {
+                    // var l = data.map((x) => x.display_name);
+                    // console.log("LIST",l)
                     var bb = data[0].boundingbox;
                     map.fitBounds([ [bb[0],bb[2]], [bb[1],bb[3]] ]);
                     map.panTo([data[0].lat, data[0].lon]);
+                    document.getElementById('searchResult').innerHTML = "";
                 }
                 else {
                     document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
@@ -636,6 +664,35 @@ function doSearch() {
                     document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";
                 }
             });
+
+        // var searchUrl = 'https://photon.komoot.io/api?limit=5&q=';
+        // readPhoton(searchUrl + value).then(
+        //     function(value) {
+        //         if (value.length > 0 && typeof value === "string") {
+        //             var s = JSON.parse(value);
+        //             if (s?.features) {
+        //                 var l = s.features.map((x) => x.properties.name +', ' + x.properties.countrycode);
+        //                 console.log("LIST",l)
+        //                 if (s.features.length > 0) {
+        //                     if (s.features[0].properties?.extent) {
+        //                         var bb = s.features[0].properties.extent;
+        //                         map.fitBounds([ [bb[3],bb[0]], [bb[1],bb[2]] ]);
+        //                     }
+        //                     else {
+        //                         map.panTo([s.features[0].geometry.coordinates[1], s.features[0].geometry.coordinates[0]]);
+        //                     }
+        //                     document.getElementById('searchResult').innerHTML = "";
+        //                 }
+        //                 else {
+        //                     document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Not Found</font>";}
+        //             }
+        //         }
+        //     },
+        //     function(error) {
+        //         document.getElementById('searchResult').innerHTML = "&nbsp;<font color='#ff0'>Search Error</font>";
+        //     }
+        // );
+
     }
     else {
         if (lockit) {
@@ -1347,18 +1404,18 @@ var addOverlays = function(overlist) {
     }
 
     // Add Air Corridors
-    if (overlist.indexOf("AC")!==-1) {
-        overlays["air corridors"] = L.tileLayer('https://{s}.tile.maps.openaip.net/geowebcache/service/tms/1.0.0/openaip_basemap@EPSG%3A900913@png/{z}/{x}/{y}.{ext}', {
-            attribution: '<a href="https://www.openaip.net/">openAIP Data</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-NC-SA</a>)',
-            ext: 'png',
-            minZoom: 4,
-            maxZoom: 15,
-            maxNativeZoom: 14,
-            tms: true,
-            detectRetina: true,
-            subdomains: '12'
-        });
-    }
+    // if (overlist.indexOf("AC")!==-1) {
+    //     overlays["air corridors"] = L.tileLayer('https://api.tiles.openaip.net/api/data/openaip/{z}/{x}/{y}.png', {
+    //         attribution: '<a href="https://www.openaip.net/">openAIP Data</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-NC-SA</a>)',
+    //         ext: 'png',
+    //         minZoom: 4,
+    //         maxZoom: 15,
+    //         maxNativeZoom: 14,
+    //         tms: true,
+    //         detectRetina: true,
+    //         subdomains: '12'
+    //     });
+    // }
 
     // Add the OpenSea markers layer
     if (overlist.indexOf("SN")!==-1) {
@@ -2453,7 +2510,8 @@ function doCommand(cmd) {
         }
     }
     if (cmd.hasOwnProperty("clear")) {
-        doTidyUp(cmd.clear);
+        if (!isArray(cmd.clear)) { cmd.clear = [ cmd.clear ]; }
+        cmd.clear.forEach((el) => doTidyUp(el));
     }
     if (cmd.hasOwnProperty("panit")) {
         if (cmd.panit == true || cmd.panit === "true") { panit = true; }

@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
  - v4.9.0 - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
  - v4.8.1 - Slight tidy of some of the geojson handling
  - v4.8.0 - Merged PR for feedback functionality cleanup and example. PR #271 and #272
