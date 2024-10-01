@@ -438,9 +438,9 @@ var Lgrid = L.latlngGraticule({
 // Add small sidc icons around edge of map for things just outside of view
 // This function based heavily on Game Aware code from Måns Beckman
 // Copyright (c) 2013 Måns Beckman, All rights reserved.
-var edgeAware = function() {
+var edgeAware = function () {
+    map.removeLayer(edgeLayer);
     if (!edgeEnabled) { return; }
-    map.removeLayer(edgeLayer)
     edgeLayer = new L.layerGroup();
     var mapBounds = map.getBounds();
     var mapBoundsCenter = mapBounds.getCenter();
@@ -921,30 +921,51 @@ var addThing = function() {
 
 var form = {};
 var addToForm = function(n,v) { form[n] = v; }
-var feedback = function(n,v,a,c) {
+var feedback = function(n = "map",v,a = "feedback",c) {
     if (v === "_form") { v = form; }
-    if (markers[n]) {
-        // console.log("FB1",n,v,a,c)
-        allData[n].action = a || "feedback";
+    // undefined is handled directly in the function declaration, but null/"" also requires explicit handling within the function.
+    n = (n === null || n === "") ? "map" : n;
+    var dataToSend = { "name": n, "action": a, "value": v };
+    //Kept only for backward compatibility, as the context menu should handle the click position values internally.
+    if (n == "map") {
+        dataToSend.lat = rclk.lat;
+        dataToSend.lon = rclk.lng;
+    }
+    ws.send(JSON.stringify(dataToSend));
+
+    //** The following lines left just to verify reasoning and clarifying why it was removed
+
+    //** the reasong to seperate entities uncleare 
+    //if (markers[n]) {
+    // console.log("FB1",n,v,a,c)
+    //** Why are we even modifying `allData`?
+    //    allData[n].action = a || "feedback";
         //if (v !== undefined) { allData[n][a||"value"] = v; }
-        if (v !== undefined) { allData[n]["value"] = v; }
-        ws.send(JSON.stringify(allData[n]));
-        setMarker(allData[n]);
-    }
-    else if (polygons[n]) {
+    //    if (v !== undefined) { allData[n]["value"] = v; }
+    //** Why are we sending back the `allData` object at all?
+    //    ws.send(JSON.stringify(allData[n]));
+    ///** Why are we updating the markers array from a feedback function?
+    //    setMarker(allData[n]);
+    //}
+    
+    //** what is so sppecial about feedback fomr polygons?
+    //else if (polygons[n]) {
         // console.log("FB2", n, v, a);
-        const polyData = { "name": n, "action": a || "feedback", "value": v || null };
+    //    const polyData = { "name": n, "action": a || "feedback", "value": v || null };
         //sendDrawing(n,v,a)
-        ws.send(JSON.stringify(polyData));
-    }
-    else {
-        if (n === undefined) { n = "map"; }
+    //    ws.send(JSON.stringify(polyData));
+    //}
+    //** If neither a polygon nor a marker is found, assume it's a map and send the same data?
+    //else {
+    //    if (n === undefined) { n = "map"; }
         // console.log("FB3",n,v,a,c)
-        rmenudata = v;
-        ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
-    }
-	const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
-	ws.send(JSON.stringify(dataToSend));
+    //** Modifying menu content inside feedback function is a bug!
+    //    rmenudata = v;
+    //    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
+    //}
+    //** Sending the same data again is redundant, as it could result in feedback being sent twice (except for the markers where we sent unnecessary data).
+	//const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
+	//ws.send(JSON.stringify(dataToSend));
     if (c === true) { map.closePopup(); }
 }
 
@@ -3123,6 +3144,13 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("maxage")) {
         document.getElementById("maxage").value = cmd.maxage;
         setMaxAge();
+    }
+    if (cmd.hasOwnProperty("sidcEdgeIcon")) {
+        if (typeof cmd.sidcEdgeIcon === 'boolean') {
+            edgeEnabled = cmd.sidcEdgeIcon;
+        } else {
+            console.log("ERR - invalid sidcEdgeIcon command: ", cmd.sidcEdgeIcon);
+        }
     }
     // Replace heatmap layer with new array (and optionally options)
     if (cmd.hasOwnProperty("heatmap") && heat) {
