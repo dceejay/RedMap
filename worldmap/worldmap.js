@@ -935,7 +935,7 @@ var feedback = function(n = "map",v,a = "feedback",c) {
 
     //** The following lines left just to verify reasoning and clarifying why it was removed
 
-    //** the reasong to seperate entities uncleare 
+    //** the reasong to seperate entities uncleare
     //if (markers[n]) {
     // console.log("FB1",n,v,a,c)
     //** Why are we even modifying `allData`?
@@ -947,7 +947,7 @@ var feedback = function(n = "map",v,a = "feedback",c) {
     ///** Why are we updating the markers array from a feedback function?
     //    setMarker(allData[n]);
     //}
-    
+
     //** what is so sppecial about feedback fomr polygons?
     //else if (polygons[n]) {
         // console.log("FB2", n, v, a);
@@ -2530,9 +2530,10 @@ function doCommand(cmd) {
             document.getElementById("toplink").setAttribute("style", "pointer-events:none");
         }
     }
-    if (cmd.hasOwnProperty("clear")) {
-        if (!isArray(cmd.clear)) { cmd.clear = [ cmd.clear ]; }
-        cmd.clear.forEach((el) => doTidyUp(el));
+    if (cmd.hasOwnProperty("clearlayer") || cmd.hasOwnProperty("clear")) {
+        var clr = cmd.clearlayer || cmd.clear;
+        if (!isArray(clr)) { clr = [ clr ]; }
+        clr.forEach((el) => doTidyUp(el));
     }
     if (cmd.hasOwnProperty("panit")) {
         if (cmd.panit == true || cmd.panit === "true") { panit = true; }

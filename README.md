@@ -384,6 +384,7 @@ Optional properties for **msg.payload.command** include
  - **search** - search markers on map for name containing `string`. If not found in existing markers, will then try geocoding looking using Nominatim. An empty string `""` clears the search results. - `{"command":{"search":"Winchester"}}`
  - **showlayer** - show the named overlay(s) - `{"command":{"showlayer":"foo"}}` or `{"command":{"showlayer":["foo","bar"]}}`
  - **hidelayer** - hide the named overlay(s) - `{"command":{"hidelayer":"bar"}}` or `{"command":{"hidelayer":["bar","another"]}}`
+ - **clearlayer** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clearlayer":"myOldLayer"}}` or `{"command":{"clearlayer":["oldLayer1","oldLayer2","etc,etc"]}}`
  - **side** - add a second map alongside with slide between them. Use the name of a *baselayer* to add - or "none" to remove the control. - `{"command":{"side":"Esri Satellite"}}`
  - **split** - once you have split the screen with the *side* command - the split value is then the % across the screen of the split line. - `{"command":{"split":50}}`
  - **map** - Object containing details of a new map layer:
@@ -395,7 +396,6 @@ Optional properties for **msg.payload.command** include
    - **delete** - name or array of names of base layers and/or overlays to delete and remove from layer menu.
  - **heatmap** - set heatmap latlngs array object see https://github.com/Leaflet/Leaflet.heat#reference
  - **options** - if heatmap set, then use this to set heatmap options object see https://github.com/Leaflet/Leaflet.heat#reference
- - **clear** - layer name - to clear a complete layer and remove from layer menu - `{"command":{"clear":"myOldLayer"}}` or `{"command":{"clear":["oldLayer1","oldLayer2","etc,etc"]}}`
  - **panlock** - lock the map area to the current visible area. - `{"command":{"panlock":true}}`
  - **panit** - auto pan to the latest marker updated.  - `{"command":{"panit":true}}`
  - **zoomlock** - locks the zoom control to the current value and removes zoom control - `{"command":{"zoomlock":true}}`
@@ -423,7 +423,8 @@ You can also use the name "none" to completely remove the base layer,
 
 #### To clear all markers from a layer, or an overlay from the map
 
-    msg.payload = { "command": { "clear: "name of the layer/overlay you wish to clear" }};
+    msg.payload = { "command": { "clearlayer: "name of the layer/overlay you wish to clear" }};
+    msg.payload = { "command": { "clearlayer: ["array","ofLayer","names","toClear"] }};
 
 Feeding this into the tracks node will also remove the tracks stored for that layer.
 

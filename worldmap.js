@@ -493,13 +493,32 @@ module.exports = function(RED) {
                 }
             }
             if (msg?.payload?.command?.clear) {
-                for (let p in node.pointsarray) {
-                    if (node.pointsarray.hasOwnProperty(p)) {
-                        if (node.pointsarray[p][0].layer === msg.payload.command.clear) {
-                            delete node.pointsarray[p];
+                if (!isArray(msg?.payload?.command?.clear)) {
+                    msg.payload.command.clear = [ msg.payload.command.clear ]
+                }
+                msg.payload.command.clear.forEach(function(el) {
+                    for (let p in node.pointsarray) {
+                        if (node.pointsarray.hasOwnProperty(p)) {
+                            if (node.pointsarray[p][0].layer === el) {
+                                delete node.pointsarray[p];
+                            }
                         }
                     }
+                })
+            }
+            if (msg?.payload?.command?.clearlayer) {
+                if (!isArray(msg?.payload?.command?.clearlayer)) {
+                    msg.payload.command.clearlayer = [ msg.payload.command.clearlayer ]
                 }
+                msg.payload.command.clearlayer.forEach(function(el) {
+                    for (let p in node.pointsarray) {
+                        if (node.pointsarray.hasOwnProperty(p)) {
+                            if (node.pointsarray[p][0].layer === el) {
+                                delete node.pointsarray[p];
+                            }
+                        }
+                    }
+                })
             }
         }
 
