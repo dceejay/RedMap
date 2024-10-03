@@ -2532,7 +2532,7 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("clearlayer") || cmd.hasOwnProperty("clear")) {
         var clr = cmd.clearlayer || cmd.clear;
-        if (!isArray(clr)) { clr = [ clr ]; }
+        if (!Array.isArray(clr)) { clr = [ clr ]; }
         clr.forEach((el) => doTidyUp(el));
     }
     if (cmd.hasOwnProperty("panit")) {
