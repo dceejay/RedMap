@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.0.1  - Fix isArray error PR #288.
 - v5.0.0  - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
 - v4.9.0  - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
 - v4.8.1  - Slight tidy of some of the geojson handling
