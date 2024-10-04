@@ -715,7 +715,7 @@ There are some internal functions available to make interacting with Node-RED ea
 ```
 var menu = 'Add some data <input name="foo" value="${foo}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
 menu += 'Add more data <input name="bar" value="${bar}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
-menu += '<button name="my_form" onclick=\'feedback(this.name,"_form",null,true)\'>Submit</button>'
+menu += '<button name="my_form" onclick=\'feedback(this.name,"_form","formAction",true)\'>Submit</button>'
 msg.payload = { command: { "contextmenu":menu } }
 ```
 
