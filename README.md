@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.0.2  - Fix sidcEdgeIcon docs PR#289.
 - v5.0.1  - Fix isArray error PR #288.
 - v5.0.0  - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
 - v4.9.0  - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
@@ -36,12 +37,6 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v4.1.0  - Add optional SOG, COG, altft, altm input properties.
 - v4.0.0  - Breaking - Better context menu variable substitution and retention
             Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
-- v3.2.0  - Sync up drawing sessions across browsers to same map
-- v3.1.0  - Add esri overlay layers, and let geojson overlay rendering be customised
-- v3.0.0  - Bump to Leaflet 1.9.4
-            Breaking - Move to geoman for drawing shapes.
-            Allow command.rotation to set rotation of map.
-            Allow editing of multipoint geojson tracks.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -412,7 +407,7 @@ Optional properties for **msg.payload.command** include
  - **trackme** - Turns on/off the browser self locating. Boolean false = off, true = cyan circle showing accuracy error, or an object like `{"command":{"trackme":{"name":"Dave","icon":"car","iconColor":"blue","layer":"mytrack","accuracy":false}}}`. Usual marker options can be applied. 
  - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu": "hide"}}`
  - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers": "hide"}}`
- - **sidcEdgeIcon** - Show or hide small sidc icons around edge of map for things just outside of view. Values can be true or false (default is true). - `{"command":{"edgeenabled": false}}`
+ - **sidcEdgeIcon** - Show or hide small sidc icons around edge of map for things just outside of view. Values can be true or false (default is true). - `{"command":{"sidcEdgeIcon": false}}`
 
 #### To switch layer, move map and zoom
 
