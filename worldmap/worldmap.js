@@ -933,39 +933,6 @@ var feedback = function(n = "map",v,a = "feedback",c) {
     }
     ws.send(JSON.stringify(dataToSend));
 
-    //** The following lines left just to verify reasoning and clarifying why it was removed
-
-    //** the reasong to seperate entities uncleare
-    //if (markers[n]) {
-    // console.log("FB1",n,v,a,c)
-    //** Why are we even modifying `allData`?
-    //    allData[n].action = a || "feedback";
-        //if (v !== undefined) { allData[n][a||"value"] = v; }
-    //    if (v !== undefined) { allData[n]["value"] = v; }
-    //** Why are we sending back the `allData` object at all?
-    //    ws.send(JSON.stringify(allData[n]));
-    ///** Why are we updating the markers array from a feedback function?
-    //    setMarker(allData[n]);
-    //}
-
-    //** what is so sppecial about feedback fomr polygons?
-    //else if (polygons[n]) {
-        // console.log("FB2", n, v, a);
-    //    const polyData = { "name": n, "action": a || "feedback", "value": v || null };
-        //sendDrawing(n,v,a)
-    //    ws.send(JSON.stringify(polyData));
-    //}
-    //** If neither a polygon nor a marker is found, assume it's a map and send the same data?
-    //else {
-    //    if (n === undefined) { n = "map"; }
-        // console.log("FB3",n,v,a,c)
-    //** Modifying menu content inside feedback function is a bug!
-    //    rmenudata = v;
-    //    ws.send(JSON.stringify({action:a||"feedback", name:n, value:v, lat:rclk.lat, lon:rclk.lng}));
-    //}
-    //** Sending the same data again is redundant, as it could result in feedback being sent twice (except for the markers where we sent unnecessary data).
-	//const dataToSend = { "name": n, "action": a || "feedback", "value": v || null };
-	//ws.send(JSON.stringify(dataToSend));
     if (c === true) { map.closePopup(); }
 }
 
