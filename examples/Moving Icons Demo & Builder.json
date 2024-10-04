@@ -1,0 +1,381 @@
+[
+    {
+        "id": "f83930ff.b21488",
+        "type": "worldmap",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "dms",
+        "showgrid": "true",
+        "showruler": "true",
+        "allowFileDrop": "false",
+        "path": "/worldmap",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 2160,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "be0f2591062868c9",
+        "type": "worldmap in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "path": "/worldmap",
+        "events": "connect,disconnect,point,layer,bounds,files,draw,other",
+        "x": 700,
+        "y": 540,
+        "wires": [
+            [
+                "9a57374d6e27c511"
+            ]
+        ]
+    },
+    {
+        "id": "9a57374d6e27c511",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "Get Map Actions",
+        "property": "payload.action",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "connected",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "addIcon",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "drawdelete",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 900,
+        "y": 540,
+        "wires": [
+            [
+                "e9f1ecfa6a675189"
+            ],
+            [
+                "d589c991d812517c"
+            ],
+            [
+                "1c6b932267082192"
+            ]
+        ]
+    },
+    {
+        "id": "46fb64f7db15d138",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Context Menu (1; 2; 3; 4; 5)",
+        "info": "",
+        "x": 1150,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "e480e2a7d19f3060",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Get And Store (8)",
+        "info": "",
+        "x": 1120,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "d589c991d812517c",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Get object data",
+        "func": "// Move attributes using destructuring\nmsg.payload = {\n  ...msg.payload,\n  ...msg.payload.value\n};\n\n// Optionally, delete the internal object\ndelete msg.payload.value;\ndelete msg.payload.action;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 640,
+        "wires": [
+            [
+                "e6ebed7ef8df0dcd",
+                "eb0a9d4569cf7b06"
+            ]
+        ]
+    },
+    {
+        "id": "e9f1ecfa6a675189",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Set map contextMenu",
+        "func": "\n// Icons samples list \nconst iconsObject = {\n    \"RedMap-Icons\": \"plane,smallplane,ship,car,bus,uav,quad,helicopter,sensor,arrow,wind,satellite,iss,locate,friend,hostile,neutral,unknown,earthquake\",\n    \"Font-Awesome-1\": \"ambulance, automobile, bicycle, bus, cab, car, fighter-jet, motorcycle, plane, rocket, ship, space-shuttle, subway, taxi, train, truck, wheelchair, wheelchair-alt,ambulance, h-square, heart, heart-o, heartbeat, hospital-o, medkit, plus-square, stethoscope, user-md, wheelchair, wheelchair-alt\",\n    \"Font-Awesome-2\": \"fa-ambulance, fa-automobile, fa-bicycle, fa-bus, fa-cab, fa-car, fa-fighter-jet, fa-motorcycle, fa-plane, fa-rocket, fa-ship, fa-space-shuttle, fa-subway, fa-taxi, fa-train, fa-truck, fa-wheelchair, fa-wheelchair-alt, fa-ambulance, fa-h-square, fa-heart, fa-heart-o, fa-heartbeat, fa-hospital-o, fa-medkit, fa-plus-square, fa-stethoscope, fa-user-md, fa-wheelchair, fa-wheelchair-alt\",\n    \"Emojis-Icons\": \":umbrella_with_rain_drops:, :coffee:, :aquarius:, :anchor:, :parking:, :cyclone:, :foggy:, :closed_umbrella:, :night_with_stars:, :sunrise_over_mountains:, :sunrise:, :city_sunset:, :city_sunrise:, :rainbow:, :bridge_at_night:, :ocean:, :volcano:, :milky_way:, :earth_africa:, :earth_americas:, :earth_asia:, :globe_with_meridians:, :new_moon:, :waxing_crescent_moon:, :first_quarter_moon:, :moon:, :waxing_gibbous_moon:, :full_moon:, :waning_gibbous_moon:, :last_quarter_moon:, :waning_crescent_moon:, :crescent_moon:, :new_moon_with_face:, :first_quarter_moon_with_face:, :last_quarter_moon_with_face:, :full_moon_with_face:, :sun_with_face:, :star2:, :stars:, :thermometer:, :mostly_sunny:, :sun_small_cloud:, :barely_sunny:, :sun_behind_cloud:, :partly_sunny_rain:, :sun_behind_rain_cloud:, :rain_cloud:, :snow_cloud:, :lightning:, :lightning_cloud:, :tornado:, :tornado_cloud:, :fog:, :wind_blowing_face:, :sunflower:, :blossom:, :corn:, :ear_of_rice:, :herb:, :four_leaf_clover:, :maple_leaf:, :fallen_leaf:, :leaves:, :mushroom:, :tomato:, :eggplant:, :grapes:, :melon:, :watermelon:, :tangerine:, :lemon:, :banana:, :pineapple:, :apple:, :green_apple:, :pear:, :peach:, :cherries:, :strawberry:, :hamburger:, :pizza:, :meat_on_bone:, :poultry_leg:, :rice_cracker:, :rice_ball:, :rice:, :curry:, :ramen:, :spaghetti:, :bread:, :fries:, :sweet_potato:, :dango:, :oden:, :sushi:, :fried_shrimp:, :fish_cake:, :icecream:, :shaved_ice:, :ice_cream:, :doughnut:, :cookie:, :chocolate_bar:, :candy:, :lollipop:, :custard:, :honey_pot:, :cake:, :bento:, :stew:, :fried_egg:, :cooking:, :fork_and_knife:, :tea:, :sake:, :wine_glass:, :cocktail:, :tropical_drink:, :beer:, :beers:, :baby_bottle:, :knife_fork_plate:, :champagne:, :popcorn:, :ribbon:, :ticket:, :slot_machine:, :8ball:, :game_die:, :bowling:, :flower_playing_cards:, :basketball:, :checkered_flag:, :snowboarder:, :woman-running:, :man-running:, :runner:, :running:, :woman-surfing:, :man-surfing:, :surfer:, :sports_medal:, :trophy:, :horse_racing:, :football:, :rugby_football:, :woman-swimming:, :man-swimming:, :swimmer:, :woman-lifting-weights:, :man-lifting-weights:, :weight_lifter:, :woman-golfing:, :man-golfing:, :golfer:, :racing_motorcycle:, :racing_car:, :cricket_bat_and_ball:, :volleyball:, :field_hockey_stick_and_ball:, :ice_hockey_stick_and_puck:, :table_tennis_paddle_and_ball:, :snow_capped_mountain:, :camping:, :beach_with_umbrella:, :building_construction:, :house_buildings:, :cityscape:, :derelict_house_building:, :classical_building:, :desert:, :desert_island:, :national_park:, :stadium:, :house:, :house_with_garden:, :office:, :post_office:, :european_post_office:, :hospital:, :bank:, :atm:, :hotel:, :love_hotel:, :convenience_store:, :school:, :department_store:, :factory:, :izakaya_lantern:, :lantern:, :japanese_castle:, :european_castle:, :rainbow-flag:, :waving_white_flag:, :flag-england:, :flag-scotland:, :flag-wales:, :waving_black_flag:, :rosette:, :label:, :badminton_racquet_and_shuttlecock:, :bow_and_arrow:, :amphora:, :horse:, :monkey_face:, :dog:, :pig:, :frog:, :hamster:, :wolf:, :bear:, :panda_face:, :busstop:, :minibus:, :ambulance:, :fire_engine:, :police_car:, :oncoming_police_car:, :taxi:, :oncoming_taxi:, :car:, :red_car:, :oncoming_automobile:, :blue_car:, :truck:, :articulated_lorry:, :tractor:, :monorail:, :mountain_railway:, :suspension_railway:, :mountain_cableway:, :aerial_tramway:, :ship:, :woman-rowing-boat:, :man-rowing-boat:, :rowboat:, :speedboat:, :traffic_light:, :vertical_traffic_light:, :construction:, :rotating_light:, :triangular_flag_on_post:, :door:, :no_entry_sign:, :smoking:, :no_smoking:\",\n    \"Weather-lite\": \"wi-wu-nt_tstorms,wi-wu-nt_cloudywi-wu-clear,wi-wu-nt_clear,wi-wu-chancerain,wi-wu-snow,wi-wu-sleet,wi-wu-fog,wi-darksky-wind,wi-darksky-cloudy,wi-wu-cloudy,wi-wu-nt_partlysunny,wi-darksky-hail,wi-wu-tstorms,wi-darksky-tornado,wi-wu-mostlysunny,wi-owm-09d,wi-wu-nt_partlycloudy,wi-wu-nt_hazy,wi-owm-09n,wi-wu-nt_rain,wi-owm-11n,wi-wu-nt_snow,wi-wu-nt_fog,wi-wu-flurries,wi-wu-hazy,wi-wu-rain,wi-wu-nt_flurries,wi-wu-nt_sleet\",\n};\n\n//Build icons categories select\nfunction buildCategoriesSelect() {\n    let html = '';\n\n    // Build the category select (first dropdown)\n    html += \"<select style=\\\"height: 1.8em !important\\\" id=\\\"categorySelect\\\" onchange='let category = this.value; const allOptions = document.querySelectorAll(\\\"#iconsSelect option\\\");allOptions.forEach(option => {option.disabled = true;option.style.display = \\\"none\\\";});const categoryOptions = document.querySelectorAll(\\\"#iconsSelect .\\\" + category );categoryOptions.forEach(option => {option.disabled = false;option.style.display = \\\"block\\\";})'>\\n\";\n     html += '<option value=\"\">-- Select Icon Category --</option>\\n';\n    for (let category in iconsObject) {\n        html += `<option value=\"${category}\">${capitalize(category.trim())}</option>\\n`;\n    }\n    html += '</select>\\n';\n    return html;\n}\n//build icons select\nfunction buildIconsSelect() {\n    let html = '';\n    // Build the options select (second dropdown)\n    html += '<select style=\\\"height: 1.8em !important\\\" id=\"iconsSelect\" onchange=\"addToForm(this.id,this.value)\">\\n';\n    html += '<option value=\"\">-- Select Icon --</option>\\n'; \n    for (let category in iconsObject) {\n        const options = iconsObject[category].split(\",\");\n        options.forEach(value => {\n            html += `<option value=\"${value.trim()}\" class=\"${category} hidden-option\">${capitalize(value.trim())}</option>\\n`;\n        });\n    }\n    html += '</select>\\n';\n\n    return html;\n}\n\n// Utility function to capitalize first letter of a word\nfunction capitalize(str) {\n    return str.charAt(0).toUpperCase() + str.slice(1);\n}\n\nlet contextMenu  = \"<b>Build new map entity</b><br/><br/>\";\ncontextMenu     += \"<table id='addTable' style=\\\"width:100%;\\\">\";\ncontextMenu     += \"<tr><td>Name</td><td><input type='text' id='inName' value='anyName' autofocus /></td></tr>\";\ncontextMenu     += \"<tr><td>Layer</td><td><input type='text' id='inLay' placeholder='unknown' value='' /></td></tr>\";\ncontextMenu     += \"<tr><td>Draggable</td><td><input type='text' id='inDrag' value=false /></td></tr>\";\ncontextMenu     += \"<tr><td>Track</td><td><input type='text' id='inTrack' value=0 /></td></tr>\";\ncontextMenu     += \"<tr><td>Speed</td><td><input type='text' id='inSpeed' value=0 /></td></tr>\";\ncontextMenu     += \"<tr><td>Lat</td><td><input type='text' id='inLat' placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lat.toFixed(6);' /></td></tr>\";\ncontextMenu     += \"<tr><td>Lon</td><td><input type='text' id='inLon'  placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lng.toFixed(6);' /></td></tr>\";\ncontextMenu     += \"<tr><td>Label</td><td><input type='text' id='inLabel'  placeholder='' value='' /></td></tr>\";\ncontextMenu     += \"<tr><td><a href=\\\"https://www.spatialillusions.com/unitgenerator-legacy/\\\" target=\\\"_blank\\\">SIDC</a></td><td><input type='text' id='inSIDC'  placeholder='' value='' /></td></tr>\";\ncontextMenu     += \"<tr><td>SIDC Options</td><td><input type='text' id='inOptions'  placeholder='' value={\\\"fillOpacity\\\":0,\\\"direction\\\":0,\\\"speed\\\":0,\\\"type\\\":\\\"\\\",\\\"infoSize\\\":0,\\\"infoFields\\\":\\\"\\\",\\\"staffComments\\\":\\\"\\\",\\\"altitudeDepth\\\":\\\"\\\",\\\"quantity\\\":0,\\\"additionalInformation\\\":\\\"\\\"} /></td></tr>\";\ncontextMenu     += \"<tr><td>Icon Category</td><td>\";\ncontextMenu     += buildCategoriesSelect();\ncontextMenu     += \"</td></tr>\";\ncontextMenu     += \"<tr><td>Icon</td><td>\";\ncontextMenu     += buildIconsSelect();\ncontextMenu     += \"</td></tr>\";\ncontextMenu     += \"<tr><td>iconColor</td><td><input type='text' id='inColor' value='' /></td></tr>\";\ncontextMenu     += \"<tr><td>toolTip</td><td><input type='text' id='inTool' value='' /></td></tr>\";\ncontextMenu     += \"<tr><td>Payload</td><td><div id='payload' ></div></td></tr>\";\ncontextMenu     += \"<tr><td></td><td><button id='addIcon' type='button' onclick=\";\ncontextMenu     += \"'let _lat = document.getElementById(\\\"inLat\\\").value; _lat = parseFloat((_lat === \\\"\\\") ? rclk.lat.toFixed(6) : _lat);\" +\n                    \"let _lon = document.getElementById(\\\"inLon\\\").value; _lon = parseFloat((_lon === \\\"\\\") ? rclk.lng.toFixed(6) : _lon);\" +\n                    \"let _name = document.getElementById(\\\"inName\\\").value; _name = (_name === \\\"\\\") ? \\\"noName\\\" : _name;\" +\n                    \"let _lay = document.getElementById(\\\"inLay\\\").value;\" +\n                    \"let _drag = document.getElementById(\\\"inDrag\\\").value; _drag = (_drag === false) ? \\\"\\\" : (_drag === \\\"true\\\");\" +\n                    \"let _track = document.getElementById(\\\"inTrack\\\").value; _track = parseFloat((_track === \\\"\\\") ? 0 : _track);\" +\n                    \"let _speed = document.getElementById(\\\"inSpeed\\\").value; _speed = parseFloat((_speed === \\\"\\\") ? 0 : _speed);\" +\n                    \"let _icon = document.getElementById(\\\"iconsSelect\\\").value; _icon = (_icon === \\\"\\\") ? \\\"uav\\\" : _icon;\" +\n                    \"let _label = document.getElementById(\\\"inLabel\\\").value;\" +\n                    \"let _color = document.getElementById(\\\"inColor\\\").value;\" +\n                    \"let _tool = document.getElementById(\\\"inTool\\\").value;\" +\n                    \"let _sidc = document.getElementById(\\\"inSIDC\\\").value;\" +\n                    \"let _sidcOptions = JSON.parse(document.getElementById(\\\"inOptions\\\").value);\" +\n                    \"_sidcOptions = (_sidc === \\\"\\\") ? \\\"\\\" : _sidcOptions;\" +\n                    \"for (let key in _sidcOptions) {if ((_sidcOptions[key] === \\\"\\\") || (_sidcOptions[key] === 0)) {delete _sidcOptions[key];}}\" +\n                    \"_sidcOptions = (Object.keys(_sidcOptions).length === 0 ) ? \\\"\\\" : _sidcOptions;\" +\n                    \"_icon = (_sidc !== \\\"\\\") ? \\\"\\\" : _icon;\" +\n                    \"let _fbData = {\\\"layer\\\": _lay,\\\"draggable\\\": _drag,\\\"track\\\":_track,\\\"speed\\\":_speed,\\\"lat\\\":_lat,\\\"lon\\\":_lon,\\\"icon\\\":_icon,\\\"iconColor\\\":_color,\\\"tooltip\\\":_tool,\\\"label\\\":_label,\\\"SIDC\\\":_sidc,\\\"options\\\":_sidcOptions};\" +\n                    \"for (let key in _fbData) {if (_fbData[key] === \\\"\\\") {delete _fbData[key];}}\" +\n                    \"document.getElementById(\\\"payload\\\").innerHTML = JSON.stringify({\\\"name\\\" : _name, ..._fbData},null,2);\"+\n                    \"feedback(_name,_fbData,\\\"addIcon\\\",false);'\";\ncontextMenu     += \" style='width: 100% !important;'>Add it to my map</button></td></tr></table>\";\nmsg.payload = {\"command\" :{\"contextmenu\" : contextMenu}};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1140,
+        "y": 520,
+        "wires": [
+            [
+                "f83930ff.b21488",
+                "819c91eeff39e4a5"
+            ]
+        ]
+    },
+    {
+        "id": "e2b0cb7ac27e86d2",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "This example can be used as a marker builder.\\n It utilizes the map's context menu option to create a form for adding map elements,\\n displays the msg.payload value for the element creation, and generates the map icon. \\n The example also demonstrates the following Red Map features: \\n  1. Map context menu\\n  2. Usage of input fields/HTML/JavaScript inside the map's context menu\\n  3. Different icon types for Red Map markers (use SIDC link to generate SIDC string)\\n 4. Attributes of Red Map markers\\n  5. Feedback function\\n  6. Usage of the map input node\\n 7. Delete Objects\\n 8. Store list of objects\\n 9. Moving Objects\\n Usage: rightclick on the map and start to play, copy the payload field into function or change nodes to inject the icon from the backend",
+        "info": "",
+        "x": 1440,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "e6ebed7ef8df0dcd",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Save in Objects list",
+        "func": "var objects = global.get(\"objects\");\nif (objects === undefined) objects = [];\n\nfunction addOrReplaceObject(array, newObject) {\n    // Find the index of the object with the same 'name' attribute\n    const index = array.findIndex(obj => obj.name === newObject.name);\n\n    if (index !== -1) {\n        // If the object exists, replace it\n        array[index] = newObject;\n    } else {\n        // If the object doesn't exist, add it to the array\n        array.push(newObject);\n    }\n\n    return array;\n}\n\naddOrReplaceObject(objects, msg.payload);\nglobal.set(\"objects\",objects);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1310,
+        "y": 640,
+        "wires": [
+            [
+                "819c91eeff39e4a5"
+            ]
+        ]
+    },
+    {
+        "id": "d35078c8f9df08de",
+        "type": "split",
+        "z": "f6f2187d.f17ca8",
+        "name": "Split Objects",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 1990,
+        "y": 640,
+        "wires": [
+            [
+                "cf11bb7022f07dfe",
+                "f83930ff.b21488"
+            ]
+        ]
+    },
+    {
+        "id": "1c6b932267082192",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Delete Object",
+        "func": "var objects = global.get(\"objects\");\n\nobjects = objects.filter(obj => obj.name !== msg.payload.name);\nglobal.set(\"objects\",objects);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 780,
+        "wires": [
+            [
+                "819c91eeff39e4a5",
+                "eb0a9d4569cf7b06"
+            ]
+        ]
+    },
+    {
+        "id": "819c91eeff39e4a5",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "get Objects",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "objects",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1690,
+        "y": 640,
+        "wires": [
+            [
+                "d35078c8f9df08de"
+            ]
+        ]
+    },
+    {
+        "id": "5e7640ea9b4ea07b",
+        "type": "delay",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1840,
+        "y": 760,
+        "wires": [
+            [
+                "94ae7a702138b59e"
+            ]
+        ]
+    },
+    {
+        "id": "94ae7a702138b59e",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Move object",
+        "func": "var objects = global.get(\"objects\");\nvar object = msg.payload;\nconst time = 1;\n\n\nfunction updateObject(array, newObject) {\n    // Find the index of the object with the same 'name' attribute\n    const index = array.findIndex(obj => obj.name === newObject.name);\n\n    if (index !== -1) {\n        // If the object exists, replace it\n        array[index] = newObject;\n    }\n    return array;\n}\n\nfunction toRadians(degrees) {\n    return degrees * Math.PI / 180;\n}\n\nfunction toDegrees(radians) {\n    return radians * 180 / Math.PI;\n}\n\nfunction calculateNewPosition(lat1, lon1, speed, heading, time) {\n    const R = 6371000; // Earth's radius in meters\n\n    // Convert latitude and longitude from degrees to radians\n    const lat1Rad = toRadians(lat1);\n    const lon1Rad = toRadians(lon1);\n\n    // Convert heading to radians\n    const headingRad = toRadians(heading);\n\n    // Calculate the distance traveled\n    const distance = speed * time;\n\n    // Calculate the new latitude\n    const lat2Rad = Math.asin(Math.sin(lat1Rad) * Math.cos(distance / R) + \n        Math.cos(lat1Rad) * Math.sin(distance / R) * Math.cos(headingRad));\n\n    // Calculate the new longitude\n    const lon2Rad = lon1Rad + Math.atan2(Math.sin(headingRad) * Math.sin(distance / R) * Math.cos(lat1Rad),\n        Math.cos(distance / R) - Math.sin(lat1Rad) * Math.sin(lat2Rad));\n\n    // Convert the new latitude and longitude back to degrees\n    const lat2 = toDegrees(lat2Rad);\n    const lon2 = toDegrees(lon2Rad);\n\n    return { lat: lat2, lon: lon2 };\n}\nconst newPosition = calculateNewPosition(object.lat, object.lon, object.speed, object.track, time);\n\nobject.lat = newPosition.lat;\nobject.lon = newPosition.lon;\nupdateObject(objects,object);\nglobal.set(\"objects\",objects);\nmsg.payload = object;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 760,
+        "wires": [
+            [
+                "819c91eeff39e4a5"
+            ]
+        ]
+    },
+    {
+        "id": "eb0a9d4569cf7b06",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Delete ",
+        "func": "let objectName = msg.payload.name;\nmsg.payload = {\"name\" : objectName, \"deleted\" : true};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1670,
+        "y": 580,
+        "wires": [
+            [
+                "f83930ff.b21488"
+            ]
+        ]
+    },
+    {
+        "id": "cf11bb7022f07dfe",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "speed<>0?",
+        "property": "payload.speed",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1690,
+        "y": 760,
+        "wires": [
+            [
+                "5e7640ea9b4ea07b"
+            ]
+        ]
+    },
+    {
+        "id": "8a911b867f46b866",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Input Node (6)",
+        "info": "",
+        "x": 730,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "f1d7f67c49c076ca",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Delete (from store",
+        "info": "",
+        "x": 1130,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "6b5a7d3cfab068e8",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Delete (From Map) (7)",
+        "info": "",
+        "x": 1660,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "cfb3ba5e89438cd6",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Move (9)",
+        "info": "",
+        "x": 1840,
+        "y": 720,
+        "wires": []
+    }
+]
