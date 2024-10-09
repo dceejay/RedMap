@@ -27,8 +27,8 @@
         "mapurl": "",
         "mapopt": "",
         "mapwms": false,
-        "x": 1620,
-        "y": 760,
+        "x": 1840,
+        "y": 820,
         "wires": []
     },
     {
@@ -39,7 +39,7 @@
         "path": "/worldmap",
         "events": "connect,disconnect,point,layer,bounds,files,draw,other",
         "x": 140,
-        "y": 800,
+        "y": 900,
         "wires": [
             [
                 "9a57374d6e27c511"
@@ -89,7 +89,7 @@
         "repair": false,
         "outputs": 6,
         "x": 340,
-        "y": 800,
+        "y": 900,
         "wires": [
             [
                 "47bd2da7d8d032c5"
@@ -118,7 +118,7 @@
         "name": "Map Context Menu (1; 2; 3; 4; 5)",
         "info": "",
         "x": 610,
-        "y": 720,
+        "y": 760,
         "wires": []
     },
     {
@@ -128,7 +128,7 @@
         "name": "Add to Store (8)",
         "info": "",
         "x": 560,
-        "y": 860,
+        "y": 900,
         "wires": []
     },
     {
@@ -144,7 +144,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 900,
+        "y": 940,
         "wires": [
             [
                 "e6ebed7ef8df0dcd"
@@ -174,7 +174,7 @@
         "finalize": "",
         "libs": [],
         "x": 790,
-        "y": 900,
+        "y": 940,
         "wires": [
             [
                 "d49d5d6e6b436813"
@@ -193,7 +193,7 @@
         "stream": false,
         "addname": "",
         "property": "payload",
-        "x": 890,
+        "x": 1110,
         "y": 680,
         "wires": [
             [
@@ -214,7 +214,7 @@
         "finalize": "",
         "libs": [],
         "x": 560,
-        "y": 1000,
+        "y": 1020,
         "wires": [
             [
                 "eb0a9d4569cf7b06"
@@ -234,7 +234,7 @@
         "finalize": "",
         "libs": [],
         "x": 750,
-        "y": 1000,
+        "y": 1040,
         "wires": [
             [
                 "d49d5d6e6b436813"
@@ -248,7 +248,7 @@
         "name": "Input Node (6)",
         "info": "",
         "x": 170,
-        "y": 740,
+        "y": 840,
         "wires": []
     },
     {
@@ -258,7 +258,7 @@
         "name": "Delete (from store)",
         "info": "",
         "x": 570,
-        "y": 960,
+        "y": 980,
         "wires": []
     },
     {
@@ -267,8 +267,8 @@
         "z": "f6f2187d.f17ca8",
         "name": "Delete (From Map) (7)",
         "info": "",
-        "x": 800,
-        "y": 960,
+        "x": 780,
+        "y": 1000,
         "wires": []
     },
     {
@@ -277,7 +277,7 @@
         "z": "f6f2187d.f17ca8",
         "name": "Move (9)",
         "info": "",
-        "x": 720,
+        "x": 1260,
         "y": 640,
         "wires": []
     },
@@ -294,7 +294,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 1080,
+        "y": 1100,
         "wires": [
             [
                 "d22c566910bce313"
@@ -308,7 +308,7 @@
         "name": "Update Object Data",
         "info": "",
         "x": 570,
-        "y": 1040,
+        "y": 1060,
         "wires": []
     },
     {
@@ -316,14 +316,14 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Init - Set flow vars",
-        "func": "//Create flow constants for reuse\n\n// Utility function to capitalize first letter of a word\nfunction capitalize(str) {\n    return str.charAt(0).toUpperCase() + str.slice(1);\n}\n// Icons samples list \nconst iconsObject = {\n    \"RedMap-Icons\": \"plane,smallplane,ship,car,bus,uav,quad,helicopter,sensor,arrow,wind,satellite,iss,locate,friend,hostile,neutral,unknown,earthquake\",\n    \"Font-Awesome-1\": \"ambulance, automobile, bicycle, bus, cab, car, fighter-jet, motorcycle, plane, rocket, ship, space-shuttle, subway, taxi, train, truck, wheelchair, wheelchair-alt,ambulance, h-square, heart, heart-o, heartbeat, hospital-o, medkit, plus-square, stethoscope, user-md, wheelchair, wheelchair-alt\",\n    \"Font-Awesome-2\": \"fa-ambulance, fa-automobile, fa-bicycle, fa-bus, fa-cab, fa-car, fa-fighter-jet, fa-motorcycle, fa-plane, fa-rocket, fa-ship, fa-space-shuttle, fa-subway, fa-taxi, fa-train, fa-truck, fa-wheelchair, fa-wheelchair-alt, fa-ambulance, fa-h-square, fa-heart, fa-heart-o, fa-heartbeat, fa-hospital-o, fa-medkit, fa-plus-square, fa-stethoscope, fa-user-md, fa-wheelchair, fa-wheelchair-alt\",\n    \"Emojis-Icons\": \":umbrella_with_rain_drops:, :coffee:, :aquarius:, :anchor:, :parking:, :cyclone:, :foggy:, :closed_umbrella:, :night_with_stars:, :sunrise_over_mountains:, :sunrise:, :city_sunset:, :city_sunrise:, :rainbow:, :bridge_at_night:, :ocean:, :volcano:, :milky_way:, :earth_africa:, :earth_americas:, :earth_asia:, :globe_with_meridians:, :new_moon:, :waxing_crescent_moon:, :first_quarter_moon:, :moon:, :waxing_gibbous_moon:, :full_moon:, :waning_gibbous_moon:, :last_quarter_moon:, :waning_crescent_moon:, :crescent_moon:, :new_moon_with_face:, :first_quarter_moon_with_face:, :last_quarter_moon_with_face:, :full_moon_with_face:, :sun_with_face:, :star2:, :stars:, :thermometer:, :mostly_sunny:, :sun_small_cloud:, :barely_sunny:, :sun_behind_cloud:, :partly_sunny_rain:, :sun_behind_rain_cloud:, :rain_cloud:, :snow_cloud:, :lightning:, :lightning_cloud:, :tornado:, :tornado_cloud:, :fog:, :wind_blowing_face:, :sunflower:, :blossom:, :corn:, :ear_of_rice:, :herb:, :four_leaf_clover:, :maple_leaf:, :fallen_leaf:, :leaves:, :mushroom:, :tomato:, :eggplant:, :grapes:, :melon:, :watermelon:, :tangerine:, :lemon:, :banana:, :pineapple:, :apple:, :green_apple:, :pear:, :peach:, :cherries:, :strawberry:, :hamburger:, :pizza:, :meat_on_bone:, :poultry_leg:, :rice_cracker:, :rice_ball:, :rice:, :curry:, :ramen:, :spaghetti:, :bread:, :fries:, :sweet_potato:, :dango:, :oden:, :sushi:, :fried_shrimp:, :fish_cake:, :icecream:, :shaved_ice:, :ice_cream:, :doughnut:, :cookie:, :chocolate_bar:, :candy:, :lollipop:, :custard:, :honey_pot:, :cake:, :bento:, :stew:, :fried_egg:, :cooking:, :fork_and_knife:, :tea:, :sake:, :wine_glass:, :cocktail:, :tropical_drink:, :beer:, :beers:, :baby_bottle:, :knife_fork_plate:, :champagne:, :popcorn:, :ribbon:, :ticket:, :slot_machine:, :8ball:, :game_die:, :bowling:, :flower_playing_cards:, :basketball:, :checkered_flag:, :snowboarder:, :woman-running:, :man-running:, :runner:, :running:, :woman-surfing:, :man-surfing:, :surfer:, :sports_medal:, :trophy:, :horse_racing:, :football:, :rugby_football:, :woman-swimming:, :man-swimming:, :swimmer:, :woman-lifting-weights:, :man-lifting-weights:, :weight_lifter:, :woman-golfing:, :man-golfing:, :golfer:, :racing_motorcycle:, :racing_car:, :cricket_bat_and_ball:, :volleyball:, :field_hockey_stick_and_ball:, :ice_hockey_stick_and_puck:, :table_tennis_paddle_and_ball:, :snow_capped_mountain:, :camping:, :beach_with_umbrella:, :building_construction:, :house_buildings:, :cityscape:, :derelict_house_building:, :classical_building:, :desert:, :desert_island:, :national_park:, :stadium:, :house:, :house_with_garden:, :office:, :post_office:, :european_post_office:, :hospital:, :bank:, :atm:, :hotel:, :love_hotel:, :convenience_store:, :school:, :department_store:, :factory:, :izakaya_lantern:, :lantern:, :japanese_castle:, :european_castle:, :rainbow-flag:, :waving_white_flag:, :flag-england:, :flag-scotland:, :flag-wales:, :waving_black_flag:, :rosette:, :label:, :badminton_racquet_and_shuttlecock:, :bow_and_arrow:, :amphora:, :horse:, :monkey_face:, :dog:, :pig:, :frog:, :hamster:, :wolf:, :bear:, :panda_face:, :busstop:, :minibus:, :ambulance:, :fire_engine:, :police_car:, :oncoming_police_car:, :taxi:, :oncoming_taxi:, :car:, :red_car:, :oncoming_automobile:, :blue_car:, :truck:, :articulated_lorry:, :tractor:, :monorail:, :mountain_railway:, :suspension_railway:, :mountain_cableway:, :aerial_tramway:, :ship:, :woman-rowing-boat:, :man-rowing-boat:, :rowboat:, :speedboat:, :traffic_light:, :vertical_traffic_light:, :construction:, :rotating_light:, :triangular_flag_on_post:, :door:, :no_entry_sign:, :smoking:, :no_smoking:\",\n    \"Weather-lite\": \"wi-wu-nt_tstorms,wi-wu-nt_cloudywi-wu-clear,wi-wu-nt_clear,wi-wu-chancerain,wi-wu-snow,wi-wu-sleet,wi-wu-fog,wi-darksky-wind,wi-darksky-cloudy,wi-wu-cloudy,wi-wu-nt_partlysunny,wi-darksky-hail,wi-wu-tstorms,wi-darksky-tornado,wi-wu-mostlysunny,wi-owm-09d,wi-wu-nt_partlycloudy,wi-wu-nt_hazy,wi-owm-09n,wi-wu-nt_rain,wi-owm-11n,wi-wu-nt_snow,wi-wu-nt_fog,wi-wu-flurries,wi-wu-hazy,wi-wu-rain,wi-wu-nt_flurries,wi-wu-nt_sleet\",\n};\nflow.set(\"iconsObject\",iconsObject);\n\n//Build icons categories select\nfunction buildCategoriesSelect() {\n    let html = '';\n\n    // Build the category select (first dropdown)\n    html += \"<select style=\\\"height: 1.8em !important\\\" id=\\\"categorySelect\\\" onchange='let category = this.value; const allOptions = document.querySelectorAll(\\\"#iconsSelect option\\\");allOptions.forEach(option => {option.disabled = true;option.style.display = \\\"none\\\";});const categoryOptions = document.querySelectorAll(\\\"#iconsSelect .\\\" + category );categoryOptions.forEach(option => {option.disabled = false;option.style.display = \\\"block\\\";})'>\\n\";\n    html += '<option value=\"\">-- Select Icon Category --</option>\\n';\n    for (let category in iconsObject) {\n        html += `<option value=\"${category}\">${capitalize(category.trim())}</option>\\n`;\n    }\n    html += '</select>\\n';\n    return html;\n}\n\n//Flow `categoriesSelect` will hold html icon categories select snippet\nflow.set(\"categoriesSelect\", buildCategoriesSelect());\n\n//build icons select\nfunction buildIconsSelect() {\n    let html = '';\n    // Build the options select (second dropdown)\n    html += '<select style=\\\"height: 1.8em !important\\\" id=\"iconsSelect\" onchange=\"addToForm(this.id,this.value)\">\\n';\n    html += '<option value=\"\">-- Select Icon --</option>\\n';\n    for (let category in iconsObject) {\n        const options = iconsObject[category].split(\",\");\n        options.forEach(value => {\n            html += `<option value=\"${value.trim()}\" class=\"${category} hidden-option\">${capitalize(value.trim())}</option>\\n`;\n        });\n    }\n    html += '</select>\\n';\n\n    return html;\n}\n//Flow `categoriesSelect` will hold html icons select snippet\nflow.set(\"iconsSelect\", buildIconsSelect());\n\nlet objects = [{\"name\":\"ID8794\",\"draggable\":true,\"track\":0,\"speed\":200,\"lat\":51.060807,\"lon\":-1.395179,\"icon\":\"uav\",\"iconColor\":\"blue\"},{\"name\":\"ID8590\",\"layer\":\"test\",\"draggable\":true,\"track\":0,\"speed\":200,\"lat\":51.07683,\"lon\":-1.433625,\"icon\":\"plane\",\"iconColor\":\"red\"},{\"name\":\"ID8478\",\"draggable\":true,\"track\":0,\"speed\":200,\"lat\":51.073893,\"lon\":-1.366041,\"icon\":\"smallplane\",\"iconColor\":\"green\"}];\nglobal.set(\"objects\",objects);\nreturn msg;",
+        "func": "//Create flow constants for reuse\n\n// Utility function to capitalize first letter of a word\nfunction capitalize(str) {\n    return str.charAt(0).toUpperCase() + str.slice(1);\n}\n// Icons samples list \nconst iconsObject = {\n    \"RedMap-Icons\": \"plane,smallplane,ship,car,bus,uav,quad,helicopter,sensor,arrow,wind,satellite,iss,locate,friend,hostile,neutral,unknown,earthquake\",\n    \"Font-Awesome-1\": \"ambulance, automobile, bicycle, bus, cab, car, fighter-jet, motorcycle, plane, rocket, ship, space-shuttle, subway, taxi, train, truck, wheelchair, wheelchair-alt,ambulance, h-square, heart, heart-o, heartbeat, hospital-o, medkit, plus-square, stethoscope, user-md, wheelchair, wheelchair-alt\",\n    \"Font-Awesome-2\": \"fa-ambulance, fa-automobile, fa-bicycle, fa-bus, fa-cab, fa-car, fa-fighter-jet, fa-motorcycle, fa-plane, fa-rocket, fa-ship, fa-space-shuttle, fa-subway, fa-taxi, fa-train, fa-truck, fa-wheelchair, fa-wheelchair-alt, fa-ambulance, fa-h-square, fa-heart, fa-heart-o, fa-heartbeat, fa-hospital-o, fa-medkit, fa-plus-square, fa-stethoscope, fa-user-md, fa-wheelchair, fa-wheelchair-alt\",\n    \"Emojis-Icons\": \":umbrella_with_rain_drops:, :coffee:, :aquarius:, :anchor:, :parking:, :cyclone:, :foggy:, :closed_umbrella:, :night_with_stars:, :sunrise_over_mountains:, :sunrise:, :city_sunset:, :city_sunrise:, :rainbow:, :bridge_at_night:, :ocean:, :volcano:, :milky_way:, :earth_africa:, :earth_americas:, :earth_asia:, :globe_with_meridians:, :new_moon:, :waxing_crescent_moon:, :first_quarter_moon:, :moon:, :waxing_gibbous_moon:, :full_moon:, :waning_gibbous_moon:, :last_quarter_moon:, :waning_crescent_moon:, :crescent_moon:, :new_moon_with_face:, :first_quarter_moon_with_face:, :last_quarter_moon_with_face:, :full_moon_with_face:, :sun_with_face:, :star2:, :stars:, :thermometer:, :mostly_sunny:, :sun_small_cloud:, :barely_sunny:, :sun_behind_cloud:, :partly_sunny_rain:, :sun_behind_rain_cloud:, :rain_cloud:, :snow_cloud:, :lightning:, :lightning_cloud:, :tornado:, :tornado_cloud:, :fog:, :wind_blowing_face:, :sunflower:, :blossom:, :corn:, :ear_of_rice:, :herb:, :four_leaf_clover:, :maple_leaf:, :fallen_leaf:, :leaves:, :mushroom:, :tomato:, :eggplant:, :grapes:, :melon:, :watermelon:, :tangerine:, :lemon:, :banana:, :pineapple:, :apple:, :green_apple:, :pear:, :peach:, :cherries:, :strawberry:, :hamburger:, :pizza:, :meat_on_bone:, :poultry_leg:, :rice_cracker:, :rice_ball:, :rice:, :curry:, :ramen:, :spaghetti:, :bread:, :fries:, :sweet_potato:, :dango:, :oden:, :sushi:, :fried_shrimp:, :fish_cake:, :icecream:, :shaved_ice:, :ice_cream:, :doughnut:, :cookie:, :chocolate_bar:, :candy:, :lollipop:, :custard:, :honey_pot:, :cake:, :bento:, :stew:, :fried_egg:, :cooking:, :fork_and_knife:, :tea:, :sake:, :wine_glass:, :cocktail:, :tropical_drink:, :beer:, :beers:, :baby_bottle:, :knife_fork_plate:, :champagne:, :popcorn:, :ribbon:, :ticket:, :slot_machine:, :8ball:, :game_die:, :bowling:, :flower_playing_cards:, :basketball:, :checkered_flag:, :snowboarder:, :woman-running:, :man-running:, :runner:, :running:, :woman-surfing:, :man-surfing:, :surfer:, :sports_medal:, :trophy:, :horse_racing:, :football:, :rugby_football:, :woman-swimming:, :man-swimming:, :swimmer:, :woman-lifting-weights:, :man-lifting-weights:, :weight_lifter:, :woman-golfing:, :man-golfing:, :golfer:, :racing_motorcycle:, :racing_car:, :cricket_bat_and_ball:, :volleyball:, :field_hockey_stick_and_ball:, :ice_hockey_stick_and_puck:, :table_tennis_paddle_and_ball:, :snow_capped_mountain:, :camping:, :beach_with_umbrella:, :building_construction:, :house_buildings:, :cityscape:, :derelict_house_building:, :classical_building:, :desert:, :desert_island:, :national_park:, :stadium:, :house:, :house_with_garden:, :office:, :post_office:, :european_post_office:, :hospital:, :bank:, :atm:, :hotel:, :love_hotel:, :convenience_store:, :school:, :department_store:, :factory:, :izakaya_lantern:, :lantern:, :japanese_castle:, :european_castle:, :rainbow-flag:, :waving_white_flag:, :flag-england:, :flag-scotland:, :flag-wales:, :waving_black_flag:, :rosette:, :label:, :badminton_racquet_and_shuttlecock:, :bow_and_arrow:, :amphora:, :horse:, :monkey_face:, :dog:, :pig:, :frog:, :hamster:, :wolf:, :bear:, :panda_face:, :busstop:, :minibus:, :ambulance:, :fire_engine:, :police_car:, :oncoming_police_car:, :taxi:, :oncoming_taxi:, :car:, :red_car:, :oncoming_automobile:, :blue_car:, :truck:, :articulated_lorry:, :tractor:, :monorail:, :mountain_railway:, :suspension_railway:, :mountain_cableway:, :aerial_tramway:, :ship:, :woman-rowing-boat:, :man-rowing-boat:, :rowboat:, :speedboat:, :traffic_light:, :vertical_traffic_light:, :construction:, :rotating_light:, :triangular_flag_on_post:, :door:, :no_entry_sign:, :smoking:, :no_smoking:\",\n    \"Weather-lite\": \"wi-wu-nt_tstorms,wi-wu-nt_cloudywi-wu-clear,wi-wu-nt_clear,wi-wu-chancerain,wi-wu-snow,wi-wu-sleet,wi-wu-fog,wi-darksky-wind,wi-darksky-cloudy,wi-wu-cloudy,wi-wu-nt_partlysunny,wi-darksky-hail,wi-wu-tstorms,wi-darksky-tornado,wi-wu-mostlysunny,wi-owm-09d,wi-wu-nt_partlycloudy,wi-wu-nt_hazy,wi-owm-09n,wi-wu-nt_rain,wi-owm-11n,wi-wu-nt_snow,wi-wu-nt_fog,wi-wu-flurries,wi-wu-hazy,wi-wu-rain,wi-wu-nt_flurries,wi-wu-nt_sleet\",\n};\nflow.set(\"iconsObject\",iconsObject);\n\n//Build icons categories select\nfunction buildCategoriesSelect() {\n    let html = '';\n\n    // Build the category select (first dropdown)\n    html += \"<select style=\\\"height: 1.8em !important\\\" id=\\\"categorySelect\\\" onchange='let category = this.value; const allOptions = document.querySelectorAll(\\\"#iconsSelect option\\\");allOptions.forEach(option => {option.disabled = true;option.style.display = \\\"none\\\";});const categoryOptions = document.querySelectorAll(\\\"#iconsSelect .\\\" + category );categoryOptions.forEach(option => {option.disabled = false;option.style.display = \\\"block\\\";})'>\\n\";\n    html += '<option value=\"\">-- Select Icon Category --</option>\\n';\n    for (let category in iconsObject) {\n        html += `<option value=\"${category}\">${capitalize(category.trim())}</option>\\n`;\n    }\n    html += '</select>\\n';\n    return html;\n}\n\n//Flow `categoriesSelect` will hold html icon categories select snippet\nflow.set(\"categoriesSelect\", buildCategoriesSelect());\n\n//build icons select\nfunction buildIconsSelect() {\n    let html = '';\n    // Build the options select (second dropdown)\n    html += '<select style=\\\"height: 1.8em !important\\\" id=\"iconsSelect\" onchange=\"addToForm(this.id,this.value)\">\\n';\n    html += '<option value=\"\">-- Select Icon --</option>\\n';\n    for (let category in iconsObject) {\n        const options = iconsObject[category].split(\",\");\n        options.forEach(value => {\n            html += `<option value=\"${value.trim()}\" class=\"${category} hidden-option\">${capitalize(value.trim())}</option>\\n`;\n        });\n    }\n    html += '</select>\\n';\n\n    return html;\n}\n//Flow `categoriesSelect` will hold html icons select snippet\nflow.set(\"iconsSelect\", buildIconsSelect());\n\nlet objects = [{ \"name\": \"ID8794\", \"draggable\": true, \"track\": 0, \"speed\": 0, \"lat\": 51.050015, \"lon\": -1.399382, \"icon\": \"helicopter\", \"iconColor\": \"blue\" }, { \"name\": \"ID8590\", \"layer\": \"test\", \"draggable\": true, \"track\": 0, \"speed\": 0, \"lat\": 51.07683, \"lon\": -1.433625, \"icon\": \"plane\", \"iconColor\": \"red\" }, { \"name\": \"ID8478\", \"draggable\": true, \"track\": 0, \"speed\": 0, \"lat\": 51.073893, \"lon\": -1.366041, \"icon\": \"smallplane\", \"iconColor\": \"green\" }, { \"name\": \"ID4820\", \"draggable\": false, \"track\": 0, \"speed\": 0, \"lat\": 51.119299, \"lon\": -1.399198, \"SIDC\": \"SFACMF------\", \"options\": { \"additionalInformation\": \"Info\" } }];\nglobal.set(\"objects\",objects);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 570,
+        "x": 550,
         "y": 600,
         "wires": [
             [
@@ -369,7 +369,7 @@
         "finalize": "",
         "libs": [],
         "x": 530,
-        "y": 1160,
+        "y": 1180,
         "wires": [
             [
                 "d22c566910bce313"
@@ -389,7 +389,7 @@
         "finalize": "",
         "libs": [],
         "x": 780,
-        "y": 1120,
+        "y": 1140,
         "wires": [
             [
                 "d49d5d6e6b436813"
@@ -403,7 +403,7 @@
         "name": "Update Object Position",
         "info": "",
         "x": 580,
-        "y": 1120,
+        "y": 1140,
         "wires": []
     },
     {
@@ -412,7 +412,7 @@
         "z": "f6f2187d.f17ca8",
         "name": "Object Context Menu ",
         "info": "",
-        "x": 1400,
+        "x": 1620,
         "y": 640,
         "wires": []
     },
@@ -436,7 +436,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 730,
+        "x": 950,
         "y": 680,
         "wires": [
             [
@@ -481,6 +481,13 @@
                 "pt": "global",
                 "to": "false",
                 "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "updateRate",
+                "pt": "global",
+                "to": "5000",
+                "tot": "num"
             }
         ],
         "action": "",
@@ -488,7 +495,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 730,
+        "x": 710,
         "y": 600,
         "wires": [
             []
@@ -509,11 +516,11 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 550,
+        "x": 530,
         "y": 680,
         "wires": [
             [
-                "f2bc3916dc12ca60"
+                "41067c9c0c7f3268"
             ]
         ]
     },
@@ -537,7 +544,7 @@
         "to": "",
         "reg": false,
         "x": 550,
-        "y": 800,
+        "y": 860,
         "wires": [
             []
         ]
@@ -547,14 +554,14 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Move objects",
-        "func": "let objects = global.get(\"objects\");\nlet object = msg.payload;\nconst time = 1;\n\nlet index = objects.findIndex(obj => obj.name === object.name);\n\nfunction toRadians(degrees) {\n    return degrees * Math.PI / 180;\n}\n\nfunction toDegrees(radians) {\n    return radians * 180 / Math.PI;\n}\n\nfunction calculateNewPosition(lat1, lon1, speed, heading, time) {\n    const R = 6371000; // Earth's radius in meters\n\n    // Convert latitude and longitude from degrees to radians\n    const lat1Rad = toRadians(lat1);\n    const lon1Rad = toRadians(lon1);\n\n    // Convert heading to radians\n    const headingRad = toRadians(heading);\n\n    // Calculate the distance traveled\n    const distance = speed * time;\n\n    // Calculate the new latitude\n    const lat2Rad = Math.asin(Math.sin(lat1Rad) * Math.cos(distance / R) + \n        Math.cos(lat1Rad) * Math.sin(distance / R) * Math.cos(headingRad));\n\n    // Calculate the new longitude\n    const lon2Rad = lon1Rad + Math.atan2(Math.sin(headingRad) * Math.sin(distance / R) * Math.cos(lat1Rad),\n        Math.cos(distance / R) - Math.sin(lat1Rad) * Math.sin(lat2Rad));\n\n    // Convert the new latitude and longitude back to degrees\n    const lat2 = toDegrees(lat2Rad);\n    const lon2 = toDegrees(lon2Rad);\n\n    return { lat: lat2, lon: lon2 };\n}\nif ((object.speed > 0) && index !== -1) {\n    const newPosition = calculateNewPosition(object.lat, object.lon, object.speed, object.track, time);\n    object.lat = newPosition.lat;\n    object.lon = newPosition.lon;\n    objects[index] = object;\n    msg.moved = true;\n} else {\n    msg.moved = false;\n}\nglobal.set(\"objects\", objects);\n\nreturn msg;",
+        "func": "let objects = global.get(\"objects\");\nlet object = msg.payload;\nconst time = global.get(\"updateRate\")/1000;\n\nlet index = objects.findIndex(obj => obj.name === object.name);\n\nfunction toRadians(degrees) {\n    return degrees * Math.PI / 180;\n}\n\nfunction toDegrees(radians) {\n    return radians * 180 / Math.PI;\n}\n\nfunction calculateNewPosition(lat1, lon1, speed, heading, time) {\n    const R = 6371000; // Earth's radius in meters\n\n    // Convert latitude and longitude from degrees to radians\n    const lat1Rad = toRadians(lat1);\n    const lon1Rad = toRadians(lon1);\n\n    // Convert heading to radians\n    const headingRad = toRadians(heading);\n\n    // Calculate the distance traveled\n    const distance = speed * time;\n\n    // Calculate the new latitude\n    const lat2Rad = Math.asin(Math.sin(lat1Rad) * Math.cos(distance / R) + \n        Math.cos(lat1Rad) * Math.sin(distance / R) * Math.cos(headingRad));\n\n    // Calculate the new longitude\n    const lon2Rad = lon1Rad + Math.atan2(Math.sin(headingRad) * Math.sin(distance / R) * Math.cos(lat1Rad),\n        Math.cos(distance / R) - Math.sin(lat1Rad) * Math.sin(lat2Rad));\n\n    // Convert the new latitude and longitude back to degrees\n    const lat2 = toDegrees(lat2Rad);\n    const lon2 = toDegrees(lon2Rad);\n\n    return { lat: lat2, lon: lon2 };\n}\nif ((object.speed > 0) && index !== -1) {\n    const newPosition = calculateNewPosition(object.lat, object.lon, object.speed, object.track, time);\n    object.lat = newPosition.lat;\n    object.lon = newPosition.lon;\n    objects[index] = object;\n    msg.moved = true;\n} else {\n    msg.moved = false;\n}\nglobal.set(\"objects\", objects);\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1050,
+        "x": 1270,
         "y": 680,
         "wires": [
             [
@@ -571,9 +578,9 @@
         "fieldType": "msg",
         "format": "html",
         "syntax": "mustache",
-        "template": "<b>Update Object Properties</b><br/><br/>\n<table id='addTable' style=\"width:100%;\">\n<tr><td>Layer</td><td><input type='text' id='inLay' placeholder='unknown' value='{{menu.layer}}' /></td></tr>\n<tr><td>Draggable</td><td><input type='checkbox' id='inDrag' name='inDrag' {{menu.drag}}></td></tr>\n<tr><td>Track</td><td><input type='text' id='inTrack' value='{{menu.track}}' /></td></tr>\n<tr><td>Speed</td><td><input type='text' id='inSpeed' value='{{menu.speed}}' /></td></tr>\n<tr><td>Lat</td><td><input type='text' id='inLat' value='{{menu.lat}}' /></td></tr>\n<tr><td>Lon</td><td><input type='text' id='inLon' value='{{menu.lon}}'/></td></tr>\n<tr><td>Label</td><td><input type='text' id='inLabel'  value='{{menu.label}}' /></td></tr>\n<tr><td><a href=\"https://www.spatialillusions.com/unitgenerator-legacy/\" target=\"_blank\">SIDC</a></td>\n<td><input type='text' id='inSIDC'  value='{{menu.SID}}' /></td></tr>\n<tr><td>SIDC Options</td><td><input type='text' id='inOptions'  value='{{menu.options}}' /></td></tr>\n<tr><td>Icon Category</td><td>{{{menu.categories}}}</td></tr>\n<tr><td>Icon</td><td>{{{menu.icons}}}</td></tr>\n<tr><td>iconColor</td><td><input type='text' id='inColor' value='{{menu.iconColor}}' /></td></tr>\n<tr><td>toolTip</td><td><input type='text' id='inTool' value='{{menu.tooltip}}' /></td></tr>\n<tr><td>Payload</td><td><div id='payload'></div></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' onclick=\n    'let _lat = document.getElementById(\"inLat\").value; _lat = parseFloat((_lat === \"\") ? rclk.lat.toFixed(6) : _lat);\n    let _lon = document.getElementById(\"inLon\").value; _lon = parseFloat((_lon === \"\") ? rclk.lng.toFixed(6) : _lon);\n    let _lay = document.getElementById(\"inLay\").value;\n    let _drag = document.getElementById(\"inDrag\").checked;\n    let _track = document.getElementById(\"inTrack\").value; _track = parseFloat((_track === \"\") ? 0 : _track);\n    let _speed = document.getElementById(\"inSpeed\").value; _speed = parseFloat((_speed === \"\") ? 0 : _speed);\n    let _icon = document.getElementById(\"iconsSelect\").value; _icon = (_icon === \"\") ? \"uav\" : _icon;\n    let _label = document.getElementById(\"inLabel\").value || \"\";\n    let _color = document.getElementById(\"inColor\").value || \"\";\n    let _tool = document.getElementById(\"inTool\").value;\n    let _sidc = document.getElementById(\"inSIDC\").value;\n    try {let _sidcOptions = JSON.parse(document.getElementById(\"inOptions\").value);} catch(e) {let _sidcOptions = \"\";}\n    _sidcOptions = (_sidc === \"\") ? \"\" : _sidcOptions;\n    for (let key in _sidcOptions) {if ((_sidcOptions[key] === \"\") || (_sidcOptions[key] === 0)) {delete _sidcOptions[key];}}\n    _sidcOptions = (Object.keys(_sidcOptions).length === 0 ) ? \"\" : _sidcOptions;\n    _icon = (_sidc !== \"\") ? \"\" : _icon;\n    let _fbData = {\"layer\": _lay,\"draggable\": _drag,\"track\":_track,\"speed\":_speed,\"lat\":_lat,\"lon\":_lon,\"icon\":_icon,\"iconColor\":_color,\"tooltip\":_tool,\"label\":_label,\"SIDC\":_sidc,\"options\":_sidcOptions};\n    for (let key in _fbData) {if (_fbData[key] === \"\") {delete _fbData[key];}}\n    document.getElementById(\"payload\").innerHTML = JSON.stringify({\"name\" :\"{{payload.name}}\", ..._fbData},null,2);\n    feedback(\"{{payload.name}}\",_fbData,\"updateObject\",false);'\n    style='width: 100% !important;'>Update Object Data</button></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' style='width:100%;background-color: red; color: white;' onclick='feedback(\"{{payload.name}}\",\"\",\"drawdelete\",true);'>Delete Object</button></td></tr>\n</table>",
+        "template": "<b>Update Object Properties</b><br/><br/>\n<table id='addTable' style=\"width:100%;\">\n<tr><td>Layer</td><td><input type='text' id='inLay' placeholder='unknown' value='{{menu.layer}}' /></td></tr>\n<tr><td>Draggable</td><td><input type='checkbox' id='inDrag' name='inDrag' {{menu.drag}}></td></tr>\n<tr><td>Track</td><td><input type='text' id='inTrack' value='{{menu.track}}' /></td></tr>\n<tr><td>Speed</td><td><input type='text' id='inSpeed' value='{{menu.speed}}' /></td></tr>\n<tr><td>Alt</td><td><input type='text' id='inAlt' value='{{menu.alt}}' /></td></tr>\n<tr><td>Lat</td><td><input type='text' id='inLat' value='{{menu.lat}}' /></td></tr>\n<tr><td>Lon</td><td><input type='text' id='inLon' value='{{menu.lon}}'/></td></tr>\n<tr><td>Label</td><td><input type='text' id='inLabel'  value='{{menu.label}}' /></td></tr>\n<tr><td><a href=\"https://www.spatialillusions.com/unitgenerator-legacy/\" target=\"_blank\">SIDC</a></td>\n<td><input type='text' id='inSIDC'  value='{{menu.SIDC}}' /></td></tr>\n<tr><td>SIDC Options</td><td><input type='text' id='inOptions'  value='{{menu.options}}' /></td></tr>\n<tr><td>Icon Category</td><td>{{{menu.categories}}}</td></tr>\n<tr><td>Icon</td><td>{{{menu.icons}}}</td></tr>\n<tr><td>iconColor</td><td><input type='text' id='inColor' value='{{menu.iconColor}}' /></td></tr>\n<tr><td>toolTip</td><td><input type='text' id='inTool' value='{{menu.tooltip}}' /></td></tr>\n<tr><td>Payload</td><td><div id='payload'></div></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' onclick=\n    'let _lat = document.getElementById(\"inLat\").value; _lat = parseFloat((_lat === \"\") ? rclk.lat.toFixed(6) : _lat);\n    let _lon = document.getElementById(\"inLon\").value; _lon = parseFloat((_lon === \"\") ? rclk.lng.toFixed(6) : _lon);\n    let _lay = document.getElementById(\"inLay\").value;\n    let _drag = document.getElementById(\"inDrag\").checked;\n    let _track = document.getElementById(\"inTrack\").value; _track = parseFloat((_track === \"\") ? 0 : _track);\n    let _speed = document.getElementById(\"inSpeed\").value; _speed = parseFloat((_speed === \"\") ? 0 : _speed);\n    let _alt = document.getElementById(\"inAlt\").value; _alt = parseFloat((_alt === \"\") ? 0 : _alt);\n    let _icon = document.getElementById(\"iconsSelect\").value; _icon = (_icon === \"\") ? \"uav\" : _icon;\n    let _label = document.getElementById(\"inLabel\").value || \"\";\n    let _color = document.getElementById(\"inColor\").value || \"\";\n    let _tool = document.getElementById(\"inTool\").value;\n    let _sidc = document.getElementById(\"inSIDC\").value;\n    let _sidcOptions;\n    try {_sidcOptions = JSON.parse(document.getElementById(\"inOptions\").value);} catch(e) {_sidcOptions = \"\";}\n    _sidcOptions = (_sidc === \"\") ? \"\" : _sidcOptions;\n    for (let key in _sidcOptions) {if ((_sidcOptions[key] === \"\") || (_sidcOptions[key] === 0)) {delete _sidcOptions[key];}}\n    _sidcOptions = (Object.keys(_sidcOptions).length === 0 ) ? \"\" : _sidcOptions;\n    _icon = (_sidc !== \"\") ? \"\" : _icon;\n    let _fbData = {\"layer\": _lay,\"draggable\": _drag,\"track\":_track,\"speed\":_speed,\"alt\":_alt,\"lat\":_lat,\"lon\":_lon,\"icon\":_icon,\"iconColor\":_color,\"tooltip\":_tool,\"label\":_label,\"SIDC\":_sidc,\"options\":_sidcOptions};\n    for (let key in _fbData) {if (_fbData[key] === \"\") {delete _fbData[key];}}\n    document.getElementById(\"payload\").innerHTML = JSON.stringify({\"name\" :\"{{payload.name}}\", ..._fbData},null,2);\n    feedback(\"{{payload.name}}\",_fbData,\"updateObject\",false);'\n    style='width: 100% !important;'>Update Object Data</button></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' style='width:100%;background-color: red; color: white;' onclick='feedback(\"{{payload.name}}\",\"\",\"drawdelete\",true);'>Delete Object</button></td></tr>\n</table>",
         "output": "str",
-        "x": 1420,
+        "x": 1640,
         "y": 680,
         "wires": [
             [
@@ -586,14 +593,14 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Set Form Values",
-        "func": "let icons = flow.get(\"iconsObject\");\nlet category = Object.keys(icons).find(key => icons[key].includes(msg.payload.icon));\nmsg.menu = {};\nmsg.menu.layer = msg.payload.layer;\nmsg.menu.drag = msg.payload.draggable === true ? \"checked\" : \"\";\nmsg.menu.track = msg.payload.track || 0;\nmsg.menu.speed = msg.payload.speed || 0;\nmsg.menu.lat = msg.payload.lat;\nmsg.menu.lon = msg.payload.lon;\nmsg.menu.label = msg.payload.label || \"\";\nmsg.menu.SIDC = msg.payload.SIDC || \"\";\nmsg.menu.options = JSON.stringify(msg.payload.options) || \"\";\nmsg.menu.categories = flow.get(\"categoriesSelect\").replace(category+\"\\\"\",category+\"\\\" selected\");\nmsg.menu.icons = flow.get(\"iconsSelect\").replace(msg.payload.icon+\"\\\"\",msg.payload.icon+\"\\\" selected\");;\nmsg.menu.iconColor = msg.payload.iconColor || \"\";\nmsg.menu.toolstip = msg.payload.tooltip || \"\";\n\n\n\n\nreturn msg;",
+        "func": "let icons = flow.get(\"iconsObject\");\nlet category = Object.keys(icons).find(key => icons[key].includes(msg.payload.icon));\nmsg.menu = {};\nmsg.menu.layer = msg.payload.layer;\nmsg.menu.drag = msg.payload.draggable === true ? \"checked\" : \"\";\nmsg.menu.track = msg.payload.track || 0;\nmsg.menu.speed = msg.payload.speed || 0;\nmsg.menu.alt = msg.payload.alt || 0;\nmsg.menu.lat = msg.payload.lat;\nmsg.menu.lon = msg.payload.lon;\nmsg.menu.label = msg.payload.label || \"\";\nmsg.menu.SIDC = msg.payload.SIDC || \"\";\nmsg.menu.options = JSON.stringify(msg.payload.options) || \"\";\nmsg.menu.categories = flow.get(\"categoriesSelect\").replace(category+\"\\\"\",category+\"\\\" selected\");\nmsg.menu.icons = flow.get(\"iconsSelect\").replace(msg.payload.icon+\"\\\"\",msg.payload.icon+\"\\\" selected\");;\nmsg.menu.iconColor = msg.payload.iconColor || \"\";\nmsg.menu.tooltip = msg.payload.tooltip || \"\";\n\n\n\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
+        "x": 1440,
         "y": 680,
         "wires": [
             [
@@ -617,7 +624,7 @@
         "repair": false,
         "outputs": 1,
         "x": 1020,
-        "y": 1000,
+        "y": 1040,
         "wires": [
             [
                 "f83930ff.b21488"
@@ -651,7 +658,7 @@
         "name": "Immediate draw",
         "info": "",
         "x": 1020,
-        "y": 940,
+        "y": 1000,
         "wires": []
     },
     {
@@ -674,7 +681,7 @@
         "to": "",
         "reg": false,
         "x": 550,
-        "y": 760,
+        "y": 820,
         "wires": [
             [
                 "68a4405c6a59ddd8"
@@ -690,13 +697,65 @@
         "fieldType": "msg",
         "format": "html",
         "syntax": "mustache",
-        "template": "<b>Update Object Properties</b><br/><br/>\n<table id='addTable' style=\"width:100%;\">\n<tr><td>Name</td><td><input type='text' id='inName' value=''  autofocus;/></td></tr>\n<tr><td>Layer</td><td><input type='text' id='inLay' placeholder='unknown' value='' /></td></tr>\n<tr><td>Draggable</td><td><input type='checkbox' id='inDrag' name='inDrag'></td></tr>\n<tr><td>Track</td><td><input type='text' id='inTrack' value=0 /></td></tr>\n<tr><td>Speed</td><td><input type='text' id='inSpeed' value=0 /></td></tr>\n<tr><td>Lat</td><td><input type='text' id='inLat' placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lat.toFixed(6);' /></td></tr>\n<tr><td>Lon</td><td><input type='text' id='inLon' placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lng.toFixed(6);' /></td></tr>\n<tr><td>Label</td><td><input type='text' id='inLabel'  value='' /></td></tr>\n<tr><td><a href=\"https://www.spatialillusions.com/unitgenerator-legacy/\" target=\"_blank\">SIDC</a></td>\n<td><input type='text' id='inSIDC'  value='' /></td></tr>\n<tr><td>SIDC Options</td><td><input type='text' id='inOptions'  value='{\"fillOpacity\":0,\"direction\":0,\"speed\":0,\"type\":\"\",\"infoSize\":0,\"infoFields\":\"\",\"staffComments\":\"\",\"altitudeDepth\":\"\",\"quantity\":0,\"additionalInformation\":\"\"}' /></td></tr>\n<tr><td>Icon Category</td><td>{{{flow.categoriesSelect}}}</td></tr>\n<tr><td>Icon</td><td>{{{flow.iconsSelect}}}</td></tr>\n<tr><td>iconColor</td><td><input type='text' id='inColor' value='' /></td></tr>\n<tr><td>toolTip</td><td><input type='text' id='inTool' value='' /></td></tr>\n<tr><td>Payload</td><td><div id='payload'></div></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' onclick=\n    'let _name = document.getElementById(\"inName\").value; _name = (_name === \"\") ? \"ID\"+Math.floor(Math.random() * 10000) : _name;\n    let _lat = document.getElementById(\"inLat\").value; _lat = parseFloat((_lat === \"\") ? rclk.lat.toFixed(6) : _lat);\n    let _lon = document.getElementById(\"inLon\").value; _lon = parseFloat((_lon === \"\") ? rclk.lng.toFixed(6) : _lon);\n    let _lay = document.getElementById(\"inLay\").value;\n    let _drag = document.getElementById(\"inDrag\").checked;\n    let _track = document.getElementById(\"inTrack\").value; _track = parseFloat((_track === \"\") ? 0 : _track);\n    let _speed = document.getElementById(\"inSpeed\").value; _speed = parseFloat((_speed === \"\") ? 0 : _speed);\n    let _icon = document.getElementById(\"iconsSelect\").value; _icon = (_icon === \"\") ? \"uav\" : _icon;\n    let _label = document.getElementById(\"inLabel\").value || \"\";\n    let _color = document.getElementById(\"inColor\").value || \"\";\n    let _tool = document.getElementById(\"inTool\").value;\n    let _sidc = document.getElementById(\"inSIDC\").value;\n    try {let _sidcOptions = JSON.parse(document.getElementById(\"inOptions\").value);} catch(e) {let _sidcOptions = \"\";}\n    _sidcOptions = (_sidc === \"\") ? \"\" : _sidcOptions;\n    for (let key in _sidcOptions) {if ((_sidcOptions[key] === \"\") || (_sidcOptions[key] === 0)) {delete _sidcOptions[key];}}\n    _sidcOptions = (Object.keys(_sidcOptions).length === 0 ) ? \"\" : _sidcOptions;\n    _icon = (_sidc !== \"\") ? \"\" : _icon;\n    let _fbData = {\"layer\": _lay,\"draggable\": _drag,\"track\":_track,\"speed\":_speed,\"lat\":_lat,\"lon\":_lon,\"icon\":_icon,\"iconColor\":_color,\"tooltip\":_tool,\"label\":_label,\"SIDC\":_sidc,\"options\":_sidcOptions};\n    for (let key in _fbData) {if (_fbData[key] === \"\") {delete _fbData[key];}}\n    document.getElementById(\"payload\").innerHTML = JSON.stringify({\"name\" :_name, ..._fbData},null,2);\n    feedback(_name,_fbData,\"addObject\",false);'\n    style='width: 100% !important;'>Add New Object</button></td></tr>\n</table>",
+        "template": "<b>Update Object Properties</b><br/><br/>\n<table id='addTable' style=\"width:100%;\">\n<tr><td>Name</td><td><input type='text' id='inName' value=''  autofocus;/></td></tr>\n<tr><td>Layer</td><td><input type='text' id='inLay' placeholder='unknown' value='' /></td></tr>\n<tr><td>Draggable</td><td><input type='checkbox' id='inDrag' name='inDrag'></td></tr>\n<tr><td>Track</td><td><input type='text' id='inTrack' value=0 /></td></tr>\n<tr><td>Speed</td><td><input type='text' id='inSpeed' value=0 /></td></tr>\n<tr><td>Alt</td><td><input type='text' id='inAlt' value=0 /></td></tr>\n<tr><td>Lat</td><td><input type='text' id='inLat' placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lat.toFixed(6);' /></td></tr>\n<tr><td>Lon</td><td><input type='text' id='inLon' placeholder='Value/Empty/dblClk' value='' ondblclick='this.value=rclk.lng.toFixed(6);' /></td></tr>\n<tr><td>Label</td><td><input type='text' id='inLabel'  value='' /></td></tr>\n<tr><td><a href=\"https://www.spatialillusions.com/unitgenerator-legacy/\" target=\"_blank\">SIDC</a></td>\n<td><input type='text' id='inSIDC'  value='' /></td></tr>\n<tr><td>SIDC Options</td><td><input type='text' id='inOptions'  value='{\"fillOpacity\":0,\"direction\":0,\"speed\":0,\"type\":\"\",\"infoSize\":0,\"infoFields\":\"\",\"staffComments\":\"\",\"altitudeDepth\":\"\",\"quantity\":0,\"additionalInformation\":\"\"}' /></td></tr>\n<tr><td>Icon Category</td><td>{{{flow.categoriesSelect}}}</td></tr>\n<tr><td>Icon</td><td>{{{flow.iconsSelect}}}</td></tr>\n<tr><td>iconColor</td><td><input type='text' id='inColor' value='' /></td></tr>\n<tr><td>toolTip</td><td><input type='text' id='inTool' value='' /></td></tr>\n<tr><td>Payload</td><td><div id='payload'></div></td></tr>\n<tr><td></td><td><button id='addIcon' type='button' onclick=\n    'let _name = document.getElementById(\"inName\").value; _name = (_name === \"\") ? \"ID\"+Math.floor(Math.random() * 10000) : _name;\n    let _lat = document.getElementById(\"inLat\").value; _lat = parseFloat((_lat === \"\") ? rclk.lat.toFixed(6) : _lat);\n    let _lon = document.getElementById(\"inLon\").value; _lon = parseFloat((_lon === \"\") ? rclk.lng.toFixed(6) : _lon);\n    let _lay = document.getElementById(\"inLay\").value;\n    let _drag = document.getElementById(\"inDrag\").checked;\n    let _track = document.getElementById(\"inTrack\").value; _track = parseFloat((_track === \"\") ? 0 : _track);\n    let _speed = document.getElementById(\"inSpeed\").value; _speed = parseFloat((_speed === \"\") ? 0 : _speed);\n    let _alt = document.getElementById(\"inAlt\").value; _alt = parseFloat((_alt === \"\") ? 0 : _alt);\n    let _icon = document.getElementById(\"iconsSelect\").value; _icon = (_icon === \"\") ? \"uav\" : _icon;\n    let _label = document.getElementById(\"inLabel\").value || \"\";\n    let _color = document.getElementById(\"inColor\").value || \"\";\n    let _tool = document.getElementById(\"inTool\").value;\n    let _sidc = document.getElementById(\"inSIDC\").value;\n    let _sidcOptions;\n    try {_sidcOptions = JSON.parse(document.getElementById(\"inOptions\").value);} catch(e) {_sidcOptions = \"\";}\n    _sidcOptions = (_sidc === \"\") ? \"\" : _sidcOptions;\n    for (let key in _sidcOptions) {if ((_sidcOptions[key] === \"\") || (_sidcOptions[key] === 0)) {delete _sidcOptions[key];}}\n    _sidcOptions = (Object.keys(_sidcOptions).length === 0 ) ? \"\" : _sidcOptions;\n    _icon = (_sidc !== \"\") ? \"\" : _icon;\n    let _fbData = {\"layer\": _lay,\"draggable\": _drag,\"track\":_track,\"speed\":_speed,\"alt\":_alt,\"lat\":_lat,\"lon\":_lon,\"icon\":_icon,\"iconColor\":_color,\"tooltip\":_tool,\"label\":_label,\"SIDC\":_sidc,\"options\":_sidcOptions};\n    for (let key in _fbData) {if (_fbData[key] === \"\") {delete _fbData[key];}}\n    document.getElementById(\"payload\").innerHTML = JSON.stringify({\"name\" :_name, ..._fbData},null,2);\n    feedback(_name,_fbData,\"addObject\",false);'\n    style='width: 100% !important;'>Add New Object</button></td></tr>\n</table>",
         "output": "str",
         "x": 750,
-        "y": 760,
+        "y": 820,
         "wires": [
             [
                 "f83930ff.b21488"
+            ]
+        ]
+    },
+    {
+        "id": "8923e313189793d4",
+        "type": "delay",
+        "z": "f6f2187d.f17ca8",
+        "name": "Rate",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": true,
+        "outputs": 1,
+        "x": 790,
+        "y": 680,
+        "wires": [
+            [
+                "f2bc3916dc12ca60"
+            ]
+        ]
+    },
+    {
+        "id": "41067c9c0c7f3268",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "Rate",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rate",
+                "pt": "msg",
+                "to": "updateRate",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 670,
+        "y": 680,
+        "wires": [
+            [
+                "8923e313189793d4"
             ]
         ]
     }
