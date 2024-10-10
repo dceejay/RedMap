@@ -3324,6 +3324,7 @@ function doTAKjson(p) {
             d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
             d.role = p.detail?.__group?.role;
         }
+        if (d.team == "undefined") { delete d.team; }
         d.type = p.type;
         d.remarks = p.detail?.remarks
         if (p.detail?.remarks && p.detail.remarks.hasOwnProperty["#text"]) {
@@ -3366,6 +3367,7 @@ function doTAKMCjson(p) {
         d.name = p.detail?.contact?.callsign || p.uid;
         d.hdg = p.detail?.track?.course;
         d.speed = p.detail?.track?.speed;
+        if (d.team == "undefined") { delete d.team; }
 
         try {
             d.timestamp = (new Date(+p.sendTime)).toISOString();

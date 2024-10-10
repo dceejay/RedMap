@@ -1,7 +1,7 @@
 ### Change Log for Node-RED Worldmap
 
-
- - v5.0.2   Fix sidcEdgeIcon docs PR#289.
+ - v5.0.3 - Add great context menu example flow. PR#290. Bump express lib. PR#291.
+ - v5.0.2 - Fix sidcEdgeIcon docs PR#289.
  - v5.0.1 - Fix isArray error PR #288.
  - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
  - v4.9.0 - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
