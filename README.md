@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.0.4  - Tweak CoT handling slightly.
 - v5.0.3  - Add great context menu example flow. PR#290. Bump express lib. PR#291.
 - v5.0.2  - Fix sidcEdgeIcon docs PR#289.
 - v5.0.1  - Fix isArray error PR #288.

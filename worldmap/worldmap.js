@@ -3319,19 +3319,28 @@ function doTAKjson(p) {
         d.lon = Number(p.point.lon);
         if (p.type.indexOf('a') === 0) {
             d.hdg = p.detail?.track?.course;
-            d.speed = p.detail?.track?.speed;
-            d.team = p.detail?.__group?.name;
-            d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+            if (p.detail?.track?.speed) {
+                d.speed = Number(p.detail?.track?.speed);
+                if (d.speed == 9999999 || d.speed == 0) { delete d.speed; }
+                else {
+                    d.speed = d.speed + " m/s";
+                    delete d.hdg;
+                    d.course = p.detail?.track?.course;
+                    d.options = { direction: d.course };
+                }
+            }
+            if (p.detail?.__group?.name) {
+                d.team = p.detail?.__group?.name;
+                d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+            }
             d.role = p.detail?.__group?.role;
         }
-        if (d.team == "undefined") { delete d.team; }
         d.type = p.type;
         d.remarks = p.detail?.remarks
         if (p.detail?.remarks && p.detail.remarks.hasOwnProperty["#text"]) {
             d.remarks = p.detail.remarks["#text"];
         }
         d.uid = p.uid;
-
         try {
             var st = (new Date(p.time)).getTime() / 1000;
             var et = (new Date(p.stale)).getTime() / 1000;
@@ -3340,11 +3349,11 @@ function doTAKjson(p) {
             d.ttl = parseInt(et-st);
         }
         catch(e) { console.log(e); }
-        d.alt = Number(p.point.hae) || 9999999;
-        if (d.alt && d.alt == 9999999) { delete d.alt; }
-        if (d.speed && d.speed == 9999999) { delete d.speed; }
-        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
         handleCoTtypes(d,p);
+        d.alt = Number(p.point.hae) || 9999999;
+        if (d?.alt && parseInt(d.alt) == 9999999) { delete d.alt; }
+        else { d.alt = d.alt + "m"; }
+        if (d?.hdg && parseInt(d.hdg) == 9999999) { delete d.hdg; }
         setMarker(d);
     }
     else {
@@ -3359,26 +3368,35 @@ function doTAKMCjson(p) {
         var d = {};
         d.lat = p.lat;
         d.lon = p.lon;
-        d.team = p.detail?.group?.name;
-        d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+        if (p.detail?.__group?.name) {
+            d.team = p.detail?.__group?.name;
+            d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';
+        }
         d.role = p.detail?.group?.role;
         d.type = p.type;
         d.uid = p.uid;
         d.name = p.detail?.contact?.callsign || p.uid;
         d.hdg = p.detail?.track?.course;
-        d.speed = p.detail?.track?.speed;
-        if (d.team == "undefined") { delete d.team; }
-
+        if (p.detail?.track?.speed) {
+            d.speed = Number(p.detail?.track?.speed);
+            if (d.speed == 9999999 || d.speed == 0) { delete d.speed; }
+            else {
+                d.speed = d.speed + " m/s";
+                delete d.hdg;
+                d.course = p.detail?.track?.course;
+                d.options = { direction: d.course };
+            }
+        }
         try {
             d.timestamp = (new Date(+p.sendTime)).toISOString();
             d.staletime = (new Date(+p.staleTime)).toISOString();
             d.ttl = parseInt((+p.staleTime / 1000) - (+p.sendTime / 1000));
         } catch(e) { console.log(e); }
+        handleCoTtypes(d,p);
         d.alt = p.hae || 9999999;
         if (d.alt && d.alt == 9999999) { delete d.alt; }
-        if (d.speed && d.speed == 9999999) { delete d.speed; }
+        else { d.alt = d.alt + "m"; }
         if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
-        handleCoTtypes(d,p);
         setMarker(d);
     }
     else {
