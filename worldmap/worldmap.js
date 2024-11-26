@@ -2288,10 +2288,10 @@ function setMarker(data) {
     // If .label then use that rather than name tooltip
     if (data.label) {
         if (typeof data.label === "boolean" && data.label === true) {
-            marker.bindTooltip(data["name"], { permanent:true, direction:"right", offset:labelOffset });
+            marker.bindTooltip(data["name"], data.tooltipOptions || { permanent:true, direction:"right", offset:labelOffset });
         }
         else if (typeof data.label === "string" && data.label.length > 0) {
-            marker.bindTooltip(data.label, { permanent:true, direction:"right", offset:labelOffset });
+            marker.bindTooltip(data.label, data.tooltipOptions || { permanent:true, direction:"right", offset:labelOffset });
         }
         delete marker.options.title;
         delete data.label;
@@ -2299,7 +2299,7 @@ function setMarker(data) {
     // otherwise check for .tooltip then use that rather than name tooltip
     else if (data.tooltip) {
         if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
-            marker.bindTooltip(data.tooltip, { direction:"bottom", offset:[0,4] });
+            marker.bindTooltip(data.tooltip, data.tooltipOptions || { direction:"bottom", offset:[0,4] });
             delete marker.options.title;
             delete data.tooltip;
         }
