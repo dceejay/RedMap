@@ -2387,7 +2387,7 @@ function setMarker(data) {
     var track = data.track ?? data.COG ?? data.cog ?? data.hdg ?? data.heading ?? data.bearing;
     if (track != undefined) {  // if there is a heading
         // Speed is in m/s
-        if (data.speed != null && data.length === undefined) {  // and a speed - lets convert to a leader length
+        if (data.speed != null && data.length === undefined && !data?.SIDC) {  // and a speed - lets convert to a leader length
             data.length = parseFloat(data.speed || "0") * 60;
             var re1 = new RegExp('kn|knot|kt|kts','i');
             var re2 = new RegExp('kph|kmh','i');

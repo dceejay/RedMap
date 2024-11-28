@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.0.7  - Allow Tooltip options (see new example). #PR295.
 - v5.0.6  - Tweak SIDC flag handling slightly to show direction if available and moving.
 - v5.0.4  - Tweak CoT handling slightly.
 - v5.0.3  - Add great context menu example flow. PR#290. Bump express lib. PR#291.
