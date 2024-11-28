@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
  - v5.0.4 - Tweak CoT handling slightly.
  - v5.0.3 - Add great context menu example flow. PR#290. Bump express lib. PR#291.
  - v5.0.2 - Fix sidcEdgeIcon docs PR#289.

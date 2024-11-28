@@ -2123,12 +2123,13 @@ function setMarker(data) {
         }
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
-        if (data.SIDC.length > 12) {
+        if (data.SIDC.length > 12 && data.SIDC.substr(12,2) !== "**") {
             var cc = data.SIDC.substr(12,2).toLowerCase();
             opts.country = cc.toUpperCase();
             opts.staffComments = emojify(":flag-"+cc+":") + " " + (opts?.staffComments || "");
             data.flag = emojify(":flag-"+cc+":");
         }
+        if (data?.speed) { opts.direction = data?.bearing || data?.hdg || data?.COG }
         // escape out any isocodes eg flag symbols
         var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed","country"];
         //const regex = /\p{Extended_Pictographic}/ug;
@@ -3317,6 +3318,7 @@ function doTAKjson(p) {
         d.name = p.detail?.contact?.callsign || p.uid;
         d.lat = Number(p.point.lat);
         d.lon = Number(p.point.lon);
+        d.layer = "TAK";
         if (p.type.indexOf('a') === 0) {
             d.hdg = p.detail?.track?.course;
             if (p.detail?.track?.speed) {
@@ -3368,6 +3370,7 @@ function doTAKMCjson(p) {
         var d = {};
         d.lat = p.lat;
         d.lon = p.lon;
+        d.layer = "TAK";
         if (p.detail?.__group?.name) {
             d.team = p.detail?.__group?.name;
             d.team = d.team + ' <i style="color:' + d.team + '" class="fa fa-square"></i>';

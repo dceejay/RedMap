@@ -71,7 +71,7 @@ module.exports = function(RED) {
                 res.send({key:process.env.MAPBOXGL_TOKEN});
             }
             else {
-                node.error("No API key set");
+                node.error("No MapBox API key set");
                 res.send({key:''})
             }
         });
@@ -271,7 +271,7 @@ module.exports = function(RED) {
         ui = RED.require("node-red-dashboard")(RED);
     }
     catch(e) {
-        RED.log.info("Node-RED Dashboard not found - ui_worldmap not installed.");
+        RED.log.info("Node-RED Dashboard 1 not found - ui_worldmap node not installed.");
     }
     setTimeout( function() {
         if (ui) {
