@@ -88,6 +88,7 @@ Optional properties for **msg.payload** include
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
+ - **tooltipOptions** : custom tooltip/label options  (offset, direction, permanent, sticky, interactive, opacity, className) )
  - **contextmenu** : an html fragment to display on right click of marker - defaults to delete marker. You can specify `${name}` to substitute in the name of the marker. Set to `""` to disable just this instance.
 
 Any other `msg.payload` properties will be added to the icon popup text box. This can be

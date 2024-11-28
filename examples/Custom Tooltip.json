@@ -1,0 +1,83 @@
+[
+    {
+        "id": "ec9da974.051b48",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 1010,
+        "y": 560,
+        "wires": [
+            [
+                "f77a7ed4.f955d"
+            ]
+        ]
+    },
+    {
+        "id": "f77a7ed4.f955d",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Car + Label",
+        "func": "var thing = {\n    name:\"Jason Isaacs\", \n    lat:51, \n    lon:-1.45,\n    icon:\"car\",\n    iconColor:\"darkred\",\n    extrainfo:\"Hello to Jason Isaacs\",\n    label:\"This is a custom label\",\n    tooltipOptions: {\"offset\" : [-100,-100], \"permanent\" : true, \"opacity\" : 1, \"direction\" : \"top\", \"className\" : \"tooltip\"}\n};\nmsg.payload = thing;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 560,
+        "wires": [
+            [
+                "f83930ff.b21488"
+            ]
+        ]
+    },
+    {
+        "id": "cd09f7be.079518",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "Simple map - click inject to send info to map.",
+        "info": "Adds a map at http://(your-server-ip):1880/worldmap. \n\nThe `function` node creates an object with some basic properties required to add to a map.",
+        "x": 1170,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "f83930ff.b21488",
+        "type": "worldmap",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "lat": "",
+        "lon": "",
+        "zoom": "",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "show",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "false",
+        "coords": "none",
+        "showgrid": "false",
+        "showruler": "true",
+        "allowFileDrop": "false",
+        "path": "/worldmap",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriO,EsriDG,NatGeo,UKOS,OpTop",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1400,
+        "y": 560,
+        "wires": []
+    }
+]
