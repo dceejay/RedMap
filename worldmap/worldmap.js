@@ -2123,13 +2123,19 @@ function setMarker(data) {
         }
         opts.size = opts.size || sz;
         opts.size = opts.size * (opts.scale || 1);
-        if (data.SIDC.length > 12 && data.SIDC.substr(12,2) !== "**") {
+        if (data.SIDC.length > 12 && /^[A-Za-z]{2}$/gm.test(data.SIDC.substr(12,2))) {
             var cc = data.SIDC.substr(12,2).toLowerCase();
             opts.country = cc.toUpperCase();
             opts.staffComments = emojify(":flag-"+cc+":") + " " + (opts?.staffComments || "");
-            data.flag = emojify(":flag-"+cc+":");
+            data.flag = opts.country.toUpperCase() + " " + emojify(":flag-"+cc+":");
         }
-        if (data?.speed) { opts.direction = data?.bearing || data?.hdg || data?.COG }
+        if (data.SIDC.length == 20 && opts?.country && opts.country.length == 2) {
+            data.flag = opts.country.toUpperCase() + " " + emojify(":flag-"+opts.country.toLowerCase()+":");
+            opts.country = data.flag;
+        }
+        data.speed = opts?.speed || data?.speed; // If SIDC then options.speed can override the speed.
+        if (data?.speed && !opts?.direction) { opts.direction = data?.track || data?.hdg || data?.heading || data?.COG || data?.bearing }
+        if (data.speed == undefined) { delete data.speed; }
         // escape out any isocodes eg flag symbols
         var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed","country"];
         //const regex = /\p{Extended_Pictographic}/ug;
@@ -2229,8 +2235,10 @@ function setMarker(data) {
     //     data.flag = mmsiToCountry(data.MMSI)
     // }
     if (data?.flag && data.flag.length == 2) {
-        const tflg = emojify(":flag-"+data.flag.toLowerCase()+":");
-        if (!tflg.includes("flag-")) { data.flag = tflg; }
+        const tflg = data.flag.toUpperCase() + " " + emojify(":flag-"+data.flag.toLowerCase()+":")
+        if (!tflg.includes("flag-")) {
+            data.flag = tflg;
+        }
     }
     if (data.hasOwnProperty("photourl")) {
         words += "<img src=\"" + data.photourl + "\" style=\"max-width:100%; max-height:250px; margin-top:10px;\"><br/>";
@@ -2308,7 +2316,6 @@ function setMarker(data) {
 
     // Add right click contextmenu
     marker = rightmenu(marker);
-
     // Delete more already handled properties
     var llc = data.lineColor ?? data.color;
     delete data.lat;

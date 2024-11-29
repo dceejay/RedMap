@@ -144,6 +144,8 @@ SIDC codes can be generated using the online tool - https://www.spatialillusions
 
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 
+Note: If the SIDC code is a 2525C 15 characters long, where chars 13 and 14 are a country code - then the country flag emoji is added to the staffComments field of the icon. If it's a 20 char 2525D code then the options:country property will be used to create the flag.
+
 #### TAK Visualisation
 
 Users of [TAK](https://tak.gov) can use the [TAK ingest node](https://flows.nodered.org/node/node-red-contrib-tak-registration) to create a JSON formatted TAK event object, received from a TAK server. This can be fed directly into the worldmap node.
