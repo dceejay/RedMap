@@ -2129,10 +2129,19 @@ function setMarker(data) {
             opts.staffComments = emojify(":flag-"+cc+":") + " " + (opts?.staffComments || "");
             data.flag = opts.country.toUpperCase() + " " + emojify(":flag-"+cc+":");
         }
-        if (data.SIDC.length == 20 && opts?.country && opts.country.length == 2) {
-            data.flag = opts.country.toUpperCase() + " " + emojify(":flag-"+opts.country.toLowerCase()+":");
-            opts.country = data.flag;
+        if (data.SIDC.length == 12 && data?.flag && data.flag.length == 2) {
+            opts.staffComments = emojify(":flag-"+data.flag.toLowerCase()+":") + " " + (opts?.staffComments || "");
         }
+        if (data.SIDC.length == 20) {
+            if (opts?.country && opts.country.length == 2) {
+                data.flag = opts.country.toUpperCase() + " " + emojify(":flag-"+opts.country.toLowerCase()+":");
+                opts.country = data.flag;
+            }
+            else if (data?.flag && data.flag.length == 2) {
+                opts.country = data.flag.toUpperCase() + " " + emojify(":flag-"+data.flag.toLowerCase()+":");
+            }
+        }
+        console.log("OPTS",opts)
         data.speed = opts?.speed || data?.speed; // If SIDC then options.speed can override the speed.
         if (data?.speed && !opts?.direction) { opts.direction = data?.track || data?.hdg || data?.heading || data?.COG || data?.bearing }
         if (data.speed == undefined) { delete data.speed; }
