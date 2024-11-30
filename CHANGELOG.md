@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
  - v5.0.7 - Allow Tooltip options (see new example). #PR295.
  - v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
  - v5.0.4 - Tweak CoT handling slightly.

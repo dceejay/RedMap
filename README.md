@@ -13,33 +13,34 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
-- v5.0.7  - Allow Tooltip options (see new example). #PR295.
-- v5.0.6  - Tweak SIDC flag handling slightly to show direction if available and moving.
-- v5.0.4  - Tweak CoT handling slightly.
-- v5.0.3  - Add great context menu example flow. PR#290. Bump express lib. PR#291.
-- v5.0.2  - Fix sidcEdgeIcon docs PR#289.
-- v5.0.1  - Fix isArray error PR #288.
-- v5.0.0  - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
-- v4.9.0  - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
-- v4.8.1  - Slight tidy of some of the geojson handling
-- v4.8.0  - Merged PR for feedback functionality cleanup and example. PR #271 and #272
-- v4.7.0  - Update pmtiles library, fix feedback function inconsistency. Issue #270
-- v4.6.5  - Let geojson allow for generic overrides with .icon and .layer.
-- v4.6.4  - Fix deletion of layers logic to actually fully remove points.
-- v4.6.3  - Fix sending of layer events when not wanted. Issue #262
-- v4.6.2  - Fix multiple use of contextmenu feedback. Issue #259
-- v4.6.1  - Let default pmtiles be light/dark or monocolored.
-- v4.5.2  - Tidy up when pmtiles removed.
-- v4.5.0  - Fix pmtiles to look for maps in userdir rather than modules
-- v4.4.0  - Add quad(copter) drone icon.
-- v4.3.3  - Fix for objects changing layers.
-- v4.3.2  - Fix geojson popup missing label name.
-- v4.3.1  - Small fix to icon transparency, and routing detail.
-- v4.3.0  - Add support for PMtiles files.
-- v4.2.1  - Revert use of optional chaining to extend life slightly. Issue #252
-- v4.2.0  - Let icons also be inline images data:image... 
-- v4.1.0  - Add optional SOG, COG, altft, altm input properties.
-- v4.0.0  - Breaking - Better context menu variable substitution and retention
+- v5.0.8 - Fix flag handling for SIDC 2525D, add example.
+- v5.0.7 - Allow Tooltip options (see new example). #PR295.
+- v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
+- v5.0.4 - Tweak CoT handling slightly.
+- v5.0.3 - Add great context menu example flow. PR#290. Bump express lib. PR#291.
+- v5.0.2 - Fix sidcEdgeIcon docs PR#289.
+- v5.0.1 - Fix isArray error PR #288.
+- v5.0.0 - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
+- v4.9.0 - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
+- v4.8.1 - Slight tidy of some of the geojson handling
+- v4.8.0 - Merged PR for feedback functionality cleanup and example. PR #271 and #272
+- v4.7.0 - Update pmtiles library, fix feedback function inconsistency. Issue #270
+- v4.6.5 - Let geojson allow for generic overrides with .icon and .layer.
+- v4.6.4 - Fix deletion of layers logic to actually fully remove points.
+- v4.6.3 - Fix sending of layer events when not wanted. Issue #262
+- v4.6.2 - Fix multiple use of contextmenu feedback. Issue #259
+- v4.6.1 - Let default pmtiles be light/dark or monocolored.
+- v4.5.2 - Tidy up when pmtiles removed.
+- v4.5.0 - Fix pmtiles to look for maps in userdir rather than modules
+- v4.4.0 - Add quad(copter) drone icon.
+- v4.3.3 - Fix for objects changing layers.
+- v4.3.2 - Fix geojson popup missing label name.
+- v4.3.1 - Small fix to icon transparency, and routing detail.
+- v4.3.0 - Add support for PMtiles files.
+- v4.2.1 - Revert use of optional chaining to extend life slightly. Issue #252
+- v4.2.0 - Let icons also be inline images data:image... 
+- v4.1.0 - Add optional SOG, COG, altft, altm input properties.
+- v4.0.0 - Breaking - Better context menu variable substitution and retention
             Now uses ${name} syntax rather than $name so we can handle user defined variables in context menus.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
@@ -145,6 +146,8 @@ SIDC codes can be generated using the online tool - https://www.spatialillusions
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 
 Note: If the SIDC code is a 2525C 15 characters long, where chars 13 and 14 are a country code - then the country flag emoji is added to the staffComments field of the icon. If it's a 20 char 2525D code then the options:country property will be used to create the flag.
+
+Note: Not all browsers/OS support unicode emoji - if you can see the Swiss flag here (🇨🇭) then you may be OK.
 
 #### TAK Visualisation
 
