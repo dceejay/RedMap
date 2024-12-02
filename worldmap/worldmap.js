@@ -3336,15 +3336,15 @@ function doTAKjson(p) {
         d.lon = Number(p.point.lon);
         d.layer = "TAK";
         if (p.type.indexOf('a') === 0) {
-            d.hdg = p.detail?.track?.course;
+            d.track = p.detail?.track?.course;
+            if (d.track && d.track == 9999999) { delete d.track; }
+            if (d?.track) { d.track = Math.round(d.track * 100)/100; }
             if (p.detail?.track?.speed) {
                 d.speed = Number(p.detail?.track?.speed);
                 if (d.speed == 9999999 || d.speed == 0) { delete d.speed; }
                 else {
                     d.speed = d.speed + " m/s";
-                    delete d.hdg;
-                    d.course = p.detail?.track?.course;
-                    d.options = { direction: d.course };
+                    if (d?.track) { d.options = { direction: d.track } };
                 }
             }
             if (p.detail?.__group?.name) {
@@ -3371,7 +3371,6 @@ function doTAKjson(p) {
         d.alt = Number(p.point.hae) || 9999999;
         if (d?.alt && parseInt(d.alt) == 9999999) { delete d.alt; }
         else { d.alt = d.alt + "m"; }
-        if (d?.hdg && parseInt(d.hdg) == 9999999) { delete d.hdg; }
         setMarker(d);
     }
     else {
@@ -3395,15 +3394,15 @@ function doTAKMCjson(p) {
         d.type = p.type;
         d.uid = p.uid;
         d.name = p.detail?.contact?.callsign || p.uid;
-        d.hdg = p.detail?.track?.course;
+        d.track = p.detail?.track?.course;
+        if (d?.track && d.track == 9999999) { delete d.track; }
+        if (d?.track) { d.track = Math.round(d.track * 100)/100; }
         if (p.detail?.track?.speed) {
             d.speed = Number(p.detail?.track?.speed);
             if (d.speed == 9999999 || d.speed == 0) { delete d.speed; }
             else {
                 d.speed = d.speed + " m/s";
-                delete d.hdg;
-                d.course = p.detail?.track?.course;
-                d.options = { direction: d.course };
+                if (d?.track) { d.options = { direction: d.track } };
             }
         }
         try {
@@ -3415,7 +3414,6 @@ function doTAKMCjson(p) {
         d.alt = p.hae || 9999999;
         if (d.alt && d.alt == 9999999) { delete d.alt; }
         else { d.alt = d.alt + "m"; }
-        if (d.hdg && d.hdg == 9999999) { delete d.hdg; }
         setMarker(d);
     }
     else {
