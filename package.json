@@ -6,7 +6,7 @@
         "@turf/bezier-spline": "~7.1.0",
         "cgi": "0.3.1",
         "compression": "^1.7.5",
-        "express": "^4.21.1",
+        "express": "^4.21.2",
         "sockjs": "~0.3.24"
     },
     "bundledDependencies": [
