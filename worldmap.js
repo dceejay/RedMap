@@ -17,11 +17,9 @@ module.exports = function(RED) {
             urlPath: "/cgi-bin",
             filePath: __dirname,
             // extensions: { "/bin/sh": ["sh"] },
-            debugOutput: true
+            debugOutput: false
         };
-        console.log("CGI-BIN",cgiconfig);
         RED.httpNode.all("/cgi-bin*", core.createHandler(cgiconfig));
-        console.log(RED)
     }
 
     var pmtiles;
