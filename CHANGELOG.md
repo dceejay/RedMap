@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v6.0.0 - Change cgi lib for MIT licensed cgi-core, needs mapserv.sh. Bump for express library security update.
  - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
  - v5.0.7 - Allow Tooltip options (see new example). #PR295.
  - v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.

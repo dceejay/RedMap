@@ -3326,7 +3326,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
     map.addLayer(layers[lay]);
 }
 
-// handle TAK messages from TAK server tcp - XML->JSON
+// handle TAK messages from TAK server tcp - XML->JSON (use fastXML node)
 function doTAKjson(p) {
     //console.log("TAK event",p);
     if (p.type.indexOf('a-') === 0 || p.type.indexOf('b-m-p-') === 0 || p.type.indexOf('b-a-o-') === 0 || p.type.indexOf('b-a-g') === 0) {

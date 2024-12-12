@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v6.0.0 - Change cgi lib for MIT licensed cgi-core, needs mapserv.sh. Bump for express library security update.
 - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
 - v5.0.7 - Allow Tooltip options (see new example). #PR295.
 - v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
@@ -20,7 +21,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v5.0.3 - Add great context menu example flow. PR#290. Bump express lib. PR#291.
 - v5.0.2 - Fix sidcEdgeIcon docs PR#289.
 - v5.0.1 - Fix isArray error PR #288.
-- v5.0.0 - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
+- v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
 - v4.9.0 - If payload.flag is two char ISO code replace it with flag emoji. Revert part of PR #271
 - v4.8.1 - Slight tidy of some of the geojson handling
 - v4.8.0 - Merged PR for feedback functionality cleanup and example. PR #271 and #272
@@ -795,8 +796,8 @@ IMHO the easiest WMS map server to make work is the <a href="http://www.mapserve
 
 Configuring that, setting up your tiles, and creating a **.map** file is way beyond the scope of this README so I will leave that as an exercise for the reader. Once set up you should have a cgi process you can run called `mapserv`, and a `.map` file that describes the layers available from the server.
 
-Create and edit these into an executeable file called **mapserv**, located in this node's directory, typically
-`~/.node-red/node_modules/node-red-contrib-web-worldmap/mapserv`, for example:
+Create and edit these into an executeable file called **mapserv.sh**, located in this node's directory, typically
+`~/.node-red/node_modules/node-red-contrib-web-worldmap/mapserv.sh`, for example:
 
     #! /bin/sh
     # set this to the path of your WMS map file (which in turn points to your tiles)
@@ -809,7 +810,7 @@ You can then add a new WMS Base layer by injecting a message like
 
     msg.payload = { command : { map : {
         "name": "Local WMS",
-        "url": "/cgi-bin/mapserv",   // we will serve the tiles from this node locally.
+        "url": "/cgi-bin/mapserv.sh",   // we will serve the tiles from this node locally.
         "opt": {
             "layers": "gb",          // specifies a layer in your map file
             "format": "image/png",
@@ -833,5 +834,7 @@ It also shows how to zoom and move the map or add a new layer.
     [{"id":"86457344.50e6b","type":"inject","z":"cb7b09e3354afd4c","name":"","repeat":"","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":170,"y":500,"wires":[["9a142026.fa47f"]]},{"id":"9a142026.fa47f","type":"function","z":"cb7b09e3354afd4c","name":"add new layer","func":"msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = { maxZoom: 19, attribution: '&copy; OpenStreetMap'};\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":400,"y":500,"wires":[["c643e022.1816c"]]},{"id":"c643e022.1816c","type":"worldmap","z":"cb7b09e3354afd4c","name":"","lat":"30","lon":"0","zoom":"3","layer":"OSMG","cluster":"","maxage":"","usermenu":"show","layers":"show","panit":"false","panlock":"false","zoomlock":"false","hiderightclick":"false","coords":"deg","showgrid":"false","showruler":"false","allowFileDrop":"false","path":"worldmap","overlist":"CO,RA,DN","maplist":"OSMG,OSMH,EsriS","mapname":"","mapurl":"","mapopt":"","mapwms":false,"x":640,"y":540,"wires":[]},{"id":"2998e233.4ba64e","type":"function","z":"cb7b09e3354afd4c","name":"USGS Quake monitor csv re-parse","func":"msg.payload.lat = msg.payload.latitude;\nmsg.payload.lon = msg.payload.longitude;\nmsg.payload.layer = \"earthquake\";\nmsg.payload.name = msg.payload.id;\nmsg.payload.icon = \"globe\";\nmsg.payload.iconColor = \"orange\";\n\ndelete msg.payload.latitude;\ndelete msg.payload.longitude;\t\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":520,"y":640,"wires":[["c643e022.1816c"]]},{"id":"e72c5732.9fa198","type":"function","z":"cb7b09e3354afd4c","name":"move and zoom","func":"msg.payload = { command:{layer:\"Esri Terrain\",lat:0,lon:-90,zoom:2} };\nreturn msg;","outputs":1,"timeout":"","noerr":0,"initialize":"","finalize":"","libs":[],"x":400,"y":540,"wires":[["c643e022.1816c"]]},{"id":"12317723.589249","type":"csv","z":"cb7b09e3354afd4c","name":"","sep":",","hdrin":true,"hdrout":"","multi":"one","ret":"\\n","temp":"","x":370,"y":580,"wires":[["2998e233.4ba64e"]]},{"id":"10e5e5f0.8daeaa","type":"inject","z":"cb7b09e3354afd4c","name":"","repeat":"","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":170,"y":540,"wires":[["e72c5732.9fa198"]]},{"id":"b6917d83.d1bac","type":"http request","z":"cb7b09e3354afd4c","name":"","method":"GET","url":"http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.csv","x":250,"y":640,"wires":[["12317723.589249"]]},{"id":"3842171.4d487e8","type":"inject","z":"cb7b09e3354afd4c","name":"Quakes","repeat":"900","crontab":"","once":false,"topic":"","payload":"","payloadType":"none","x":180,"y":580,"wires":[["b6917d83.d1bac"]]}]
 
 ---
+
+## Acknowledgements
 
 Car, Bus and Helicopter icons originally made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> are licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="mapinfo">CC 3.0 BY</a>.
