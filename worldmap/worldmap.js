@@ -146,7 +146,7 @@ var handleData = function(data) {
         }
 
         // handle any commands in the data
-        if (data.command) { doCommand(data.command); delete data.command; }
+        if (data?.command) { doCommand(data.command); delete data.command; }
 
         // handle raw geojson type msg
         if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
@@ -1267,7 +1267,7 @@ var addOverlays = function(overlist) {
         };
 
         var decode = function (encoded, options) {
-            options = defaultOptions(options);
+            options = defaultOptions();
             var flatPoints = decodeDeltas(encoded);
             var points = [];
             for (var i = 0, len = flatPoints.length; i + (options.dimension - 1) < len;) {
@@ -1281,7 +1281,7 @@ var addOverlays = function(overlist) {
         }
 
         var decodeDeltas = function (encoded, options) {
-            options = defaultOptions(options);
+            options = defaultOptions();
             var lastNumbers = [];
             var numbers = decodeFloats(encoded, options);
             for (var i = 0, len = numbers.length; i < len;) {
@@ -1293,7 +1293,7 @@ var addOverlays = function(overlist) {
         }
 
         var decodeFloats = function (encoded, options) {
-            options = defaultOptions(options);
+            options = defaultOptions();
             var numbers = decodeSignedIntegers(encoded);
             for (var i = 0, len = numbers.length; i < len; ++i) {
                 numbers[i] /= options.factor;
@@ -1676,7 +1676,7 @@ function setMarker(data) {
         });
         data = Object.assign({},allData[data["name"]]);
     }
-    delete data.action;
+    if (data.action) { delete data.action; }
 
     if (typeof markers[data["name"]] != "undefined") {
         if (markers[data["name"]].lay !== lay) {
@@ -3226,7 +3226,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
     opt.pointToLayer = function (feature, latlng) {
         var myMarker;
         if (feature.properties.hasOwnProperty("icon")) {
-            var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
+            var regi = /^[SGEIO][A-Z]{3}.*/i;  // if it looks like a SIDC code
             if (regi.test(feature.properties.icon)) {
                 feature.properties.SIDC = (feature.properties.icon.toUpperCase()+"------------").substr(0,12);
                 delete feature.properties.icon;
@@ -3272,7 +3272,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             });
         }
         if (!feature.properties.hasOwnProperty("title") && feature.properties.hasOwnProperty("marker-symbol")) {
-            if (!(feature.properties["marker-symbol"].indexOf('fa-') === 0)) {
+            if (!feature.properties["marker-symbol"].indexOf('fa-') === 0) {
                 feature.properties.title = feature.properties["marker-symbol"];
             }
         }
