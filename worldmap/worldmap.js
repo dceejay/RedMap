@@ -452,8 +452,9 @@ var edgeAware = function () {
     var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
     for (var id in markers) {
         if (allData[id] && allData[id].hasOwnProperty("SIDC")) {
-            markerLatLng = markers[id].getLatLng();
+            var markerLatLng = markers[id].getLatLng();
             if ( viewBounds.contains(markerLatLng) && !mapBounds.contains(markerLatLng) ) {
+                var x,y;
                 var k = (markerLatLng.lat - mapBoundsCenter.lat) / (markerLatLng.lng - mapBoundsCenter.lng);
 
                 if (markerLatLng.lng > mapBoundsCenter.lng) { x = mapBounds.getEast() - mapBoundsCenter.lng; }
@@ -726,12 +727,12 @@ function clearSearch() {
         }
     }
     removeMarks();
-    if (lockit) {
+    // if (lockit) {
         document.getElementById('searchResult').innerHTML = "";
-    }
-    else {
-        document.getElementById('searchResult').innerHTML = "";
-    }
+    // }
+    // else {
+    //     document.getElementById('searchResult').innerHTML = "";
+    // }
 }
 
 function removeMarks() {
@@ -902,7 +903,7 @@ var addThing = function() {
     colo = colorKeywordToRGB(colo);
     var hdg = parseFloat(bits[4] || 0);
     var drag = true;
-    var regi = /^[S,G,E,I,O][A-Z]{3}.*/i;  // if it looks like a SIDC code
+    var regi = /^[SGEIO][A-Z]{3}.*/i;  // if it looks like a SIDC code
     var d = {action:"point", name:bits[0].trim(), layer:lay, draggable:drag, lat:rclk.lat, lon:rclk.lng, hdg:hdg, ttl:0 };
     if (regi.test(icon)) {
         d.SIDC = (icon.toUpperCase()+"------------").substr(0,12);
@@ -1756,7 +1757,7 @@ function setMarker(data) {
         polygons[data["name"]].lay = lay;
         // if clickable then add popup
         if (opt.clickable === true) {
-            var words = "<b>"+data["name"]+"</b>";
+            let words = "<b>"+data["name"]+"</b>";
             if (data.popup) { words = words + "<br/>" + data.popup.replace(/\${name}/g,data["name"]); }
             polygons[data["name"]].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
         }
@@ -1852,11 +1853,11 @@ function setMarker(data) {
             data.iconColor = data.iconColor ?? "black";
             icon = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="20" height="20">';
             icon += '<path d="M15.388 4.781c.068.068.061.154-.171.656-.028.06-.18.277-.18.277s.102.113.13.14c.054.055.078.175.056.27-.068.295-.89 1.47-1.35 1.93-.285.286-.432.481-.422.56.009.068.117.356.24.64.219.5.3.599 2.762 3.339 1.95 2.169 2.546 2.87 2.582 3.028.098.439-.282.847-1.264 1.356l-.507.263-7.389-5.29-4.43 3.365.102.18c.056.099.519.676 1.029 1.283.51.607.933 1.161.94 1.232.026.284-1.111 1.177-1.282 1.006-.27-.27-1.399-1.131-1.494-1.14-.068-.007-1.04-.747-1.37-1.077-.329-.33-1.07-1.301-1.076-1.37-.01-.094-.871-1.224-1.14-1.493-.171-.171.722-1.308 1.006-1.282.07.007.625.43 1.231.94.607.51 1.185.973 1.283 1.029l.18.101 3.365-4.43-5.29-7.388.263-.507c.51-.982.918-1.362 1.357-1.264.158.035.859.632 3.028 2.581 2.74 2.462 2.838 2.544 3.339 2.762.284.124.572.232.639.24.08.01.274-.136.56-.422.46-.46 1.635-1.282 1.93-1.35.095-.022.216.003.27.057.028.028.139.129.139.129s.217-.153.277-.18c.502-.233.59-.238.657-.17z" fill="'+data.iconColor+'"/></svg>';
-            var svgplane = "data:image/svg+xml;base64," + btoa(icon);
+            var svgsplane = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"planeicon",
                 iconAnchor: [16, 16],
-                html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+(dir - 45)+'deg); -moz-transform:rotate('+(dir - 45)+'deg);"/>'
+                html:'<img src="'+svgsplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+(dir - 45)+'deg); -moz-transform:rotate('+(dir - 45)+'deg);"/>'
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -2052,7 +2053,7 @@ function setMarker(data) {
         }
         else if (data.icon.match(/^:.*:$/g)) { // emoji icon :smile:
             var em = emojify(data.icon);
-            var col = data.iconColor ?? "#910000";
+            let col = data.iconColor ?? "#910000";
             myMarker = L.divIcon({
                 className:"emicon",
                 html: '<center><span style="font-size:2em; color:'+col+'">'+em+'</span></center>',
@@ -2062,7 +2063,7 @@ function setMarker(data) {
             labelOffset = [12,-4];
         }
         else if (data.icon.match(/^https?:.*$|^\/|^data:image\//)) { // web url icon https://...
-            var sz = data.iconSize ?? 32;
+            let sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
                 iconSize: [sz, sz],
@@ -2074,8 +2075,8 @@ function setMarker(data) {
             delete data.iconSize;
         }
         else if (data.icon.substr(0,3) === "fa-") { // fa icon
-            var col = data.iconColor ?? "#910000";
-            var imod = "";
+            let col = data.iconColor ?? "#910000";
+            let imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "fa-2x "; }
             myMarker = L.divIcon({
                 className:"faicon",
@@ -2088,8 +2089,8 @@ function setMarker(data) {
             labelOffset = [8,-8];
         }
         else if (data.icon.substr(0,3) === "wi-") { // weather icon
-            var col = data.iconColor ?? "#910000";
-            var imod = "";
+            let col = data.iconColor ?? "#910000";
+            let imod = "";
             if (data.icon.indexOf(" ") === -1) { imod = "wi-2x "; }
             myMarker = L.divIcon({
                 className:"wiicon",
@@ -2447,7 +2448,7 @@ function setMarker(data) {
                     polygon.setStyle({opacity:0});
                 }
             }
-            polygon.name = data["name"];
+            if (polygon !== null) { polygon.name = data["name"]; }
             if (polygons[data["name"]] != null && polygons[data["name"]].hasOwnProperty("_layers")) {
                 polygons[data["name"]].addLayer(polygon);
             }
@@ -2553,7 +2554,7 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("grid")) {
         if (cmd.grid.hasOwnProperty("showgrid")) {
-            var changed = false;
+            let changed = false;
             if ((cmd.grid.showgrid == "true" || cmd.grid.showgrid == true ) && !showGrid) { changed = true; }
             if ((cmd.grid.showgrid == "false" || cmd.grid.showgrid == false ) && showGrid) { changed = true; }
             if (changed) {
@@ -2572,7 +2573,7 @@ function doCommand(cmd) {
     }
     if (cmd.hasOwnProperty("ruler")) {
         if (cmd.ruler.hasOwnProperty("showruler")) {
-            var changed = false;
+            let changed = false;
             if ((cmd.ruler.showruler == "true" || cmd.ruler.showruler == true ) && !showRuler) { changed = true; }
             if ((cmd.ruler.showruler == "false" || cmd.ruler.showruler == false ) && showRuler) { changed = true; }
             if (changed) {
@@ -2702,7 +2703,7 @@ function doCommand(cmd) {
                 basemaps[cmd.map.name].removeFrom(map);
                 existsalready = true;
             }
-            var opt = {};
+            let opt = {};
             if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt || {}; }
 
             if (!opt.paintRules && !opt.labelRules && !opt.backgroundColor && !opt.theme) {
@@ -2758,7 +2759,7 @@ function doCommand(cmd) {
             existsalready = true;
         }
         try {
-            var opt = cmd.map.opt || {};
+            let opt = cmd.map.opt || {};
             if (opt.hasOwnProperty("style")) { opt.style = new Function('return ' + opt.style)(); }
             else {
                 opt.style = function(feature) {
@@ -3271,7 +3272,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             });
         }
         if (!feature.properties.hasOwnProperty("title") && feature.properties.hasOwnProperty("marker-symbol")) {
-            if (!feature.properties["marker-symbol"].indexOf('fa-') === 0) {
+            if (!(feature.properties["marker-symbol"].indexOf('fa-') === 0)) {
                 feature.properties.title = feature.properties["marker-symbol"];
             }
         }
@@ -3422,7 +3423,7 @@ function doTAKMCjson(p) {
 }
 
 function convertCOTtoCIFColour(color) {
-    const c = parseInt(color);
+    // const c = parseInt(color);
     const arr = new ArrayBuffer(4);
     const view = new DataView(arr);
     view.setUint32(0, color, false);
