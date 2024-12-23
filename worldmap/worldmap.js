@@ -149,22 +149,22 @@ var handleData = function(data) {
         if (data?.command) { doCommand(data.command); delete data.command; }
 
         // handle raw geojson type msg
-        if (data.hasOwnProperty("type") && data.type.indexOf("Feature") === 0) {
+        if (data?.type && data.type.indexOf("Feature") === 0) {
             if (data?.properties?.title) {
                 doGeojson(data.properties.title,data,data?.layer,data?.options,data?.icon) // name, geojson, layer, options, icon
             }
             else { doGeojson("geojson",data,data?.layer,data?.options,data?.icon); }
         }
         // handle TAK json (from tak-ingest node or fastxml node)
-        else if (data.hasOwnProperty("event") && data.event.hasOwnProperty("point")) {
+        else if (data?.event?.point) {
             doTAKjson(data.event);
         }
         // handle TAK json (from multicast Protobuf via tak-ingest node)
-        else if (data.hasOwnProperty("cotEvent") && data.cotEvent.hasOwnProperty("lat") && data.cotEvent.hasOwnProperty("lon")) {
+        else if (data?.cotEvent && data.cotEvent.hasOwnProperty("lat") && data.cotEvent.hasOwnProperty("lon")) {
             doTAKMCjson(data.cotEvent);
         }
         // handle default worldmap json msg
-        else if (data.hasOwnProperty("name")) { setMarker(data); }
+        else if (data?.name) { setMarker(data); }
         else {
             if (JSON.stringify(data) !== '{}') {
                 console.log("SKIP",data);
@@ -1676,7 +1676,7 @@ function setMarker(data) {
         });
         data = Object.assign({},allData[data["name"]]);
     }
-    if (data.action) { delete data.action; }
+    delete data.action;
 
     if (typeof markers[data["name"]] != "undefined") {
         if (markers[data["name"]].lay !== lay) {
