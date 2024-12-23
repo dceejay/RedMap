@@ -1565,6 +1565,7 @@ var rangerings = function(latlng, options) {
 
 // the MAIN add marker or shape to map function
 function setMarker(data) {
+    if (!data) { return; }
     var rightmenu = function(m) {
         m.on('click', function(e) {
             var fb = allData[data["name"]];
