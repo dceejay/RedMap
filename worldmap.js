@@ -201,7 +201,7 @@ module.exports = function(RED) {
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
                 allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
             }
-            if (msg?.payload?.command?.map?.delete) {
+            if (msg.payload?.command?.map?.delete) {
                 var ddd = msg.payload.command.map.delete;
                 if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
                 for (let a=0; a < ddd.length; a++) {
@@ -227,7 +227,8 @@ module.exports = function(RED) {
             for (var i=0; i < RED.httpNode._router.stack.length; i++) {
                 var r = RED.httpNode._router.stack[i];
                 if ((r.name === "serveStatic") && (r.regexp.test(node.path))) {
-                    RED.httpNode._router.stack.splice(i, 1)
+                    RED.httpNode._router.stack.splice(i, 1);
+                    i = i-1;
                 }
             }
             node.status({});
@@ -479,7 +480,7 @@ module.exports = function(RED) {
                     node.send(newmsg);  // send the track
                 }
             }
-            if (msg?.payload?.command?.map?.delete) {
+            if (msg.payload?.command?.map?.delete) {
                 var ddd = msg.payload.command.map.delete;
                 if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
                 for (let a=0; a < ddd.length; a++) {
@@ -492,8 +493,8 @@ module.exports = function(RED) {
                     }
                 }
             }
-            if (msg?.payload?.command?.clear) {
-                if (!isArray(msg?.payload?.command?.clear)) {
+            if (msg.payload?.command?.clear) {
+                if (!isArray(msg.payload?.command?.clear)) {
                     msg.payload.command.clear = [ msg.payload.command.clear ]
                 }
                 msg.payload.command.clear.forEach(function(el) {
@@ -506,8 +507,8 @@ module.exports = function(RED) {
                     }
                 })
             }
-            if (msg?.payload?.command?.clearlayer) {
-                if (!isArray(msg?.payload?.command?.clearlayer)) {
+            if (msg.payload?.command?.clearlayer) {
+                if (!isArray(msg.payload?.command?.clearlayer)) {
                     msg.payload.command.clearlayer = [ msg.payload.command.clearlayer ]
                 }
                 msg.payload.command.clearlayer.forEach(function(el) {

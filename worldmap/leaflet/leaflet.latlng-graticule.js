@@ -230,12 +230,10 @@
                 this._currZoom = zoom;
             }
 
-            var interv;
-
             if (!this._currLngInterval) {
                 try {
-                    for (var idx in this.options.lngInterval) {
-                        var dict = this.options.lngInterval[idx];
+                    for (let idx in this.options.lngInterval) {
+                        let dict = this.options.lngInterval[idx];
                         if (dict.start <= zoom) {
                             if (dict.end && dict.end >= zoom) {
                                 this._currLngInterval = dict.interval;
@@ -251,8 +249,8 @@
 
             if (!this._currLatInterval) {
                 try {
-                    for (var idx in this.options.latInterval) {
-                        var dict = this.options.latInterval[idx];
+                    for (let idx in this.options.latInterval) {
+                        let dict = this.options.latInterval[idx];
                         if (dict.start <= zoom) {
                             if (dict.end && dict.end >= zoom) {
                                 this._currLatInterval = dict.interval;
@@ -365,7 +363,7 @@
                             _lon_delta = curvedLat;
                         }
 
-                        var __lon_left = _lon_l, __lon_right = _lon_r;
+                        let __lon_left = _lon_l, __lon_right = _lon_r;
                         if (ll.x > 0) {
                             var __lon_left = map.containerPointToLatLng(L.point(0, ll.y));
                             __lon_left = __lon_left.lng - _point_per_lon;
@@ -405,14 +403,14 @@
                         ctx.stroke();
                     }
                     else {
-                        var __lon_right = _lon_r;
+                        let __lon_right = _lon_r;
                         var rr = self._latLngToCanvasPoint(L.latLng(lat_tick, __lon_right));
                         if (curvedLon) {
                             __lon_right = map.containerPointToLatLng(L.point(0, rr.y));
                             __lon_right = __lon_right.lng;
                             rr = self._latLngToCanvasPoint(L.latLng(lat_tick, __lon_right));
 
-                            var __lon_left = map.containerPointToLatLng(L.point(ww, rr.y));
+                            let __lon_left = map.containerPointToLatLng(L.point(ww, rr.y));
                             __lon_left = __lon_left.lng;
                             ll = self._latLngToCanvasPoint(L.latLng(lat_tick, __lon_left));
                         }
