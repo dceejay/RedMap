@@ -3273,7 +3273,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             });
         }
         if (!feature.properties.hasOwnProperty("title") && feature.properties.hasOwnProperty("marker-symbol")) {
-            if (!feature.properties["marker-symbol"].indexOf('fa-') === 0) {
+            if (feature.properties["marker-symbol"].indexOf('fa-') !== 0) {
                 feature.properties.title = feature.properties["marker-symbol"];
             }
         }
