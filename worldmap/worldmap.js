@@ -118,17 +118,17 @@ console.log("CONNECT TO",location.pathname + 'socket');
 var handleData = function(data) {
     if (Array.isArray(data)) {
         // console.log("ARRAY:",data.length);
-        for (var prop in data) {
-            if (data[prop].command) { doCommand(data[prop].command); delete data[prop].command; }
-            if (data[prop].hasOwnProperty("name")) {
-                setMarker(data[prop]);
-                // bnds.extend(markers[data[prop].name].getLatLng());
+        for (var prop of data) {
+            if (prop.command) { doCommand(prop.command); delete prop.command; }
+            if (prop.hasOwnProperty("name")) {
+                setMarker(prop);
+                // bnds.extend(markers[prop.name].getLatLng());
             }
-            else if (data[prop].hasOwnProperty("filename") && data[prop].filename === "doc.kml") {
-                data = {command:{map:{overlay:"KML", kml:data[prop].payload}}};
+            else if (prop.hasOwnProperty("filename") && prop.filename === "doc.kml") {
+                data = {command:{map:{overlay:"KML", kml:prop.payload}}};
                 doCommand(data.command); return;
             }
-            else { console.log("SKIP array item",data[prop]); }
+            else { console.log("SKIP array item",prop); }
         }
     }
     else {
@@ -329,7 +329,7 @@ var errRing;
 function onLocationFound(e) {
     if (followState === true) { map.panTo(e.latlng); }
     if (followMode.icon) {
-        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:e.heading, speed:(e.speed*1 ?? undefined), layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
+        var self = {name:followMode.name || "self", lat:e.latlng.lat, lon:e.latlng.lng, hdg:isNaN(e?.heading * 1) ? undefined : e?.heading * 1, speed:isNaN(e?.speed * 1) ? undefined : e?.speed * 1, layer:followMode.layer, icon:followMode.icon, iconColor:followMode.iconColor ?? "#910000" };
         setMarker(self);
     }
     if (e.heading !== null) { map.setBearing(e.heading); }
@@ -344,7 +344,7 @@ function onLocationFound(e) {
         //     L.polygon([ e.latlng, lla ], {color:"00ffff", weight:3, opacity:0.5, clickable:false}).addTo(map);
         // }
     }
-    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:e.heading, speed:(e.speed*1 ?? undefined)}));
+    ws.send(JSON.stringify({action:"point", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5), point:"self", hdg:isNaN(e?.heading * 1) ? undefined : e?.heading * 1, speed:isNaN(e?.speed * 1) ? undefined : e?.speed * 1}));
 }
 
 function onLocationError(e) { console.log(e.message); }
@@ -2197,9 +2197,9 @@ function setMarker(data) {
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
             marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
-            var b = marker.getPopup().getContent().split("heading : ");
-            if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
-            else { b = undefined; }
+            // var b = marker.getPopup().getContent().split("heading : ");
+            // if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
+            // else { b = undefined; }
 
             var fb = allData[marker.name];
             fb.action = "move";
@@ -2306,7 +2306,7 @@ function setMarker(data) {
         delete data.popped;
     }
     // If .label then use that rather than name tooltip
-    if (data.label) {
+    if (data.hasOwnProperty("label")) {
         if (typeof data.label === "boolean" && data.label === true) {
             marker.bindTooltip(data["name"], data.tooltipOptions || { permanent:true, direction:"right", offset:labelOffset });
         }
@@ -2317,7 +2317,7 @@ function setMarker(data) {
         delete data.label;
     }
     // otherwise check for .tooltip then use that rather than name tooltip
-    else if (data.tooltip) {
+    else if (data.hasOwnProperty("tooltip")) {
         if (typeof data.tooltip === "string" && data.tooltip.length > 0) {
             marker.bindTooltip(data.tooltip, data.tooltipOptions || { direction:"bottom", offset:[0,4] });
             delete marker.options.title;
