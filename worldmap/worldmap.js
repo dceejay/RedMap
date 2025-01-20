@@ -1827,7 +1827,7 @@ function setMarker(data) {
         var siz = 32;
         var sizc = 16;
         if (data?.iconSize && !isNaN(data.iconSize)) {
-            if (data.iconSize >= 8 && data.iconSize <= 256) {
+            if (data.iconSize >= 8 && data.iconSize <= 512) {
                 siz = data.iconSize;
                 sizc = Math.round(siz/2);
             }
