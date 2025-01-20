@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.1.0 - Let special icons be sizeable using iconSize property.
 - v5.0.9 - Slight tidy on flags, bump turf dep.
 - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
 - v5.0.7 - Allow Tooltip options (see new example). #PR295.
@@ -78,6 +79,7 @@ Optional properties for **msg.payload** include
  - **color** : CSS color name or #rrggbb value for heading vector line or accuracy polygon.
  - **icon** : <a href="https://fontawesome.com/v4.7.0/icons/" target="mapinfo">font awesome</a> icon name, <a href="https://github.com/Paul-Reed/weather-icons-lite" target="mapinfo">weather-lite</a> icon, :emoji name:, or https:// or inline data:image/ uri.
  - **iconColor** : Standard CSS colour name or #rrggbb hex value.
+ - **iconSize** : Set the size in pixels of the "special" icons and web icons.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
  - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds)
@@ -105,7 +107,7 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
-Or you can specify an image to load as an icon by setting the icon to `http(s)://...` By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form `data:image/...`  which uses a base64 encoded image.
+Or you can specify an image to load as an icon by setting the icon to `http(s)://...` By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number of pixels - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form `data:image/...`  which uses a base64 encoded image.
 
 There are also several special icons...
 
@@ -128,6 +130,9 @@ There are also several special icons...
  - **neutral** : pseudo NATO style green square.
  - **unknown** : pseudo NATO style yellow square.
  - **earthquake** : black circle - diameter proportional to `msg.mag`.
+
+ The size of these can also be set in pixels using the **iconSize** property, e.g. `iconSize:96`. 
+ The default size is 32 pixels.
 
 #### NATO Symbology
 

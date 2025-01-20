@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.1.0 - Let special icons be sizeable using iconSize property.
  - v5.0.9 - Slight tidy on flags, bump turf dep.
  - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
  - v5.0.7 - Allow Tooltip options (see new example). #PR295.

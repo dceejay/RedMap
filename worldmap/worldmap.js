@@ -1824,6 +1824,14 @@ function setMarker(data) {
 
     if (data.hasOwnProperty("icon")) {
         var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? "0") + map.getBearing();
+        var siz = 32;
+        var sizc = 16;
+        if (data?.iconSize && !isNaN(data.iconSize)) {
+            if (data.iconSize >= 8 && data.iconSize <= 256) {
+                siz = data.iconSize;
+                sizc = Math.round(siz/2);
+            }
+        }
         if (data.icon === "ship") {
             marker = L.boatMarker(ll, {
                 title: data["name"],
@@ -1845,20 +1853,20 @@ function setMarker(data) {
             var svgplane = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"planeicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgplane+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "smallplane") {
             data.iconColor = data.iconColor ?? "black";
-            icon = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="20" height="20">';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 20 20">';
             icon += '<path d="M15.388 4.781c.068.068.061.154-.171.656-.028.06-.18.277-.18.277s.102.113.13.14c.054.055.078.175.056.27-.068.295-.89 1.47-1.35 1.93-.285.286-.432.481-.422.56.009.068.117.356.24.64.219.5.3.599 2.762 3.339 1.95 2.169 2.546 2.87 2.582 3.028.098.439-.282.847-1.264 1.356l-.507.263-7.389-5.29-4.43 3.365.102.18c.056.099.519.676 1.029 1.283.51.607.933 1.161.94 1.232.026.284-1.111 1.177-1.282 1.006-.27-.27-1.399-1.131-1.494-1.14-.068-.007-1.04-.747-1.37-1.077-.329-.33-1.07-1.301-1.076-1.37-.01-.094-.871-1.224-1.14-1.493-.171-.171.722-1.308 1.006-1.282.07.007.625.43 1.231.94.607.51 1.185.973 1.283 1.029l.18.101 3.365-4.43-5.29-7.388.263-.507c.51-.982.918-1.362 1.357-1.264.158.035.859.632 3.028 2.581 2.74 2.462 2.838 2.544 3.339 2.762.284.124.572.232.639.24.08.01.274-.136.56-.422.46-.46 1.635-1.282 1.93-1.35.095-.022.216.003.27.057.028.028.139.129.139.129s.217-.153.277-.18c.502-.233.59-.238.657-.17z" fill="'+data.iconColor+'"/></svg>';
             var svgsplane = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"planeicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgsplane+'" style="width:32px; height:32px; -webkit-transform:rotate('+(dir - 45)+'deg); -moz-transform:rotate('+(dir - 45)+'deg);"/>'
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgsplane+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+(dir - 45)+'deg); -moz-transform:rotate('+(dir - 45)+'deg);"/>'
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1873,8 +1881,8 @@ function setMarker(data) {
             var svgbus = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"busicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgbus+'" style="width:32px; height:32px; -webkit-transform:scaleY('+sc+') rotate('+dir*sc+'deg); -moz-transform:scaleY('+sc+') rotate('+dir*sc+'deg);"/>'
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgbus+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:scaleY('+sc+') rotate('+dir*sc+'deg); -moz-transform:scaleY('+sc+') rotate('+dir*sc+'deg);"/>'
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1890,8 +1898,8 @@ function setMarker(data) {
             var svgheli = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"heliicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgheli+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgheli+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>'
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1907,8 +1915,8 @@ function setMarker(data) {
             var svguav = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"uavicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svguav+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svguav+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1919,8 +1927,8 @@ function setMarker(data) {
             var svgquad = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"quadicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgquad+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgquad+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1931,8 +1939,8 @@ function setMarker(data) {
             var svgcar = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"caricon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgcar+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgcar+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1942,21 +1950,22 @@ function setMarker(data) {
             var svgcam = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"camicon",
-                iconAnchor: [12, 12],
-                html:'<img src="'+svgcam+'" style="width:24px; height:24px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgcam+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "arrow") {
             data.iconColor = data.iconColor || "black";
-            icon = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32px" height="32px" viewBox="0 0 32 32">';
-            icon += '<path d="m16.2 0.6l-10.9 31 10.7-11.1 10.5 11.1 -10.3-31z" fill="'+data.iconColor+'"/></svg>';
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">';
+            icon += '<path d="m16.2.6-10.9 31L16 20.5l10.5 11.1z" fill="'+data.iconColor+'"/></svg>';
             var svgarrow = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"arrowicon",
-                iconAnchor: [16, 16],
-                html:"'<img src='"+svgarrow+"' style='width:32px; height:32px; -webkit-transform:translate(0px,-16px) rotate("+dir+"deg); -moz-transform:translate(0px,-16px) rotate("+dir+"deg);'/>",
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgarrow+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
+            console.log("MM",myMarker)
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "wind") {
@@ -1966,8 +1975,8 @@ function setMarker(data) {
             var svgwind = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"windicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgwind+'" style="width:32px; height:32px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgwind+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -1983,8 +1992,8 @@ function setMarker(data) {
             var svgsat = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"satelliteicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svgsat+'" style="width:32px; height:32px;"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svgsat+'" style="width:'+siz+'px; height:'+siz+'px;"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
@@ -2028,8 +2037,8 @@ function setMarker(data) {
             var svglocate = "data:image/svg+xml;base64," + btoa(icon);
             myMarker = L.divIcon({
                 className:"locateicon",
-                iconAnchor: [16, 16],
-                html:'<img src="'+svglocate+'" style="width:32px; height:32px;"/>',
+                iconAnchor: [sizc, sizc],
+                html:'<img src="'+svglocate+'" style="width:'+siz+'px; height:'+siz+'px;"/>',
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [12,-4];
@@ -2064,16 +2073,14 @@ function setMarker(data) {
             labelOffset = [12,-4];
         }
         else if (data.icon.match(/^https?:.*$|^\/|^data:image\//)) { // web url icon https://...
-            let sz = data.iconSize ?? 32;
             myMarker = L.icon({
                 iconUrl: data.icon,
-                iconSize: [sz, sz],
-                iconAnchor: [sz/2, sz/2],
-                popupAnchor: [0, -sz/2]
+                iconSize: [siz, siz],
+                iconAnchor: [sizc, sizc],
+                popupAnchor: [0, -siz/2]
             });
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag, rotationAngle:dir, rotationOrigin:"center"});
-            labelOffset = [sz/2-4,-4];
-            delete data.iconSize;
+            labelOffset = [sizc-4,-4];
         }
         else if (data.icon.substr(0,3) === "fa-") { // fa icon
             let col = data.iconColor ?? "#910000";
@@ -2113,6 +2120,7 @@ function setMarker(data) {
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
             labelOffset = [6,-6];
         }
+        delete data.iconSize;
     }
     else if (data.hasOwnProperty("SIDC")) {  // NATO mil2525 icons
         // "SIDC":"SFGPU------E***","name":"1.C2 komp","fullname":"1.C2 komp/FTS/INSS"
