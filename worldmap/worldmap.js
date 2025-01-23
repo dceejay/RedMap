@@ -3384,6 +3384,10 @@ function doTAKjson(p) {
         d.alt = Number(p.point.hae) || 9999999;
         if (d?.alt && parseInt(d.alt) == 9999999) { delete d.alt; }
         else { d.alt = d.alt + "m"; }
+        if (p?.detail?.image && p?.detail?.image['#text']) {
+            d.image = p?.detail?.image['#text'];
+            d.image = '<img alt="" src="data:image/webp;base64,'+d.image+'" width="240px"/>';
+        }
         setMarker(d);
     }
     else {
