@@ -253,9 +253,10 @@ var readFile = function(file) {
         file.type.indexOf('kmz') === -1 &&
         file.type.indexOf('json') === -1 &&
         file.type.indexOf('image/jpeg') === -1 &&
+        file.type.indexOf('image/webp') === -1 &&
         file.type.indexOf('image/png') === -1 &&
         file.type.indexOf('image/tiff') === -1) {
-        console.log('File is not text, kml, kmz, jpeg, png, or json', file.type, file);
+        console.log('File is not text, kml, kmz, jpeg, png, webp, or json', file.type, file);
         return;
     }
 
@@ -2359,17 +2360,19 @@ function setMarker(data) {
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
 
     // then any remaining properties to the info box
+    var longline = 0;
     if (data.popup) { words = data.popup; }
     else {
         words += '<table>';
         for (var i in data) {
             if ((i != "name") && (i != "length") && (i != "clickable")) {
                 if (typeof data[i] === "object") {
-                    words += '<tr><td>'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
+                    words += '<tr><td valign="top">'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
                 }
                 else {
                     // words += i +" : "+data[i]+"<br/>";
-                    words += '<tr><td>'+ i +'</td><td>' + data[i] + '</td></tr>';
+                    if (data[i].length > longline) { longline = data[i].length; }
+                    words += '<tr><td valign="top">'+ i +'</td><td>' + data[i] + '</td></tr>';
                 }
             }
         }
@@ -2379,6 +2382,7 @@ function setMarker(data) {
     words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
     var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
     if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
+    if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
     if (!data.hasOwnProperty("clickable") && data.clickable != false) {
         marker.bindPopup(words, wopt);
         marker._popup.dname = data["name"];

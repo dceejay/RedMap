@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.1.2 - Fix for longer line msg properties.
 - v5.1.1 - Fix CoT inline image.
 - v5.1.0 - Let special icons be sizeable using iconSize property.
 - v5.0.9 - Slight tidy on flags, bump turf dep.
