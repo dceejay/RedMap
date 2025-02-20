@@ -736,7 +736,6 @@ Custom Feedback Content - This exaple below shows how you can pass the latitude 
 
 ```
 var menu ='<center><br/>';
-//menu += '';
 menu += 'Add some data <input type="text" id="foo" placeholder="foo"><br/>';
 menu += 'Add more data <input type="text" id="bar" placeholder="bar"><br/>';
 menu += '<input type="button" value="Submit" onclick=';
