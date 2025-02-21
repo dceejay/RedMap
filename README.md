@@ -723,7 +723,7 @@ There are some internal functions available to make interacting with Node-RED ea
 
  - **addToForm()** : takes a property name value pair to add to a variable called `form`. When used with contextmenu feedback (above) you can set the feedback value to `"_form"` to substitute this accumulated value. This allows you to do things like `onBlur='addToForm(this.name,this.value)'` over several different fields in the menu and then use `feedback(this.name,"_form")` to submit them all at once. For example a simple multiple line form could be as per the example below:
 
- Also if you wish to retain the values between separate openings of this form you can assign property names to the value field in the form `value="${foo}`, etc. These will then appear as part of an **value** property on the worldmap-in node message.
+Retain Values - If you wish to retain the values between separate openings of this form you can assign property names to the value field in the form `value="${foo}`, etc. These will then appear as part of an **value** property on the worldmap-in node message.
 
 ```
 var menu = 'Add some data <input name="foo" value="${foo}" onchange=\'addToForm(this.name,this.value)\'></input><br/>'
@@ -731,6 +731,23 @@ menu += 'Add more data <input name="bar" value="${bar}" onchange=\'addToForm(thi
 menu += '<button name="my_form" onclick=\'feedback(this.name,"_form","formAction",true)\'>Submit</button>'
 msg.payload = { command: { "contextmenu":menu } }
 ```
+
+Custom Feedback Content - This exaple below shows how you can pass the latitude and longitude location value from the contextmenu popup when right clicking the map. You can use this method any other data you wish.
+
+```
+var menu ='<center><br/>';
+menu += 'Add some data <input type="text" id="foo" placeholder="foo"><br/>';
+menu += 'Add more data <input type="text" id="bar" placeholder="bar"><br/>';
+menu += '<input type="button" value="Submit" onclick=';
+menu += '\'feedback("myform",{';
+menu += '"foo":document.getElementById("foo").value,';
+menu += '"bar":document.getElementById("bar").value,';
+menu += '"lat":rclk.lat.toFixed(12),';
+menu += '"lon":rclk.lng.toFixed(12),';
+menu += '},"formAction",true)\' > <br/><br/> ';
+msg.payload = { command: { "contextmenu":menu } }
+```
+For a more detailed example flow using this method see: [Moving Icons Demo & Builder](https://github.com/dceejay/RedMap/blob/master/examples/Moving%20Icons%20Demo%20%26%20Builder.json)
 
  - **delMarker()** : takes the name of the marker as a parameter. In a popup this can be specified as `${name}` for dynamic substitution.
 
