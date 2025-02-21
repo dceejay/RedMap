@@ -732,7 +732,7 @@ menu += '<button name="my_form" onclick=\'feedback(this.name,"_form","formAction
 msg.payload = { command: { "contextmenu":menu } }
 ```
 
-Custom Feedback Content - This exaple below shows how you can pass the latitude and longitude location value from the contextmenu popup when right clicking the map. You can use this method any other data you wish.
+Custom Feedback Content - The example below shows how you can pass the latitude and longitude location value from the contextmenu popup when right clicking the map. You can also use this method with other data you wish.
 
 ```
 var menu ='<center><br/>';
