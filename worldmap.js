@@ -494,7 +494,7 @@ module.exports = function(RED) {
                 }
             }
             if (msg.payload?.command?.clear) {
-                if (!isArray(msg.payload?.command?.clear)) {
+                if (!Array.isArray(msg.payload?.command?.clear)) {
                     msg.payload.command.clear = [ msg.payload.command.clear ]
                 }
                 msg.payload.command.clear.forEach(function(el) {
@@ -508,7 +508,7 @@ module.exports = function(RED) {
                 })
             }
             if (msg.payload?.command?.clearlayer) {
-                if (!isArray(msg.payload?.command?.clearlayer)) {
+                if (!Array.isArray(msg.payload?.command?.clearlayer)) {
                     msg.payload.command.clearlayer = [ msg.payload.command.clearlayer ]
                 }
                 msg.payload.command.clearlayer.forEach(function(el) {
