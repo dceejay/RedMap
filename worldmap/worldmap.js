@@ -3346,7 +3346,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
 // handle TAK messages from TAK server tcp - XML->JSON
 function doTAKjson(p) {
     //console.log("TAK event",p);
-    if (p.type.indexOf('a-') === 0 || p.type.indexOf('b-m-p-') === 0 || p.type.indexOf('b-a-o-') === 0 || p.type.indexOf('b-a-g') === 0) {
+    if (p?.type && (p.type.indexOf('a-') === 0 || p.type.indexOf('b-m-p-') === 0 || p.type.indexOf('b-a-o-') === 0 || p.type.indexOf('b-a-g') === 0)) {
         var d = {};
         d.name = p.detail?.contact?.callsign || p.uid;
         d.lat = Number(p.point.lat);
@@ -3402,7 +3402,7 @@ function doTAKjson(p) {
 // handle TAK messages from TAK Multicast - Protobuf->JSON
 function doTAKMCjson(p) {
     // console.log("TAK Multicast event",p);
-    if (p.type.indexOf('a') === 0) {
+    if (p?.type && p.type.indexOf('a') === 0) {
         var d = {};
         d.lat = p.lat;
         d.lon = p.lon;
