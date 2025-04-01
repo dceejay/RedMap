@@ -3395,7 +3395,7 @@ function doTAKjson(p) {
         setMarker(d);
     }
     else {
-        console.log("Skip TAK type",p.type);
+        console.log("Skip TAK type",p?.type);
     }
 }
 
@@ -3438,7 +3438,7 @@ function doTAKMCjson(p) {
         setMarker(d);
     }
     else {
-        console.log("Skip TAK type",p.type);
+        console.log("Skip TAK type",p?.type);
     }
 }
 
