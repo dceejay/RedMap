@@ -402,6 +402,7 @@ module.exports = function(RED) {
 
         var doTrack = function(msg) {
             if (msg.hasOwnProperty("payload") && msg.payload.hasOwnProperty("name")) {
+                if (!msg.payload.layer) { msg.payload.layer = "unknown"; }
                 var newmsg = RED.util.cloneMessage(msg);
                 if (msg.payload.deleted) {
                     if (msg.payload.name.substr(-1) === '_') {
@@ -474,8 +475,12 @@ module.exports = function(RED) {
                             newmsg.payload.layer = newmsg.payload.layer.substr(1);
                         }
                     }
-                    if (node.layer === "single") {
+                    else if (node.layer === "single") {
                         newmsg.payload.layer = "Tracks";
+                    }
+                    else {
+                        newmsg.payload.layer = msg.payload.layer;
+
                     }
                     node.send(newmsg);  // send the track
                 }
