@@ -418,8 +418,8 @@ You can also use the name "none" to completely remove the base layer,
 
 #### To clear all markers from a layer, or an overlay from the map
 
-    msg.payload = { "command": { "clearlayer: "name of the layer/overlay you wish to clear" }};
-    msg.payload = { "command": { "clearlayer: ["array","ofLayer","names","toClear"] }};
+    msg.payload = { "command": { "clearlayer": "name of the layer/overlay you wish to clear" }};
+    msg.payload = { "command": { "clearlayer": ["array","ofLayer","names","toClear"] }};
 
 Feeding this into the tracks node will also remove the tracks stored for that layer.
 
