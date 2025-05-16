@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.1.5 - Fix links to SIDC unitgenerator so it is now local.
 - v5.1.4 - Fix clearlayer for tracks node.
 - v5.1.2 - Fix for longer line msg properties.
 - v5.1.1 - Fix CoT inline image.
@@ -130,7 +131,7 @@ To do this you need to supply a `msg.payload.SIDC` 2525 code instead of an icon,
         "options": { "fillOpacity":0.8, "additionalInformation":"Extra info" }
     }
 
-SIDC codes can be generated using the online tool - https://www.spatialillusions.com/unitgenerator-legacy/
+SIDC codes can be generated using the built-in unitgenerator tool.
 
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 

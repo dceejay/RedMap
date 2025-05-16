@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.1.5 - Fix links to SIDC unitgenerator so it is now local.
  - v5.1.4 - Fix clearlayer for tracks node.
  - v5.1.2 - Fix for longer line msg properties.
  - v5.1.1 - Fix CoT inline image.

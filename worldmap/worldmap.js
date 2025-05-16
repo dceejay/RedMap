@@ -878,7 +878,7 @@ map.on('locationerror', onLocationError);
 
 // single right click to add a marker
 var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
-if (navigator.onLine) { addmenu += '<br/><a href="https://www.spatialillusions.com/unitgenerator-legacy/" target="_new">MilSymbol SIDC generator</a>'; }
+addmenu += '<br/><a href="unitgenerator.html" target="_new">MilSymbol SIDC generator</a>';
 var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
 
 const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
