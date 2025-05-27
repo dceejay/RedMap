@@ -3472,18 +3472,23 @@ function createRings(r) {
 
 function handleCoTtypes(d,p) {
     if (d.type.indexOf('a-') === 0) { // handle a- types
-        var i = d.type.split('-').join('').toUpperCase();
-        i = 'S' + i.substr(1,2) + 'P' + i.substr(3);
-        if (d.role === 'Team Lead') { i = i + '----B'; }
-        if (d.role === 'HQ') { i = 'SFGPUH' };
-        if (d.role === "Medic") { i = 'SFGPUSM----A'; }
-        if (d.role === "RTO") { i = 'SFGPUUS'; }
-        if (d.role === 'K9') { i = 'SFGPUU'; }
-        d.SIDC = (i + '-------').substr(0,12);
-        // Handle "special" types
-        if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
-        if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
-        if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+        if (p?.detail?.__milsym?.id) {
+            d.SIDC = p.detail.__milsym.id;
+        }
+        else {
+            var i = d.type.split('-').join('').toUpperCase();
+            i = 'S' + i.substr(1,2) + 'P' + i.substr(3);
+            if (d.role === 'Team Lead') { i = i + '----B'; }
+            if (d.role === 'HQ') { i = 'SFGPUH' };
+            if (d.role === "Medic") { i = 'SFGPUSM----A'; }
+            if (d.role === "RTO") { i = 'SFGPUUS'; }
+            if (d.role === 'K9') { i = 'SFGPUU'; }
+            d.SIDC = (i + '-------').substr(0,12);
+            // Handle "special" types
+            if (d.type === "a-h-X-i-o") { d.SIDC = "EHIP--------" }
+            if (d.type === "a-h-X-i-m-d") { d.SIDC = "EHNPBB------" }
+            if (d.type === "a-h-X-i-g-e") { d.SIDC = "EHNPAC------" }
+        }
         return d;
     }
     else { // handle b- types
