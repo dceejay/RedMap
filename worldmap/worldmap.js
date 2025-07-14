@@ -938,9 +938,9 @@ var feedback = function(n = "map",v,a = "feedback",c) {
     if (c === true) { map.closePopup(); }
 }
 
-// map.on('click', function(e) {
-//    ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
-// });
+map.on('click', function(e) {
+    ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
+});
 
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
@@ -1966,7 +1966,6 @@ function setMarker(data) {
                 iconAnchor: [sizc, sizc],
                 html:'<img src="'+svgarrow+'" style="width:'+siz+'px; height:'+siz+'px; -webkit-transform:rotate('+dir+'deg); -moz-transform:rotate('+dir+'deg);"/>',
             });
-            console.log("MM",myMarker)
             marker = L.marker(ll, {title:data["name"], icon:myMarker, draggable:drag});
         }
         else if (data.icon === "wind") {
@@ -2602,14 +2601,17 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("button")) {
         if (!Array.isArray(cmd.button)) { cmd.button = [cmd.button]; }
         cmd.button.forEach(function(b) {
-            if (b.icon) {
-                if (!buttons[b.name]) {
-                    buttons[b.name] = L.easyButton( b.icon, function() {
-                        ws.send(JSON.stringify({action:"button", name:b.name}));
-                    }, b.name, { position:b.position||'topright' }).addTo(map);
+            if (b.name && b.icon) {
+                if (buttons[b.name]) {
+                    buttons[b.name].removeFrom(map);
+                    delete buttons[b.name];
                 }
+                buttons[b.name] = L.easyButton( b.icon, function() {
+                    ws.send(JSON.stringify({action:"button", name:b.name, value:b?.value}));
+                }, b.name, { position:b.position||'topright' });
+                buttons[b.name].addTo(map);
             }
-            else {
+            else if (b.name && !b.icon){
                 if (buttons[b.name]) {
                     buttons[b.name].removeFrom(map);
                     delete buttons[b.name];

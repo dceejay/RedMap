@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
 - v5.1.6 - Let Cot __milsym set the SIDC if present.
 - v5.1.5 - Fix links to SIDC unitgenerator so it is now local.
 - v5.1.4 - Fix clearlayer for tracks node.
@@ -21,13 +22,13 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v5.1.0 - Let special icons be sizeable using iconSize property.
 - v5.0.9 - Slight tidy on flags, bump turf dep.
 - v5.0.8 - Fix flag handling for SIDC 2525D, add example.
-- v5.0.7 - Allow Tooltip options (see new example). #PR295.
+- v5.0.7 - Allow Tooltip options (see new example). PR #295.
 - v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
 - v5.0.4 - Tweak CoT handling slightly.
-- v5.0.3 - Add great context menu example flow. PR#290. Bump express lib. PR#291.
-- v5.0.2 - Fix sidcEdgeIcon docs PR#289.
+- v5.0.3 - Add great context menu example flow. PR #290. Bump express lib. PR #291.
+- v5.0.2 - Fix sidcEdgeIcon docs PR #289.
 - v5.0.1 - Fix isArray error PR #288.
-- v5.0.0 - v5.0.0 - Feedback cleanup PR#281, edgeicons option PR#287, bump libs for vuln fixes.
+- v5.0.0 - v5.0.0 - Feedback cleanup PR #281, edgeicons option PR #287, bump libs for vuln fixes.
 
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.

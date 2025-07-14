@@ -323,7 +323,7 @@ module.exports = function(RED) {
     var WorldMapIn = function(n) {
         RED.nodes.createNode(this,n);
         this.path = n.path || "/worldmap";
-        this.events = n.events || "connect,disconnect,point,layer,bounds,files,draw,other";
+        this.events = n.events || "connect,disconnect,point,layer,bounds,files,draw,click,other";
         if (this.path.charAt(0) != "/") { this.path = "/" + this.path; }
         if (!sockets[this.path]) {
             var libPath = path.posix.join(RED.settings.httpNodeRoot, this.path, 'leaflet', 'sockjs.min.js');
@@ -349,6 +349,9 @@ module.exports = function(RED) {
                     if ((node.events.indexOf("bounds")!==-1) && (message.action === "bounds")) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
+                    if ((node.events.indexOf("click")!==-1) && (message.action === "click")) {
+                        setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
+                    }
                     if ((node.events.indexOf("point")!==-1) && ((message.action === "point")||(message.action === "move")||(message.action === "delete") ))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
@@ -362,7 +365,7 @@ module.exports = function(RED) {
                     if ((node.events.indexOf("draw")!==-1) && ((message.action === "draw")||(message.action === "drawdelete")))  {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
-                    if (node.events.indexOf("other")!==-1 && "connected,point,addlayer,dellayer,delete,move,draw,drawdelete,files,bounds".indexOf(message.action) === -1) {
+                    if (node.events.indexOf("other")!==-1 && "connected,point,addlayer,dellayer,delete,move,draw,drawdelete,files,bounds,click".indexOf(message.action) === -1) {
                         setImmediate(function() {node.send({payload:message, topic:node.path.substr(1), _sessionid:client.id, _sessionip:sessionip})});
                     }
                 }
