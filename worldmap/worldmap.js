@@ -2358,31 +2358,37 @@ function setMarker(data) {
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
 
-    // then any remaining properties to the info box
-    var longline = 0;
-    if (data.popup) { words = data.popup; }
-    else {
-        words += '<table>';
-        for (var i in data) {
-            if ((i != "name") && (i != "length") && (i != "clickable")) {
-                if (typeof data[i] === "object") {
-                    words += '<tr><td valign="top">'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
-                }
-                else {
-                    // words += i +" : "+data[i]+"<br/>";
-                    if (data[i].length > longline) { longline = data[i].length; }
-                    words += '<tr><td valign="top">'+ i +'</td><td>' + data[i] + '</td></tr>';
+    if (!data.hasOwnProperty("clickable") && data.clickable != false) {
+        var wopt = { autoClose:false, closeButton:true, closeOnClick:false, minWidth:200 };
+        if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
+        if (data?.popupOptions) { // allow user to override popup options eg to add className
+            wopt = data.popupOptions;
+            delete data.popupOptions;
+        }
+
+        // then any remaining properties to the info box
+        var longline = 0;
+        if (data.popup) { words = data.popup; }
+        else {
+            words += '<table>';
+            for (var i in data) {
+                if ((i != "name") && (i != "length") && (i != "clickable")) {
+                    if (typeof data[i] === "object") {
+                        words += '<tr><td valign="top">'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
+                    }
+                    else {
+                        // words += i +" : "+data[i]+"<br/>";
+                        if (data[i].length > longline) { longline = data[i].length; }
+                        words += '<tr><td valign="top">'+ i +'</td><td>' + data[i] + '</td></tr>';
+                    }
                 }
             }
+            words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
+            words += '</table>';
         }
-        words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
-        words += '</table>';
-    }
-    words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
-    var wopt = {autoClose:false, closeButton:true, closeOnClick:false, minWidth:200};
-    if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
-    if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
-    if (!data.hasOwnProperty("clickable") && data.clickable != false) {
+        words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+
+        if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
         marker.bindPopup(words, wopt);
         marker._popup.dname = data["name"];
     }

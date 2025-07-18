@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
 - v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
 - v5.1.6 - Let Cot __milsym set the SIDC if present.
 - v5.1.5 - Fix links to SIDC unitgenerator so it is now local.
@@ -28,8 +29,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v5.0.3 - Add great context menu example flow. PR #290. Bump express lib. PR #291.
 - v5.0.2 - Fix sidcEdgeIcon docs PR #289.
 - v5.0.1 - Fix isArray error PR #288.
-- v5.0.0 - v5.0.0 - Feedback cleanup PR #281, edgeicons option PR #287, bump libs for vuln fixes.
-
+- v5.0.0 - Feedback cleanup PR #281, edgeicons option PR #287, bump libs for vuln fixes.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -77,6 +77,7 @@ Optional properties for **msg.payload** include
  - **clickable** : Default true. Setting to false disables showing any popup.
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
+ - **popupOptions** : optional object to help style the popup - See Leaflet popup docs for options - eg to add a custom class - `{className:"mySpecialPopup",width:600}`
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
  - **tooltipOptions** : custom tooltip/label options  (offset, direction, permanent, sticky, interactive, opacity, className) )
