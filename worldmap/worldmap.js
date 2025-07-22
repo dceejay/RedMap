@@ -2613,7 +2613,7 @@ function doCommand(cmd) {
                     delete buttons[b.name];
                 }
                 buttons[b.name] = L.easyButton( b.icon, function() {
-                    ws.send(JSON.stringify({action:"button", name:b.name, value:b?.value}));
+                    ws.send(JSON.stringify({action:"button", name:b?.name, value:b?.value}));
                 }, b.name, { position:b.position||'topright' });
                 buttons[b.name].addTo(map);
             }
