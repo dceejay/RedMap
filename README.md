@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
 - v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
 - v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
 - v5.1.6 - Let Cot __milsym set the SIDC if present.
@@ -377,6 +378,7 @@ Optional properties for **msg.payload.command** include
  - **lat** - move map to specified latitude.
  - **lon** - move map to specified longitude.
  - **zoom** - move map to specified zoom level (1 - world, 13 to 20 max zoom depending on map).
+ - **zoomLevels** - an array of accepted zoom levels to switch between if you map only supports certain scalings - set to null to clear.
  - **bounds** - if set to an array `[ [ lat(S), lon(W) ], [lat(N), lon(E)] ]` - sets the overall map bounds.
  - **rotation** - rotate the base map to the specified compass angle.
  - **layer** - set map to specified base layer name - `{"command":{"layer":"Esri"}}`

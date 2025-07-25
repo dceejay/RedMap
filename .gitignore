@@ -6,3 +6,4 @@ mapbox.token
 worldmap/ml3d.html
 worldmap/unitgenerator.html
 *.pmtiles
+worldmap/images/world-110m-flat.json

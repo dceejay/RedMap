@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
  - v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
  - v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
  - v5.1.6 - Let Cot __milsym set the SIDC if present.

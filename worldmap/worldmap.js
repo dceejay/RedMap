@@ -3127,6 +3127,14 @@ function doCommand(cmd) {
         document.getElementById("lockit").checked = lockit;
     }
     // if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
+
+    if (cmd.hasOwnProperty("zoomLevels")) {
+        if (Array.isArray(cmd.zoomLevels) && cmd?.zoomLevels.length > 0) {
+            map.options.zooms = cmd.zoomLevels;
+        }
+        else { delete map.options.zooms; }
+    }
+
     // Move to a new position
     var clat = map.getCenter().lat;
     var clon = map.getCenter().lng;
