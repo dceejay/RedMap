@@ -2727,29 +2727,33 @@ function doCommand(cmd) {
                 basemaps[cmd.map.name].removeFrom(map);
                 existsalready = true;
             }
-            let opt = {};
-            if (cmd.map.hasOwnProperty("opt")) { opt = cmd.map.opt || {}; }
-
-            if (!opt.paintRules && !opt.labelRules && !opt.backgroundColor && !opt.theme) {
-                opt.theme = "light"; // light, dark, white, black, grayscale
-            };
-
-            opt.url = cmd.map.pmtiles;
-            opt.attribution = opt.attribution || '&copy; Protomaps & OSM';
-            opt.maxDataZoom = opt.maxDataZoom || 15;
-            opt.maxZoom = opt.maxZoom || 20;
-
-            console.log("New PMtiles:",cmd.map.name,opt);
-            basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
-            if (!existsalready) {
-                layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
-            }
-            if (Object.keys(basemaps).length === 1) {
-                baselayername = cmd.map.name;
-                basemaps[baselayername].addTo(map);
-            }
-            if (pmtloaded === "") { pmtloaded = cmd.map.name; }
-        } catch(e) { console.log(e); }
+            const p = new pmtiles.PMTiles(cmd.map.pmtiles);
+            p.getHeader().then((h) => {
+                var opt = cmd.map.opt || {};
+                if (!opt.maxZoom) { opt.maxZoom = h.maxZoom || 20; }
+                opt.maxDataZoom = opt.maxDataZoom || 15;
+                opt.attribution = opt.attribution || '&copy; Protomaps & OSM';
+                if (!opt.paintRules && !opt.labelRules && !opt.backgroundColor && !opt.theme) {
+                    opt.theme = "light"; // light, dark, white, black, grayscale
+                }
+                if (h.tileType === 1) {
+                    opt.url = cmd.map.pmtiles;
+                    basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
+                }
+                else {
+                    basemaps[cmd.map.name] = pmtiles.leafletRasterLayer(p, opt);
+                }
+                if (!existsalready) {
+                    layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
+                }
+                if (Object.keys(basemaps).length === 1) {
+                    baselayername = cmd.map.name;
+                    basemaps[baselayername].addTo(map);
+                }
+                if (pmtloaded === "") { pmtloaded = cmd.map.name; }
+            });
+        }
+        catch(e) { console.log(e); }
     }
     // Add or swap new minimap layer
     if (cmd.map && cmd.map.hasOwnProperty("minimap")) {

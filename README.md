@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.5.0 - Add ability to load raster pmtiles files. Issue #312
 - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
 - v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
 - v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
@@ -772,15 +773,19 @@ You can also load them dynamically with a command like
 
 Where `opt` can be as per the options file mentioned above - or omitted completely.
 
+NOTE: for some reason many files converted to pmtiles format fail to load/display. In this case you can easily use the tileserver-gl map server either natively or via docker (see below) to serve the pmtiles format file.
+
 ### Using a Docker Map Server
 
-I have found the easiest to use mapserver for a decent generic map to be Tileserver-gl. It uses mbtiles format maps - for example from [MapTiler Data](https://data.maptiler.com/downloads/planet/). You can download your mbtiles file into a directory and then from that directory run
+I have found the easiest to use mapserver for a decent generic map to be Tileserver-gl. It uses mbtiles or pmtiles format maps - for example from [MapTiler Data](https://data.maptiler.com/downloads/planet/). You can download your mbtiles file into a directory and then from that directory run
 ```
 docker run --name maptiler -d -v $(pwd):/data -p 1884:8080 maptiler/tileserver-gl -p 8080 --mbtiles yourMapFile.mbtiles
 ```
 and use a url like `"url": "http://localhost:1884/styles/basic-preview/{z}/{x}/{y}.png"`
 
-Other more traditional map servers include containers like https://hub.docker.com/r/camptocamp/mapserver, then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
+This also works for pmtiles format map files.
+
+Other more traditional map servers include containers like https://hub.docker.com/r/camptocamp/mapserver,  which then assuming you have the mapfile 'my-app.map' in the current working directory, you could mount it as:
 ```
 docker run -d --name camptocamp -v $(pwd):/etc/mapserver/:ro -p 1881:80 camptocamp/mapserver
 ```
