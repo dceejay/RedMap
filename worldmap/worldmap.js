@@ -2730,8 +2730,9 @@ function doCommand(cmd) {
             const p = new pmtiles.PMTiles(cmd.map.pmtiles);
             p.getHeader().then((h) => {
                 var opt = cmd.map.opt || {};
-                if (!opt.maxZoom) { opt.maxZoom = h.maxZoom || 20; }
-                opt.maxDataZoom = opt.maxDataZoom || 15;
+                if (!opt.minNativeZoom) { opt.minNativeZoom = h.minZoom || 5; }
+                if (!opt.maxNativeZoom) { opt.maxNativeZoom = h.maxZoom || 15; }
+                opt.maxZoom = opt.maxZoom || 20;
                 opt.attribution = opt.attribution || '&copy; Protomaps & OSM';
                 if (!opt.paintRules && !opt.labelRules && !opt.backgroundColor && !opt.theme) {
                     opt.theme = "light"; // light, dark, white, black, grayscale

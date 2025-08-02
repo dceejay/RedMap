@@ -13,6 +13,7 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 
 ### Updates
 
+- v5.5.1 - Fix maxNativeZoom for pmtiles to pull from tiles files. Issue #312
 - v5.5.0 - Add ability to load raster pmtiles files. Issue #312
 - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
 - v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
@@ -758,7 +759,7 @@ You can set some default options for the pmtiles by creating a file called **pmt
 
     {
         "attribution": "Protomaps and OSM",
-        "maxDataZoom": 15,
+        "maxNativeZoom": 15,
         "maxZoom": 20,
         "theme": "dark"
     }
