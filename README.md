@@ -766,7 +766,7 @@ You can set some default options for the pmtiles by creating a file called **pmt
 
 theme can be light, dark, white, black, or grayscale. 
 
-The `maxDataZoom` should match the maximum zoom level in you pmtiles file(s) - whereas the `maxZoom` is the leaflet maximum zoom level you want to support. `shade` can be any valid html colour or #rrggbb string, and `dark` is a boolean (default false).
+The `maxNativeZoom` should match the maximum zoom level in you pmtiles file(s) - whereas the `maxZoom` is the leaflet maximum zoom level you want to support. `theme` can be 'light', 'dark', 'white', 'black', or 'grayscale'.
 
 You can also load them dynamically with a command like
 
