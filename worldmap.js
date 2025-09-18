@@ -131,9 +131,7 @@ module.exports = function(RED) {
                     client.write(JSON.stringify({command:c}));
                     for (var p=0; p < pmtiles.length; p++) {
                         fs.symlink(RED.settings.userDir+'/'+pmtiles[p], __dirname+'/worldmap/'+pmtiles[p], 'file', (err) => {
-                            if (err) {
-                                if (err.code !== "EEXIST") { console.log(err); }
-                            }
+                            if (err && err.code !== "EEXIST") { console.log(err); }
                         })
                         client.write(JSON.stringify({command: {map: {name:pmtiles[p].split('.')[0], pmtiles:pmtiles[p], opt:pmtilesopts }}}));
                         node.log("Added pmtiles file: "+pmtiles[p]);

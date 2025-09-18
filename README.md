@@ -1,18 +1,16 @@
 # node-red-contrib-web-worldmap
 
+A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world map web page for plotting "things" on. Please feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/dceejay) this project.
+
 [![platform](https://img.shields.io/badge/platform-Node--RED-red)](https://nodered.org)
 ![NPM version](https://badge.fury.io/js/node-red-contrib-web-worldmap.svg)
 [![GitHub license](https://img.shields.io/github/license/dceejay/redmap.svg)](https://github.com/dceejay/redmap/blob/master/LICENSE)
-
-A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a world
-map web page for plotting "things" on.
-
-Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/dceejay) this project.
 
 ![Map Image](https://dceejay.github.io/pages/images/redmap.png)
 
 ### Updates
 
+- v5.5.2 - Slight improvement for on/offline choice of map
 - v5.5.1 - Fix maxNativeZoom for pmtiles to pull from tiles files. Issue #312
 - v5.5.0 - Add ability to load raster pmtiles files. Issue #312
 - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
@@ -24,15 +22,6 @@ Feel free to [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%
 - v5.1.2 - Fix for longer line msg properties.
 - v5.1.1 - Fix CoT inline image.
 - v5.1.0 - Let special icons be sizeable using iconSize property.
-- v5.0.9 - Slight tidy on flags, bump turf dep.
-- v5.0.8 - Fix flag handling for SIDC 2525D, add example.
-- v5.0.7 - Allow Tooltip options (see new example). PR #295.
-- v5.0.6 - Tweak SIDC flag handling slightly to show direction if available and moving.
-- v5.0.4 - Tweak CoT handling slightly.
-- v5.0.3 - Add great context menu example flow. PR #290. Bump express lib. PR #291.
-- v5.0.2 - Fix sidcEdgeIcon docs PR #289.
-- v5.0.1 - Fix isArray error PR #288.
-- v5.0.0 - Feedback cleanup PR #281, edgeicons option PR #287, bump libs for vuln fixes.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 
@@ -97,6 +86,8 @@ If you use the name without the fa- prefix (eg `male`) you will get the icon ins
 
 You can also specify an emoji as the icon by using the :emoji name: syntax - for example `:smile:`. Here is a **[list of emojis](https://github.com/dceejay/RedMap/blob/master/emojilist.md)**.
 
+Note: Not all browsers/OS support unicode emoji - if you can see the Swiss flag here (🇨🇭) then you may be OK.
+
 Or you can specify an image to load as an icon by setting the icon to `http(s)://...` By default it will be scaled to 32x32 pixels. You can change the size by setting **iconSize** to a number of pixels - eg 64. Example icon - `"https://img.icons8.com/windows/32/000000/bird.png"`  or you can use an inline image of the form `data:image/...`  which uses a base64 encoded image.
 
 There are also several special icons...
@@ -142,8 +133,6 @@ SIDC codes can be generated using the built-in unitgenerator tool.
 There are lots of extra options you can specify as `msg.payload.options` - see the <a href="https://spatialillusions.com/milsymbol/documentation.html" target="mapinfo">milsymbol docs here</a>.
 
 Note: If the SIDC code is a 2525C 15 characters long, where chars 13 and 14 are a country code - then the country flag emoji is added to the staffComments field of the icon. If it's a 20 char 2525D code then the options:country property will be used to create the flag.
-
-Note: Not all browsers/OS support unicode emoji - if you can see the Swiss flag here (🇨🇭) then you may be OK.
 
 #### TAK Visualisation
 

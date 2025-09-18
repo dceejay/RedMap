@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.5.2 - Slight improvement for on/offline choice of map
  - v5.5.1 - Fix maxNativeZoom for pmtiles to pull from tiles files. Issue #312
  - v5.5.0 - Add ability to load raster pmtiles files. Issue #312
  - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312

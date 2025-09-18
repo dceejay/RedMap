@@ -181,10 +181,15 @@ var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", we
 layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
 overlays["countries"] = layers["_countries"];
 
-var onoffline = function() { if (!navigator.onLine) {
-    if (pmtloaded !== "") { basemaps[pmtloaded].addTo(map); layercontrol._update(); }
-    else { map.addLayer(overlays["countries"]); }
-} }
+var onoffline = function() {
+    if (!navigator.onLine) {
+        if (pmtloaded !== "") { basemaps[pmtloaded].addTo(map); layercontrol._update(); }
+        else { map.addLayer(overlays["countries"]); }
+    }
+    else if (Object.keys(basemaps).length === 0 ) {
+        map.addLayer(overlays["countries"]);
+    }
+}
 
 document.addEventListener ("keydown", function (ev) {
     // Set Ctl-Alt-3 to switch to 3d view
@@ -2739,6 +2744,7 @@ function doCommand(cmd) {
                 }
                 if (h.tileType === 1) {
                     opt.url = cmd.map.pmtiles;
+                    if (!opt.maxDataZoom) { opt.maxDataZoom = h.maxZoom || 15; }
                     basemaps[cmd.map.name] = protomapsL.leafletLayer(opt);
                 }
                 else {
