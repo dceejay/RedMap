@@ -1828,6 +1828,9 @@ function setMarker(data) {
 
     if (data.draggable === true) { drag = true; }
 
+    if (data.sog) { data.speed = data.sog * 0.514444; data.sog = data.sog + " kt"; } // SOG is in knots
+    if (data.SOG) { data.speed = data.SOG * 0.514444; data.SOG = data.SOG + " kt"; } // SOG is in knots
+
     if (data.hasOwnProperty("icon")) {
         var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? "0") + map.getBearing();
         var siz = 32;
@@ -1845,6 +1848,7 @@ function setMarker(data) {
             });
             marker.setHeading(dir);
             q = 'https://www.bing.com/images/search?q='+data.icon+'%20%2B"'+encodeURIComponent(data["name"])+'"';
+            if (data?.IMO) { q = 'https://www.bing.com/images/search?q='+data.IMO; }
             words += '<a href=\''+q+'\' target="_thingpic">Pictures</a><br>';
         }
         else if (data.icon === "plane") {
@@ -2249,8 +2253,6 @@ function setMarker(data) {
         data.alt = +(parseFloat(data.altm)).toFixed(2) + " m";
         delete data.altm;
     }
-    if (data.sog) { data.speed = data.sog * 0.514444; data.sog = data.sog + " kt"; } // SOG is in knots
-    if (data.SOG) { data.speed = data.SOG * 0.514444; data.SOG = data.SOG + " kt"; } // SOG is in knots
 
     // remove items from list of properties, then add all others to popup
     if (data.hasOwnProperty("options")) { delete data.options; }
@@ -3140,7 +3142,7 @@ function doCommand(cmd) {
     // if (cmd.hasOwnProperty("panlock") && lockit === true) { doLock(true); }
 
     if (cmd.hasOwnProperty("zoomLevels")) {
-        if (Array.isArray(cmd.zoomLevels) && cmd?.zoomLevels.length > 0) {
+        if (Array.isArray(cmd.zoomLevels) && cmd.zoomLevels.length > 0) {
             map.options.zooms = cmd.zoomLevels;
         }
         else { delete map.options.zooms; }

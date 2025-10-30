@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.5.3 - ensure SOG gets picked up earlier in chain
 - v5.5.2 - Slight improvement for on/offline choice of map
 - v5.5.1 - Fix maxNativeZoom for pmtiles to pull from tiles files. Issue #312
 - v5.5.0 - Add ability to load raster pmtiles files. Issue #312
