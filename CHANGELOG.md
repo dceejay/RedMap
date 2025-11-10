@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.5.4 - slight tweak to geojson property display as table
  - v5.5.3 - ensure SOG gets picked up earlier in chain
  - v5.5.2 - Slight improvement for on/offline choice of map
  - v5.5.1 - Fix maxNativeZoom for pmtiles to pull from tiles files. Issue #312

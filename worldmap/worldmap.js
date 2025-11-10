@@ -3255,6 +3255,9 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             delete feature.properties["fill-opacity"];
             delete feature.properties["font-color"];
             delete feature.properties["font-opacity"];
+            // delete feature.properties["styleUrl"];
+            delete feature.properties["styleHash"];
+            delete feature.properties["styleMapHash"];
         }
         if (feature.hasOwnProperty("style")) {
             //console.log("GSTYLE", feature.style)
@@ -3338,12 +3341,21 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             delete tx["_gpxType"];
             var n = tx["name"];
             delete tx["name"];
-            tx = JSON.stringify(tx,null,' ');
-            if ( tx !== "{}") {
-                var gp = '<pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>'
-                if (n) { gp = '<b>'+n+'</b>' + gp; }
-                l.bindPopup(gp);
+            var tx2 = Object.entries(tx);
+            var gp = '<table style="border:none;">';
+            for (var i=0; i < tx2.length; i++) {
+                gp += '<tr><td style="border:none; vertical-align:top; padding-right:3px;">'+tx2[i][0]+'</td><td style="border:none; vertical-align:top;">'+tx2[i][1]+'</td></tr>';
             }
+            gp += '</table>';
+            //tx = JSON.stringify(tx,null,' ');
+            // if ( tx !== "{}") {
+            //     //var gp = '<pre style="overflow-x:scroll">'+tx.replace(/[\{\}"]/g,'')+'</pre>'
+            //     var gp = '<pre>'+tx.replace(/[\{\}"]/g,'')+'</pre>'
+            //     if (n) { gp = '<b>'+n+'</b>' + gp; }
+            //     l.bindPopup(gp);
+            // }
+            if (n) { gp = '<b>'+n+'</b>' + gp; }
+            if (gp.length > 36) { l.bindPopup(gp); }
         }
         if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
             l.on('click', function (e) {
