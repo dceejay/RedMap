@@ -562,6 +562,7 @@ function doTidyUp(l) {
                     layers[markers[m].lay].removeLayer(markers[m]);
                     delete markers[m];
                     delete allData[m];
+                    edgeAware();
                 }
             }
         }
@@ -2167,6 +2168,7 @@ function setMarker(data) {
         data.speed = opts?.speed || data?.speed; // If SIDC then options.speed can override the speed.
         if (data?.speed && !opts?.direction) { opts.direction = data?.track || data?.hdg || data?.heading || data?.COG || data?.bearing }
         if (data.speed == undefined) { delete data.speed; }
+        if (data.speed === 0 && opts.direction === 0) { delete opts.direction; }
         // escape out any isocodes eg flag symbols
         var optfields = ["additionalInformation","higherFormation","specialHeadquarters","staffComments","type","uniqueDesignation","speed","country"];
         //const regex = /\p{Extended_Pictographic}/ug;
