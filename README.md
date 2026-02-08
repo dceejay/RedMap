@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.5.7 - Fix COG handling for built in icons, bump various libs for CVEs
 - v5.5.4 - slight tweak to geojson property display as table
 - v5.5.3 - ensure SOG gets picked up earlier in chain
 - v5.5.2 - Slight improvement for on/offline choice of map

@@ -1833,7 +1833,7 @@ function setMarker(data) {
     if (data.SOG) { data.speed = data.SOG * 0.514444; data.SOG = data.SOG + " kt"; } // SOG is in knots
 
     if (data.hasOwnProperty("icon")) {
-        var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? "0") + map.getBearing();
+        var dir = parseFloat(data.track ?? data.hdg ?? data.heading ?? data.bearing ?? data.COG ?? data.cog ??"0") + map.getBearing();
         var siz = 32;
         var sizc = 16;
         if (data?.iconSize && !isNaN(data.iconSize)) {
