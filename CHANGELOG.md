@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
  - v5.5.8 - Bump qs dep for CVE
  - v5.5.7 - Fix COG handling for built in icons, bump various libs for CVEs
  - v5.5.4 - slight tweak to geojson property display as table

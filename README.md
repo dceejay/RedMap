@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
 - v5.5.8 - Bump qs dep for CVE
 - v5.5.7 - Fix COG handling for built in icons, bump various libs for CVEs
 - v5.5.4 - slight tweak to geojson property display as table
@@ -766,6 +767,8 @@ You can also load them dynamically with a command like
     msg.payload = {"command":{"map":{"name":"MyMap", "pmtiles":"/path/to/mymap.pmtiles", "opt":myOptionsObject}}}
 
 Where `opt` can be as per the options file mentioned above - or omitted completely.
+
+If you have multiple pmtiles loaded then the map will try to autoswitch if you move out of bounds of one and into another - or zoom in or out beyond the zoom limits and there is another suitable pmtiles file available.
 
 NOTE: for some reason many files converted to pmtiles format fail to load/display. In this case you can easily use the tileserver-gl map server either natively or via docker (see below) to serve the pmtiles format file.
 

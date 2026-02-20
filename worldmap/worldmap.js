@@ -18,7 +18,7 @@ var menuOpen = false;
 var clusterAt = 0;
 var maxage = 900;   // default max age of icons on map in seconds - cleared after 15 mins
 var baselayername = "OSM grey";     // Default base layer OSM but uniform grey
-var pagefoot = "&nbsp;&copy; DCJ 2025";
+var pagefoot = "&nbsp;&copy; DCJ 2026";
 var inIframe = false;
 var showUserMenu = true;
 var showLayerMenu = true;
@@ -878,6 +878,59 @@ map.on('moveend', function() {
         oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
     }
     edgeAware();
+
+    // if we have bounds meta data for the current baselayer (usually pmtiles)
+    if (basemaps[baselayername] && basemaps[baselayername].hasOwnProperty("meta")) {
+        const m = basemaps[baselayername].meta
+        const c = map.getCenter()
+        const z = map.getZoom();
+        //console.log("ZOOM: "+m.minZoom+" - "+z+" - "+m.maxZoom)
+        // if we are within the meta bounds and we have zoomed in beyond the max zoom level for this baselayer, try to find a more suitable baselayer
+        if (c.lat > m.minLat && c.lat < m.maxLat && c.lng > m.minLon && c.lng < m.maxLon) {
+            if (z > m.maxZoom) {
+                for (var key in basemaps) {
+                    if (key !== baselayername && basemaps[key].hasOwnProperty("meta")) {
+                        const mb = basemaps[key].meta;
+                        if (z <= mb.maxZoom && c.lat > mb.minLat && c.lat < mb.maxLat && c.lng > mb.minLon && c.lng < mb.maxLon) {
+                            console.log("Zoom greater than "+m.maxZoom+", Switching to "+key);
+                            map.removeLayer(basemaps[baselayername]);
+                            baselayername = key;
+                            map.addLayer(basemaps[baselayername]);
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (z <= m.minZoom) {
+                for (var key in basemaps) {
+                    if (key !== baselayername && basemaps[key].hasOwnProperty("meta")) {
+                        if (z >= basemaps[key].meta.minZoom) {
+                            console.log("Zoom below min "+m.minZoom+", Switching to "+key);
+                            map.removeLayer(basemaps[baselayername]);
+                            baselayername = key;
+                            map.addLayer(basemaps[baselayername]);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        // if we are outside the meta bounds, try to find a baselayer that does cover this area
+        else {
+            for (var key in basemaps) {
+                if (basemaps[key].hasOwnProperty("meta") && key !== baselayername) {
+                    const mb = basemaps[key].meta;
+                    if (c.lat > mb.minLat && c.lat < mb.maxLat && c.lng > mb.minLon && c.lng < mb.maxLon) {
+                        console.log("Outside Bounds, Switching to "+key);
+                        map.removeLayer(basemaps[baselayername]);
+                        baselayername = key;
+                        map.addLayer(basemaps[baselayername]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 });
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
@@ -2754,6 +2807,7 @@ function doCommand(cmd) {
                 else {
                     basemaps[cmd.map.name] = pmtiles.leafletRasterLayer(p, opt);
                 }
+                basemaps[cmd.map.name].meta = { minZoom: h.minZoom, maxZoom: h.maxZoom, minLat: h.minLat, maxLat: h.maxLat, minLon: h.minLon, maxLon: h.maxLon };
                 if (!existsalready) {
                     layercontrol.addBaseLayer(basemaps[cmd.map.name],cmd.map.name);
                 }
