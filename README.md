@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.6.1 - Also call autoswitch on initial connect to ensure map in view.
 - v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
 - v5.5.8 - Bump qs dep for CVE
 - v5.5.7 - Fix COG handling for built in icons, bump various libs for CVEs
@@ -21,12 +22,6 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 - v5.4.0 - Let msg.payload.command.zoomLevels set an array of acceptable zoom levels. Issue #312
 - v5.3.0 - Let msg.payload.popupOptions object set Leaflet popup options so it can be customised. Issue #311
 - v5.2.0 - Allow left click send back co-ords. Let Button be replaceable more easily and take value property. Issue #308 and #309
-- v5.1.6 - Let Cot __milsym set the SIDC if present.
-- v5.1.5 - Fix links to SIDC unitgenerator so it is now local.
-- v5.1.4 - Fix clearlayer for tracks node.
-- v5.1.2 - Fix for longer line msg properties.
-- v5.1.1 - Fix CoT inline image.
-- v5.1.0 - Let special icons be sizeable using iconSize property.
 
 - see [CHANGELOG](https://github.com/dceejay/RedMap/blob/master/CHANGELOG.md) for full list of changes.
 

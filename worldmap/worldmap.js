@@ -94,7 +94,7 @@ var connect = function() {
             document.getElementById("footer").innerHTML = "<font color='#494'>"+pagefoot+"</font>";
         }
         ws.send(JSON.stringify({action:"connected",parameters:Object.fromEntries((new URL(location)).searchParams),clientTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone || false}));
-        setTimeout(function() { onoffline(); }, 500);
+        setTimeout(function() { onoffline(); pickMapLayer();}, 500);
     };
     ws.onclose = function() {
         console.log("DISCONNECTED");
@@ -862,23 +862,7 @@ function showMapCurrentZoom() {
     },750);
 }
 
-map.on('zoomend', function() {
-    showMapCurrentZoom();
-    window.localStorage.setItem("lastzoom", map.getZoom());
-    var b = map.getBounds();
-    oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
-    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
-    edgeAware();
-});
-map.on('moveend', function() {
-    window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
-    var b = map.getBounds();
-    if (b._southWest.lat !== oldBounds.sw.lat && b._southWest.lng !== oldBounds.sw.lng && b._northEast.lat !== oldBounds.ne.lat && b._northEast.lng !== oldBounds.ne.lng) {
-        ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
-        oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
-    }
-    edgeAware();
-
+function pickMapLayer() {
     // if we have bounds meta data for the current baselayer (usually pmtiles)
     if (basemaps[baselayername] && basemaps[baselayername].hasOwnProperty("meta")) {
         const m = basemaps[baselayername].meta
@@ -931,6 +915,25 @@ map.on('moveend', function() {
             }
         }
     }
+}
+
+map.on('zoomend', function() {
+    showMapCurrentZoom();
+    window.localStorage.setItem("lastzoom", map.getZoom());
+    var b = map.getBounds();
+    oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
+    ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+    edgeAware();
+});
+map.on('moveend', function() {
+    window.localStorage.setItem("lastpos",JSON.stringify(map.getCenter()));
+    var b = map.getBounds();
+    if (b._southWest.lat !== oldBounds.sw.lat && b._southWest.lng !== oldBounds.sw.lng && b._northEast.lat !== oldBounds.ne.lat && b._northEast.lng !== oldBounds.ne.lng) {
+        ws.send(JSON.stringify({action:"bounds", south:b._southWest.lat, west:b._southWest.lng, north:b._northEast.lat, east:b._northEast.lng, zoom:map.getZoom() }));
+        oldBounds = {sw:{lat:b._southWest.lat,lng:b._southWest.lng},ne:{lat:b._northEast.lat,lng:b._northEast.lng}};
+    }
+    edgeAware();
+    pickMapLayer();
 });
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
