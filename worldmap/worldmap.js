@@ -1,5 +1,13 @@
 /* eslint-disable no-undef */
 
+/**
+ * @fileoverview Leaflet-based interactive world map client for Node-RED worldmap node.
+ * Connects to a Node-RED backend via SockJS WebSocket and renders markers,
+ * shapes, overlays, and TAK/CoT data on a Leaflet map.
+ * @author DCJ
+ * @version 2026
+ */
+
 var startpos = [51.05, -1.38];  // Start location - somewhere in UK :-)
 var startzoom = 10;
 
@@ -59,6 +67,12 @@ var iconSz = {
 
 var filesAdded = '';
 
+/**
+ * Dynamically loads a JS or CSS file into the document <head>, skipping
+ * any file that has already been added.
+ * @param {string} fileName - URL or path of the .js or .css file to load.
+ * @returns {void}
+ */
 var loadStatic = function(fileName) {
     if (filesAdded.indexOf(fileName) !== -1) { return; }
     var head = document.getElementsByTagName('head')[0]
@@ -84,6 +98,13 @@ var loadStatic = function(fileName) {
     }
 }
 
+/**
+ * Opens a SockJS WebSocket connection to the Node-RED backend.
+ * Handles connection, disconnection (with auto-reconnect after 2.5s),
+ * and incoming messages. On connect, sends client timezone and URL
+ * parameters to the server, then triggers map layer selection.
+ * @returns {void}
+ */
 // Create the socket
 var connect = function() {
     // var transports = ["websocket", "xhr-streaming", "xhr-polling"],
@@ -115,6 +136,14 @@ var connect = function() {
 };
 console.log("CONNECT TO",location.pathname + 'socket');
 
+/**
+ * Routes incoming WebSocket data to the appropriate handler.
+ * Supports arrays of marker/command objects, raw XML strings (NVG, KML, GPX),
+ * GeoJSON Feature/FeatureCollection objects, TAK/CoT JSON events (both
+ * fastxml and Protobuf-decoded formats), and standard worldmap marker objects.
+ * @param {Object|Array|string} data - Parsed JSON data from the WebSocket message.
+ * @returns {void}
+ */
 var handleData = function(data) {
     if (Array.isArray(data)) {
         // console.log("ARRAY:",data.length);
@@ -181,6 +210,13 @@ window.onunload = function() { if (ws) { ws.close(); } }
 // layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
 // overlays["countries"] = layers["_countries"];
 
+/**
+ * Adds an appropriate fallback base layer when the browser is offline,
+ * or when no base maps are available online. Uses a PMTiles layer if
+ * one is loaded, otherwise falls back to the countries outline overlay
+ * if available.
+ * @returns {void}
+ */
 var onoffline = function() {
     if (!navigator.onLine) {
         if (pmtloaded !== "") { basemaps[pmtloaded].addTo(map); layercontrol._update(); }
@@ -539,6 +575,18 @@ function doLock(v) {
     //console.log("Map bounds lock :",lockit);
 }
 
+/**
+ * Removes stale markers and optionally clears a named layer from the map.
+ * When called without an argument, sweeps all markers whose timestamp has
+ * expired based on the current maxage setting (marker sweep only — layer
+ * cleanup requires an explicit layer name argument).
+ * When called with a layer name, removes all markers on that layer and
+ * removes the layer itself from the map and layer control.
+ * Special case: passing "heatmap" clears all heatmap points.
+ * @param {string} [l] - Name of a specific layer to remove entirely.
+ *   If omitted, only expired markers are swept.
+ * @returns {void}
+ */
 // Remove old markers
 function doTidyUp(l) {
     if (l === "heatmap") {
@@ -574,6 +622,13 @@ function doTidyUp(l) {
     }
 }
 
+/**
+ * Reads the maxage value from the UI input and (re)starts the periodic
+ * marker sweep interval, which calls doTidyUp() every 20 seconds.
+ * Note: the interval invokes doTidyUp() without a layer argument, so
+ * only stale markers are swept — layer cleanup must be triggered explicitly.
+ * @returns {void}
+ */
 // Call tidyup every {maxage} seconds - default 10 mins
 var stale = null;
 function setMaxAge() {
@@ -584,6 +639,11 @@ function setMaxAge() {
 }
 setMaxAge();
 
+/**
+ * Updates the day/night terminator line position on the map if the
+ * day/night overlay is currently active. Called on a 60-second interval.
+ * @returns {void}
+ */
 // move the daylight / nighttime boundary (if enabled) every minute
 function moveTerminator() { // if terminator line plotted move it every minute
     if (layers["_daynight"] && layers["_daynight"].getLayers().length > 0) {
@@ -593,6 +653,12 @@ function moveTerminator() { // if terminator line plotted move it every minute
 }
 setInterval( function() { moveTerminator() }, 60000 );
 
+/**
+ * Refreshes the rainfall radar tile layer URL to the latest 10-minute
+ * radar snapshot from RainViewer, if the layer is active and the browser
+ * is online. Called on a 600-second (10-minute) interval.
+ * @returns {void}
+ */
 // move the rainfall overlay (if enabled) every 10 minutes
 function moveRainfall() {
     if (navigator.onLine && overlays.hasOwnProperty("rainfall") && map.hasLayer(overlays["rainfall"])) {
@@ -602,6 +668,12 @@ function moveRainfall() {
 }
 setInterval( function() { moveRainfall() }, 600000 );
 
+/**
+ * Sets the zoom level at which markers are clustered and refreshes
+ * the current map zoom display.
+ * @param {number} [v=0] - Zoom level threshold for clustering. 0 disables clustering.
+ * @returns {void}
+ */
 function setCluster(v) {
     clusterAt = v || 0;
     console.log("clusterAt set:",clusterAt);
@@ -632,6 +704,12 @@ async function readPhoton(url) {
     }
 }
 
+/**
+ * Searches for map markers matching the given search input by name or icon,
+ * constrained to the current map bounds. If no markers are found, falls back
+ * to a Nominatim geocoder lookup and pans the map to the result.
+ * @returns {void}
+ */
 // Search for markers with names of ... or icons of ...
 function doSearch() {
     var value = document.getElementById('search').value;
@@ -944,7 +1022,20 @@ var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onk
 addmenu += '<br/><a href="unitgenerator.html" target="_new">MilSymbol SIDC generator</a>';
 var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
 
+/**
+ * Converts an RGBA CSS colour string to a hex colour string.
+ * @param {string} rgba - CSS rgba() or rgb() colour string.
+ * @returns {string} Hex colour string (e.g. "#ff0000").
+ */
 const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
+
+/**
+ * Resolves a CSS colour keyword (e.g. "red", "cornflowerblue") to a hex
+ * colour string by temporarily creating a DOM element and reading its
+ * computed colour value.
+ * @param {string} colorKeyword - Any valid CSS colour keyword or value.
+ * @returns {string} Hex colour string.
+ */
 const colorKeywordToRGB = (colorKeyword) => {
     let el = document.createElement('div');
     el.style.color = colorKeyword;
@@ -956,6 +1047,13 @@ const colorKeywordToRGB = (colorKeyword) => {
 
 var rclk = {};
 var hiderightclick = false;
+/**
+ * Reads the right-click popup input field and creates a new marker at
+ * the last right-clicked map position. Parses a comma-separated string
+ * of name, icon/SIDC, layer, colour, and heading. Sends the new point
+ * to the server via WebSocket.
+ * @returns {void}
+ */
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     map.closePopup();
@@ -1058,6 +1156,16 @@ map.on('contextmenu', function(e) {
 //var layercontrol = L.control.selectLayers(basemaps, overlays).addTo(map);
 layercontrol = L.control.layers(basemaps, overlays);
 
+/**
+ * Adds the base tile map layers to the map based on a list of layer codes.
+ * Handles both online tile layers (OSM variants, Esri, etc.) and offline
+ * PMTiles layers. Initialises the layer control and selects the first
+ * available layer.
+ * @param {string} maplist - Space- or comma-separated string of layer codes
+ *   (e.g. "OSMG OSMC EsriS").
+ * @param {string} [first] - Name of the layer to activate first.
+ * @returns {void}
+ */
 // Add all the base layer maps if we are online.
 var addBaseMaps = function(maplist,first) {
     // console.log("MAPS",first,maplist)
@@ -1226,6 +1334,14 @@ var addBaseMaps = function(maplist,first) {
     }
 }
 
+/**
+ * Adds optional overlay layers to the map based on a list of overlay codes.
+ * Handles countries outline (CO), day/night terminator (DN), rainfall radar (RA),
+ * OSM Buildings (BU), railways, heatmap, drawing tools, minimap, side-by-side
+ * comparison, and more.
+ * @param {string} overlist - Space- or comma-separated string of overlay codes.
+ * @returns {void}
+ */
 // Now add the overlays
 var addOverlays = function(overlist) {
     //console.log("OVERLAYS",overlist)
@@ -1542,10 +1658,16 @@ helpText += 'This can be used to set your initial start position.';
 helpText += 'While active it also restricts the "auto pan" and "search" to within that area.</p>';
 helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected';
 helpText += 'all layers whether hidden or not will contribute to the heatmap.';
-helpText += 'The default is that only visible layers add to the heatmap.</p><br/>';
+helpText += 'The default is that only visible layers add to the heatmap.</p>';
 helpText += '<button type="button" id="closeHelp">Close help</button>';
 
 var dialog;
+/**
+ * Displays the help dialog modal. Populates the dialog element with the
+ * pre-built helpText HTML string and wires up the close button.
+ * @param {string} d - (Unused) Placeholder for potential future dialog content.
+ * @returns {void}
+ */
 var doDialog = function(d) {
     //console.log("DIALOGUE",d);
     dialog = document.getElementById("helpDialog");
@@ -1555,6 +1677,13 @@ var doDialog = function(d) {
     dialog.showModal();
 }
 
+/**
+ * Deletes a named marker or shape from the map and all internal data stores.
+ * Optionally notifies the server via WebSocket that the item was deleted.
+ * @param {string} dname - Name of the marker or shape to delete.
+ * @param {boolean} [note=false] - If true, sends a delete action to the server.
+ * @returns {void}
+ */
 // Delete a marker or shape (and notify websocket)
 var delMarker = function(dname,note) {
     if (note) { map.closePopup(); }
@@ -1584,6 +1713,15 @@ var delMarker = function(dname,note) {
     }
 }
 
+/**
+ * Enables editing (move, rotate, or drag) of a named polygon or shape
+ * via Leaflet-Geoman. On double-click, disables editing and sends the
+ * updated shape geometry to the server.
+ * @param {string} pname - Name of the polygon/shape to edit.
+ * @param {string} [fun] - Edit mode: "rot" for rotate, "drag" for drag,
+ *   or omitted for vertex editing.
+ * @returns {void}
+ */
 var editPoly = function(pname,fun) {
     map.closePopup();
     if (fun === "rot") { polygons[pname].pm.enableRotate(); }
@@ -1609,6 +1747,17 @@ var editPoly = function(pname,fun) {
     })
 }
 
+/**
+ * Creates a Leaflet FeatureGroup of semi-circular range rings centred on
+ * a given latlng, used to indicate sensor field-of-view or range arcs.
+ * @param {L.LatLng} latlng - Centre point for the rings.
+ * @param {Object} [options] - Options object.
+ * @param {number|number[]} [options.ranges=[250,500,750,1000]] - Ring radius/radii in metres.
+ * @param {number} [options.pan=0] - Bearing direction in degrees.
+ * @param {number} [options.fov=60] - Field of view angle in degrees.
+ * @param {string} [options.color='#aaaa00'] - Ring colour.
+ * @returns {L.FeatureGroup} Feature group containing the range ring semi-circles.
+ */
 var rangerings = function(latlng, options) {
     options = L.extend({
         ranges: [250,500,750,1000],
@@ -1638,6 +1787,28 @@ var rangerings = function(latlng, options) {
 //     else { return str; }
 // };
 
+/**
+ * The primary function for adding or updating a marker, shape, or overlay
+ * on the map. Handles points, polylines, polygons, circles, images, arcs,
+ * NATO MilSymbol (SIDC) icons, FontAwesome icons, and custom icon URLs.
+ * Also manages TTL-based auto-deletion, heatmap contribution, popup binding,
+ * leader lines, and layer assignment.
+ * @param {Object} data - Marker/shape descriptor object. Key properties:
+ * @param {string} data.name - Unique identifier for the marker.
+ * @param {number} [data.lat] - Latitude.
+ * @param {number} [data.lon] - Longitude.
+ * @param {string} [data.layer] - Layer name to add the marker to.
+ * @param {string} [data.icon] - FontAwesome icon name or special value.
+ * @param {string} [data.SIDC] - NATO MilSymbol SIDC code.
+ * @param {string} [data.iconColor] - Colour for the icon.
+ * @param {boolean} [data.deleted] - If true, removes the marker from the map.
+ * @param {number} [data.ttl] - Time-to-live in seconds (0 = permanent).
+ * @param {Array}  [data.area] - Array of latlng objects for a polygon.
+ * @param {Array}  [data.line] - Array of latlng objects for a polyline.
+ * @param {number} [data.radius] - Radius in metres for a circle.
+ * @param {Object} [data.options] - Leaflet path options override.
+ * @returns {void}
+ */
 // the MAIN add marker or shape to map function
 function setMarker(data) {
     if (!data) { return; }
@@ -2286,7 +2457,7 @@ function setMarker(data) {
         });
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
-            if (marker.getPopup()) { marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l); }
+            marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
             // var b = marker.getPopup().getContent().split("heading : ");
             // if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             // else { b = undefined; }
@@ -2592,6 +2763,22 @@ var custIco = function(cmd) {
     return customLayer;
 }
 
+/**
+ * Processes incoming command objects from the server to control the map
+ * remotely. Handles a wide range of commands including: map/overlay
+ * initialisation, pan/zoom/rotation, layer visibility, marker age limits,
+ * clustering, UI button injection, heatmap updates, user location tracking,
+ * legend display, custom CSS/JS loading, and arbitrary eval of custom commands.
+ * @param {Object} cmd - Command object received from the server.
+ * @param {boolean} [cmd.init] - If true, triggers map/overlay initialisation.
+ * @param {string}  [cmd.layer] - Base layer to activate.
+ * @param {number}  [cmd.lat] - Latitude to pan to.
+ * @param {number}  [cmd.lon] - Longitude to pan to.
+ * @param {number}  [cmd.zoom] - Zoom level to set.
+ * @param {string|string[]} [cmd.clearlayer] - Layer name(s) to clear.
+ * @param {Object}  [cmd.map] - Overlay/basemap descriptor for adding layers.
+ * @returns {void}
+ */
 // handle any incoming COMMANDS to control the map remotely
 function doCommand(cmd) {
     // console.log("COMMAND",cmd);
@@ -3305,6 +3492,18 @@ function doCommand(cmd) {
     }
 }
 
+/**
+ * Renders a GeoJSON Feature or FeatureCollection on the map as a named
+ * overlay layer. Supports SIDC symbols, FontAwesome icons, and vector
+ * markers for point features, and applies style properties from feature
+ * properties or the options argument for polygon/line features.
+ * @param {string} n - Name for the overlay layer.
+ * @param {Object} g - GeoJSON Feature or FeatureCollection object.
+ * @param {string} [l] - Layer name override (defaults to g.name or "unknown").
+ * @param {Object} [o] - Leaflet path style options to apply to features.
+ * @param {string} [i] - Default icon name for point features without an icon property.
+ * @returns {void}
+ */
 // handle any incoming GEOJSON directly - may style badly
 function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
     var lay = l ?? g.name ?? "unknown";
@@ -3457,6 +3656,14 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
     map.addLayer(layers[lay]);
 }
 
+/**
+ * Handles a TAK/CoT event object (from the tak-ingest or fastxml Node-RED nodes)
+ * and converts it to a worldmap marker, then calls setMarker().
+ * Processes atom types (a-) for personnel/vehicle tracks and b- types for
+ * spot markers, position indicators, emergency alerts, and geofence events.
+ * @param {Object} p - Parsed CoT event object with point, detail, type, uid fields.
+ * @returns {void}
+ */
 // handle TAK messages from TAK server tcp - XML->JSON
 function doTAKjson(p) {
     //console.log("TAK event",p);
@@ -3513,6 +3720,13 @@ function doTAKjson(p) {
     }
 }
 
+/**
+ * Handles a TAK Multicast event object decoded from Protobuf via the
+ * tak-ingest Node-RED node, converting it to a worldmap marker.
+ * Only processes atom types (a-) for tracks.
+ * @param {Object} p - Parsed TAK multicast CoT object with lat, lon, type, uid fields.
+ * @returns {void}
+ */
 // handle TAK messages from TAK Multicast - Protobuf->JSON
 function doTAKMCjson(p) {
     // console.log("TAK Multicast event",p);
@@ -3556,6 +3770,12 @@ function doTAKMCjson(p) {
     }
 }
 
+/**
+ * Converts a 32-bit ARGB integer colour value (as used in CoT/TAK messages)
+ * to a CSS hex colour string, discarding the alpha channel.
+ * @param {number} color - 32-bit integer ARGB colour value.
+ * @returns {string} CSS hex colour string (e.g. "#ff0000").
+ */
 function convertCOTtoCIFColour(color) {
     // const c = parseInt(color);
     const arr = new ArrayBuffer(4);
@@ -3565,12 +3785,24 @@ function convertCOTtoCIFColour(color) {
     return "#" + b2h.substr(2);
 }
 
+/**
+ * Converts an ArrayBuffer to a lowercase hex string.
+ * @param {ArrayBuffer} buffer - The buffer to convert.
+ * @returns {string} Hex-encoded string representation of the buffer bytes.
+ */
 function buf2hex(buffer) { // buffer is an ArrayBuffer
     return [...new Uint8Array(buffer)]
         .map(x => x.toString(16).padStart(2, '0'))
         .join('');
 }
 
+/**
+ * Generates an array of intermediate range ring values for a given maximum
+ * range, using step sizes of 100, 1000, or 10000 depending on the magnitude.
+ * Returns the value directly if it is 100 or less.
+ * @param {number} r - Maximum range in metres.
+ * @returns {number|number[]} Single value if r <= 100, otherwise an array of ring radii.
+ */
 function createRings(r) {
     if (r <= 100) { return r; }
     var rings = [];
@@ -3584,6 +3816,15 @@ function createRings(r) {
     return rings;
 }
 
+/**
+ * Maps a CoT type string to an appropriate SIDC code or icon on the marker
+ * data object. Handles atom types (a-) via milsymbol conversion and a
+ * selection of b- types (spot markers, position indicators, emergency alerts,
+ * geofence events, waypoints). Modifies the data object in place.
+ * @param {Object} d - Worldmap marker data object to be mutated.
+ * @param {Object} p - Raw CoT/TAK event object containing type, detail, etc.
+ * @returns {Object} The mutated data object.
+ */
 function handleCoTtypes(d,p) {
     if (d.type.indexOf('a-') === 0) { // handle a- types
         if (p?.detail?.__milsym?.id) {
