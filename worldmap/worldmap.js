@@ -410,8 +410,9 @@ else {
 
      // Create the clear heatmap button
     var clrHeat = L.easyButton( 'fa-eraser', function() {
-        console.log("Reset heatmap");
-        if (heat) { heat.setLatLngs([]); }
+		 
+//      console.log("Reset heatmap");
+        if (heat) {heat.setLatLngs([]);}
     }, "Clears the current heatmap", {position:"bottomright"});
 }
 
@@ -541,7 +542,7 @@ function doLock(v) {
 // Remove old markers
 function doTidyUp(l) {
     if (l === "heatmap") {
-       if (heat) { heat.setLatLngs([]); }
+        if (heat) {heat.setLatLngs([]);}
     }
     else {
         var d = parseInt(Date.now()/1000);
@@ -938,11 +939,6 @@ map.on('moveend', function() {
 map.on('locationfound', onLocationFound);
 map.on('locationerror', onLocationError);
 
-// single right click to add a marker
-var addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
-addmenu += '<br/><a href="unitgenerator.html" target="_new">MilSymbol SIDC generator</a>';
-var rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
-
 const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`;
 const colorKeywordToRGB = (colorKeyword) => {
     let el = document.createElement('div');
@@ -953,8 +949,22 @@ const colorKeywordToRGB = (colorKeyword) => {
     return rgba2hex(rgbValue);
 }
 
-var rclk = {};
-var hiderightclick = false;
+// ********************
+// **  Right Click   **
+// ********************
+var rclk = {};                // right-click object, to store lat + lon 
+var hiderightclick = false;   // this is disabling Marker's right-click context menu too!
+let disableaddmarker = false; // only disable the "Add Marker" context menu on the map 
+
+// single right click to add a marker  (if not disabled by "disableAddMarker")
+let addmenu = "";
+let rightmenuMap = null;
+
+addmenu = "<b>Add marker</b><br><input type='text' id='rinput' autofocus onkeydown='if (event.keyCode == 13) addThing();' ";
+addmenu += "placeholder='name (,icon/SIDC, layer, colour, heading)'/>";
+addmenu += '<br/><a href="unitgenerator.html" target="_new">MilSymbol SIDC generator</a>';
+rightmenuMap = L.popup({keepInView:true, minWidth:260}).setContent(addmenu);
+
 var addThing = function() {
     var thing = document.getElementById('rinput').value;
     map.closePopup();
@@ -996,6 +1006,7 @@ var feedback = function(n = "map",v,a = "feedback",c) {
         dataToSend.lon = rclk.lng;
     }
     ws.send(JSON.stringify(dataToSend));
+
     if (c === true) { map.closePopup(); }
 }
 
@@ -1003,16 +1014,10 @@ map.on('click', function(e) {
     ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 });
 
-map.on('popupopen', function(e) {
-    const mp = e.popup._source;
-    ws.send(JSON.stringify({action:"openPopup",name:mp.name,layer:mp.lay,icon:mp.icon,iconColor:mp.iconColor,SIDC:mp.SIDC,draggable:true,lat:parseFloat(mp.getLatLng().lat.toFixed(6)),lon:parseFloat(mp.getLatLng().lng.toFixed(6))}));
-});
-
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
-var rclicked = false;
-var rtout = null;
-
+var rclicked = false;  // to stop timeout 
+var rtout = null;      // timeout object itself
 
 map.on('contextmenu', function(e) {
     if (rclicked) {
@@ -1023,27 +1028,26 @@ map.on('contextmenu', function(e) {
         }
     }
     else {
+		if ((hiderightclick === true) || (addmenu.length === 0) || (disableaddmarker === true)) { return null }
         rclicked = true;
         rtout = setTimeout( function() {
             rclicked = false;
-            if ((hiderightclick !== true) && (addmenu.length > 0)) {
-                rclk = e.latlng;
-                form = {};
-                var ramen = ""+addmenu;
-                if (typeof rmenudata !== "string") {
-                    for (const item in rmenudata) {
-                        ramen = ramen.replace(new RegExp("\\${"+item+"}","g"),rmenudata[item]);
-                    }
-                }
-                ramen = ramen.replace(/\${.*?}/g,'')
-                rightmenuMap.setContent(ramen);
-                rightmenuMap.setLatLng(e.latlng);
-                map.openPopup(rightmenuMap);
-                setTimeout( function() {
-                    try { document.getElementById('rinput').focus(); }
-                    catch(e) {}
-                }, 200);
-            }
+			rclk = e.latlng;
+			form = {};
+			var ramen = ""+addmenu;
+			if (typeof rmenudata !== "string") {
+				for (const item in rmenudata) {
+					ramen = ramen.replace(new RegExp("\\${"+item+"}","g"),rmenudata[item]);
+				}
+			}
+			ramen = ramen.replace(/\${.*?}/g,'')
+			rightmenuMap.setContent(ramen);
+			rightmenuMap.setLatLng(e.latlng);
+			map.openPopup(rightmenuMap);
+			setTimeout( function() {
+				try { document.getElementById('rinput').focus(); }
+				catch(e) {}
+			}, 200);
         }, 300);
     }
 });
@@ -1260,7 +1264,7 @@ var addOverlays = function(overlist) {
         }
 
         var shape;
-        map.on('pm:create', (e) => {
+        map.on("pm:create", (e) => {
             drawCount = drawCount + 1;
             var name = e.shape + drawCount;
 
@@ -1694,7 +1698,7 @@ function setMarker(data) {
     opt.weight = opt.weight ?? data.weight ?? 2;
     opt.opacity = opt.opacity ?? data.opacity ?? 1;
     if (!data.SIDC) { opt.fillOpacity = opt.fillOpacity ?? data.fillOpacity ?? 0.2; }
-    opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
+    opt.clickable = (data.clickable !== false);
     opt.fill = opt.fill ?? (data.hasOwnProperty("fill")) ? data.fill : true;
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
 
@@ -2278,8 +2282,10 @@ function setMarker(data) {
             oldll = {lat:ola, lon:olo};
         });
         marker.on('dragend', function (e) {
-            var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
-            marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
+            // *** set up Popup Content *** 
+			let l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
+            let pp = marker.getPopup();
+			if (pp) {marker.setPopupContent(pp.getContent().split("lat, lon")[0] + l); } // skip, if pp is undefined
             // var b = marker.getPopup().getContent().split("heading : ");
             // if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             // else { b = undefined; }
@@ -2290,7 +2296,6 @@ function setMarker(data) {
             fb.lon = parseFloat(marker.getLatLng().lng.toFixed(6));
             fb.from = oldll;
             ws.send(JSON.stringify(fb));
-            //if (marker === true) { marker.openPopup(); }
         });
     }
 
@@ -2377,15 +2382,12 @@ function setMarker(data) {
         }
         delete data.weblink;
     }
-    if (data.hasOwnProperty("popped") && (data.popped === true)) {
-        marker.popped = true;
-        delete data.popped;
-    }
-    if (data.hasOwnProperty("popped") && (data.popped === false)) {
-        marker.closePopup();
-        marker.popped = false;
-        delete data.popped;
-    }
+    
+	var p = false;
+    if (data.popped === true) p = true;
+//  delete data.popped;
+	if (p === false) marker.closePopup();
+	
     // If .label then use that rather than name tooltip
     if (data.hasOwnProperty("label")) {
         if (typeof data.label === "boolean" && data.label === true) {
@@ -2428,7 +2430,7 @@ function setMarker(data) {
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
 
-    if (!data.hasOwnProperty("clickable") || data.clickable == true) {
+    if (data.clickable !== false) {
         var wopt = { autoClose:false, closeButton:true, closeOnClick:false, minWidth:200 };
         if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
         if (data?.popupOptions) { // allow user to override popup options eg to add className
@@ -2442,7 +2444,7 @@ function setMarker(data) {
         else {
             words += '<table>';
             for (var i in data) {
-                if ((i != "name") && (i != "length") && (i != "clickable")) {
+                if ((i !== "name") && (i !== "length") && (i !== "clickable")) {
                     if (typeof data[i] === "object") {
                         words += '<tr><td valign="top">'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
                     }
@@ -2461,9 +2463,6 @@ function setMarker(data) {
         if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
         marker.bindPopup(words, wopt);
         marker._popup.dname = data["name"];
-        marker.getPopup().on('remove', function() {
-            ws.send(JSON.stringify({action:"closePopup",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
-        });
     }
 
     if (data.hasOwnProperty("clickURL")) {
@@ -2554,7 +2553,7 @@ function setMarker(data) {
         }
     }
     if (panit === true) { map.setView(ll,map.getZoom()); }
-    if (marker.popped === true) { marker.openPopup(); }
+    if (p === true) { marker.openPopup(); }
 }
 
 var custIco = function() {
@@ -2717,6 +2716,9 @@ function doCommand(cmd) {
     if (cmd.hasOwnProperty("hiderightclick")) {
         if (cmd.hiderightclick == "true" || cmd.hiderightclick == true) { hiderightclick = true; }
         else { hiderightclick = false; }
+    }
+    if (cmd.hasOwnProperty("disableaddmarker")) {
+        disableaddmarker = (cmd.disableaddmarker == "true" || cmd.disableaddmarker === true); 
     }
     if (cmd.hasOwnProperty("contextmenu")) {
         if (typeof cmd.contextmenu === "string") {
@@ -2902,7 +2904,7 @@ function doCommand(cmd) {
                 opt.onEachFeature = function (f,l) {
                     var pw = '<pre>'+JSON.stringify(f.properties,null,' ').replace(/[\{\}"]/g,'')+'</pre>';
                     if (pw.length > 11) { l.bindPopup(pw); }
-                    if (cmd.map.hasOwnProperty("clickable") && cmd.map.clickable === true) {
+                    if (cmd.map.clickable !== false) {
                         l.on('click', function (e) {
                             ws.send(JSON.stringify({action:"clickgeo",name:cmd.map.overlay,type:f.type,properties:f.properties,geometry:f.geometry}));
                         });
@@ -3424,7 +3426,7 @@ function doGeojson(n,g,l,o,i) {  // name, geojson, layer, options, icon
             if (n) { gp = '<b>'+n+'</b>' + gp; }
             if (gp.length > 36) { l.bindPopup(gp); }
         }
-        if (o && o.hasOwnProperty("clickable") && o.clickable === true) {
+        if (o && o.clickable !== false) {
             l.on('click', function (e) {
                 ws.send(JSON.stringify({action:"clickgeo",name:n,type:f.type,properties:f.properties,geometry:f.geometry}));
             });
