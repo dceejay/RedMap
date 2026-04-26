@@ -678,6 +678,9 @@ The **worldmap in** node can be used to receive various events from the map. Exa
 
     { "action": "file", "name": "myfilename", "type":"image/jpeg", "lat":51, "lon":-1, "content":"....."}   // when a file is dropped on the map - see below.
 
+    { "action": "openPopup", "name":"Poptest", "lat":47.59, "lon":18.41, "popped":true } // when a popup is opened
+    { "action":"closePopup", "name":"Poptest", "lat":47.59, "lon":18.41, "popped":false } // when a popup is closed
+
     { "action": "button", "name": "My Fancy Button" } // when a user defined button is clicked
 
     { "action": "feedback", "name": "some name", "value": "some value", "lat":51, "lon":0, "layer":"unknown" } // when a user calls the feedback function - see below
