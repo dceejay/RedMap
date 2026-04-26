@@ -270,7 +270,7 @@ module.exports = function(RED) {
         ui = RED.require("node-red-dashboard")(RED);
     }
     catch(e) {
-        RED.log.info("Node-RED Dashboard 1 not found - ui_worldmap node not installed.");
+        // RED.log.info("Node-RED Dashboard 1 not found - ui_worldmap node not installed.");
     }
     setTimeout( function() {
         if (ui) {

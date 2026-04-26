@@ -411,7 +411,7 @@ else {
      // Create the clear heatmap button
     var clrHeat = L.easyButton( 'fa-eraser', function() {
         console.log("Reset heatmap");
-        heat.setLatLngs([]);
+        if (heat) { heat.setLatLngs([]); }
     }, "Clears the current heatmap", {position:"bottomright"});
 }
 
@@ -541,7 +541,7 @@ function doLock(v) {
 // Remove old markers
 function doTidyUp(l) {
     if (l === "heatmap") {
-        heat.setLatLngs([]);
+       if (heat) { heat.setLatLngs([]); }
     }
     else {
         var d = parseInt(Date.now()/1000);
@@ -996,7 +996,6 @@ var feedback = function(n = "map",v,a = "feedback",c) {
         dataToSend.lon = rclk.lng;
     }
     ws.send(JSON.stringify(dataToSend));
-
     if (c === true) { map.closePopup(); }
 }
 
@@ -1004,10 +1003,16 @@ map.on('click', function(e) {
     ws.send(JSON.stringify({action:"click", lat:e.latlng.lat.toFixed(5), lon:e.latlng.lng.toFixed(5)}));
 });
 
+map.on('popupopen', function(e) {
+    const mp = e.popup._source;
+    ws.send(JSON.stringify({action:"openPopup",name:mp.name,layer:mp.lay,icon:mp.icon,iconColor:mp.iconColor,SIDC:mp.SIDC,draggable:true,lat:parseFloat(mp.getLatLng().lat.toFixed(6)),lon:parseFloat(mp.getLatLng().lng.toFixed(6))}));
+});
+
 // allow double right click to zoom out (if enabled)
 // single right click opens a message window that adds a marker
 var rclicked = false;
 var rtout = null;
+
 
 map.on('contextmenu', function(e) {
     if (rclicked) {
@@ -1255,7 +1260,7 @@ var addOverlays = function(overlist) {
         }
 
         var shape;
-        map.on("pm:create", (e) => {
+        map.on('pm:create', (e) => {
             drawCount = drawCount + 1;
             var name = e.shape + drawCount;
 
@@ -2285,6 +2290,7 @@ function setMarker(data) {
             fb.lon = parseFloat(marker.getLatLng().lng.toFixed(6));
             fb.from = oldll;
             ws.send(JSON.stringify(fb));
+            //if (marker === true) { marker.openPopup(); }
         });
     }
 
@@ -2371,14 +2377,13 @@ function setMarker(data) {
         }
         delete data.weblink;
     }
-    var p;
     if (data.hasOwnProperty("popped") && (data.popped === true)) {
-        p = true;
+        marker.popped = true;
         delete data.popped;
     }
     if (data.hasOwnProperty("popped") && (data.popped === false)) {
         marker.closePopup();
-        p = false;
+        marker.popped = false;
         delete data.popped;
     }
     // If .label then use that rather than name tooltip
@@ -2423,7 +2428,7 @@ function setMarker(data) {
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
 
-    if (!data.hasOwnProperty("clickable") && data.clickable != false) {
+    if (!data.hasOwnProperty("clickable") || data.clickable == true) {
         var wopt = { autoClose:false, closeButton:true, closeOnClick:false, minWidth:200 };
         if (words.indexOf('<video ') >=0 || words.indexOf('<img ') >=0 ) { wopt.maxWidth="640"; } // make popup wider if it has an image or video
         if (data?.popupOptions) { // allow user to override popup options eg to add className
@@ -2456,6 +2461,9 @@ function setMarker(data) {
         if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
         marker.bindPopup(words, wopt);
         marker._popup.dname = data["name"];
+        marker.getPopup().on('remove', function() {
+            ws.send(JSON.stringify({action:"closePopup",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+        });
     }
 
     if (data.hasOwnProperty("clickURL")) {
@@ -2546,7 +2554,7 @@ function setMarker(data) {
         }
     }
     if (panit === true) { map.setView(ll,map.getZoom()); }
-    if (p === true) { marker.openPopup(); }
+    if (marker.popped === true) { marker.openPopup(); }
 }
 
 var custIco = function() {
