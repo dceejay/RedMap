@@ -76,7 +76,7 @@ var loadStatic = function(fileName) {
         style.type = 'text/css';
         style.rel = 'stylesheet';
         console.log("Loading: ",fileName);
-        head.append(style);;
+        head.append(style);
         filesAdded += ' ' + fileName;
     }
     else {
@@ -177,17 +177,17 @@ var handleData = function(data) {
 
 window.onunload = function() { if (ws) { ws.close(); } }
 
-var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
-layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
-overlays["countries"] = layers["_countries"];
+// var customTopoLayer = L.geoJson(null, {clickable:false, style: {color:"blue", weight:2, fillColor:"#cf6", fillOpacity:0.04}});
+// layers["_countries"] = omnivore.topojson('images/world-50m-flat.json',null,customTopoLayer);
+// overlays["countries"] = layers["_countries"];
 
 var onoffline = function() {
     if (!navigator.onLine) {
         if (pmtloaded !== "") { basemaps[pmtloaded].addTo(map); layercontrol._update(); }
-        else { map.addLayer(overlays["countries"]); }
+        else if (overlays["countries"]) { map.addLayer(overlays["countries"]); }
     }
     else if (Object.keys(basemaps).length === 0 ) {
-        map.addLayer(overlays["countries"]);
+        if (overlays["countries"]) { map.addLayer(overlays["countries"]); }
     }
 }
 
@@ -331,6 +331,7 @@ var followMode = { accuracy:true };
 var followState = false;
 var trackMeButton;
 var errRing;
+var clrHeat;
 
 function onLocationFound(e) {
     if (followState === true) { map.panTo(e.latlng); }
@@ -409,7 +410,7 @@ else {
     // }, "Locate me").addTo(map);
 
      // Create the clear heatmap button
-    var clrHeat = L.easyButton( 'fa-eraser', function() {
+    clrHeat = L.easyButton( 'fa-eraser', function() {
         console.log("Reset heatmap");
         if (heat) { heat.setLatLngs([]); }
     }, "Clears the current heatmap", {position:"bottomright"});
@@ -451,9 +452,9 @@ var edgeAware = function () {
     var mapBounds = map.getBounds();
     var mapBoundsCenter = mapBounds.getCenter();
 
-    pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
-    pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
-    pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
+    var pSW = map.options.crs.latLngToPoint(mapBounds.getSouthWest(), map.getZoom());
+    var pNE = map.options.crs.latLngToPoint(mapBounds.getNorthEast(), map.getZoom());
+    var pCenter = map.options.crs.latLngToPoint(mapBoundsCenter, map.getZoom());
 
     var viewBounds = L.latLngBounds(map.options.crs.pointToLatLng(L.point(pSW.x - (pCenter.x - pSW.x ), pSW.y - (pCenter.y - pSW.y )), map.getZoom()) , map.options.crs.pointToLatLng(L.point(pNE.x + (pNE.x - pCenter.x) , pNE.y + (pNE.y - pCenter.y) ), map.getZoom()) );
     for (var id in markers) {
@@ -513,7 +514,7 @@ function doPanit(v) {
 
 var heatAll = false;
 function doHeatAll(v) {
-    if (v !== undefined) { heatall = v; }
+    if (v !== undefined) { heatAll = v; }
     console.log("Heatall set :",heatAll);
 }
 
@@ -579,7 +580,7 @@ function setMaxAge() {
     maxage = document.getElementById('maxage').value;
     if (stale) { clearInterval(stale); }
     //if (maxage > 0) {
-    stale = setInterval( function() { doTidyUp() }, 20000); // check every 20 secs
+    stale = setInterval( function() { doTidyUp() }, 20000); // clear markers from all layers every 20 secs
 }
 setMaxAge();
 
@@ -758,7 +759,7 @@ function toggleMenu() {
     }
     else {
         document.getElementById("menu").style.display = 'none';
-        dialogue.close();
+        if (dialog) { dialog.close(); }
     }
 }
 
@@ -774,7 +775,7 @@ function closeMenu() {
         menuOpen = false;
         document.getElementById("menu").style.display = 'none';
     }
-    dialogue.close();
+    if (dialog) { dialog.close(); }
 }
 
 document.getElementById("menu").style.display = 'none';
@@ -980,7 +981,7 @@ var addThing = function() {
     ws.send(JSON.stringify(d));
     delete d.action;
     setMarker(d);
-    map.addLayer(layers[lay]);
+    if (layers[lay]) { map.addLayer(layers[lay]); }
 }
 
 var form = {};
@@ -1005,7 +1006,12 @@ map.on('click', function(e) {
 
 map.on('popupopen', function(e) {
     const mp = e.popup._source;
-    ws.send(JSON.stringify({action:"openPopup",name:mp.name,layer:mp.lay,icon:mp.icon,iconColor:mp.iconColor,SIDC:mp.SIDC,draggable:true,lat:parseFloat(mp.getLatLng().lat.toFixed(6)),lon:parseFloat(mp.getLatLng().lng.toFixed(6))}));
+    const m = allData[mp["name"]];
+    m.popped = true;
+    m.action = "openPopup";
+    ws.send(JSON.stringify(m));
+    delete m.action;
+    //ws.send(JSON.stringify({action:"openPopup",name:mp.name,layer:mp.lay,icon:mp.icon,iconColor:mp.iconColor,SIDC:mp.SIDC,draggable:true,lat:parseFloat(mp.getLatLng().lat.toFixed(6)),lon:parseFloat(mp.getLatLng().lng.toFixed(6))}));
 });
 
 // allow double right click to zoom out (if enabled)
@@ -1067,7 +1073,7 @@ var addBaseMaps = function(maplist,first) {
         var osmAttrib='Map data © OpenStreetMap contributors';
 
         if (maplist.indexOf("MB3d")!==-1) { // handle the case of 3d by redirecting to that page instead.
-            window.location.href("index3d.html");
+            window.location.href = "index3d.html";
         }
         if (maplist.indexOf("OSMG")!==-1) {
             basemaps[layerlookup["OSMG"]] = new L.TileLayer.Grayscale(osmUrl, {
@@ -1306,7 +1312,7 @@ var addOverlays = function(overlist) {
                 rightmenuMarker = L.popup({offset:[0,-12]}).setContent(drawcontextmenu.replace(/\${name}/g,name).replace(/\${.*?}/g,'') || "<input type='text' autofocus value='"+name+"' id='dinput' placeholder='name (,icon, layer)'/><br/><button onclick='editPoly(\""+name+"\");'>Edit points</button><button onclick='editPoly(\""+name+"\",\"drag\");'>Drag</button><button onclick='editPoly(\""+name+"\",\"rot\");'>Rotate</button><button onclick='delMarker(\""+name+"\",true);'>Delete</button><button onclick='sendRoute(\""+name+"\");'>Route</button><button onclick='sendDrawing(\""+name+"\");'>OK</button>");
             }
             rightmenuMarker.setLatLng(cent);
-            setTimeout(function() {map.openPopup(rightmenuMarker).replace(/\${name}/g,name)},25);
+            setTimeout(function() {map.openPopup(rightmenuMarker)},25);
         });
 
         sendDrawing = function(n,v,a) {
@@ -1520,16 +1526,6 @@ var coords = L.control.mouseCoordinate({position:"bottomleft"});
 // Add an optional legend
 var legend = L.control({position:"bottomleft"});
 
-// Add the dialog box for messages
-// var dialogue = L.control.dialog({initOpen:false, size:[600,400], anchor:[50,150]}).addTo(map);
-// dialogue.freeze();
-
-var doDialog = function(d) {
-    //console.log("DIALOGUE",d);
-    dialogue.setContent(d);
-    dialogue.open();
-}
-
 var helpText = '<h3>Node-RED - Map all the things</h3><br/>';
 helpText += '<p><i class="fa fa-search fa-lg fa-fw"></i> <b>Search</b> - You may enter a name, or partial name, or icon name of an object to search for.';
 helpText += 'The map will then jump to centre on each of the results in turn. If nothing is found locally it will try to';
@@ -1546,7 +1542,18 @@ helpText += 'This can be used to set your initial start position.';
 helpText += 'While active it also restricts the "auto pan" and "search" to within that area.</p>';
 helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected';
 helpText += 'all layers whether hidden or not will contribute to the heatmap.';
-helpText += 'The default is that only visible layers add to the heatmap.</p>';
+helpText += 'The default is that only visible layers add to the heatmap.</p><br/>';
+helpText += '<button type="button" id="closeHelp">Close help</button>';
+
+var dialog;
+var doDialog = function(d) {
+    //console.log("DIALOGUE",d);
+    dialog = document.getElementById("helpDialog");
+    dialog.innerHTML = helpText;
+    const closeButton = document.getElementById("closeHelp");
+    closeButton.addEventListener("click", () => { dialog.close(); });
+    dialog.showModal();
+}
 
 // Delete a marker or shape (and notify websocket)
 var delMarker = function(dname,note) {
@@ -1638,8 +1645,8 @@ function setMarker(data) {
         m.on('click', function(e) {
             var fb = allData[data["name"]];
             fb.action = "click";
-            if (fb.sendOnClick ?? true)
-                ws.send(JSON.stringify(fb));
+            if (fb.sendOnClick ?? true) { ws.send(JSON.stringify(fb)); }
+            delete fb.action;
         });
         // customise right click context menu
         var rightcontext = "";
@@ -1690,12 +1697,12 @@ function setMarker(data) {
     var opt = data.options || {};
     opt.color = opt.color ?? data.color ?? data.lineColor ?? "#910000";
     opt.fillColor = opt.fillColor ?? data.fillColor ?? "#910000";
-    opt.stroke = opt.stroke ?? (data.hasOwnProperty("stroke")) ? data.stroke : true;
+    opt.stroke = opt.stroke ?? (data.hasOwnProperty("stroke") ? data.stroke : true);
     opt.weight = opt.weight ?? data.weight ?? 2;
     opt.opacity = opt.opacity ?? data.opacity ?? 1;
     if (!data.SIDC) { opt.fillOpacity = opt.fillOpacity ?? data.fillOpacity ?? 0.2; }
     opt.clickable = (data.hasOwnProperty("clickable")) ? data.clickable : false;
-    opt.fill = opt.fill ?? (data.hasOwnProperty("fill")) ? data.fill : true;
+    opt.fill = opt.fill ?? (data.hasOwnProperty("fill") ? data.fill : true);
     if (data.hasOwnProperty("dashArray")) { opt.dashArray = data.dashArray; }
 
     // Replace building
@@ -2279,7 +2286,7 @@ function setMarker(data) {
         });
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
-            marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
+            if (marker.getPopup()) { marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l); }
             // var b = marker.getPopup().getContent().split("heading : ");
             // if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             // else { b = undefined; }
@@ -2290,7 +2297,7 @@ function setMarker(data) {
             fb.lon = parseFloat(marker.getLatLng().lng.toFixed(6));
             fb.from = oldll;
             ws.send(JSON.stringify(fb));
-            //if (marker === true) { marker.openPopup(); }
+            delete fb.action;
         });
     }
 
@@ -2377,14 +2384,8 @@ function setMarker(data) {
         }
         delete data.weblink;
     }
-    if (data.hasOwnProperty("popped") && (data.popped === true)) {
-        marker.popped = true;
-        delete data.popped;
-    }
-    if (data.hasOwnProperty("popped") && (data.popped === false)) {
-        marker.closePopup();
-        marker.popped = false;
-        delete data.popped;
+    if (data.hasOwnProperty("popped")) {
+        marker.popped = data.popped;
     }
     // If .label then use that rather than name tooltip
     if (data.hasOwnProperty("label")) {
@@ -2442,7 +2443,7 @@ function setMarker(data) {
         else {
             words += '<table>';
             for (var i in data) {
-                if ((i != "name") && (i != "length") && (i != "clickable")) {
+                if ((i != "name") && (i != "length") && (i != "clickable") && (i != "popped")) {
                     if (typeof data[i] === "object") {
                         words += '<tr><td valign="top">'+ i +'</td><td>' + JSON.stringify(data[i]) + '</td></tr>';
                     }
@@ -2462,7 +2463,11 @@ function setMarker(data) {
         marker.bindPopup(words, wopt);
         marker._popup.dname = data["name"];
         marker.getPopup().on('remove', function() {
-            ws.send(JSON.stringify({action:"closePopup",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
+            const m = allData[marker["name"]];
+            m.popped = false;
+            m.action = "closePopup";
+            ws.send(JSON.stringify(m));
+            delete m.action;
         });
     }
 
@@ -2481,6 +2486,7 @@ function setMarker(data) {
     //     var fb = allData[marker.name];
     //     fb.action = "click";
     //     ws.send(JSON.stringify(fb));
+    //     delete fb.action;
     // });
     if (heat && ((data.addtoheatmap != false) || (!data.hasOwnProperty("addtoheatmap")))) { // Added to give ability to control if points from active layer contribute to heatmap
         if (heatAll || map.hasLayer(layers[lay])) { heat.addLatLng(lli); }
@@ -2557,7 +2563,7 @@ function setMarker(data) {
     if (marker.popped === true) { marker.openPopup(); }
 }
 
-var custIco = function() {
+var custIco = function(cmd) {
     var col = cmd.map.iconColor ?? "#910000";
     var myMarker = L.VectorMarkers.icon({
         icon: "circle",
@@ -2594,7 +2600,7 @@ function doCommand(cmd) {
         addBaseMaps(cmd.maplist,cmd.layer);
     }
     if (cmd.init && cmd.hasOwnProperty("overlist")) {
-        overlays = [];
+        overlays = {};
         addOverlays(cmd.overlist);
     }
     if (cmd.hasOwnProperty("toptitle")) {
@@ -2957,7 +2963,7 @@ function doCommand(cmd) {
                     var sidc = feature.properties.symbol.toUpperCase().replace("APP6A:",'')//.substr(0,13);
                     var country;
                     if (sidc.length > 12) { country = sidc.substr(12).replace(/-/g,''); sidc = sidc.substr(0,12); }
-                    myMarker = new ms.Symbol( sidc, {
+                    var myMarker = new ms.Symbol( sidc, {
                         uniqueDesignation:feature.properties.label,
                         country:country,
                         direction:feature.properties.course,
@@ -3081,7 +3087,7 @@ function doCommand(cmd) {
         // var json = window.toGeoJSON.gpx(gp);
         // console.log("j",json)
         // doGeojson(json.features[0].properties.name,json,json.features[0].properties.type) // name,geojson,layer,options
-        overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco());
+        overlays[cmd.map.overlay] = omnivore.gpx.parse(cmd.map.gpx, null, custIco(cmd));
         if (!existsalready) {
             layercontrol.addOverlay(overlays[cmd.map.overlay],cmd.map.overlay);
         }
@@ -3480,7 +3486,7 @@ function doTAKjson(p) {
         }
         d.type = p.type;
         d.remarks = p.detail?.remarks
-        if (p.detail?.remarks && p.detail.remarks.hasOwnProperty["#text"]) {
+        if (p.detail?.remarks && p.detail.remarks.hasOwnProperty("#text")) {
             d.remarks = p.detail.remarks["#text"];
         }
         d.uid = p.uid;

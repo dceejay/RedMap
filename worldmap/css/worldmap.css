@@ -129,6 +129,10 @@ a {
     bottom:1px;
 }
 
+#helpDialog {
+    width: 80%;
+}
+
 #rinput {
     font-size:14px;
     padding:2px;

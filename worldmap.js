@@ -129,7 +129,7 @@ module.exports = function(RED) {
                     if (node.name) { c.toptitle = node.name; }
                     //console.log("INIT",c)
                     client.write(JSON.stringify({command:c}));
-                    for (var p=0; p < pmtiles.length; p++) {
+                    for (var p=0; p < (pmtiles||[]).length; p++) {
                         fs.symlink(RED.settings.userDir+'/'+pmtiles[p], __dirname+'/worldmap/'+pmtiles[p], 'file', (err) => {
                             if (err && err.code !== "EEXIST") { console.log(err); }
                         })
@@ -197,11 +197,13 @@ module.exports = function(RED) {
                 allPoints[msg.payload.name] = RED.util.cloneMessage(msg.payload);
                 var t = node.maxage || 3600;
                 if (msg.payload.ttl && msg.payload.ttl < t) { t = msg.payload.ttl; }
-                allPoints[msg.payload.name].tout = setTimeout( function() { delete allPoints[msg.payload.name] }, t * 1000 );
+                (function(name) {
+                    allPoints[name].tout = setTimeout(function() { delete allPoints[name]; }, t * 1000);
+                })(msg.payload.name);
             }
             if (msg.payload?.command?.map?.delete) {
                 var ddd = msg.payload.command.map.delete;
-                if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
+                if (!Array.isArray(ddd)) { ddd = [ddd]; }
                 for (let a=0; a < ddd.length; a++) {
                     for (let p in allPoints) {
                         if (allPoints.hasOwnProperty(p)) {
@@ -384,7 +386,7 @@ module.exports = function(RED) {
                 }
             }
             clients = {};
-            sockets[this.path].removeListener('connection', callback);
+            sockets[node.path].removeListener('connection', callback);
             node.status({});
         });
         sockets[this.path].on('connection', callback);
@@ -398,7 +400,7 @@ module.exports = function(RED) {
         this.pointsarray = {};
         this.layer = n.layer || "combined"; // separate, single
         this.smooth = n.smooth || false;
-        var node = this;
+        const node = this;
         var bezierSpline = require("@turf/bezier-spline").default;
 
         var doTrack = function(msg) {
@@ -409,7 +411,7 @@ module.exports = function(RED) {
                     if (msg.payload.name.substr(-1) === '_') {
                         var a = node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)].pop();
                         node.pointsarray[msg.payload.name.substr(0,msg.payload.name.length-1)] = [ a ];
-                        node.send(newmsg);
+                        // node.send(newmsg);
                     }
                     else {
                         delete node.pointsarray[msg.payload.name];
@@ -488,7 +490,7 @@ module.exports = function(RED) {
             }
             if (msg.payload?.command?.map?.delete) {
                 var ddd = msg.payload.command.map.delete;
-                if (!Array.isArray(ddd)) { ddd = [cmd.map.delete]; }
+                if (!Array.isArray(ddd)) { ddd = [ddd]; }
                 for (let a=0; a < ddd.length; a++) {
                     for (let p in node.pointsarray) {
                         if (node.pointsarray.hasOwnProperty(p)) {
