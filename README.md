@@ -10,7 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
-- v5.7.0 - Add events for openPopup and closePopup, small popup fixups.
+- v5.7.0 - Add events for openPopup and closePopup, small popup fixups. Add showdialog command.
 - v5.6.1 - Also call autoswitch on initial connect to ensure map in view.
 - v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
 - v5.5.8 - Bump qs dep for CVE
@@ -405,6 +405,7 @@ Optional properties for **msg.payload.command** include
  - **showmenu** - Show or hide the display of the hamberger menu control in the top right . Values can be "show" or "hide". - `{"command":{"showmenu": "hide"}}`
  - **showlayers** - Show or hide the display of selectable layers. Does not control the display of an individual layer, rather a users ability to interact with them. Values can be "show" or "hide". - `{"command":{"showlayers": "hide"}}`
  - **sidcEdgeIcon** - Show or hide small sidc icons around edge of map for things just outside of view. Values can be true or false (default is true). - `{"command":{"sidcEdgeIcon": false}}`
+  - **showdialog** - Show a dialog style overlay of html to provide information to the user. Send an empty string to close automatically. - `{"command":{"showdialog": "<h1>Title</h1>Hello World"}}`
 
 #### To switch layer, move map and zoom
 

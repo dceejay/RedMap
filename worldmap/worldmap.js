@@ -198,8 +198,6 @@ var handleData = function(data) {
             if (JSON.stringify(data) !== '{}') {
                 console.log("SKIP",data);
             }
-            // if (typeof data === "string") { doDialog(data); }
-            // else { console.log("SKIP",data); }
         }
     }
 }
@@ -352,7 +350,7 @@ var readFile = function(file) {
             ws.send(JSON.stringify({action:"file", name:file.name, type:file.type, content:content, lat:droplatlng.lat, lon:droplatlng.lng}));
         }
         else {
-            console.log("NOT SURE WHAT THIS IS?",content)
+            console.log("NOT SURE WHAT TYPE OF FILE THIS IS ?",content)
         }
     });
     reader.readAsDataURL(file);
@@ -1659,20 +1657,20 @@ helpText += 'While active it also restricts the "auto pan" and "search" to withi
 helpText += '<p><i class="fa fa-globe fa-lg fa-fw"></i> <b>Heatmap all layers</b> - When selected';
 helpText += 'all layers whether hidden or not will contribute to the heatmap.';
 helpText += 'The default is that only visible layers add to the heatmap.</p>';
-helpText += '<button type="button" id="closeHelp">Close help</button>';
+helpText += '<button type="button" id="closeDialog">Close help</button>';
 
 var dialog;
 /**
  * Displays the help dialog modal. Populates the dialog element with the
- * pre-built helpText HTML string and wires up the close button.
- * @param {string} d - (Unused) Placeholder for potential future dialog content.
+ * provided dialog content HTML string and wires up the close button.
+ * @param {string} d - dialog content.
  * @returns {void}
  */
 var doDialog = function(d) {
     //console.log("DIALOGUE",d);
     dialog = document.getElementById("helpDialog");
-    dialog.innerHTML = helpText;
-    const closeButton = document.getElementById("closeHelp");
+    dialog.innerHTML = d;
+    const closeButton = document.getElementById("closeDialog");
     closeButton.addEventListener("click", () => { dialog.close(); });
     dialog.showModal();
 }
@@ -2806,6 +2804,20 @@ function doCommand(cmd) {
         var clr = cmd.clearlayer || cmd.clear;
         if (!Array.isArray(clr)) { clr = [ clr ]; }
         clr.forEach((el) => doTidyUp(el));
+    }
+    if (cmd.hasOwnProperty("showdialog")) {
+        if (typeof cmd.showdialog === "string") {
+            if (cmd.showdialog === "") {
+                if (dialog) { dialog.close(); }
+            }
+            else if (!/script/i.test(cmd.showdialog)) {
+                let dia = cmd.showdialog;
+                if (!/id=\"closeDialog\"/.test(cmd.showdialog)) {
+                    dia += '<p><button type="button" id="closeDialog">Close</button></p>';
+                }
+                doDialog(dia);
+            }
+        }
     }
     if (cmd.hasOwnProperty("panit")) {
         if (cmd.panit == true || cmd.panit === "true") { panit = true; }
