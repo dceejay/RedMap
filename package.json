@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-web-worldmap",
-    "version": "5.7.0",
+    "version": "5.7.1",
     "description": "A Node-RED node to provide a web page of a world map for plotting things on.",
     "dependencies": {
         "@turf/bezier-spline": "7.3.5",
@@ -12,7 +12,7 @@
     "overrides": {
         "express": {
             "body-parser": {
-                "qs": "6.14.2"
+                "qs": "6.15.2"
             }
         }
     },
