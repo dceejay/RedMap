@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.7.2 - Bump express libs
 - v5.7.0 - Add events for openPopup and closePopup, small popup fixups. Add showdialog command.
 - v5.6.1 - Also call autoswitch on initial connect to ensure map in view.
 - v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
