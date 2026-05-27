@@ -10,7 +10,8 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
-- v5.7.2 - Bump express libs
+- v5.8.0 - Stop double click on icons zooming in. Bump uuid lib.
+- v5.7.2 - Bump express libs.
 - v5.7.0 - Add events for openPopup and closePopup, small popup fixups. Add showdialog command.
 - v5.6.1 - Also call autoswitch on initial connect to ensure map in view.
 - v5.6.0 - Autoswitch pmtiles basemaps based on zoom and/or coverage.
@@ -62,7 +63,7 @@ Optional properties for **msg.payload** include
  - **iconSize** : Set the size in pixels of the "special" icons and web icons.
  - **SIDC** : NATO symbology code (can be used instead of icon). See below.
  - **building** : OSMbulding GeoJSON feature set to add 2.5D buildings to buildings layer. See below.
- - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds)
+ - **ttl** : time to live, how long an individual marker stays on map in seconds (overrides general maxage setting, minimum 20 seconds). Setting to 0 disables the timeout.
  - **photoUrl** : adds an image pointed at by the url to the popup box.
  - **videoUrl** : adds an mp4 video pointed at by the url to the popup box. Ideally 320x240 in size.
  - **weblink** : adds a link to an external page. Either set a url as a *string*, or an *object* like `{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"}`, or multiple links with an *array of objects* `[{"name":"BBC News", "url":"https://news.bbc.co.uk", "target":"_new"},{"name":"node-red", "url":"https://nodered.org", "target":"_new"}]`

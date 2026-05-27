@@ -2525,6 +2525,9 @@ function setMarker(data) {
         if (data.ttl != 0) {
             marker.ts = parseInt(Date.now()/1000) + Number(data.ttl);
         }
+        else {
+            if (marker.hasOwnProperty("ts")) { delete marker.ts; }
+        }
         delete data.ttl;
     }
     else if (maxage != 0) {
@@ -2649,6 +2652,10 @@ function setMarker(data) {
     }
 
     marker.lay = lay;                       // and the layer it is on
+
+    marker.on("dblclick", function (ev) {
+        L.DomEvent.stopPropagation(ev)
+    });
 
     // marker.on('click', function(e) {
     //     //ws.send(JSON.stringify({action:"click",name:marker.name,layer:marker.lay,icon:marker.icon,iconColor:marker.iconColor,SIDC:marker.SIDC,draggable:true,lat:parseFloat(marker.getLatLng().lat.toFixed(6)),lon:parseFloat(marker.getLatLng().lng.toFixed(6))}));
