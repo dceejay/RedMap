@@ -10,6 +10,7 @@ A <a href="https://nodered.org" target="mapinfo">Node-RED</a> node to provide a 
 
 ### Updates
 
+- v5.8.1 - Fix draggable event
 - v5.8.0 - Stop double click on icons zooming in. Bump uuid lib.
 - v5.7.2 - Bump express libs.
 - v5.7.0 - Add events for openPopup and closePopup, small popup fixups. Add showdialog command.

@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.8.1 - Fix draggable event
  - v5.8.0 - Stop double click on icons zooming in. Bump uuid lib.
  - v5.7.2 - Bump express libs
  - v5.7.0 - Add events for openPopup and closePopup actions, small popup fixups. Add showdialog command.

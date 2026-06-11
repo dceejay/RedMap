@@ -2455,7 +2455,9 @@ function setMarker(data) {
         });
         marker.on('dragend', function (e) {
             var l = marker.getLatLng().toString().replace('LatLng(','lat, lon : ').replace(')','')
-            marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
+            if (marker.getPopup() != undefined) {
+                marker.setPopupContent(marker.getPopup().getContent().split("lat, lon")[0] + l);
+            }
             // var b = marker.getPopup().getContent().split("heading : ");
             // if (b.length === 2) { b = parseFloat(b[1].split("<br")[0]); }
             // else { b = undefined; }
