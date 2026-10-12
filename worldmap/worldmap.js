@@ -1998,7 +1998,8 @@ function setMarker(data) {
 
     // If we created a shape then apply some generic things to it
     if (polygons[data["name"]] !== undefined) {
-        // Set the layer
+        // Set a name and layer
+        polygons[data["name"]].name = data["name"];
         polygons[data["name"]].lay = lay;
         // if clickable then add popup
         if (opt.clickable === true) {
@@ -3416,7 +3417,7 @@ function doCommand(cmd) {
     }
     // Lock the pan so map can't be moved
     if (cmd.hasOwnProperty("panlock")) {
-        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = true; }
+        if (cmd.panlock == "true" || cmd.panlock == true) { lockit = true; doLock(true);}
         else { lockit = false; doLock(false); }
         document.getElementById("lockit").checked = lockit;
     }
