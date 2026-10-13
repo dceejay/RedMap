@@ -2603,6 +2603,8 @@ function setMarker(data) {
     if (data.hasOwnProperty("fillColor")) { delete data.fillColor; }
     if (data.hasOwnProperty("radius")) { delete data.radius; }
     if (data.hasOwnProperty("greatcircle")) { delete data.greatcircle; }
+    var hideName = data.hideName;
+    if (data.hasOwnProperty("hideName")) { delete data.hideName; }
 
     if (!data.hasOwnProperty("clickable") || data.clickable == true) {
         var wopt = { autoClose:false, closeButton:true, closeOnClick:false, minWidth:200 };
@@ -2632,7 +2634,12 @@ function setMarker(data) {
             words += '<tr><td>lat, lon</td><td>'+ marker.getLatLng().toString().replace('LatLng(','').replace(')','') + '</td></tr>';
             words += '</table>';
         }
-        words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+        if (hideName) {
+            words = words.replace(/\${name}/g,data["name"]);
+        }
+        else {
+            words = "<b>"+data["name"]+"</b><br/>" + words.replace(/\${name}/g,data["name"]); //"<button style=\"border-radius:4px; float:right; background-color:lightgrey;\" onclick='popped=false;popmark.closePopup();'>X</button><br/>" + words;
+        }
 
         if (longline > 100) { wopt.minWidth="640"; } // make popup wider if it has a long line
         marker.bindPopup(words, wopt);

@@ -75,6 +75,7 @@ Optional properties for **msg.payload** include
  - **popped** : set to true to automatically open the popup info box, set to false to close it.
  - **popup** : html to fill the popup if you don't want the automatic default of the properties list. Using this overrides photourl, videourl and weblink options.
  - **popupOptions** : optional object to help style the popup - See Leaflet popup docs for options - eg to add a custom class - `{className:"mySpecialPopup",width:600}`
+ - **hideName** : set to true to omit the bold name title from the top of the popup.
  - **label** : displays the contents as a permanent label next to the marker, or
  - **tooltip** : displays the contents when you hover over the marker. (Mutually exclusive with label. Label has priority)
  - **tooltipOptions** : custom tooltip/label options  (offset, direction, permanent, sticky, interactive, opacity, className) )
