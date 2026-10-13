@@ -1,5 +1,6 @@
 ### Change Log for Node-RED Worldmap
 
+ - v5.9.0 - Remove name from areas if using popup replacement
  - v5.8.2 - Fix map lock, shape name/popup bug. Bump libs
  - v5.8.1 - Fix draggable event
  - v5.8.0 - Stop double click on icons zooming in. Bump uuid lib.

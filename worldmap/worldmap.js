@@ -2004,7 +2004,7 @@ function setMarker(data) {
         // if clickable then add popup
         if (opt.clickable === true) {
             let words = "<b>"+data["name"]+"</b>";
-            if (data.popup) { words = words + "<br/>" + data.popup.replace(/\${name}/g,data["name"]); }
+            if (data.popup) { words = data.popup.replace(/\${name}/g,data["name"]); }
             polygons[data["name"]].bindPopup(words, {autoClose:false, closeButton:true, closeOnClick:true, minWidth:200});
         }
         // add a tooltip (if supplied)
